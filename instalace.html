@@ -328,8 +328,10 @@ function calToday(){ calYear=today.getFullYear(); calMonth=today.getMonth(); ren
 function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
 function getEvents(){
-  return data.filter(r=>r.datum).map(r=>{
-    const start=new Date(r.datum+'T00:00:00');
+  return data.filter(r=>r.datum&&r.datum!=='').map(r=>{
+    // Normalize datum — may be ISO string like "2026-03-15T23:00:00.000Z" or "2026-03-15"
+    const rawDate = r.datum.includes('T') ? r.datum.substring(0,10) : r.datum;
+    const start=new Date(rawDate+'T00:00:00');
     const end=new Date(start); end.setDate(end.getDate()+Math.max(1,Number(r.delka)||1)-1);
     return {id:r.id,obj:r.obj,misto:r.misto,status:r.status,start,end};
   });
@@ -392,6 +394,7 @@ function showSaving(t,s){ document.getElementById('saving-title').textContent=t;
 function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
 
 async function saveRecord(){
+  const isEdit = !!editId;
   const rec={
     id:      editId?String(editId):String(Date.now()),
     obj:     document.getElementById('f-obj').value.trim(),
@@ -405,9 +408,9 @@ async function saveRecord(){
     poznamky:document.getElementById('f-poznamky').value.trim(),
   };
   closeModal();
-  showSaving(editId?'Ukládám změny...':'Přidávám instalaci...','Komunikuji s Google Sheets');
+  showSaving(isEdit?'Ukládám změny...':'Přidávám instalaci...','Komunikuji s Google Sheets');
   try {
-    await apiPost({action:editId?'update':'append',record:rec});
+    await apiPost({action:isEdit?'update':'append',record:rec});
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při ukládání: '+e.message); }

@@ -26,7 +26,7 @@
   }
   #header-left { padding: 16px 0; }
   #header-left .subtitle { font-size: 10px; letter-spacing: .25em; color: #777; text-transform: uppercase; margin-bottom: 4px; }
-  #header-left .title    { font-size: 26px; font-weight: 900; color: #f4f2ed; letter-spacing: .05em; line-height: 1; }
+  #header-left .title    { font-size: 18px; font-weight: 900; color: #f4f2ed; letter-spacing: .03em; line-height: 1.2; max-width: 500px; }
   #header-tabs { display: flex; align-items: stretch; }
   #header-tabs button {
     background: transparent; color: #888; border: none;
@@ -45,6 +45,18 @@
     align-items: start;
   }
 
+  @media (max-width: 700px) {
+    #header { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 10px; }
+    #header-left .title { font-size: 15px; }
+    #header-tabs button { padding: 0 14px; font-size: 11px; }
+    #konfigurator-layout { grid-template-columns: 1fr; padding: 12px 10px; gap: 16px; }
+    #right-panel { position: static; }
+    #ring-preview svg { width: 180px; height: 180px; }
+    .section-opts { gap: 6px; }
+    .opt-btn { min-width: 70px; padding: 6px 10px; font-size: 12px; }
+    #cenik-layout { padding: 16px 10px; }
+    #price-cards { grid-template-columns: 1fr; }
+  }
   /* Progress */
   #progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
   #progress-bar-bg { flex: 1; height: 4px; background: #ddd; border-radius: 2px; }
