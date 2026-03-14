@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDshopik – Obhlídky</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Arial Narrow', Arial, sans-serif; background: #0f1117; color: #e8e4dc; min-height: 100vh; }
+button, input, select, textarea { font-family: inherit; }
+
+#header { background: #0f1117; border-bottom: 1px solid #1e2230; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #4a5060; text-transform: uppercase; margin-bottom: 4px; }
+.header-left .title { font-size: 22px; font-weight: 900; letter-spacing: .06em; color: #e8e4dc; line-height: 1; }
+.header-left .title span { color: #3ab0a0; }
+
+.stats { display: flex; gap: 6px; flex-wrap: wrap; }
+.stat { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+.stat .num { font-size: 18px; font-weight: 800; line-height: 1; }
+.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; margin-top: 2px; }
+
+#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4a5060; }
+#sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #4a5060; flex-shrink: 0; }
+#sync-dot.ok      { background: #40a050; }
+#sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
+#sync-dot.error   { background: #c05050; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #1e2230; background: #0f1117; }
+.filter-btn { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+.filter-btn:hover { border-color: #3a3d4a; color: #c0c8d0; }
+.filter-btn.active { background: #3ab0a0; color: #0f1117; border-color: #3ab0a0; }
+.filter-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+#search-wrap { margin-left: auto; position: relative; }
+#search-wrap input { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; transition: border-color .2s; }
+#search-wrap input:focus { border-color: #3ab0a0; }
+#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #4a5060; }
+
+#btn-add { background: #3ab0a0; color: #0f1117; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
+#btn-add:hover { background: #4ac0b0; }
+#btn-refresh { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+#btn-refresh:hover { color: #e8e4dc; }
+
+#table-wrap { padding: 0 32px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+thead th { background: #1a1d26; color: #4a5060; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2d3a; white-space: nowrap; cursor: pointer; user-select: none; transition: color .15s; }
+thead th:hover { color: #3ab0a0; }
+thead th.sorted { color: #3ab0a0; }
+thead th .sort-arrow { margin-left: 4px; font-size: 9px; }
+tbody tr { border-bottom: 1px solid #1a1d26; transition: background .12s; cursor: pointer; }
+tbody tr:hover { background: #161820; }
+tbody td { padding: 12px 14px; font-size: 12px; vertical-align: top; color: #c0c8d0; }
+td.obj      { font-weight: 700; color: #e8e4dc; font-size: 13px; white-space: nowrap; }
+td.zakaznik { color: #e8e4dc; font-weight: 600; }
+td.datum    { white-space: nowrap; }
+td.vzdalenost { white-space: nowrap; text-align: center; }
+
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: .06em; white-space: nowrap; }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+.s-nova          { background: #1a2235; color: #6080c0; border: 1px solid #2a3555; } .s-nova .badge-dot          { background: #6080c0; }
+.s-potvrzena     { background: #1a2a20; color: #3ab0a0; border: 1px solid #205540; } .s-potvrzena .badge-dot     { background: #3ab0a0; }
+.s-probehla      { background: #1a2a1a; color: #40a050; border: 1px solid #204530; } .s-probehla .badge-dot      { background: #40a050; }
+.s-zrusena       { background: #2a1a1a; color: #c05050; border: 1px solid #552020; } .s-zrusena .badge-dot       { background: #c05050; }
+.s-ceka          { background: #2a2010; color: #e2b830; border: 1px solid #554020; } .s-ceka .badge-dot          { background: #e2b830; }
+
+.v-pokracovat    { background: #1a2a1a; color: #40a050; border: 1px solid #204530; }
+.v-nabidka       { background: #1a2235; color: #6080c0; border: 1px solid #2a3555; }
+.v-instalace     { background: #1a2a20; color: #3ab0a0; border: 1px solid #205540; }
+.v-nezajem       { background: #2a1a1a; color: #c05050; border: 1px solid #552020; }
+.v-ceka          { background: #2a2010; color: #e2b830; border: 1px solid #554020; }
+
+tbody tr[data-stav="Nová"]               td:first-child { border-left: 3px solid #6080c0; }
+tbody tr[data-stav="Potvrzena"]          td:first-child { border-left: 3px solid #3ab0a0; }
+tbody tr[data-stav="Proběhla"]           td:first-child { border-left: 3px solid #40a050; }
+tbody tr[data-stav="Zrušena"]            td:first-child { border-left: 3px solid #c05050; }
+tbody tr[data-stav="Čeká na rozhodnutí"] td:first-child { border-left: 3px solid #e2b830; }
+
+.dist-badge { display: inline-flex; align-items: center; gap: 4px; background: #1a2235; color: #6080c0; border: 1px solid #2a3555; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+
+#empty-state { text-align: center; padding: 60px 20px; color: #4a5060; display: none; }
+#empty-state .big { font-size: 36px; margin-bottom: 10px; }
+
+/* Modal */
+#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#modal-overlay.open { display: flex; }
+#modal { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; width: 100%; max-width: 620px; max-height: 90vh; overflow-y: auto; }
+#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #1e2230; display: flex; align-items: center; justify-content: space-between; }
+#modal-title { font-size: 16px; font-weight: 800; letter-spacing: .05em; }
+#modal-close { background: none; border: none; color: #4a5060; font-size: 20px; cursor: pointer; padding: 0 4px; }
+#modal-close:hover { color: #e8e4dc; }
+#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; }
+.form-group input, .form-group select, .form-group textarea { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3ab0a0; }
+.form-group textarea { resize: vertical; min-height: 70px; }
+.form-group select option { background: #1a1d26; }
+
+.psč-row { display: flex; gap: 8px; align-items: flex-end; }
+.psč-row input { flex: 1; }
+#btn-calc-dist {
+  background: #3ab0a0; color: #0f1117; border: none; border-radius: 6px;
+  padding: 8px 14px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+#btn-calc-dist:hover { background: #4ac0b0; }
+#dist-result { font-size: 11px; color: #3ab0a0; margin-top: 4px; min-height: 16px; }
+
+#modal-footer { padding: 16px 24px; border-top: 1px solid #1e2230; display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
+#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #552020; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
+#btn-delete:hover { background: #2a1a1a; }
+.btn-cancel { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-cancel:hover { color: #e8e4dc; }
+.btn-save { background: #3ab0a0; color: #0f1117; border: none; border-radius: 6px; padding: 8px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-save:hover { background: #4ac0b0; }
+
+#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; align-items: center; justify-content: center; }
+#saving-overlay.open { display: flex; }
+#saving-box { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; padding: 24px 36px; text-align: center; }
+#saving-box .saving-title { font-size: 14px; font-weight: 700; color: #3ab0a0; margin-bottom: 6px; }
+#saving-box .saving-sub   { font-size: 12px; color: #4a5060; }
+
+@media (max-width: 720px) {
+  #header { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 8px; }
+  #toolbar { padding: 10px 12px; }
+  #table-wrap { padding: 0 12px; }
+  #modal-body { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: 1; }
+}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="header-left">
+    <div class="eyebrow">LEDshopik · Obchod</div>
+    <div class="title">OBHLÍDKY <span>&</span> PRŮZKUMY</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-total" style="color:#e8e4dc">0</div><div class="lbl">Celkem</div></div>
+      <div class="stat"><div class="num" id="stat-nova"      style="color:#6080c0">0</div><div class="lbl">Nové</div></div>
+      <div class="stat"><div class="num" id="stat-potvrzena" style="color:#3ab0a0">0</div><div class="lbl">Potvrzeny</div></div>
+      <div class="stat"><div class="num" id="stat-probehla"  style="color:#40a050">0</div><div class="lbl">Proběhly</div></div>
+      <div class="stat"><div class="num" id="stat-ceka"      style="color:#e2b830">0</div><div class="lbl">Čeká</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="toolbar">
+  <button class="filter-btn active" data-filter="vse"               onclick="setFilter('vse')">Vše</button>
+  <button class="filter-btn" data-filter="Nová"                     onclick="setFilter('Nová')"><span class="filter-dot" style="background:#6080c0"></span>Nová</button>
+  <button class="filter-btn" data-filter="Potvrzena"                onclick="setFilter('Potvrzena')"><span class="filter-dot" style="background:#3ab0a0"></span>Potvrzena</button>
+  <button class="filter-btn" data-filter="Proběhla"                 onclick="setFilter('Proběhla')"><span class="filter-dot" style="background:#40a050"></span>Proběhla</button>
+  <button class="filter-btn" data-filter="Čeká na rozhodnutí"       onclick="setFilter('Čeká na rozhodnutí')"><span class="filter-dot" style="background:#e2b830"></span>Čeká</button>
+  <button class="filter-btn" data-filter="Zrušena"                  onclick="setFilter('Zrušena')"><span class="filter-dot" style="background:#c05050"></span>Zrušena</button>
+  <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
+  <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
+  <button id="btn-add" onclick="openModal()">+ Nová obhlídka</button>
+  <button onclick="toggleNastaveni()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">⚙ Sazby</button>
+</div>
+
+<div id="nastaveni-section" style="display:none;margin:16px 32px;background:#161820;border:1px solid #2a2d3a;border-radius:10px;overflow:hidden;">
+  <div style="padding:14px 20px;border-bottom:1px solid #1e2230;display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-size:14px;font-weight:800;letter-spacing:.06em;">⚙ NASTAVENÍ SAZEB</div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="saveNastaveni()" style="background:#3ab0a0;color:#0f1117;border:none;border-radius:6px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;">Uložit</button>
+      <button onclick="toggleNastaveni()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:12px;cursor:pointer;">Zavřít</button>
+    </div>
+  </div>
+  <div style="padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#3ab0a0;text-transform:uppercase;margin-bottom:6px;">Sazba za km</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="number" id="n-km" min="0" step="1" style="width:100px;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:7px 12px;font-size:13px;outline:none;">
+        <span style="font-size:12px;color:#4a5060;">Kč / km</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#3ab0a0;text-transform:uppercase;margin-bottom:6px;">Sazba cestovní čas</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="number" id="n-ces" min="0" step="10" style="width:100px;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:7px 12px;font-size:13px;outline:none;">
+        <span style="font-size:12px;color:#4a5060;">Kč / hod</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#3ab0a0;text-transform:uppercase;margin-bottom:6px;">Sazba práce / obhlídka</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="number" id="n-prace" min="0" step="10" style="width:100px;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:7px 12px;font-size:13px;outline:none;">
+        <span style="font-size:12px;color:#4a5060;">Kč / hod</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#3ab0a0;text-transform:uppercase;margin-bottom:6px;">Výchozí PSČ (sídlo)</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="text" id="n-psc" maxlength="6" style="width:100px;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:7px 12px;font-size:13px;outline:none;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="table-wrap">
+  <table>
+    <thead><tr>
+      <th onclick="sortBy('obj')"         data-col="obj">        OBJ. Č.       <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('zakaznik')"    data-col="zakaznik">   Zákazník      <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('misto')"       data-col="misto">      Místo         <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('predmet')"     data-col="predmet">    Předmět       <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('datum')"       data-col="datum">      Datum         <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('technik')"     data-col="technik">    Technik       <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('vzdalenost')"  data-col="vzdalenost"> Vzdálenost    <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('stav')"        data-col="stav">       Stav          <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('vysledek')"    data-col="vysledek">   Výsledek      <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('cena_odhad')"  data-col="cena_odhad"> Odhad ceny   <span class="sort-arrow"></span></th>
+      <th>Poznámka</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div id="empty-state"><div class="big">📋</div><p>Žádné obhlídky</p></div>
+</div>
+
+<div id="modal-overlay" onclick="overlayClick(event)">
+  <div id="modal">
+    <div id="modal-header">
+      <div id="modal-title">Nová obhlídka</div>
+      <button id="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body">
+      <div class="form-group"><label>OBJ. Č.</label><input type="text" id="f-obj" placeholder="např. 872804"></div>
+      <div class="form-group"><label>Stav</label>
+        <select id="f-stav">
+          <option>Nová</option>
+          <option>Potvrzena</option>
+          <option>Proběhla</option>
+          <option>Čeká na rozhodnutí</option>
+          <option>Zrušena</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Zákazník</label><input type="text" id="f-zakaznik" placeholder="Jméno nebo firma"></div>
+      <div class="form-group full"><label>Místo obhlídky</label><input type="text" id="f-misto" placeholder="Adresa nebo město"></div>
+      <div class="form-group full">
+        <label>PSČ zákazníka</label>
+        <div class="psč-row">
+          <input type="text" id="f-psc" placeholder="např. 70200" maxlength="6">
+          <button id="btn-calc-dist" type="button" onclick="calcDistance()">📍 Spočítat vzdálenost</button>
+        </div>
+        <div id="dist-result"></div>
+      </div>
+      <div class="form-group"><label>Vzdálenost (km)</label><input type="number" id="f-vzdalenost" placeholder="km" min="0" step="1" oninput="calcCosts()"></div>
+      <div class="form-group"><label>Čas jízdy (min)</label><input type="number" id="f-cas-jizdy" placeholder="min" min="0" step="1" oninput="calcCosts()"></div>
+      <div class="form-group full"><label>Předmět obhlídky</label><input type="text" id="f-predmet" placeholder="Co se bude řešit..."></div>
+      <div class="form-group"><label>Datum obhlídky</label><input type="date" id="f-datum"></div>
+      <div class="form-group"><label>Technik</label><input type="text" id="f-technik" placeholder="Kdo pojede"></div>
+      <div class="form-group"><label>Email zákazníka</label><input type="email" id="f-email" placeholder="email@zakaznik.cz"></div>
+      <div class="form-group"><label>Odhadovaná cena zakázky</label><input type="number" id="f-cena-odhad" placeholder="Kč" min="0" step="100"></div>
+      <div class="form-group"><label>Výsledek obhlídky</label>
+        <select id="f-vysledek">
+          <option value="">— nevyplněno —</option>
+          <option>Čeká na rozhodnutí</option>
+          <option>Posílat nabídku</option>
+          <option>Naplánovat instalaci</option>
+          <option>Nezájem</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Délka obhlídky (hod)</label><input type="number" id="f-delka-obh" placeholder="hod" min="0" step="0.5" oninput="calcCosts()"></div>
+      <div class="form-group full" id="cost-box" style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;padding:14px 16px;display:none;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#3ab0a0;text-transform:uppercase;margin-bottom:10px;">Kalkulace nákladů</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">
+          <div style="color:#8890a0;">Doprava (tam+zpět)</div><div id="cost-km" style="color:#e8e4dc;font-weight:600;">—</div>
+          <div style="color:#8890a0;">Cestovní čas (tam+zpět)</div><div id="cost-cas" style="color:#e8e4dc;font-weight:600;">—</div>
+          <div style="color:#8890a0;">Práce / obhlídka</div><div id="cost-prace" style="color:#e8e4dc;font-weight:600;">—</div>
+          <div style="color:#3ab0a0;font-weight:700;">CELKEM</div><div id="cost-total" style="color:#3ab0a0;font-weight:800;font-size:14px;">—</div>
+        </div>
+      </div>
+      <div class="form-group full"><label>Poznámka</label><textarea id="f-poznamka" placeholder="Další informace..."></textarea></div>
+      <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;padding:12px 16px;">
+        <input type="checkbox" id="f-notifikovat" style="width:18px;height:18px;accent-color:#3ab0a0;cursor:pointer;flex-shrink:0;">
+        <label for="f-notifikovat" style="font-size:13px;color:#c0c8d0;cursor:pointer;letter-spacing:0;text-transform:none;font-weight:400;">Notifikovat zákazníka emailem</label>
+      </div>
+    </div>
+    <div id="modal-footer">
+      <button id="btn-delete" onclick="deleteRecord()" style="display:none">🗑 Smazat</button>
+      <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
+      <button class="btn-save" onclick="saveRecord()">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<div id="saving-overlay">
+  <div id="saving-box">
+    <div class="saving-title" id="saving-title">Ukládám...</div>
+    <div class="saving-sub"   id="saving-sub">Komunikuji s Google Sheets</div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwIyu8maOQAhMPCFvoPCDtcwbO-u2cK3FKnO23GuuQojyK5qVYc9DhcnGg-WIn3zqqQIQ/exec';
+const HOME_PSC     = '61900';
+
+// ── Nastavení sazeb (ukládá se do localStorage) ───────────────────────────────
+function loadSazby(){
+  return {
+    km:       Number(localStorage.getItem('sazba_km'))    || 15,
+    cestovni: Number(localStorage.getItem('sazba_ces'))   || 300,
+    prace:    Number(localStorage.getItem('sazba_prace')) || 500,
+  };
+}
+function saveSazbyLS(km,ces,prace){
+  localStorage.setItem('sazba_km',    km);
+  localStorage.setItem('sazba_ces',   ces);
+  localStorage.setItem('sazba_prace', prace);
+}
+
+const COLS = ['id','obj','zakaznik','misto','psc','predmet','datum','technik','email','vzdalenost','cas_jizdy','delka_obh','stav','vysledek','cena_odhad','poznamka','notifikovat'];
+
+const STATUS_CLASS = {
+  'Nová':               's-nova',
+  'Potvrzena':          's-potvrzena',
+  'Proběhla':           's-probehla',
+  'Zrušena':            's-zrusena',
+  'Čeká na rozhodnutí': 's-ceka',
+};
+const VYSLEDEK_CLASS = {
+  'Čeká na rozhodnutí': 'v-ceka',
+  'Posílat nabídku':    'v-nabidka',
+  'Naplánovat instalaci':'v-instalace',
+  'Nezájem':            'v-nezajem',
+};
+
+let data=[], filterVal='vse', sortCol='datum', sortDir=-1, editId=null;
+const today=new Date();
+
+function toInputDate(d){
+  if(!d||d==='') return '';
+  if(typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  const dt=new Date(d);
+  if(isNaN(dt)) return '';
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+}
+function fmtDate(d){
+  const s=toInputDate(d); if(!s) return '—';
+  const [y,m,day]=s.split('-'); return `${day}.${m}.${y}`;
+}
+function fmtKm(km){ return km&&km!='0'?`${km} km`:'—'; }
+function fmtCena(c){ return c&&c!='0'?Number(c).toLocaleString('cs-CZ')+' Kč':'—'; }
+function syncStatus(state,text){ document.getElementById('sync-dot').className=state; document.getElementById('sync-text').textContent=text; }
+
+// ── Výpočet vzdálenosti přes OSRM ────────────────────────────────────────────
+async function calcDistance(){
+  const psc = document.getElementById('f-psc').value.trim();
+  if(!psc){ alert('Zadej PSČ zákazníka'); return; }
+  const btn = document.getElementById('btn-calc-dist');
+  const res = document.getElementById('dist-result');
+  btn.textContent='⏳ Počítám...';
+  btn.disabled=true;
+  res.textContent='';
+  try {
+    // Geocode HOME PSC
+    const homeGeo = await geocodePSC(HOME_PSC);
+    const destGeo = await geocodePSC(psc);
+    if(!homeGeo) throw new Error('Nepodařilo se najít výchozí PSČ '+HOME_PSC);
+    if(!destGeo) throw new Error('Nepodařilo se najít PSČ '+psc);
+
+    // OSRM route
+    const url = `https://router.project-osrm.org/route/v1/driving/${homeGeo.lon},${homeGeo.lat};${destGeo.lon},${destGeo.lat}?overview=false`;
+    const r = await fetch(url);
+    const json = await r.json();
+    if(json.code!=='Ok') throw new Error('Trasa nenalezena');
+    const km  = Math.round(json.routes[0].distance / 1000);
+    const min = Math.round(json.routes[0].duration / 60);
+    document.getElementById('f-vzdalenost').value = km;
+    document.getElementById('f-cas-jizdy').value  = min;
+    res.textContent = `✓ ${km} km · ${min} min jízdy · tam a zpět: ${km*2} km`;
+    res.style.color = '#3ab0a0';
+  } catch(e) {
+    res.textContent = '✗ ' + e.message;
+    res.style.color = '#c05050';
+  } finally {
+    btn.textContent='📍 Spočítat vzdálenost';
+    btn.disabled=false;
+  }
+}
+
+async function geocodePSC(psc){
+  const url = `https://nominatim.openstreetmap.org/search?postalcode=${psc}&country=CZ&format=json&limit=1`;
+  const r = await fetch(url, { headers: { 'Accept-Language': 'cs', 'User-Agent': 'LEDshopik-App' } });
+  const json = await r.json();
+  if(!json.length) return null;
+  return { lat: json[0].lat, lon: json[0].lon };
+}
+
+// ── API ───────────────────────────────────────────────────────────────────────
+async function loadData(){
+  syncStatus('loading','Načítám data...');
+  try {
+    const res=await fetch(SCRIPT_URL+'?modul=obhlidky');
+    const json=await res.json();
+    data=json.data||[];
+    syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
+    renderTable();
+  } catch(e){ syncStatus('error','Chyba: '+e.message); }
+}
+
+async function apiPost(payload){
+  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({...payload,modul:'obhlidky'})});
+  const json=await res.json();
+  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+}
+
+// ── Filter & sort ─────────────────────────────────────────────────────────────
+function setFilter(f){
+  filterVal=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f));
+  renderTable();
+}
+function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTable(); }
+
+function getFiltered(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  return data.filter(r=>{
+    if(filterVal!=='vse'&&r.stav!==filterVal) return false;
+    if(q&&![r.obj,r.zakaznik,r.misto,r.predmet,r.technik,r.poznamka].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b)=>{
+    const va=a[sortCol]||'', vb=b[sortCol]||'';
+    if(sortCol==='vzdalenost'||sortCol==='cena_odhad') return (Number(va)-Number(vb))*sortDir;
+    return va<vb?-sortDir:va>vb?sortDir:0;
+  });
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderTable(){
+  const rows=getFiltered();
+  document.querySelectorAll('thead th[data-col]').forEach(th=>{
+    th.classList.toggle('sorted',th.dataset.col===sortCol);
+    th.querySelector('.sort-arrow').textContent=th.dataset.col===sortCol?(sortDir===1?' ↓':' ↑'):'';
+  });
+  document.getElementById('stat-total').textContent=data.length;
+  document.getElementById('stat-nova').textContent=data.filter(r=>r.stav==='Nová').length;
+  document.getElementById('stat-potvrzena').textContent=data.filter(r=>r.stav==='Potvrzena').length;
+  document.getElementById('stat-probehla').textContent=data.filter(r=>r.stav==='Proběhla').length;
+  document.getElementById('stat-ceka').textContent=data.filter(r=>r.stav==='Čeká na rozhodnutí').length;
+
+  const tbody=document.getElementById('tbody');
+  if(!rows.length){ tbody.innerHTML=''; document.getElementById('empty-state').style.display='block'; return; }
+  document.getElementById('empty-state').style.display='none';
+
+  tbody.innerHTML=rows.map(r=>`
+    <tr data-id="${r.id}" data-stav="${r.stav}" onclick="openModal('${r.id}')">
+      <td class="obj">${r.obj||'—'}</td>
+      <td class="zakaznik">${r.zakaznik||'—'}</td>
+      <td>${r.misto||'—'}</td>
+      <td style="font-size:11px;color:#8890a0;max-width:160px;">${r.predmet||''}</td>
+      <td class="datum">${fmtDate(r.datum)}</td>
+      <td>${r.technik||'—'}</td>
+      <td class="vzdalenost">${r.vzdalenost&&r.vzdalenost!='0'?`<span class="dist-badge">📍 ${r.vzdalenost} km</span>`:'—'}</td>
+      <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
+      <td>${r.vysledek?`<span class="badge ${VYSLEDEK_CLASS[r.vysledek]||''}">${r.vysledek}</span>`:'—'}</td>
+      <td style="white-space:nowrap;">${fmtCena(r.cena_odhad)}</td>
+      <td style="font-size:11px;color:#8890a0;max-width:160px;">${r.poznamka||''}</td>
+    </tr>`).join('');
+}
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+function openModal(id){
+  const r=id?data.find(x=>x.id===String(id)):null;
+  editId=r?String(r.id):null;
+  document.getElementById('modal-title').textContent=r?'Upravit obhlídku':'Nová obhlídka';
+  document.getElementById('btn-delete').style.display=r?'inline-flex':'none';
+  document.getElementById('dist-result').textContent='';
+  if(r){
+    document.getElementById('f-obj').value=r.obj||'';
+    document.getElementById('f-zakaznik').value=r.zakaznik||'';
+    document.getElementById('f-misto').value=r.misto||'';
+    document.getElementById('f-psc').value=r.psc||'';
+    document.getElementById('f-predmet').value=r.predmet||'';
+    document.getElementById('f-datum').value=toInputDate(r.datum);
+    document.getElementById('f-technik').value=r.technik||'';
+    document.getElementById('f-email').value=r.email||'';
+    document.getElementById('f-vzdalenost').value=r.vzdalenost||'';
+    document.getElementById('f-cas-jizdy').value=r.cas_jizdy||'';
+    document.getElementById('f-delka-obh').value=r.delka_obh||'';
+    document.getElementById('f-stav').value=r.stav||'Nová';
+    document.getElementById('f-vysledek').value=r.vysledek||'';
+    document.getElementById('f-cena-odhad').value=r.cena_odhad||'';
+    document.getElementById('f-poznamka').value=r.poznamka||'';
+    document.getElementById('f-notifikovat').checked=r.notifikovat==='ano';
+  } else {
+    ['f-obj','f-zakaznik','f-misto','f-psc','f-predmet','f-technik','f-email','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
+    document.getElementById('f-vzdalenost').value='';
+    document.getElementById('f-cas-jizdy').value='';
+    document.getElementById('f-delka-obh').value='';
+    document.getElementById('f-cena-odhad').value='';
+    document.getElementById('f-stav').value='Nová';
+    document.getElementById('f-vysledek').value='';
+    document.getElementById('f-datum').value=toInputDate(new Date());
+    document.getElementById('f-notifikovat').checked=false;
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); editId=null; }
+function overlayClick(e){ if(e.target===document.getElementById('modal-overlay')) closeModal(); }
+function showSaving(t,s){ document.getElementById('saving-title').textContent=t; document.getElementById('saving-sub').textContent=s; document.getElementById('saving-overlay').classList.add('open'); }
+function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
+
+async function saveRecord(){
+  const isEdit=!!editId;
+  const currentId=editId?String(editId):String(Date.now());
+  const rec={
+    id:          currentId,
+    obj:         document.getElementById('f-obj').value.trim(),
+    zakaznik:    document.getElementById('f-zakaznik').value.trim(),
+    misto:       document.getElementById('f-misto').value.trim(),
+    psc:         document.getElementById('f-psc').value.trim(),
+    predmet:     document.getElementById('f-predmet').value.trim(),
+    datum:       document.getElementById('f-datum').value,
+    technik:     document.getElementById('f-technik').value.trim(),
+    email:       document.getElementById('f-email').value.trim(),
+    vzdalenost:  document.getElementById('f-vzdalenost').value||'0',
+    cas_jizdy:   document.getElementById('f-cas-jizdy').value||'0',
+    delka_obh:   document.getElementById('f-delka-obh').value||'0',
+    stav:        document.getElementById('f-stav').value,
+    vysledek:    document.getElementById('f-vysledek').value,
+    cena_odhad:  document.getElementById('f-cena-odhad').value||'0',
+    poznamka:    document.getElementById('f-poznamka').value.trim(),
+    notifikovat: document.getElementById('f-notifikovat').checked?'ano':'ne',
+  };
+  closeModal();
+  showSaving(isEdit?'Ukládám změny...':'Přidávám obhlídku...','Komunikuji s Google Sheets');
+  try {
+    await apiPost({action:isEdit?'update':'append',record:rec});
+    showSaving('Hotovo!','Data uložena');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba při ukládání: '+e.message); }
+}
+
+async function deleteRecord(){
+  if(!editId||!confirm('Opravdu smazat tuto obhlídku?')) return;
+  const id=editId; closeModal();
+  showSaving('Mažu záznam...','Komunikuji s Google Sheets');
+  try {
+    await apiPost({action:'delete',id:String(id)});
+    showSaving('Smazáno!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba při mazání: '+e.message); }
+}
+
+function toggleNastaveni(){
+  const s=document.getElementById('nastaveni-section');
+  s.style.display=s.style.display==='none'?'block':'none';
+  if(s.style.display==='block'){
+    const sz=loadSazby();
+    document.getElementById('n-km').value=sz.km;
+    document.getElementById('n-ces').value=sz.cestovni;
+    document.getElementById('n-prace').value=sz.prace;
+    document.getElementById('n-psc').value=localStorage.getItem('home_psc')||HOME_PSC;
+  }
+}
+
+function saveNastaveni(){
+  saveSazbyLS(
+    Number(document.getElementById('n-km').value)||15,
+    Number(document.getElementById('n-ces').value)||300,
+    Number(document.getElementById('n-prace').value)||500
+  );
+  const psc=document.getElementById('n-psc').value.trim();
+  if(psc) localStorage.setItem('home_psc',psc);
+  toggleNastaveni();
+}
+
+function getHomePSC(){ return localStorage.getItem('home_psc')||HOME_PSC; }
+
+function calcCosts(){
+  const km    = Number(document.getElementById('f-vzdalenost').value)||0;
+  const min   = Number(document.getElementById('f-cas-jizdy').value)||0;
+  const delka = Number(document.getElementById('f-delka-obh').value)||0;
+  const sz    = loadSazby();
+  const costBox = document.getElementById('cost-box');
+  if(km===0&&min===0&&delka===0){ costBox.style.display='none'; return; }
+  costBox.style.display='block';
+  const cKm    = km * 2 * sz.km;
+  const cCas   = (min * 2 / 60) * sz.cestovni;
+  const cPrace = delka * sz.prace;
+  const total  = cKm + cCas + cPrace;
+  const fmt = n => Math.round(n).toLocaleString('cs-CZ')+' Kč';
+  document.getElementById('cost-km').textContent    = km>0    ? fmt(cKm)+` (${km*2} km × ${sz.km} Kč)` : '—';
+  document.getElementById('cost-cas').textContent   = min>0   ? fmt(cCas)+` (${Math.round(min*2/60*10)/10} hod × ${sz.cestovni} Kč)` : '—';
+  document.getElementById('cost-prace').textContent = delka>0 ? fmt(cPrace)+` (${delka} hod × ${sz.prace} Kč)` : '—';
+  document.getElementById('cost-total').textContent = fmt(total);
+}
+
+loadData();
+setInterval(loadData,120000);
+</script>
+</body>
+</html>
