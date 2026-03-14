@@ -237,7 +237,7 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbycyrgEqncRsW8-Zb2SIgutAkll08weO-j77QuILo-pW6dRtBrOdWMt4iW5t8rVsbspTg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxa4gFbSXdBgyQVoYyWeWS3exR2Pau8hrVdQdCIYxdnpc4Hz06w2EHwQKyAMGS6ZWjGPA/exec';
 const MONTHS_CS  = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const STATUS_CLASS = {'Naplánováno':'s-planovano','Probíhá':'s-probiha','Hotovo':'s-hotovo','Zrušeno':'s-zruseno','Čeká na potvrzení':'s-ceka'};
 const EV_CLASS     = {'Naplánováno':'ev-planovano','Probíhá':'ev-probiha','Hotovo':'ev-hotovo','Zrušeno':'ev-zruseno','Čeká na potvrzení':'ev-ceka'};
@@ -398,8 +398,10 @@ function showSaving(t,s){ document.getElementById('saving-title').textContent=t;
 function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
 
 async function saveRecord(){
+  const isEdit = !!editId;
+  const currentId = editId ? String(editId) : String(Date.now());
   const rec={
-    id:      editId?String(editId):String(Date.now()),
+    id:      currentId,
     obj:     document.getElementById('f-obj').value.trim(),
     misto:   document.getElementById('f-misto').value.trim(),
     obsah:   document.getElementById('f-obsah').value.trim(),
@@ -411,9 +413,9 @@ async function saveRecord(){
     poznamky:document.getElementById('f-poznamky').value.trim(),
   };
   closeModal();
-  showSaving(editId?'Ukládám změny...':'Přidávám instalaci...','Komunikuji s Google Sheets');
+  showSaving(isEdit?'Ukládám změny...':'Přidávám instalaci...','Komunikuji s Google Sheets');
   try {
-    await apiPost({action:editId?'update':'append',record:rec});
+    await apiPost({action:isEdit?'update':'append',record:rec});
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při ukládání: '+e.message); }
