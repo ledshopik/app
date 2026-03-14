@@ -237,7 +237,7 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbycyrgEqncRsW8-Zb2SIgutAkll08weO-j77QuILo-pW6dRtBrOdWMt4iW5t8rVsbspTg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzaDQoIdNmM81slH6bH383vZzKPrCH6KswQ0Ed2z7EItl0rhEJ3gg0KHnJOVbTwsZa1/exec';
 const MONTHS_CS  = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const STATUS_CLASS = {'Naplánováno':'s-planovano','Probíhá':'s-probiha','Hotovo':'s-hotovo','Zrušeno':'s-zruseno','Čeká na potvrzení':'s-ceka'};
 const EV_CLASS     = {'Naplánováno':'ev-planovano','Probíhá':'ev-probiha','Hotovo':'ev-hotovo','Zrušeno':'ev-zruseno','Čeká na potvrzení':'ev-ceka'};
@@ -328,10 +328,8 @@ function calToday(){ calYear=today.getFullYear(); calMonth=today.getMonth(); ren
 function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
 function getEvents(){
-  return data.filter(r=>r.datum&&r.datum!=='').map(r=>{
-    // Normalize datum — may be ISO string like "2026-03-15T23:00:00.000Z" or "2026-03-15"
-    const rawDate = r.datum.includes('T') ? r.datum.substring(0,10) : r.datum;
-    const start=new Date(rawDate+'T00:00:00');
+  return data.filter(r=>r.datum).map(r=>{
+    const start=new Date(r.datum+'T00:00:00');
     const end=new Date(start); end.setDate(end.getDate()+Math.max(1,Number(r.delka)||1)-1);
     return {id:r.id,obj:r.obj,misto:r.misto,status:r.status,start,end};
   });
@@ -394,7 +392,7 @@ function showSaving(t,s){ document.getElementById('saving-title').textContent=t;
 function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
 
 async function saveRecord(){
-  const isEdit = !!editId;
+  const isEdit=!!editId;
   const rec={
     id:      editId?String(editId):String(Date.now()),
     obj:     document.getElementById('f-obj').value.trim(),
