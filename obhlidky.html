@@ -214,7 +214,7 @@ tbody tr[data-stav="Čeká na rozhodnutí"] td:first-child { border-left: 3px so
       <th onclick="sortBy('vzdalenost')"  data-col="vzdalenost"> Vzdálenost    <span class="sort-arrow"></span></th>
       <th onclick="sortBy('stav')"        data-col="stav">       Stav          <span class="sort-arrow"></span></th>
       <th onclick="sortBy('vysledek')"    data-col="vysledek">   Výsledek      <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('cena_odhad')"  data-col="cena_odhad"> Odhad ceny   <span class="sort-arrow"></span></th>
+      <th data-col="cena_obhlidky"> Cena obhlídky <span class="sort-arrow"></span></th>
       <th>Poznámka</th>
     </tr></thead>
     <tbody id="tbody"></tbody>
@@ -459,7 +459,7 @@ function renderTable(){
       <td class="vzdalenost">${r.vzdalenost&&r.vzdalenost!='0'?`<span class="dist-badge">📍 ${r.vzdalenost} km</span>`:'—'}</td>
       <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
       <td>${r.vysledek?`<span class="badge ${VYSLEDEK_CLASS[r.vysledek]||''}">${r.vysledek}</span>`:'—'}</td>
-      <td style="white-space:nowrap;">${fmtCena(r.cena_odhad)}</td>
+      <td style="white-space:nowrap;font-weight:600;color:#3ab0a0;">${calcRowCost(r)}</td>
       <td style="font-size:11px;color:#8890a0;max-width:160px;">${r.poznamka||''}</td>
     </tr>`).join('');
 }
@@ -546,6 +546,16 @@ async function deleteRecord(){
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při mazání: '+e.message); }
+}
+
+function calcRowCost(r){
+  const km    = Number(r.vzdalenost)||0;
+  const min   = Number(r.cas_jizdy)||0;
+  const delka = Number(r.delka_obh)||0;
+  if(km===0&&min===0&&delka===0) return '—';
+  const sz = loadSazby();
+  const total = (km*2*sz.km) + (min*2/60*sz.cestovni) + (delka*sz.prace);
+  return Math.round(total).toLocaleString('cs-CZ')+' Kč';
 }
 
 function toggleNastaveni(){
