@@ -372,11 +372,11 @@ function renderCalendar(){
 }
 
 function openModal(id){
-  editId=id??null;
-  document.getElementById('modal-title').textContent=id?'Upravit instalaci':'Nová instalace';
-  document.getElementById('btn-delete').style.display=id?'inline-flex':'none';
-  if(id){
-    const r=data.find(x=>x.id===String(id)); if(!r) return;
+  const r = id ? data.find(x=>x.id===String(id)) : null;
+  editId = r ? String(r.id) : null;
+  document.getElementById('modal-title').textContent=r?'Upravit instalaci':'Nová instalace';
+  document.getElementById('btn-delete').style.display=r?'inline-flex':'none';
+  if(r){
     document.getElementById('f-obj').value=r.obj||'';
     document.getElementById('f-misto').value=r.misto||'';
     document.getElementById('f-obsah').value=r.obsah||'';
