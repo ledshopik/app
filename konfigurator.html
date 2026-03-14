@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDshopik – Konfigurátor ceny výroby svítidel RING</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif;
+    background: #f4f2ed;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  input  { font-family: inherit; }
+
+  /* Header */
+  #header {
+    background: #1a1a1a;
+    padding: 0 28px;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    border-bottom: 3px solid #e2b830;
+  }
+  #header-left { padding: 16px 0; }
+  #header-left .subtitle { font-size: 10px; letter-spacing: .25em; color: #777; text-transform: uppercase; margin-bottom: 4px; }
+  #header-left .title    { font-size: 26px; font-weight: 900; color: #f4f2ed; letter-spacing: .05em; line-height: 1; }
+  #header-tabs { display: flex; align-items: stretch; }
+  #header-tabs button {
+    background: transparent; color: #888; border: none;
+    padding: 0 24px; font-size: 12px; font-weight: 700;
+    letter-spacing: .15em; transition: all .2s;
+  }
+  #header-tabs button.active { background: #e2b830; color: #1a1a1a; }
+
+  /* Layout */
+  #konfigurator-layout {
+    max-width: 1050px; margin: 0 auto;
+    padding: 24px 16px;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* Progress */
+  #progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  #progress-bar-bg { flex: 1; height: 4px; background: #ddd; border-radius: 2px; }
+  #progress-bar    { height: 4px; background: #e2b830; border-radius: 2px; width: 0; transition: width .4s; }
+  #progress-text   { font-size: 12px; font-weight: 700; color: #888; white-space: nowrap; }
+
+  /* Section row */
+  .section-row {
+    margin-bottom: 12px; background: #fff;
+    border: 2px solid #e8e4dc; border-radius: 4px; overflow: hidden;
+    transition: border-color .3s;
+  }
+  .section-row.done { border-color: #e2b830; }
+  .section-header {
+    background: #f8f6f0; padding: 9px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-row.done .section-header { background: #e2b830; }
+  .step-circle {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    background: #ddd; color: #999;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+  }
+  .section-row.done .step-circle { background: #1a1a1a; color: #e2b830; }
+  .section-label { font-size: 14px; font-weight: 700; letter-spacing: .07em; color: #444; }
+  .section-row.done .section-label { color: #1a1a1a; }
+  .section-chosen { margin-left: auto; font-size: 12px; font-weight: 600; }
+  .section-opts { padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 7px; }
+
+  /* Option button */
+  .opt-btn {
+    background: #f4f2ed; color: #444;
+    border: 2px solid #ddd; border-radius: 3px;
+    padding: 7px 13px; font-size: 13px; font-weight: 500;
+    letter-spacing: .04em; cursor: pointer;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+    min-width: 80px; transition: all .15s;
+  }
+  .opt-btn:hover:not(.disabled) { border-color: #bbb; }
+  .opt-btn.active { background: #1a1a1a; color: #e2b830; border-color: #1a1a1a; font-weight: 700; }
+  .opt-btn.disabled { background: #f0eded; color: #ccc; border-color: #e8e0e0; cursor: not-allowed; opacity: .5; }
+  .opt-hint  { font-size: 10px; color: #888; font-weight: 400; }
+  .opt-btn.active .opt-hint { color: #aaa; }
+  .opt-na    { font-size: 9px; color: #e08080; font-weight: 700; }
+  .opt-price { font-size: 10px; color: #b8a020; font-weight: 700; }
+  .opt-btn.active .opt-price { color: #e2b830; }
+
+  /* Warning */
+  .warning-box {
+    margin-bottom: 12px; padding: 10px 16px;
+    background: #fff8f0; border: 2px solid #f0c080;
+    border-radius: 4px; font-size: 12px; color: #a06020;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .placeholder-box {
+    margin-bottom: 12px; background: #fff;
+    border: 2px solid #e8e4dc; border-radius: 4px;
+    padding: 14px 16px; font-size: 12px; color: #bbb;
+  }
+
+  /* Right panel */
+  #right-panel { position: sticky; top: 16px; }
+  #ring-preview {
+    background: #1a1a1a; border-radius: 4px; padding: 20px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  #ring-preview .preview-label {
+    font-size: 10px; letter-spacing: .2em; color: #555;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+
+  /* Summary */
+  #summary {
+    background: #fff; border: 2px solid #e8e4dc;
+    border-radius: 4px; overflow: hidden; margin-top: 16px;
+  }
+  #summary.complete { border-color: #e2b830; }
+  #summary-header {
+    background: #f8f6f0; padding: 10px 16px;
+    font-size: 13px; font-weight: 800; letter-spacing: .08em;
+  }
+  #summary.complete #summary-header { background: #e2b830; }
+  #summary-body { padding: 14px 16px; }
+  .summary-row {
+    display: flex; justify-content: space-between;
+    padding: 4px 0; border-bottom: 1px solid #f0ede6; font-size: 12px;
+  }
+  .summary-row span:first-child { color: #888; }
+  .summary-row span:last-child  { font-weight: 600; }
+  #summary-remaining { margin-top: 8px; font-size: 11px; color: #bbb; }
+  #summary-total {
+    margin-top: 14px; padding-top: 10px;
+    border-top: 2px solid #1a1a1a;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  #summary-total .label { font-size: 11px; letter-spacing: .1em; color: #888; }
+  #summary-total .value { font-size: 24px; font-weight: 800; }
+  #summary-vat { font-size: 10px; color: #aaa; margin-top: 2px; }
+  #no-prices-hint {
+    margin-top: 10px; padding: 8px;
+    background: #fff8e0; border-radius: 3px; font-size: 11px; color: #888;
+  }
+  #summary-buttons { display: flex; gap: 8px; margin-top: 14px; }
+  #summary-buttons button {
+    flex: 1; border-radius: 3px; padding: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: .08em; border: none;
+  }
+  #btn-reset  { background: #f4f2ed; color: #666; border: 2px solid #e0ddd6 !important; }
+  #btn-copy   { background: #1a1a1a; color: #e2b830; }
+
+  /* Cenik tab */
+  #cenik-layout { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+  #cenik-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+  }
+  #cenik-top .title { font-size: 20px; font-weight: 800; letter-spacing: .05em; }
+  #cenik-top .sub   { font-size: 12px; color: #888; margin-top: 2px; }
+  #cenik-actions { display: flex; gap: 8px; align-items: center; }
+  #saved-msg { font-size: 12px; color: #4caf50; font-weight: 700; display: none; }
+  #btn-discard {
+    background: #f4f2ed; color: #888; border: 2px solid #ddd;
+    border-radius: 3px; padding: 8px 16px; font-size: 12px; font-weight: 700;
+  }
+  #btn-save-prices {
+    background: #1a1a1a; color: #e2b830; border: none;
+    border-radius: 3px; padding: 8px 20px; font-size: 12px; font-weight: 700;
+  }
+  #price-cards {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px; margin-bottom: 28px;
+  }
+  .price-card { background: #fff; border: 2px solid #e8e4dc; border-radius: 4px; overflow: hidden; }
+  .price-card-header {
+    background: #1a1a1a; padding: 9px 16px;
+    font-size: 13px; font-weight: 800; letter-spacing: .08em; color: #e2b830;
+  }
+  .price-card-body { padding: 12px 16px; }
+  .price-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0; border-bottom: 1px solid #f4f2ed; gap: 10px;
+  }
+  .price-row-label { font-size: 13px; font-weight: 600; }
+  .price-row-hint  { font-size: 10px; color: #aaa; }
+  .price-input-wrap { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+  .price-input-wrap input {
+    width: 85px; background: #f4f2ed; border: 2px solid #e0ddd6;
+    border-radius: 3px; padding: 4px 8px; text-align: right;
+    font-size: 13px; font-weight: 600; color: #1a1a1a;
+  }
+  .price-input-wrap span { font-size: 11px; color: #999; }
+  #overview-table { background: #fff; border: 2px solid #e8e4dc; border-radius: 4px; overflow: hidden; }
+  #overview-table .tbl-header {
+    background: #1a1a1a; padding: 9px 16px;
+    font-size: 13px; font-weight: 800; letter-spacing: .08em; color: #e2b830;
+  }
+  #overview-table table { width: 100%; border-collapse: collapse; }
+  #overview-table th {
+    padding: 9px 14px; text-align: left; font-size: 11px;
+    font-weight: 700; letter-spacing: .1em; color: #888;
+    border-bottom: 2px solid #e8e4dc; background: #f8f6f0;
+  }
+  #overview-table th:last-child { text-align: right; }
+  #overview-table td { padding: 7px 14px; font-size: 12px; border-bottom: 1px solid #f0ede6; }
+  #overview-table td:last-child { text-align: right; font-weight: 700; }
+  #overview-table tr:nth-child(even) td { background: #faf9f6; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="header-left">
+    <div class="subtitle">LEDshopik · Zakázková výroba</div>
+    <div class="title">KONFIGURÁTOR CENY VÝROBY SVÍTIDEL RING</div>
+  </div>
+  <div id="header-tabs">
+    <button id="tab-konfigurator" class="active" onclick="switchTab('konfigurator')">KONFIGURÁTOR</button>
+    <button id="tab-cenik" onclick="switchTab('cenik')">SPRÁVA CEN</button>
+  </div>
+</div>
+
+<div id="tab-content-konfigurator">
+  <div id="konfigurator-layout">
+    <div id="left-col">
+      <div id="progress-wrap">
+        <div id="progress-bar-bg"><div id="progress-bar"></div></div>
+        <div id="progress-text">0 / 0</div>
+      </div>
+      <div id="sections-container"></div>
+    </div>
+    <div id="right-panel">
+      <div id="ring-preview">
+        <div class="preview-label">Náhled svítidla</div>
+        <svg id="ring-svg" width="250" height="250" viewBox="0 0 250 250" style="overflow:visible;"></svg>
+      </div>
+      <div id="summary">
+        <div id="summary-header">SOUHRN</div>
+        <div id="summary-body">
+          <div id="summary-rows"></div>
+          <div id="summary-remaining"></div>
+          <div id="summary-total" style="display:none">
+            <span class="label">CENA CELKEM</span>
+            <span class="value" id="total-value">0 Kč</span>
+          </div>
+          <div id="summary-vat" style="display:none">bez DPH</div>
+          <div id="no-prices-hint">💡 Nastavte ceny v záložce <strong>Správa cen</strong></div>
+          <div id="summary-buttons">
+            <button id="btn-reset" onclick="resetSel()">↺ RESET</button>
+            <button id="btn-copy" onclick="copyConfig()" style="display:none">⎘ KOPÍROVAT</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-content-cenik" style="display:none">
+  <div id="cenik-layout">
+    <div id="cenik-top">
+      <div>
+        <div class="title">SPRÁVA CEN</div>
+        <div class="sub">Příplatky v Kč bez DPH pro každý parametr</div>
+      </div>
+      <div id="cenik-actions">
+        <span id="saved-msg">✓ Uloženo</span>
+        <button id="btn-discard" onclick="discardPrices()">ZAHODIT</button>
+        <button id="btn-save-prices" onclick="savePricesAction()">ULOŽIT CENÍK</button>
+      </div>
+    </div>
+    <div id="price-cards"></div>
+    <div id="overview-table">
+      <div class="tbl-header">PŘEHLED PŘÍPLATKŮ</div>
+      <div style="overflow-x:auto"><table id="overview-tbl">
+        <thead><tr><th>PARAMETR</th><th>VOLBA</th><th style="text-align:right">PŘÍPLATEK</th></tr></thead>
+        <tbody id="overview-tbody"></tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PRICES_KEY = 'lsk_v4';
+const INDIRECT_OPTS = ['Indirect','Direct + Indirect'];
+
+const HINTS = {
+  'RING-25-CR':'Šíře 25 mm, CR','RING-3050C':'Šíře 30/50 mm','RING-50C':'Šíře 50 mm',
+  'Přisazená':'Na strop/zeď','Závěsná':'Na lanko/tyč',
+  'Direct':'Světlo dolů','Indirect':'Světlo nahoru','Direct + Indirect':'Obousměrné',
+  'jednobarva':'Pevná bílá','CCT':'Laditelná bílá','RGB':'Barevná','RGBW':'RGB + bílá','RGBCCT':'RGB + laditelná bílá',
+  'Ne':'Bez','Ano':'Standardní','Wi-Fi':'Smart','Zigbee':'Zigbee protokol','RF 2,4 GHz':'Dálkové rádio',
+};
+
+const DEFAULT_PRICES = {
+  typ_kruhu:          {'RING-25-CR':600,'RING-3050C':700,'RING-50C':900},
+  rozmer:             {'60 cm':500,'90 cm':700,'120 cm':900,'180 cm':1500},
+  typ_montaze:        {'Přisazená':100,'Závěsná':200},
+  sviceni:            {'Direct':250,'Indirect':250,'Direct + Indirect':500},
+  typ_pasky_direct:   {'jednobarva':100,'CCT':200,'RGB':300,'RGBW':400,'RGBCCT':500},
+  typ_pasky_indirect: {'jednobarva':100,'CCT':200,'RGB':300,'RGBW':400,'RGBCCT':500},
+  stmivani:           {'Ne':0,'Ano':100,'Wi-Fi':100,'Zigbee':100,'RF 2,4 GHz':100},
+  trafo:              {'Ne':0,'Ano':100},
+};
+
+function loadPrices() {
+  return JSON.parse(JSON.stringify(DEFAULT_PRICES));
+}
+function saveP(p) { try { localStorage.setItem(PRICES_KEY, JSON.stringify(p)); } catch(e){} }
+function fmt(n) { return Number(n).toLocaleString('cs-CZ') + ' Kč'; }
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+let sel = {};
+let prices = loadPrices();
+let editPrices = null;
+
+// ── Fixed section order ─────────────────────────────────────────────────────
+function getSections() {
+  const sv = sel.sviceni;
+  const list = [
+    {id:'typ_kruhu',          label:'Typ kruhu',          opts:['RING-25-CR','RING-3050C','RING-50C']},
+    {id:'rozmer',             label:'Průměr kruhu',       opts:['60 cm','90 cm','120 cm','180 cm']},
+    {id:'typ_montaze',        label:'Typ montáže',        opts:['Přisazená','Závěsná']},
+    {id:'sviceni',            label:'Způsob svícení',     opts:['Direct','Indirect','Direct + Indirect']},
+  ];
+  if (sv === 'Direct' || sv === 'Direct + Indirect')
+    list.push({id:'typ_pasky_direct',   label:'Typ pásky — Direct',   opts:['jednobarva','CCT','RGB','RGBW','RGBCCT']});
+  if (sv === 'Indirect' || sv === 'Direct + Indirect')
+    list.push({id:'typ_pasky_indirect', label:'Typ pásky — Indirect', opts:['jednobarva','CCT','RGB','RGBW','RGBCCT']});
+  list.push({id:'stmivani', label:'Stmívání',      opts:['Ne','Ano','Wi-Fi','Zigbee','RF 2,4 GHz']});
+  list.push({id:'trafo',    label:'Transformátor', opts:['Ne','Ano']});
+  return list;
+}
+
+function getAllPriceSections() {
+  return [
+    {id:'typ_kruhu',          label:'Typ kruhu',           opts:Object.keys(DEFAULT_PRICES.typ_kruhu)},
+    {id:'rozmer',             label:'Průměr kruhu',        opts:Object.keys(DEFAULT_PRICES.rozmer)},
+    {id:'typ_montaze',        label:'Typ montáže',         opts:Object.keys(DEFAULT_PRICES.typ_montaze)},
+    {id:'sviceni',            label:'Způsob svícení',      opts:Object.keys(DEFAULT_PRICES.sviceni)},
+    {id:'typ_pasky_direct',   label:'Typ pásky — Direct',  opts:Object.keys(DEFAULT_PRICES.typ_pasky_direct)},
+    {id:'typ_pasky_indirect', label:'Typ pásky — Indirect',opts:Object.keys(DEFAULT_PRICES.typ_pasky_indirect)},
+    {id:'stmivani',           label:'Stmívání',            opts:Object.keys(DEFAULT_PRICES.stmivani)},
+    {id:'trafo',              label:'Transformátor',       opts:Object.keys(DEFAULT_PRICES.trafo)},
+  ];
+}
+
+// ── Render konfigurator ─────────────────────────────────────────────────────
+function renderKonfigurator() {
+  const sections = getSections();
+  const filled = sections.filter(s => sel[s.id] !== undefined).length;
+  const total  = sections.length;
+  const isRing25 = sel.typ_kruhu === 'RING-25-CR';
+  const pricesSet = Object.values(prices).some(c => Object.values(c).some(v => v > 0));
+  const totalPrice = sections.reduce((s, sec) => s + (prices[sec.id]?.[sel[sec.id]] ?? 0), 0);
+
+  // Progress
+  document.getElementById('progress-bar').style.width = (total ? Math.round(filled/total*100) : 0) + '%';
+  document.getElementById('progress-text').textContent = filled + ' / ' + total;
+
+  // Sections
+  let html = '';
+  let stepN = 0;
+  for (const sec of sections) {
+    stepN++;
+    const disabledOpts = (sec.id === 'sviceni' && isRing25) ? INDIRECT_OPTS : [];
+    html += buildSectionRow(sec, stepN, disabledOpts, pricesSet);
+
+    if (sec.id === 'sviceni') {
+      if (isRing25) html += `<div class="warning-box"><span style="font-size:15px">⚠</span><span><strong>RING-25-CR</strong> nepodporuje indirect – dostupný jen režim <strong>Direct</strong>.</span></div>`;
+      if (!sel.sviceni) html += `<div class="placeholder-box">↑ Nejprve vyberte způsob svícení</div>`;
+    }
+  }
+  document.getElementById('sections-container').innerHTML = html;
+
+  // Summary
+  const allFilled = filled === total;
+  const summaryEl = document.getElementById('summary');
+  allFilled ? summaryEl.classList.add('complete') : summaryEl.classList.remove('complete');
+  document.getElementById('summary-header').textContent = allFilled ? '✓ KONFIGURACE HOTOVA' : 'SOUHRN';
+
+  const filled_secs = sections.filter(s => sel[s.id]);
+  document.getElementById('summary-rows').innerHTML = filled_secs.length
+    ? filled_secs.map(s => `<div class="summary-row"><span>${s.label}</span><span>${sel[s.id]}</span></div>`).join('')
+    : '<div style="font-size:12px;color:#bbb;">Zatím nic nevybráno</div>';
+
+  const rem = sections.filter(s => !sel[s.id]).map(s => s.label).join(', ');
+  document.getElementById('summary-remaining').textContent = rem ? 'Zbývá: ' + rem : '';
+
+  if (pricesSet && filled > 0) {
+    document.getElementById('summary-total').style.display = 'flex';
+    document.getElementById('summary-vat').style.display   = 'block';
+    document.getElementById('total-value').textContent = fmt(totalPrice);
+    document.getElementById('no-prices-hint').style.display = 'none';
+  } else {
+    document.getElementById('summary-total').style.display = 'none';
+    document.getElementById('summary-vat').style.display   = 'none';
+    document.getElementById('no-prices-hint').style.display = pricesSet ? 'none' : 'block';
+  }
+
+  document.getElementById('btn-copy').style.display = filled > 0 ? 'block' : 'none';
+
+  // Ring SVG
+  renderRingSVG();
+}
+
+function buildSectionRow(sec, stepN, disabledOpts, pricesSet) {
+  const chosen = sel[sec.id];
+  const isDone = chosen !== undefined;
+  const opts = sec.opts.map(opt => {
+    const active   = chosen === opt;
+    const disabled = disabledOpts.includes(opt);
+    const price    = prices[sec.id]?.[opt] ?? 0;
+    let cls = 'opt-btn';
+    if (active)   cls += ' active';
+    if (disabled) cls += ' disabled';
+    return `<button class="${cls}"
+      onclick="chooseOpt('${sec.id}','${opt.replace(/'/g,"&#39;")}')"
+      ${disabled ? 'disabled' : ''}>
+      <span style="display:flex;align-items:center;gap:5px;">
+        ${opt}${disabled ? '<span class="opt-na">N/A</span>' : ''}
+      </span>
+      ${HINTS[opt] && !disabled ? `<span class="opt-hint">${HINTS[opt]}</span>` : ''}
+      ${disabled ? '<span style="font-size:9px;color:#e08080;">Jen 3050C / 50C</span>' : ''}
+      ${pricesSet && price > 0 && !disabled ? `<span class="opt-price">+${fmt(price)}</span>` : ''}
+    </button>`;
+  }).join('');
+
+  return `<div class="section-row${isDone?' done':''}">
+    <div class="section-header">
+      <div class="step-circle">${isDone ? '✓' : stepN}</div>
+      <div class="section-label">${sec.label.toUpperCase()}</div>
+      ${isDone ? `<div class="section-chosen">${chosen}</div>` : ''}
+    </div>
+    <div class="section-opts">${opts}</div>
+  </div>`;
+}
+
+function renderRingSVG() {
+  const sizes = {'60 cm':52,'90 cm':68,'120 cm':86,'180 cm':108};
+  const r     = sizes[sel.rozmer] ?? 68;
+  const thick = {'RING-25-CR':5,'RING-3050C':9,'RING-50C':13}[sel.typ_kruhu] ?? 8;
+  const gMap  = {jednobarva:'#fff8e0',CCT:'#ffeebb',RGB:'#88aaff',RGBW:'#aaccff',RGBCCT:'#ffbbee'};
+  const gD    = gMap[sel.typ_pasky_direct]   ?? null;
+  const gI    = gMap[sel.typ_pasky_indirect] ?? null;
+  const glow  = gD ?? gI ?? (sel.sviceni ? '#ffe878' : '#444');
+  const direct   = sel.sviceni === 'Direct'   || sel.sviceni === 'Direct + Indirect';
+  const indirect = sel.sviceni === 'Indirect' || sel.sviceni === 'Direct + Indirect';
+  const hasLight = !!sel.sviceni;
+  const cx = 125, cy = 125;
+
+  let svg = '';
+  if (hasLight) svg += `<circle cx="${cx}" cy="${cy}" r="${r+20}" fill="${glow}" fill-opacity=".12"/>`;
+  if (indirect && hasLight) svg += `<ellipse cx="${cx}" cy="${cy-r}" rx="${Math.round(r*.6)}" ry="10" fill="${glow}" fill-opacity=".25"/>`;
+  if (direct   && hasLight) svg += `<ellipse cx="${cx}" cy="${cy+r}" rx="${Math.round(r*.5)}" ry="8"  fill="${glow}" fill-opacity=".2"/>`;
+  if (hasLight) svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${glow}" stroke-width="${thick+7}" stroke-opacity=".2"/>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${glow}" stroke-width="${thick}" stroke-opacity="${hasLight?1:.4}"/>`;
+  if (sel.typ_montaze === 'Závěsná') {
+    svg += `<line x1="${cx-16}" y1="${cy-r-2}" x2="${cx-16}" y2="${cy-r-24}" stroke="#555" stroke-width="1.5"/>`;
+    svg += `<line x1="${cx+16}" y1="${cy-r-2}" x2="${cx+16}" y2="${cy-r-24}" stroke="#555" stroke-width="1.5"/>`;
+    svg += `<line x1="${cx-26}" y1="${cy-r-24}" x2="${cx+26}" y2="${cy-r-24}" stroke="#555" stroke-width="2"/>`;
+  }
+  if (sel.typ_montaze === 'Přisazená') {
+    svg += `<rect x="${cx-26}" y="${cy-r-7}" width="52" height="5" rx="2" fill="#333"/>`;
+  }
+  document.getElementById('ring-svg').innerHTML = svg;
+}
+
+// ── Interactions ────────────────────────────────────────────────────────────
+function chooseOpt(secId, opt) {
+  sel[secId] = opt;
+  if (secId === 'typ_kruhu' && opt === 'RING-25-CR') {
+    if (INDIRECT_OPTS.includes(sel.sviceni)) {
+      delete sel.sviceni;
+      delete sel.typ_pasky_indirect;
+    }
+  }
+  if (secId === 'sviceni') {
+    if (opt === 'Direct')   delete sel.typ_pasky_indirect;
+    if (opt === 'Indirect') delete sel.typ_pasky_direct;
+  }
+  renderKonfigurator();
+}
+
+function resetSel() { sel = {}; renderKonfigurator(); }
+
+function copyConfig() {
+  const sections = getSections();
+  const pricesSet = Object.values(prices).some(c => Object.values(c).some(v => v > 0));
+  const totalPrice = sections.reduce((s, sec) => s + (prices[sec.id]?.[sel[sec.id]] ?? 0), 0);
+  const lines = sections.map(s => s.label + ': ' + (sel[s.id] ?? '—'));
+  if (pricesSet) lines.push('', 'Celková cena: ' + fmt(totalPrice));
+  navigator.clipboard?.writeText(lines.join('\n'));
+  const btn = document.getElementById('btn-copy');
+  const orig = btn.textContent;
+  btn.textContent = '✓ Zkopírováno';
+  setTimeout(() => btn.textContent = orig, 1500);
+}
+
+// ── Cenik tab ───────────────────────────────────────────────────────────────
+function renderCenik() {
+  const sections = getAllPriceSections();
+  const ep = editPrices ?? prices;
+
+  // Cards
+  document.getElementById('price-cards').innerHTML = sections.map(sec => {
+    const rows = sec.opts.map(opt => {
+      const val = ep[sec.id]?.[opt] ?? 0;
+      return `<div class="price-row">
+        <div>
+          <div class="price-row-label">${opt}</div>
+          ${HINTS[opt] ? `<div class="price-row-hint">${HINTS[opt]}</div>` : ''}
+        </div>
+        <div class="price-input-wrap">
+          <input type="number" min="0" step="10" value="${val}"
+            onchange="updatePrice('${sec.id}','${opt.replace(/'/g,"&#39;")}',this.value)">
+          <span>Kč</span>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="price-card">
+      <div class="price-card-header">${sec.label.toUpperCase()}</div>
+      <div class="price-card-body">${rows}</div>
+    </div>`;
+  }).join('');
+
+  // Overview table
+  document.getElementById('overview-tbody').innerHTML = sections.flatMap((sec, si) =>
+    sec.opts.map((opt, oi) => {
+      const price = ep[sec.id]?.[opt] ?? 0;
+      return `<tr>
+        <td style="color:#888">${oi===0 ? sec.label : ''}</td>
+        <td style="font-weight:500">${opt}</td>
+        <td style="color:${price>0?'#1a1a1a':'#ccc'}">${price>0 ? '+'+fmt(price) : '—'}</td>
+      </tr>`;
+    })
+  ).join('');
+}
+
+function updatePrice(secId, opt, val) {
+  if (!editPrices) editPrices = clone(prices);
+  editPrices[secId][opt] = parseFloat(val) || 0;
+  renderCenik();
+}
+
+function savePricesAction() {
+  if (!editPrices) return;
+  prices = clone(editPrices);
+  saveP(prices);
+  editPrices = null;
+  const msg = document.getElementById('saved-msg');
+  msg.style.display = 'inline';
+  setTimeout(() => msg.style.display = 'none', 2000);
+  renderCenik();
+  renderKonfigurator();
+}
+
+function discardPrices() {
+  editPrices = null;
+  renderCenik();
+}
+
+// ── Tab switching ───────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('tab-content-konfigurator').style.display = tab === 'konfigurator' ? '' : 'none';
+  document.getElementById('tab-content-cenik').style.display        = tab === 'cenik'        ? '' : 'none';
+  document.getElementById('tab-konfigurator').classList.toggle('active', tab === 'konfigurator');
+  document.getElementById('tab-cenik').classList.toggle('active',        tab === 'cenik');
+  if (tab === 'cenik') renderCenik();
+}
+
+// ── Init ────────────────────────────────────────────────────────────────────
+renderKonfigurator();
+</script>
+</body>
+</html>

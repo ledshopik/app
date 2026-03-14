@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDshopik – Instalace</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Arial Narrow', 'Arial', sans-serif; background: #0f1117; color: #e8e4dc; min-height: 100vh; }
+button, input, select, textarea { font-family: inherit; }
+#header { background: #0f1117; border-bottom: 1px solid #1e2230; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #4a5060; text-transform: uppercase; margin-bottom: 4px; }
+.header-left .title   { font-size: 22px; font-weight: 900; letter-spacing: .06em; color: #e8e4dc; line-height: 1; }
+.header-left .title span { color: #e2b830; }
+.stats { display: flex; gap: 6px; flex-wrap: wrap; }
+.stat { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+.stat .num { font-size: 18px; font-weight: 800; line-height: 1; }
+.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; margin-top: 2px; }
+#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4a5060; }
+#sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #4a5060; flex-shrink: 0; }
+#sync-dot.ok      { background: #40a050; }
+#sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
+#sync-dot.error   { background: #c05050; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #1e2230; background: #0f1117; }
+.filter-btn { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+.filter-btn:hover { border-color: #3a3d4a; color: #c0c8d0; }
+.filter-btn.active { background: #e2b830; color: #0f1117; border-color: #e2b830; }
+.filter-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+#search-wrap { margin-left: auto; position: relative; }
+#search-wrap input { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; transition: border-color .2s; }
+#search-wrap input:focus { border-color: #e2b830; }
+#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #4a5060; }
+#btn-add { background: #e2b830; color: #0f1117; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
+#btn-add:hover { background: #f0c840; }
+#btn-refresh { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+#btn-refresh:hover { color: #e8e4dc; }
+#table-wrap { padding: 0 32px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 980px; }
+thead th { background: #1a1d26; color: #4a5060; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2d3a; white-space: nowrap; cursor: pointer; user-select: none; transition: color .15s; }
+thead th:hover { color: #e2b830; }
+thead th.sorted { color: #e2b830; }
+thead th .sort-arrow { margin-left: 4px; font-size: 9px; }
+tbody tr { border-bottom: 1px solid #1a1d26; transition: background .12s; cursor: pointer; }
+tbody tr:hover { background: #161820; }
+tbody td { padding: 13px 14px; font-size: 12px; vertical-align: top; color: #c0c8d0; }
+td.obj { font-weight: 700; color: #e8e4dc; font-size: 13px; white-space: nowrap; }
+td.misto { color: #e8e4dc; font-weight: 600; }
+td.datum { white-space: nowrap; }
+td.poznamky { color: #8890a0; font-size: 11px; max-width: 200px; }
+td.delka { white-space: nowrap; text-align: center; }
+.delka-badge { display: inline-block; background: #1a2235; color: #6080c0; border: 1px solid #2a3555; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: .06em; white-space: nowrap; }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.s-planovano { background: #1a2235; color: #6080c0; border: 1px solid #2a3555; } .s-planovano .badge-dot { background: #6080c0; }
+.s-probiha   { background: #1a2820; color: #50c080; border: 1px solid #255030; } .s-probiha   .badge-dot { background: #50c080; }
+.s-hotovo    { background: #1a2a1a; color: #40a050; border: 1px solid #204530; } .s-hotovo    .badge-dot { background: #40a050; }
+.s-zruseno   { background: #2a1a1a; color: #c05050; border: 1px solid #552020; } .s-zruseno   .badge-dot { background: #c05050; }
+.s-ceka      { background: #2a2010; color: #e2b830; border: 1px solid #554020; } .s-ceka      .badge-dot { background: #e2b830; }
+tbody tr[data-status="Naplánováno"]       td:first-child { border-left: 3px solid #6080c0; }
+tbody tr[data-status="Probíhá"]           td:first-child { border-left: 3px solid #50c080; }
+tbody tr[data-status="Hotovo"]            td:first-child { border-left: 3px solid #40a050; }
+tbody tr[data-status="Zrušeno"]           td:first-child { border-left: 3px solid #c05050; }
+tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px solid #e2b830; }
+#empty-state { text-align: center; padding: 60px 20px; color: #4a5060; display: none; }
+#empty-state .big { font-size: 36px; margin-bottom: 10px; }
+#calendar-section { margin: 32px 32px 40px; background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; overflow: hidden; }
+#cal-header { padding: 16px 24px; border-bottom: 1px solid #1e2230; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+#cal-header .cal-title { font-size: 15px; font-weight: 800; letter-spacing: .06em; }
+#cal-nav { display: flex; align-items: center; gap: 10px; }
+#cal-nav button { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
+#cal-nav button:hover { color: #e8e4dc; }
+#cal-month-label { font-size: 14px; font-weight: 700; min-width: 140px; text-align: center; letter-spacing: .05em; }
+#btn-today { background: #e2b830; color: #0f1117; border: none; border-radius: 6px; padding: 5px 14px; font-size: 11px; font-weight: 700; cursor: pointer; }
+#cal-legend { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #4a5060; }
+.leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+#cal-grid { padding: 16px 24px 20px; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 6px; }
+.cal-weekday { text-align: center; font-size: 10px; font-weight: 700; letter-spacing: .1em; color: #4a5060; padding: 4px 0; text-transform: uppercase; }
+.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-day { min-height: 72px; background: #1a1d26; border-radius: 6px; padding: 6px 7px; position: relative; overflow: hidden; border: 1px solid transparent; transition: border-color .15s; }
+.cal-day:hover { border-color: #3a3d4a; }
+.cal-day.other-month { opacity: .3; }
+.cal-day.today { border-color: #e2b830 !important; }
+.cal-day.today .day-num { color: #e2b830; font-weight: 800; }
+.day-num { font-size: 11px; font-weight: 600; color: #4a5060; margin-bottom: 4px; }
+.cal-day.has-event .day-num { color: #c0c8d0; }
+.cal-event { font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; margin-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; line-height: 1.4; }
+.cal-event:hover { opacity: .8; }
+.ev-planovano { background: #2a3555; color: #6080c0; }
+.ev-probiha   { background: #255030; color: #50c080; }
+.ev-hotovo    { background: #204530; color: #40a050; }
+.ev-zruseno   { background: #552020; color: #c05050; opacity: .6; }
+.ev-ceka      { background: #554020; color: #e2b830; }
+.ev-cont      { border-left: 2px solid currentColor; }
+.day-busy-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #e2b830, #50c080); opacity: .6; }
+#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#modal-overlay.open { display: flex; }
+#modal { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #1e2230; display: flex; align-items: center; justify-content: space-between; }
+#modal-title { font-size: 16px; font-weight: 800; letter-spacing: .05em; }
+#modal-close { background: none; border: none; color: #4a5060; font-size: 20px; cursor: pointer; padding: 0 4px; }
+#modal-close:hover { color: #e8e4dc; }
+#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; }
+.form-group input, .form-group select, .form-group textarea { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #e2b830; }
+.form-group textarea { resize: vertical; min-height: 70px; }
+.form-group select option { background: #1a1d26; }
+#modal-footer { padding: 16px 24px; border-top: 1px solid #1e2230; display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
+#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #552020; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
+#btn-delete:hover { background: #2a1a1a; }
+.btn-cancel { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-cancel:hover { color: #e8e4dc; }
+.btn-save { background: #e2b830; color: #0f1117; border: none; border-radius: 6px; padding: 8px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-save:hover { background: #f0c840; }
+#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; align-items: center; justify-content: center; }
+#saving-overlay.open { display: flex; }
+#saving-box { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; padding: 24px 36px; text-align: center; }
+#saving-box .saving-title { font-size: 14px; font-weight: 700; color: #e2b830; margin-bottom: 6px; }
+#saving-box .saving-sub   { font-size: 12px; color: #4a5060; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="header-left">
+    <div class="eyebrow">LEDshopik · Servis &amp; montáž</div>
+    <div class="title">INSTALACE <span>—</span> PLÁN &amp; PŘEHLED</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-total" style="color:#e8e4dc">0</div><div class="lbl">Celkem</div></div>
+      <div class="stat"><div class="num" id="stat-ceka"  style="color:#e2b830">0</div><div class="lbl">Čeká</div></div>
+      <div class="stat"><div class="num" id="stat-plan"  style="color:#6080c0">0</div><div class="lbl">Plán.</div></div>
+      <div class="stat"><div class="num" id="stat-prob"  style="color:#50c080">0</div><div class="lbl">Probíhá</div></div>
+      <div class="stat"><div class="num" id="stat-hot"   style="color:#40a050">0</div><div class="lbl">Hotovo</div></div>
+      <div class="stat"><div class="num" id="stat-zrus"  style="color:#c05050">0</div><div class="lbl">Zrušeno</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="toolbar">
+  <button class="filter-btn active" data-filter="vse"                onclick="setFilter('vse')">Vše</button>
+  <button class="filter-btn" data-filter="Čeká na potvrzení"         onclick="setFilter('Čeká na potvrzení')"><span class="filter-dot" style="background:#e2b830"></span>Čeká na potvrzení</button>
+  <button class="filter-btn" data-filter="Naplánováno"               onclick="setFilter('Naplánováno')"><span class="filter-dot" style="background:#6080c0"></span>Naplánováno</button>
+  <button class="filter-btn" data-filter="Probíhá"                   onclick="setFilter('Probíhá')"><span class="filter-dot" style="background:#50c080"></span>Probíhá</button>
+  <button class="filter-btn" data-filter="Hotovo"                    onclick="setFilter('Hotovo')"><span class="filter-dot" style="background:#40a050"></span>Hotovo</button>
+  <button class="filter-btn" data-filter="Zrušeno"                   onclick="setFilter('Zrušeno')"><span class="filter-dot" style="background:#c05050"></span>Zrušeno</button>
+  <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
+  <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
+  <button id="btn-add" onclick="openModal()">+ Přidat instalaci</button>
+</div>
+
+<div id="table-wrap">
+  <table>
+    <thead><tr>
+      <th onclick="sortBy('obj')"     data-col="obj">     OBJ. Č.    <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('misto')"   data-col="misto">   Místo       <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('obsah')"   data-col="obsah">   Obsah       <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('datum')"   data-col="datum">   Datum       <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('delka')"   data-col="delka">   Délka (dny) <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('technik')" data-col="technik"> Technik     <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('kontakt')" data-col="kontakt"> Kontakt     <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('status')"  data-col="status">  Stav        <span class="sort-arrow"></span></th>
+      <th>Poznámky</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div id="empty-state"><div class="big">📋</div><p>Žádné záznamy</p></div>
+</div>
+
+<div id="calendar-section">
+  <div id="cal-header">
+    <div class="cal-title">KALENDÁŘ INSTALACÍ</div>
+    <div id="cal-nav">
+      <button onclick="calNav(-1)">&#8592;</button>
+      <div id="cal-month-label"></div>
+      <button onclick="calNav(1)">&#8594;</button>
+      <button id="btn-today" onclick="calToday()">Dnes</button>
+    </div>
+    <div id="cal-legend">
+      <div class="leg"><div class="leg-dot" style="background:#2a3555;border:1px solid #6080c0"></div>Naplánováno</div>
+      <div class="leg"><div class="leg-dot" style="background:#255030;border:1px solid #50c080"></div>Probíhá</div>
+      <div class="leg"><div class="leg-dot" style="background:#204530;border:1px solid #40a050"></div>Hotovo</div>
+      <div class="leg"><div class="leg-dot" style="background:#554020;border:1px solid #e2b830"></div>Čeká</div>
+      <div class="leg"><div class="leg-dot" style="background:#552020;border:1px solid #c05050"></div>Zrušeno</div>
+    </div>
+  </div>
+  <div id="cal-grid">
+    <div class="cal-weekdays">
+      <div class="cal-weekday">Po</div><div class="cal-weekday">Út</div><div class="cal-weekday">St</div>
+      <div class="cal-weekday">Čt</div><div class="cal-weekday">Pá</div>
+      <div class="cal-weekday" style="color:#c05050">So</div>
+      <div class="cal-weekday" style="color:#c05050">Ne</div>
+    </div>
+    <div class="cal-days" id="cal-days"></div>
+  </div>
+</div>
+
+<div id="modal-overlay" onclick="overlayClick(event)">
+  <div id="modal">
+    <div id="modal-header">
+      <div id="modal-title">Nová instalace</div>
+      <button id="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body">
+      <div class="form-group"><label>OBJ. Č.</label><input type="text" id="f-obj" placeholder="např. 872804"></div>
+      <div class="form-group"><label>Stav</label>
+        <select id="f-status"><option>Čeká na potvrzení</option><option>Naplánováno</option><option>Probíhá</option><option>Hotovo</option><option>Zrušeno</option></select>
+      </div>
+      <div class="form-group full"><label>Místo instalace</label><input type="text" id="f-misto" placeholder="např. Praha – Darwin"></div>
+      <div class="form-group full"><label>Obsah instalace</label><input type="text" id="f-obsah" placeholder="např. LED neony R25 PRO – 50m"></div>
+      <div class="form-group"><label>Plánované datum</label><input type="date" id="f-datum"></div>
+      <div class="form-group"><label>Délka instalace (dny)</label><input type="number" id="f-delka" min="1" max="365" placeholder="např. 3"></div>
+      <div class="form-group"><label>Technik / montážník</label><input type="text" id="f-technik" placeholder="Jméno technika"></div>
+      <div class="form-group"><label>Kontakt na zákazníka</label><input type="text" id="f-kontakt" placeholder="Jméno, tel., e-mail..."></div>
+      <div class="form-group full"><label>Poznámky</label><textarea id="f-poznamky" placeholder="Další informace..."></textarea></div>
+    </div>
+    <div id="modal-footer">
+      <button id="btn-delete" onclick="deleteRecord()" style="display:none">🗑 Smazat</button>
+      <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
+      <button class="btn-save" onclick="saveRecord()">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<div id="saving-overlay">
+  <div id="saving-box">
+    <div class="saving-title" id="saving-title">Ukládám...</div>
+    <div class="saving-sub"   id="saving-sub">Komunikuji s Google Sheets</div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbycyrgEqncRsW8-Zb2SIgutAkll08weO-j77QuILo-pW6dRtBrOdWMt4iW5t8rVsbspTg/exec';
+const MONTHS_CS  = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
+const STATUS_CLASS = {'Naplánováno':'s-planovano','Probíhá':'s-probiha','Hotovo':'s-hotovo','Zrušeno':'s-zruseno','Čeká na potvrzení':'s-ceka'};
+const EV_CLASS     = {'Naplánováno':'ev-planovano','Probíhá':'ev-probiha','Hotovo':'ev-hotovo','Zrušeno':'ev-zruseno','Čeká na potvrzení':'ev-ceka'};
+
+let data=[], filterVal='vse', sortCol='datum', sortDir=1, editId=null;
+const today=new Date();
+let calYear=today.getFullYear(), calMonth=today.getMonth();
+
+function syncStatus(state,text){ document.getElementById('sync-dot').className=state; document.getElementById('sync-text').textContent=text; }
+
+async function loadData(){
+  syncStatus('loading','Načítám data...');
+  try {
+    const res=await fetch(SCRIPT_URL);
+    const json=await res.json();
+    data=json.data||[];
+    syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
+    renderTable();
+  } catch(e){ syncStatus('error','Chyba: '+e.message); }
+}
+
+async function apiPost(payload){
+  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});
+  const json=await res.json();
+  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+}
+
+function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderTable(); }
+function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTable(); }
+
+function getFiltered(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  return data.filter(r=>{
+    if(filterVal!=='vse'&&r.status!==filterVal) return false;
+    if(q&&![r.obj,r.misto,r.obsah,r.technik,r.kontakt,r.poznamky].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b)=>{
+    let va=sortCol==='delka'?(Number(a.delka)||0):(a[sortCol]||'');
+    let vb=sortCol==='delka'?(Number(b.delka)||0):(b[sortCol]||'');
+    return va<vb?-sortDir:va>vb?sortDir:0;
+  });
+}
+
+function fmtDate(d){
+  if(!d||d==='') return '—';
+  // YYYY-MM-DD string
+  if(typeof d==='string' && /^\d{4}-\d{2}-\d{2}$/.test(d)){
+    const [y,m,day]=d.split('-'); return `${day}.${m}.${y}`;
+  }
+  // ISO string or Date object
+  const dt=new Date(d);
+  if(isNaN(dt)) return '—';
+  return `${String(dt.getDate()).padStart(2,'0')}.${String(dt.getMonth()+1).padStart(2,'0')}.${dt.getFullYear()}`;
+}
+
+function renderTable(){
+  const rows=getFiltered();
+  document.querySelectorAll('thead th[data-col]').forEach(th=>{
+    th.classList.toggle('sorted',th.dataset.col===sortCol);
+    th.querySelector('.sort-arrow').textContent=th.dataset.col===sortCol?(sortDir===1?' ↓':' ↑'):'';
+  });
+  document.getElementById('stat-total').textContent=data.length;
+  document.getElementById('stat-ceka').textContent=data.filter(r=>r.status==='Čeká na potvrzení').length;
+  document.getElementById('stat-plan').textContent=data.filter(r=>r.status==='Naplánováno').length;
+  document.getElementById('stat-prob').textContent=data.filter(r=>r.status==='Probíhá').length;
+  document.getElementById('stat-hot').textContent=data.filter(r=>r.status==='Hotovo').length;
+  document.getElementById('stat-zrus').textContent=data.filter(r=>r.status==='Zrušeno').length;
+  const tbody=document.getElementById('tbody');
+  if(!rows.length){ tbody.innerHTML=''; document.getElementById('empty-state').style.display='block'; renderCalendar(); return; }
+  document.getElementById('empty-state').style.display='none';
+  tbody.innerHTML=rows.map(r=>`
+    <tr data-id="${r.id}" data-status="${r.status}" onclick="openModal('${r.id}')">
+      <td class="obj">${r.obj||'—'}</td>
+      <td class="misto">${r.misto||'—'}</td>
+      <td>${r.obsah||'—'}</td>
+      <td class="datum">${fmtDate(r.datum)}</td>
+      <td class="delka">${r.delka?`<span class="delka-badge">${r.delka} ${r.delka==1?'den':'dní'}</span>`:'—'}</td>
+      <td>${r.technik||'—'}</td>
+      <td>${r.kontakt||'—'}</td>
+      <td><span class="badge ${STATUS_CLASS[r.status]||''}"><span class="badge-dot"></span>${r.status}</span></td>
+      <td class="poznamky">${r.poznamky||''}</td>
+    </tr>`).join('');
+  renderCalendar();
+}
+
+function calNav(dir){ calMonth+=dir; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function calToday(){ calYear=today.getFullYear(); calMonth=today.getMonth(); renderCalendar(); }
+function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+function getEvents(){
+  return data.filter(r=>r.datum).map(r=>{
+    const start=new Date(r.datum+'T00:00:00');
+    const end=new Date(start); end.setDate(end.getDate()+Math.max(1,Number(r.delka)||1)-1);
+    return {id:r.id,obj:r.obj,misto:r.misto,status:r.status,start,end};
+  });
+}
+
+function renderCalendar(){
+  document.getElementById('cal-month-label').textContent=`${MONTHS_CS[calMonth]} ${calYear}`;
+  const events=getEvents();
+  const firstDay=new Date(calYear,calMonth,1);
+  let startDow=firstDay.getDay(); startDow=startDow===0?6:startDow-1;
+  const dim=new Date(calYear,calMonth+1,0).getDate();
+  const dip=new Date(calYear,calMonth,0).getDate();
+  const total=Math.ceil((startDow+dim)/7)*7;
+  let html='';
+  for(let i=0;i<total;i++){
+    let dn,mo=0;
+    if(i<startDow){dn=dip-startDow+i+1;mo=-1;}
+    else if(i>=startDow+dim){dn=i-startDow-dim+1;mo=1;}
+    else{dn=i-startDow+1;}
+    const cd=new Date(calYear,calMonth+mo,dn);
+    const isT=dateStr(cd)===dateStr(today),isSat=cd.getDay()===6,isSun=cd.getDay()===0,other=mo!==0;
+    const evs=events.filter(ev=>cd>=ev.start&&cd<=ev.end);
+    let evHtml=evs.slice(0,3).map(ev=>{
+      const cont=cd>ev.start;
+      return `<div class="cal-event ${EV_CLASS[ev.status]||''} ${cont?'ev-cont':''}" onclick="event.stopPropagation();openModal('${ev.id}')" title="${ev.obj} – ${ev.misto}">${cont?'↳ '+(ev.misto||ev.obj):`${ev.obj} ${ev.misto||''}`}</div>`;
+    }).join('');
+    if(evs.length>3) evHtml+=`<div style="font-size:9px;color:#4a5060;padding:1px 4px;">+${evs.length-3} další</div>`;
+    html+=`<div class="cal-day${other?' other-month':''}${isT?' today':''}${evs.length?' has-event':''}" ${(isSat||isSun)?'style="background:#161820;"':''}>
+      <div class="day-num" style="${(isSat||isSun)?'color:#c05050;':''}">${dn}</div>
+      ${evHtml}${evs.length&&!other?'<div class="day-busy-bar"></div>':''}
+    </div>`;
+  }
+  document.getElementById('cal-days').innerHTML=html;
+}
+
+function openModal(id){
+  editId=id??null;
+  document.getElementById('modal-title').textContent=id?'Upravit instalaci':'Nová instalace';
+  document.getElementById('btn-delete').style.display=id?'inline-flex':'none';
+  if(id){
+    const r=data.find(x=>x.id===String(id)); if(!r) return;
+    document.getElementById('f-obj').value=r.obj||'';
+    document.getElementById('f-misto').value=r.misto||'';
+    document.getElementById('f-obsah').value=r.obsah||'';
+    document.getElementById('f-datum').value=r.datum||'';
+    document.getElementById('f-delka').value=r.delka||'';
+    document.getElementById('f-technik').value=r.technik||'';
+    document.getElementById('f-kontakt').value=r.kontakt||'';
+    document.getElementById('f-status').value=r.status||'Naplánováno';
+    document.getElementById('f-poznamky').value=r.poznamky||'';
+  } else {
+    ['f-obj','f-misto','f-obsah','f-datum','f-delka','f-technik','f-kontakt','f-poznamky'].forEach(fid=>document.getElementById(fid).value='');
+    document.getElementById('f-status').value='Čeká na potvrzení';
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); editId=null; }
+function overlayClick(e){ if(e.target===document.getElementById('modal-overlay')) closeModal(); }
+function showSaving(t,s){ document.getElementById('saving-title').textContent=t; document.getElementById('saving-sub').textContent=s; document.getElementById('saving-overlay').classList.add('open'); }
+function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
+
+async function saveRecord(){
+  const rec={
+    id:      editId?String(editId):String(Date.now()),
+    obj:     document.getElementById('f-obj').value.trim(),
+    misto:   document.getElementById('f-misto').value.trim(),
+    obsah:   document.getElementById('f-obsah').value.trim(),
+    datum:   document.getElementById('f-datum').value,
+    delka:   Number(document.getElementById('f-delka').value)||0,
+    technik: document.getElementById('f-technik').value.trim(),
+    kontakt: document.getElementById('f-kontakt').value.trim(),
+    status:  document.getElementById('f-status').value,
+    poznamky:document.getElementById('f-poznamky').value.trim(),
+  };
+  closeModal();
+  showSaving(editId?'Ukládám změny...':'Přidávám instalaci...','Komunikuji s Google Sheets');
+  try {
+    await apiPost({action:editId?'update':'append',record:rec});
+    showSaving('Hotovo!','Data uložena');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba při ukládání: '+e.message); }
+}
+
+async function deleteRecord(){
+  if(!editId||!confirm('Opravdu smazat tento záznam?')) return;
+  const id=editId; closeModal();
+  showSaving('Mažu záznam...','Komunikuji s Google Sheets');
+  try {
+    await apiPost({action:'delete',id:String(id)});
+    showSaving('Smazáno!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba při mazání: '+e.message); }
+}
+
+renderCalendar();
+loadData();
+setInterval(loadData,120000);
+</script>
+</body>
+</html>
