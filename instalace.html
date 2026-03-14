@@ -237,7 +237,7 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzaDQoIdNmM81slH6bH383vZzKPrCH6KswQ0Ed2z7EItl0rhEJ3gg0KHnJOVbTwsZa1/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbycyrgEqncRsW8-Zb2SIgutAkll08weO-j77QuILo-pW6dRtBrOdWMt4iW5t8rVsbspTg/exec';
 const MONTHS_CS  = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const STATUS_CLASS = {'Naplánováno':'s-planovano','Probíhá':'s-probiha','Hotovo':'s-hotovo','Zrušeno':'s-zruseno','Čeká na potvrzení':'s-ceka'};
 const EV_CLASS     = {'Naplánováno':'ev-planovano','Probíhá':'ev-probiha','Hotovo':'ev-hotovo','Zrušeno':'ev-zruseno','Čeká na potvrzení':'ev-ceka'};
@@ -281,16 +281,19 @@ function getFiltered(){
   });
 }
 
-function fmtDate(d){
-  if(!d||d==='') return '—';
-  // YYYY-MM-DD string
-  if(typeof d==='string' && /^\d{4}-\d{2}-\d{2}$/.test(d)){
-    const [y,m,day]=d.split('-'); return `${day}.${m}.${y}`;
-  }
-  // ISO string or Date object
+function toInputDate(d){
+  if(!d||d==='') return '';
+  if(typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
   const dt=new Date(d);
-  if(isNaN(dt)) return '—';
-  return `${String(dt.getDate()).padStart(2,'0')}.${String(dt.getMonth()+1).padStart(2,'0')}.${dt.getFullYear()}`;
+  if(isNaN(dt)) return '';
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+}
+
+function fmtDate(d){
+  const s=toInputDate(d);
+  if(!s) return '—';
+  const [y,m,day]=s.split('-');
+  return `${day}.${m}.${y}`;
 }
 
 function renderTable(){
@@ -328,11 +331,14 @@ function calToday(){ calYear=today.getFullYear(); calMonth=today.getMonth(); ren
 function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
 function getEvents(){
-  return data.filter(r=>r.datum).map(r=>{
-    const start=new Date(r.datum+'T00:00:00');
-    const end=new Date(start); end.setDate(end.getDate()+Math.max(1,Number(r.delka)||1)-1);
+  return data.filter(r=>r.datum&&r.datum!=='').map(r=>{
+    const d=toInputDate(r.datum);
+    if(!d) return null;
+    const start=new Date(d+'T00:00:00');
+    const end=new Date(start);
+    end.setDate(end.getDate()+Math.max(1,Number(r.delka)||1)-1);
     return {id:r.id,obj:r.obj,misto:r.misto,status:r.status,start,end};
-  });
+  }).filter(Boolean);
 }
 
 function renderCalendar(){
@@ -374,7 +380,7 @@ function openModal(id){
     document.getElementById('f-obj').value=r.obj||'';
     document.getElementById('f-misto').value=r.misto||'';
     document.getElementById('f-obsah').value=r.obsah||'';
-    document.getElementById('f-datum').value=r.datum||'';
+    document.getElementById('f-datum').value=toInputDate(r.datum);
     document.getElementById('f-delka').value=r.delka||'';
     document.getElementById('f-technik').value=r.technik||'';
     document.getElementById('f-kontakt').value=r.kontakt||'';
@@ -392,7 +398,6 @@ function showSaving(t,s){ document.getElementById('saving-title').textContent=t;
 function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
 
 async function saveRecord(){
-  const isEdit=!!editId;
   const rec={
     id:      editId?String(editId):String(Date.now()),
     obj:     document.getElementById('f-obj').value.trim(),
@@ -406,9 +411,9 @@ async function saveRecord(){
     poznamky:document.getElementById('f-poznamky').value.trim(),
   };
   closeModal();
-  showSaving(isEdit?'Ukládám změny...':'Přidávám instalaci...','Komunikuji s Google Sheets');
+  showSaving(editId?'Ukládám změny...':'Přidávám instalaci...','Komunikuji s Google Sheets');
   try {
-    await apiPost({action:isEdit?'update':'append',record:rec});
+    await apiPost({action:editId?'update':'append',record:rec});
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při ukládání: '+e.message); }
