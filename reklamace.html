@@ -153,6 +153,51 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
   <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
   <button id="btn-add" onclick="openModal()">+ Nová reklamace</button>
+  <button id="btn-sablony" onclick="toggleSablony()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">✉ Šablony emailů</button>
+</div>
+
+<div id="sablony-section" style="display:none;margin:20px 32px;background:#161820;border:1px solid #2a2d3a;border-radius:10px;overflow:hidden;">
+  <div style="padding:14px 20px;border-bottom:1px solid #1e2230;display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-size:14px;font-weight:800;letter-spacing:.06em;">✉ ŠABLONY EMAILŮ</div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="saveSablony()" style="background:#e05050;color:#fff;border:none;border-radius:6px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;">Uložit šablony</button>
+      <button onclick="toggleSablony()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:12px;cursor:pointer;">Zavřít</button>
+    </div>
+  </div>
+  <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#e05050;text-transform:uppercase;margin-bottom:8px;">Potvrzení přijetí reklamace</div>
+      <div style="font-size:10px;color:#4a5060;margin-bottom:4px;">Předmět</div>
+      <input type="text" id="s-prijeti-predmet" style="width:100%;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:7px 12px;font-size:12px;outline:none;margin-bottom:8px;" placeholder="Vaše reklamace č. {{obj}} byla přijata">
+      <div style="font-size:10px;color:#4a5060;margin-bottom:4px;">Text emailu</div>
+      <textarea id="s-prijeti-text" rows="5" style="width:100%;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:7px 12px;font-size:12px;outline:none;resize:vertical;" placeholder="Dobrý den,&#10;potvrzujeme přijetí Vaší reklamace č. {{obj}}.&#10;&#10;Budeme Vás kontaktovat do {{deadline}}.&#10;&#10;S pozdravem, LEDshopik"></textarea>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#e2b830;text-transform:uppercase;margin-bottom:8px;">Změna stavu reklamace</div>
+      <div style="font-size:10px;color:#4a5060;margin-bottom:4px;">Předmět</div>
+      <input type="text" id="s-stav-predmet" style="width:100%;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:7px 12px;font-size:12px;outline:none;margin-bottom:8px;" placeholder="Aktualizace Vaší reklamace č. {{obj}}">
+      <div style="font-size:10px;color:#4a5060;margin-bottom:4px;">Text emailu</div>
+      <textarea id="s-stav-text" rows="5" style="width:100%;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:7px 12px;font-size:12px;outline:none;resize:vertical;" placeholder="Dobrý den,&#10;stav Vaší reklamace č. {{obj}} byl změněn na: {{stav}}.&#10;&#10;S pozdravem, LEDshopik"></textarea>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#40a050;text-transform:uppercase;margin-bottom:8px;">Vyřízení reklamace</div>
+      <div style="font-size:10px;color:#4a5060;margin-bottom:4px;">Předmět</div>
+      <input type="text" id="s-vyrizeni-predmet" style="width:100%;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:7px 12px;font-size:12px;outline:none;margin-bottom:8px;" placeholder="Vaše reklamace č. {{obj}} byla vyřízena">
+      <div style="font-size:10px;color:#4a5060;margin-bottom:4px;">Text emailu</div>
+      <textarea id="s-vyrizeni-text" rows="5" style="width:100%;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:7px 12px;font-size:12px;outline:none;resize:vertical;" placeholder="Dobrý den,&#10;Vaše reklamace č. {{obj}} byla vyřízena.&#10;&#10;Způsob vyřízení: {{zpusob}}&#10;&#10;S pozdravem, LEDshopik"></textarea>
+    </div>
+    <div style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;padding:14px;">
+      <div style="font-size:11px;font-weight:700;color:#e2b830;margin-bottom:10px;">Dostupné proměnné:</div>
+      <div style="font-size:11px;color:#8890a0;line-height:2;">
+        <code style="color:#e05050;">{{obj}}</code> — číslo objednávky<br>
+        <code style="color:#e05050;">{{zakaznik}}</code> — jméno zákazníka<br>
+        <code style="color:#e05050;">{{stav}}</code> — aktuální stav<br>
+        <code style="color:#e05050;">{{deadline}}</code> — datum vyřízení<br>
+        <code style="color:#e05050;">{{technik}}</code> — přiřazený technik<br>
+        <code style="color:#e05050;">{{zpusob}}</code> — způsob vyřízení
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="table-wrap">
@@ -166,7 +211,9 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
       <th onclick="sortBy('technik')"    data-col="technik">    Technik      <span class="sort-arrow"></span></th>
       <th onclick="sortBy('datum_nahlaseni')" data-col="datum_nahlaseni"> Nahlášeno <span class="sort-arrow"></span></th>
       <th onclick="sortBy('datum_deadline')"  data-col="datum_deadline">  Deadline  <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('email')"      data-col="email">      Email        <span class="sort-arrow"></span></th>
       <th onclick="sortBy('stav')"       data-col="stav">       Stav         <span class="sort-arrow"></span></th>
+      <th>Notif.</th>
       <th>Způsob vyřízení</th>
     </tr></thead>
     <tbody id="tbody"></tbody>
@@ -342,7 +389,9 @@ function renderTable(){
       <td>${r.technik||'—'}</td>
       <td class="datum">${fmtDate(r.datum_nahlaseni)}</td>
       <td class="datum ${deadlineClass(r.datum_deadline)}">${fmtDate(r.datum_deadline)}</td>
+      <td style="font-size:11px;color:#6080c0;">${r.email||'—'}</td>
       <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
+      <td style="text-align:center;">${r.notifikovat==='ano'?'<span style="color:#40a050;font-size:14px;" title="Notifikace zapnuta">✓</span>':'<span style="color:#4a5060;font-size:14px;">—</span>'}</td>
       <td style="font-size:11px;color:#8890a0;max-width:180px;">${r.zpusob||''}</td>
     </tr>`).join('');
 }
@@ -417,6 +466,36 @@ async function deleteRecord(){
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při mazání: '+e.message); }
+}
+
+function toggleSablony(){
+  const s=document.getElementById('sablony-section');
+  s.style.display=s.style.display==='none'?'block':'none';
+  loadSablony();
+}
+
+function loadSablony(){
+  const defs={
+    'prijeti-predmet':'Vaše reklamace č. {{obj}} byla přijata',
+    'prijeti-text':'Dobrý den,\npotvrzujeme přijetí Vaší reklamace č. {{obj}}.\n\nBudeme Vás kontaktovat do {{deadline}}.\n\nS pozdravem, LEDshopik',
+    'stav-predmet':'Aktualizace Vaší reklamace č. {{obj}}',
+    'stav-text':'Dobrý den,\nstav Vaší reklamace č. {{obj}} byl změněn na: {{stav}}.\n\nS pozdravem, LEDshopik',
+    'vyrizeni-predmet':'Vaše reklamace č. {{obj}} byla vyřízena',
+    'vyrizeni-text':'Dobrý den,\nVaše reklamace č. {{obj}} byla vyřízena.\n\nZpůsob vyřízení: {{zpusob}}\n\nS pozdravem, LEDshopik',
+  };
+  Object.entries(defs).forEach(([k,v])=>{
+    const el=document.getElementById('s-'+k);
+    if(el&&!el.value) el.value=localStorage.getItem('sablona-'+k)||v;
+  });
+}
+
+function saveSablony(){
+  ['prijeti-predmet','prijeti-text','stav-predmet','stav-text','vyrizeni-predmet','vyrizeni-text'].forEach(k=>{
+    const el=document.getElementById('s-'+k);
+    if(el) localStorage.setItem('sablona-'+k,el.value);
+  });
+  const btn=document.querySelector('#sablony-section .btn-save-sablony');
+  if(btn){ const orig=btn.textContent; btn.textContent='✓ Uloženo!'; setTimeout(()=>btn.textContent=orig,1500); }
 }
 
 loadData();
