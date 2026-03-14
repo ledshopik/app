@@ -124,7 +124,7 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 #saving-box .saving-sub   { font-size: 12px; color: #4a5060; }
 </style>
 </head>
-<body>
+<body><div style="background:#0a0c12;border-bottom:1px solid #1e2230;padding:0 24px;display:flex;align-items:stretch;gap:2px;font-family:Arial Narrow,Arial,sans-serif;"><a href="index.html" style="padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:.12em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:6px;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8e4dc'" onmouseout="this.style.color='#555'">⌂ Dashboard</a><a href="instalace.html" style="padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:.12em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e2b830'" onmouseout="this.style.color='#555'">Instalace</a><a href="obhlidky.html" style="padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:.12em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#3ab0a0'" onmouseout="this.style.color='#555'">Obhlídky</a><a href="reklamace.html" style="padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:.12em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e05050'" onmouseout="this.style.color='#555'">Reklamace</a><a href="konfigurator.html" style="padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:.12em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#a070e0'" onmouseout="this.style.color='#555'">Konfigurátor</a></div>
 
 <div id="header">
   <div class="header-left">
@@ -237,7 +237,7 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxa4gFbSXdBgyQVoYyWeWS3exR2Pau8hrVdQdCIYxdnpc4Hz06w2EHwQKyAMGS6ZWjGPA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbRoAI2Vjzo9ZDQ6qT7TfhkX-vgE-Rxm9DTmNlh-WmWHh3XBi66NXOQKFtQcnGTIQJBw/exec';
 const MONTHS_CS  = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const STATUS_CLASS = {'Naplánováno':'s-planovano','Probíhá':'s-probiha','Hotovo':'s-hotovo','Zrušeno':'s-zruseno','Čeká na potvrzení':'s-ceka'};
 const EV_CLASS     = {'Naplánováno':'ev-planovano','Probíhá':'ev-probiha','Hotovo':'ev-hotovo','Zrušeno':'ev-zruseno','Čeká na potvrzení':'ev-ceka'};
