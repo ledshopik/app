@@ -211,8 +211,8 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
       <th onclick="sortBy('technik')"    data-col="technik">    Technik      <span class="sort-arrow"></span></th>
       <th onclick="sortBy('datum_nahlaseni')" data-col="datum_nahlaseni"> Nahlášeno <span class="sort-arrow"></span></th>
       <th onclick="sortBy('datum_deadline')"  data-col="datum_deadline">  Deadline  <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('email')"      data-col="email">      Email        <span class="sort-arrow"></span></th>
       <th onclick="sortBy('stav')"       data-col="stav">       Stav         <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('email')"      data-col="email">      Email        <span class="sort-arrow"></span></th>
       <th>Notif.</th>
       <th>Způsob vyřízení</th>
     </tr></thead>
@@ -389,8 +389,8 @@ function renderTable(){
       <td>${r.technik||'—'}</td>
       <td class="datum">${fmtDate(r.datum_nahlaseni)}</td>
       <td class="datum ${deadlineClass(r.datum_deadline)}">${fmtDate(r.datum_deadline)}</td>
-      <td style="font-size:11px;color:#6080c0;">${r.email||'—'}</td>
       <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
+      <td style="font-size:11px;color:#6080c0;">${r.email||'—'}</td>
       <td style="text-align:center;">${r.notifikovat==='ano'?'<span style="color:#40a050;font-size:14px;" title="Notifikace zapnuta">✓</span>':'<span style="color:#4a5060;font-size:14px;">—</span>'}</td>
       <td style="font-size:11px;color:#8890a0;max-width:180px;">${r.zpusob||''}</td>
     </tr>`).join('');
