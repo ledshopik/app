@@ -209,7 +209,12 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
       <div class="form-group"><label>Technik</label><input type="text" id="f-technik" placeholder="Přiřazený technik"></div>
       <div class="form-group"><label>Datum nahlášení</label><input type="date" id="f-datum-nahlaseni"></div>
       <div class="form-group"><label>Deadline vyřízení</label><input type="date" id="f-datum-deadline"></div>
+      <div class="form-group full"><label>Email zákazníka</label><input type="email" id="f-email" placeholder="email@zakaznik.cz"></div>
       <div class="form-group full"><label>Způsob vyřízení</label><textarea id="f-zpusob" placeholder="Jak byla reklamace vyřízena..."></textarea></div>
+      <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;padding:12px 16px;">
+        <input type="checkbox" id="f-notifikovat" style="width:18px;height:18px;accent-color:#e05050;cursor:pointer;flex-shrink:0;">
+        <label for="f-notifikovat" style="font-size:13px;color:#c0c8d0;cursor:pointer;letter-spacing:0;text-transform:none;font-weight:400;">Notifikovat zákazníka emailem při uložení</label>
+      </div>
     </div>
     <div id="modal-footer">
       <button id="btn-delete" onclick="deleteRecord()" style="display:none">🗑 Smazat</button>
@@ -230,7 +235,7 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
 // ── Konfigurace ──────────────────────────────────────────────────────────────
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJLG1dFY5I7YxSvxJJIsT43f5dhSx0UZitDR-5gUeLo1GwFzaQHOYnh4HMFlSA4x7rHw/exec';
 
-const COLS = ['id','obj','zakaznik','typ','popis','priorita','technik','datum_nahlaseni','datum_deadline','stav','zpusob'];
+const COLS = ['id','obj','zakaznik','email','typ','popis','priorita','technik','datum_nahlaseni','datum_deadline','stav','zpusob','notifikovat'];
 
 const STATUS_CLASS = {
   'Nová':                   's-nova',
@@ -351,6 +356,7 @@ function openModal(id){
   if(r){
     document.getElementById('f-obj').value=r.obj||'';
     document.getElementById('f-zakaznik').value=r.zakaznik||'';
+    document.getElementById('f-email').value=r.email||'';
     document.getElementById('f-typ').value=r.typ||'Reklamace produktu';
     document.getElementById('f-popis').value=r.popis||'';
     document.getElementById('f-priorita').value=r.priorita||'Střední';
@@ -360,7 +366,7 @@ function openModal(id){
     document.getElementById('f-stav').value=r.stav||'Nová';
     document.getElementById('f-zpusob').value=r.zpusob||'';
   } else {
-    ['f-obj','f-zakaznik','f-popis','f-technik','f-zpusob'].forEach(fid=>document.getElementById(fid).value='');
+    ['f-obj','f-zakaznik','f-email','f-popis','f-technik','f-zpusob'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('f-typ').value='Reklamace produktu';
     document.getElementById('f-priorita').value='Střední';
     document.getElementById('f-stav').value='Nová';
@@ -382,6 +388,7 @@ async function saveRecord(){
     id:               currentId,
     obj:              document.getElementById('f-obj').value.trim(),
     zakaznik:         document.getElementById('f-zakaznik').value.trim(),
+    email:            document.getElementById('f-email').value.trim(),
     typ:              document.getElementById('f-typ').value,
     popis:            document.getElementById('f-popis').value.trim(),
     priorita:         document.getElementById('f-priorita').value,
@@ -390,6 +397,7 @@ async function saveRecord(){
     datum_deadline:   document.getElementById('f-datum-deadline').value,
     stav:             document.getElementById('f-stav').value,
     zpusob:           document.getElementById('f-zpusob').value.trim(),
+    notifikovat:      document.getElementById('f-notifikovat').checked ? 'ano' : 'ne',
   };
   closeModal();
   showSaving(isEdit?'Ukládám změny...':'Přidávám reklamaci...','Komunikuji s Google Sheets');
