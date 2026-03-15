@@ -27,8 +27,9 @@ button, input, select { font-family: inherit; }
 #user-bar {
   background: #1c1f2a;
   border-bottom: 1px solid #1e2230;
-  padding: 8px 32px;
-  display: flex; align-items: center; gap: 12px;
+  padding: 0 32px;
+  display: flex; align-items: stretch; gap: 0;
+  flex-wrap: wrap;
 }
 #user-bar .user-label { font-size: 10px; color: #555; letter-spacing: .1em; text-transform: uppercase; }
 #user-select {
@@ -141,18 +142,35 @@ button, input, select { font-family: inherit; }
 </div>
 
 <div id="user-bar">
-  <div class="user-label">Zobrazit jako:</div>
-  <select id="user-select" onchange="setUser(this.value)">
-    <option value="vse">Všichni</option>
-    <option value="Mario">Mario</option>
-    <option value="Jakub">Jakub</option>
-    <option value="Marian">Marian</option>
-  </select>
-  <div id="sync-status">
-    <div id="sync-dot" class="loading"></div>
-    <span id="sync-text">Načítám...</span>
+  <a href="index.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#e2b830;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:6px;border-bottom:2px solid #e2b830;">⌂ Dashboard</a>
+  <a href="instalace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e2b830'" onmouseout="this.style.color='#555'">Instalace</a>
+  <a href="obhlidky.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#3ab0a0'" onmouseout="this.style.color='#555'">Obhlídky</a>
+  <a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e05050'" onmouseout="this.style.color='#555'">Reklamace</a>
+  <a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#a070e0'" onmouseout="this.style.color='#555'">Konfigurátor</a>
+  <a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#555'">Docházka</a>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+    <div class="user-label">Zobrazit jako:</div>
+    <select id="user-select" onchange="setUser(this.value)">
+      <option value="vse">Všichni</option>
+      <option value="Ondra">Ondra</option>
+      <option value="David">David</option>
+      <option value="Michal">Michal</option>
+      <option value="Erik">Erik</option>
+      <option value="Lukáš">Lukáš</option>
+      <option value="Mário">Mário</option>
+      <option value="Tom">Tom</option>
+      <option value="Kuba">Kuba</option>
+      <option value="Petr">Petr</option>
+      <option value="Miriam">Miriam</option>
+      <option value="Filip">Filip</option>
+      <option value="Eve">Eve</option>
+    </select>
+    <div id="sync-status">
+      <div id="sync-dot" class="loading"></div>
+      <span id="sync-text">Načítám...</span>
+    </div>
+    <button id="btn-refresh-all" onclick="loadAll()">↻ Obnovit</button>
   </div>
-  <button id="btn-refresh-all" onclick="loadAll()">↻ Obnovit</button>
 </div>
 
 <div id="main">
