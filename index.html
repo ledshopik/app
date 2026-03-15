@@ -316,7 +316,7 @@ function setUser(val){
 
 function filterByUser(data, technikField='technik'){
   if(currentUser==='vse') return data;
-  return data.filter(r=>(r[technikField]||'').toLowerCase().includes(currentUser.toLowerCase()));
+  return data.filter(r=>(r[technikField]||'').toLowerCase()===currentUser.toLowerCase());
 }
 
 // ── Sync ──────────────────────────────────────────────────────────────────────
@@ -403,7 +403,8 @@ function getCalEvents(){
   // Absence
   const DOV_CLS={'Dovolená':'ev-dov','Neschopenka':'ev-nesc','Neplacené volno':'ev-nepl'};
   const DOV_SHORT={'Dovolená':'DOV','Neschopenka':'NESC','Neplacené volno':'NEPL'};
-  dataDoch.filter(r=>r.datum_od&&r.datum_do).forEach(r=>{
+  const filtDoch = currentUser==='vse' ? dataDoch : dataDoch.filter(r=>(r.zamestnanec||'').toLowerCase()===currentUser.toLowerCase());
+  filtDoch.filter(r=>r.datum_od&&r.datum_do).forEach(r=>{
     const start=new Date(toInputDate(r.datum_od)+'T00:00:00');
     const end=new Date(toInputDate(r.datum_do)+'T00:00:00');
     const short=DOV_SHORT[r.typ]||'ABS';
