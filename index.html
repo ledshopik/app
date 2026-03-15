@@ -84,7 +84,7 @@ button, input, select { font-family: inherit; }
 .cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 4px; }
 .cal-wd { text-align: center; font-size: 9px; letter-spacing: .1em; color: #555; text-transform: uppercase; padding: 4px 0; }
 .cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.cal-day { min-height: 60px; background: #13151c; padding: 5px 6px; position: relative; cursor: default; }
+.cal-day { min-height: 80px; background: #13151c; padding: 5px 6px; position: relative; cursor: default; }
 .cal-day.other { opacity: .3; }
 .cal-day.today { outline: 1px solid #e2b830; }
 .cal-day.today .dn { color: #e2b830; font-weight: 900; }
@@ -96,6 +96,9 @@ button, input, select { font-family: inherit; }
 .ev-inst { background: #2a2010; color: #e2b830; }
 .ev-obh  { background: #1a2a20; color: #3ab0a0; }
 .ev-rek  { background: #2a1010; color: #e05050; }
+.ev-dov  { background: #1a3a20; color: #40c060; }
+.ev-nesc { background: #2a1a1a; color: #e05050; }
+.ev-nepl { background: #2a2010; color: #e2b830; }
 
 /* Schedule */
 .sched-item { display: flex; align-items: stretch; gap: 0; margin-bottom: 8px; }
@@ -221,13 +224,21 @@ button, input, select { font-family: inherit; }
     <div class="cal-header-row">
       <div class="cal-title">
         <div style="width:16px;height:2px;background:#e2b830;border-radius:1px;"></div>
-        Kalendář instalací &amp; obhlídek
+        Kalendář
       </div>
-      <div class="cal-nav">
-        <button onclick="calNav(-1)">&#8592;</button>
-        <div class="cal-month" id="cal-month-label"></div>
-        <button onclick="calNav(1)">&#8594;</button>
-        <button id="btn-cal-today" onclick="calToday()">Dnes</button>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#2a2010;"></div>Instalace</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#1a2a20;"></div>Obhlídka</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#1a3a20;"></div>Dovolená</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#2a1a1a;"></div>Neschopenka</div>
+        </div>
+        <div class="cal-nav">
+          <button onclick="calNav(-1)">&#8592;</button>
+          <div class="cal-month" id="cal-month-label"></div>
+          <button onclick="calNav(1)">&#8594;</button>
+          <button id="btn-cal-today" onclick="calToday()">Dnes</button>
+        </div>
       </div>
     </div>
     <div class="cal-grid-wrap">
@@ -287,7 +298,7 @@ const SCRIPT_REKLAMACE = 'https://script.google.com/macros/s/AKfycby1CrDyJardzxD
 const MONTHS_CS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const today = new Date();
 let calYear = today.getFullYear(), calMonth = today.getMonth();
-let dataInst=[], dataObh=[], dataRek=[], currentUser='vse';
+let dataInst=[], dataObh=[], dataRek=[], dataDoch=[], currentUser='vse';
 let tasks = JSON.parse(localStorage.getItem('dashboard_tasks')||'[]');
 
 // ── Header datum ──────────────────────────────────────────────────────────────
@@ -317,14 +328,16 @@ function syncStatus(state,text){
 async function loadAll(){
   syncStatus('loading','Načítám...');
   try {
-    const [rInst, rObh, rRek] = await Promise.all([
+    const [rInst, rObh, rRek, rDoch] = await Promise.all([
       fetch(SCRIPT_INSTALACE).then(r=>r.json()),
       fetch(SCRIPT_INSTALACE+'?modul=obhlidky').then(r=>r.json()),
       fetch(SCRIPT_REKLAMACE).then(r=>r.json()),
+      fetch(SCRIPT_INSTALACE+'?modul=dochazka').then(r=>r.json()),
     ]);
     dataInst = rInst.data||[];
     dataObh  = rObh.data||[];
     dataRek  = rRek.data||[];
+    dataDoch = rDoch.data||[];
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderAll();
   } catch(e){
@@ -386,6 +399,13 @@ function getCalEvents(){
     const d=toInputDate(r.datum); if(!d) return;
     const start=new Date(d+'T00:00:00');
     events.push({label:r.misto||r.zakaznik,start,end:start,cls:'ev-obh',id:r.id,url:'obhlidky.html'});
+  });
+  // Absence
+  const DOV_CLS={'Dovolená':'ev-dov','Neschopenka':'ev-nesc','Neplacené volno':'ev-nepl'};
+  dataDoch.filter(r=>r.datum_od&&r.datum_do).forEach(r=>{
+    const start=new Date(toInputDate(r.datum_od)+'T00:00:00');
+    const end=new Date(toInputDate(r.datum_do)+'T00:00:00');
+    events.push({label:r.zamestnanec,start,end,cls:DOV_CLS[r.typ]||'ev-dov',id:r.id,url:'dochazka.html'});
   });
   return events;
 }
