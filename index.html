@@ -84,14 +84,14 @@ button, input, select { font-family: inherit; }
 .cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 4px; }
 .cal-wd { text-align: center; font-size: 9px; letter-spacing: .1em; color: #555; text-transform: uppercase; padding: 4px 0; }
 .cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.cal-day { min-height: 80px; background: #13151c; padding: 5px 6px; position: relative; cursor: default; }
+.cal-day { min-height: 110px; background: #13151c; padding: 6px 8px; position: relative; cursor: default; }
 .cal-day.other { opacity: .3; }
 .cal-day.today { outline: 1px solid #e2b830; }
 .cal-day.today .dn { color: #e2b830; font-weight: 900; }
 .cal-day.weekend { background: #161820; }
 .dn { font-size: 10px; font-weight: 600; color: #555; margin-bottom: 3px; }
 .cal-day.has-ev .dn { color: #c0c8d0; }
-.cal-ev { font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 2px; margin-bottom: 1px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
+.cal-ev { font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 2px; margin-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
 .cal-ev:hover { opacity: .8; }
 .ev-inst { background: #2a2010; color: #e2b830; }
 .ev-obh  { background: #1a2a20; color: #3ab0a0; }
@@ -402,10 +402,12 @@ function getCalEvents(){
   });
   // Absence
   const DOV_CLS={'Dovolená':'ev-dov','Neschopenka':'ev-nesc','Neplacené volno':'ev-nepl'};
+  const DOV_SHORT={'Dovolená':'DOV','Neschopenka':'NESC','Neplacené volno':'NEPL'};
   dataDoch.filter(r=>r.datum_od&&r.datum_do).forEach(r=>{
     const start=new Date(toInputDate(r.datum_od)+'T00:00:00');
     const end=new Date(toInputDate(r.datum_do)+'T00:00:00');
-    events.push({label:r.zamestnanec,start,end,cls:DOV_CLS[r.typ]||'ev-dov',id:r.id,url:'dochazka.html'});
+    const short=DOV_SHORT[r.typ]||'ABS';
+    events.push({label:`${r.zamestnanec} · ${short}`,start,end,cls:DOV_CLS[r.typ]||'ev-dov',id:r.id,url:'dochazka.html'});
   });
   return events;
 }
