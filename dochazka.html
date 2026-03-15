@@ -137,7 +137,7 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
   .form-group.full { grid-column: 1; }
 }
 </style>
-</head>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/app/sw.js")}</script></head>
 <body>
 
 <div id="nav">
@@ -176,6 +176,17 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
   <button id="btn-add" onclick="openModal()">+ Přidat absenci</button>
   <button onclick="exportCSV()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">↓ CSV</button>
   <button onclick="exportPDF()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">↓ PDF</button>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+    <span style="font-size:10px;color:#555;letter-spacing:.1em;text-transform:uppercase;">Období:</span>
+    <select id="filter-rok" onchange="renderAll()" style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:5px 10px;font-size:12px;outline:none;"></select>
+    <select id="filter-mesic" onchange="renderAll()" style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:5px 10px;font-size:12px;outline:none;">
+      <option value="0">Celý rok</option>
+      <option value="1">Leden</option><option value="2">Únor</option><option value="3">Březen</option>
+      <option value="4">Duben</option><option value="5">Květen</option><option value="6">Červen</option>
+      <option value="7">Červenec</option><option value="8">Srpen</option><option value="9">Září</option>
+      <option value="10">Říjen</option><option value="11">Listopad</option><option value="12">Prosinec</option>
+    </select>
+  </div>
 </div>
 
 <!-- Upozornění na překryv -->
@@ -328,10 +339,42 @@ async function apiPost(payload){
 function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderAll(); }
 function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderAll(); }
 
+function initRokSelect(){
+  const sel=document.getElementById('filter-rok');
+  const currentYear=today.getFullYear();
+  for(let y=currentYear+1;y>=currentYear-3;y--){
+    const o=document.createElement('option');
+    o.value=y; o.textContent=y;
+    if(y===currentYear) o.selected=true;
+    sel.appendChild(o);
+  }
+  // nastav aktuální měsíc
+  document.getElementById('filter-mesic').value=today.getMonth()+1;
+}
+
 function getFiltered(){
   const q=(document.getElementById('search').value||'').toLowerCase();
   const todayStr=dateStr(today);
+  const rok=Number(document.getElementById('filter-rok').value)||0;
+  const mesic=Number(document.getElementById('filter-mesic').value)||0;
+
   return data.filter(r=>{
+    // Filtr období
+    if(rok){
+      const od=toInputDate(r.datum_od); const doo=toInputDate(r.datum_do);
+      if(!od||!doo) return false;
+      const rokOd=Number(od.split('-')[0]), rokDo=Number(doo.split('-')[0]);
+      const mesOd=Number(od.split('-')[1]), mesDo=Number(doo.split('-')[1]);
+      if(mesic===0){
+        // celý rok — záznam musí překrývat daný rok
+        if(rokDo<rok||rokOd>rok) return false;
+      } else {
+        // konkrétní měsíc — záznam musí překrývat daný měsíc/rok
+        const startMesic=`${rok}-${String(mesic).padStart(2,'0')}-01`;
+        const endMesic=`${rok}-${String(mesic).padStart(2,'0')}-31`;
+        if(od>endMesic||doo<startMesic) return false;
+      }
+    }
     if(filterVal==='aktualni'){
       const od=toInputDate(r.datum_od), doo=toInputDate(r.datum_do);
       if(!(od<=todayStr&&todayStr<=doo)) return false;
@@ -379,7 +422,7 @@ function exportCSV(){
 function exportPDF(){
   const rows=getFiltered();
   const tableRows=rows.map(r=>`<tr><td>${r.zamestnanec}</td><td>${r.typ}</td><td>${fmtDate(r.datum_od)}</td><td>${fmtDate(r.datum_do)}</td><td>${r.dni||countDays(toInputDate(r.datum_od),toInputDate(r.datum_do))}</td><td>${r.poznamka||''}</td></tr>`).join('');
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Docházka</title><style>body{font-family:Arial,sans-serif;font-size:12px;padding:20px;}h1{font-size:18px;margin-bottom:16px;}table{width:100%;border-collapse:collapse;}th{background:#eee;padding:6px 10px;text-align:left;border:1px solid #ccc;}td{padding:6px 10px;border:1px solid #ddd;}</style></head><body><h1>LEDshopik — Přehled absencí (${new Date().toLocaleDateString('cs-CZ')})</h1><table><thead><tr><th>Zaměstnanec</th><th>Typ</th><th>Od</th><th>Do</th><th>Dní</th><th>Poznámka</th></tr></thead><tbody>${tableRows}</tbody></table></body></html>`;
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Docházka</title><style>body{font-family:Arial,sans-serif;font-size:12px;padding:20px;}h1{font-size:18px;margin-bottom:16px;}table{width:100%;border-collapse:collapse;}th{background:#eee;padding:6px 10px;text-align:left;border:1px solid #ccc;}td{padding:6px 10px;border:1px solid #ddd;}</style><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/app/sw.js")}</script></head><body><h1>LEDshopik — Přehled absencí (${new Date().toLocaleDateString('cs-CZ')})</h1><table><thead><tr><th>Zaměstnanec</th><th>Typ</th><th>Od</th><th>Do</th><th>Dní</th><th>Poznámka</th></tr></thead><tbody>${tableRows}</tbody></table></body></html>`;
   const w=window.open('','_blank'); w.document.write(html); w.document.close(); w.print();
 }
 
@@ -512,6 +555,7 @@ async function deleteRecord(){
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
 }
 
+initRokSelect();
 loadData();
 setInterval(loadData,120000);
 </script>

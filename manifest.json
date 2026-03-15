@@ -1,0 +1,24 @@
+{
+  "name": "LEDshopik Systém",
+  "short_name": "LEDshopik",
+  "description": "Interní systém LEDshopik",
+  "start_url": "/app/index.html",
+  "display": "standalone",
+  "background_color": "#13151c",
+  "theme_color": "#e2b830",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
