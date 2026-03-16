@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDshopik – Výroba</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Arial Narrow', Arial, sans-serif; background: #0f1117; color: #e8e4dc; min-height: 100vh; }
+button, input, select, textarea { font-family: inherit; }
+
+#nav { background: #0a0c12; border-bottom: 1px solid #1e2230; padding: 0 24px; display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; }
+#nav a { padding: 10px 16px; font-size: 12px; font-weight: 700; letter-spacing: .1em; color: #555; text-decoration: none; text-transform: uppercase; display: flex; align-items: center; border-bottom: 2px solid transparent; }
+#nav a.active { color: #f07030; border-bottom-color: #f07030; }
+#nav a:hover { color: #e8e4dc; }
+
+#header { background: #0f1117; border-bottom: 1px solid #1e2230; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #4a5060; text-transform: uppercase; margin-bottom: 4px; }
+.header-left .title { font-size: 22px; font-weight: 900; letter-spacing: .06em; }
+.header-left .title span { color: #f07030; }
+
+.stats { display: flex; gap: 6px; flex-wrap: wrap; }
+.stat { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+.stat .num { font-size: 18px; font-weight: 800; line-height: 1; }
+.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; margin-top: 2px; }
+
+#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4a5060; }
+#sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #4a5060; }
+#sync-dot.ok { background: #40a050; }
+#sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
+#sync-dot.error { background: #c05050; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #1e2230; background: #0f1117; }
+.filter-btn { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+.filter-btn:hover { border-color: #3a3d4a; color: #c0c8d0; }
+.filter-btn.active { background: #f07030; color: #fff; border-color: #f07030; }
+.filter-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+#search-wrap { margin-left: auto; position: relative; }
+#search-wrap input { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; transition: border-color .2s; }
+#search-wrap input:focus { border-color: #f07030; }
+#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #4a5060; }
+
+#btn-add { background: #f07030; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
+#btn-add:hover { background: #ff8040; }
+#btn-refresh { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+
+/* Urgentní pruh */
+#urgent-bar { display: none; background: #2a0f00; border-bottom: 2px solid #f07030; padding: 10px 32px; align-items: center; gap: 10px; }
+#urgent-bar.show { display: flex; }
+
+/* Tabulka */
+#table-wrap { padding: 0 32px 32px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+thead th { background: #1a1d26; color: #4a5060; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2d3a; white-space: nowrap; cursor: pointer; user-select: none; }
+thead th:hover { color: #f07030; }
+thead th.sorted { color: #f07030; }
+thead th .sort-arrow { margin-left: 4px; font-size: 9px; }
+tbody tr { border-bottom: 1px solid #1a1d26; transition: background .12s; cursor: pointer; }
+tbody tr:hover { background: #161820; }
+tbody td { padding: 11px 14px; font-size: 12px; vertical-align: middle; color: #c0c8d0; }
+td.obj { font-weight: 700; color: #e8e4dc; font-size: 13px; }
+td.zakaznik { font-weight: 600; color: #e8e4dc; }
+
+/* Urgentní řádky */
+tbody tr[data-priorita="Urgentní"] { background: #1a0d05; }
+tbody tr[data-priorita="Urgentní"]:hover { background: #200f08; }
+tbody tr[data-priorita="Urgentní"] td:first-child { border-left: 3px solid #f07030; }
+tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #555; }
+
+/* Stav badges */
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+.s-ceka    { background: #1a2235; color: #6080c0; border: 1px solid #2a3555; } .s-ceka .badge-dot    { background: #6080c0; }
+.s-vyroba  { background: #2a2010; color: #e2b830; border: 1px solid #554020; } .s-vyroba .badge-dot  { background: #e2b830; }
+.s-hotovo  { background: #1a2a1a; color: #40a050; border: 1px solid #204530; } .s-hotovo .badge-dot  { background: #40a050; }
+.s-vydano  { background: #1a2a20; color: #3ab0a0; border: 1px solid #205540; } .s-vydano .badge-dot  { background: #3ab0a0; }
+
+/* Priorita badge */
+.prio-urgent { background: #2a1000; color: #f07030; border: 1px solid #602010; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; }
+.prio-normal { color: #555; font-size: 11px; }
+
+/* Odpočet */
+.countdown-red  { color: #e05050; font-weight: 700; }
+.countdown-warn { color: #e2b830; font-weight: 700; }
+.countdown-ok   { color: #40a050; }
+.countdown-done { color: #3ab0a0; }
+
+/* Náročnost */
+.narocnost-1 { color: #40a050; }
+.narocnost-2 { color: #e2b830; }
+.narocnost-3 { color: #e05050; }
+
+#empty-state { text-align: center; padding: 60px 20px; color: #4a5060; display: none; }
+
+/* Modal */
+#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#modal-overlay.open { display: flex; }
+#modal { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; width: 100%; max-width: 660px; max-height: 90vh; overflow-y: auto; }
+#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #1e2230; display: flex; align-items: center; justify-content: space-between; }
+#modal-title { font-size: 16px; font-weight: 800; }
+#modal-close { background: none; border: none; color: #4a5060; font-size: 20px; cursor: pointer; }
+#modal-close:hover { color: #e8e4dc; }
+#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; }
+.form-group input, .form-group select, .form-group textarea { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #f07030; }
+.form-group select option { background: #1a1d26; }
+.form-group textarea { resize: vertical; min-height: 60px; }
+
+#modal-footer { padding: 16px 24px; border-top: 1px solid #1e2230; display: flex; gap: 10px; justify-content: flex-end; }
+#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #552020; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-cancel { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-save { background: #f07030; color: #fff; border: none; border-radius: 6px; padding: 8px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-save:hover { background: #ff8040; }
+
+#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; align-items: center; justify-content: center; }
+#saving-overlay.open { display: flex; }
+#saving-box { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; padding: 24px 36px; text-align: center; }
+#saving-box .saving-title { font-size: 14px; font-weight: 700; color: #f07030; margin-bottom: 6px; }
+#saving-box .saving-sub { font-size: 12px; color: #4a5060; }
+
+@media (max-width: 720px) {
+  #header { padding: 12px 16px; }
+  #toolbar { padding: 10px 12px; }
+  #table-wrap { padding: 0 12px 24px; }
+  #modal-body { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: 1; }
+}
+</style>
+</head>
+<body>
+
+<div id="nav">
+  <a href="index.html">⌂ Dashboard</a>
+  <a href="instalace.html">Instalace</a>
+  <a href="obhlidky.html">Obhlídky</a>
+  <a href="reklamace.html">Reklamace</a>
+  <a href="konfigurator.html">Konfigurátor</a>
+  <a href="dochazka.html">Docházka</a>
+  <a href="vyroba.html" class="active">Výroba</a>
+</div>
+
+<div id="header">
+  <div class="header-left">
+    <div class="eyebrow">LEDshopik · Dílna</div>
+    <div class="title">VÝROBA <span>&</span> ZAKÁZKY</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-total"  style="color:#e8e4dc">0</div><div class="lbl">Celkem</div></div>
+      <div class="stat"><div class="num" id="stat-ceka"   style="color:#6080c0">0</div><div class="lbl">Čeká na výrobu</div></div>
+      <div class="stat"><div class="num" id="stat-vyroba" style="color:#e2b830">0</div><div class="lbl">Ve výrobě</div></div>
+      <div class="stat"><div class="num" id="stat-hotovo" style="color:#40a050">0</div><div class="lbl">Hotovo</div></div>
+      <div class="stat"><div class="num" id="stat-urgent" style="color:#f07030">0</div><div class="lbl">Urgentní</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="toolbar">
+  <button class="filter-btn active" data-filter="aktivni" onclick="setFilter('aktivni')">Aktivní</button>
+  <button class="filter-btn" data-filter="vse"    onclick="setFilter('vse')">Vše</button>
+  <button class="filter-btn" data-filter="Čeká na výrobu"          onclick="setFilter('Čeká na výrobu')"><span class="filter-dot" style="background:#6080c0"></span>Čeká na výrobu</button>
+  <button class="filter-btn" data-filter="Ve výrobě"     onclick="setFilter('Ve výrobě')"><span class="filter-dot" style="background:#e2b830"></span>Ve výrobě</button>
+  <button class="filter-btn" data-filter="Hotovo"        onclick="setFilter('Hotovo')"><span class="filter-dot" style="background:#40a050"></span>Hotovo</button>
+  <button class="filter-btn" data-filter="Vydáno zákazníkovi" onclick="setFilter('Vydáno zákazníkovi')"><span class="filter-dot" style="background:#3ab0a0"></span>Vydáno</button>
+  <button class="filter-btn" data-filter="Urgentní"      onclick="setFilter('Urgentní')"><span class="filter-dot" style="background:#f07030"></span>Urgentní</button>
+  <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
+  <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
+  <button id="btn-add" onclick="openModal()">+ Nová výroba</button>
+  <button onclick="toggleNastaveni()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">⚙ Nastavení</button>
+</div>
+
+<div id="nastaveni-panel" style="display:none;background:#161820;border-bottom:1px solid #2a2d3a;padding:16px 32px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <div style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#f07030;">⚙ NASTAVENÍ — Uložené telefony techniků</div>
+    <button onclick="saveNastaveniVyroba()" style="background:#f07030;color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:11px;font-weight:700;cursor:pointer;">Uložit</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;" id="tel-inputs"></div>
+  <div style="font-size:10px;color:#555;margin-top:8px;">Telefony se automaticky předvyplní při zadávání nové výroby podle zvoleného jména.</div>
+</div>
+
+<div id="urgent-bar">
+  <span style="background:#f07030;color:#fff;font-size:9px;font-weight:900;padding:2px 8px;border-radius:2px;flex-shrink:0;">!</span>
+  <span id="urgent-text" style="font-size:11px;color:#c0c8d0;"></span>
+</div>
+
+<div id="table-wrap">
+  <table>
+    <thead><tr>
+      <th onclick="sortBy('priorita')"      data-col="priorita">    Priorita      <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('obj')"           data-col="obj">          OBJ. Č.       <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('zakaznik')"      data-col="zakaznik">     Zákazník      <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('typ')"           data-col="typ">          Typ výroby    <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('narocnost')"     data-col="narocnost">    Náročnost     <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('datum_zalozeni')" data-col="datum_zalozeni">Založeno   <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('deadline')"      data-col="deadline">     Deadline      <span class="sort-arrow"></span></th>
+      <th>Zbývá</th>
+      <th onclick="sortBy('technik')"       data-col="technik">      Technik       <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('zadal')"         data-col="zadal">        Zadal         <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('stav')"          data-col="stav">         Stav          <span class="sort-arrow"></span></th>
+      <th>Poznámka</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div id="empty-state"><div style="font-size:36px;margin-bottom:10px;">🔧</div><p>Žádné zakázky</p></div>
+</div>
+
+<!-- Modal -->
+<div id="modal-overlay" onclick="overlayClick(event)">
+  <div id="modal">
+    <div id="modal-header">
+      <div id="modal-title">Nová výroba</div>
+      <button id="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body">
+      <div class="form-group"><label>OBJ. Č.</label><input type="text" id="f-obj" placeholder="např. 872804"></div>
+      <div class="form-group"><label>Zákazník</label><input type="text" id="f-zakaznik" placeholder="Jméno nebo firma"></div>
+      <div class="form-group"><label>Typ výroby</label>
+        <select id="f-typ">
+          <option>Pájení</option>
+          <option>Řezání</option>
+          <option>Pájení + řezání</option>
+          <option>Výroba svítidla</option>
+          <option>Montážní příprava</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Náročnost</label>
+        <select id="f-narocnost">
+          <option>Jednoduchá</option>
+          <option>Střední</option>
+          <option>Složitá</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Priorita</label>
+        <select id="f-priorita">
+          <option>Normální</option>
+          <option>Urgentní</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Datum založení</label><input type="date" id="f-datum-zalozeni"></div>
+      <div class="form-group"><label>Deadline</label><input type="date" id="f-deadline"></div>
+      <div class="form-group"><label>Technik</label>
+        <select id="f-technik" onchange="onTechnikChange()">
+          <option value="">— nevyplněno —</option>
+          <option>Ondra</option><option>David</option><option>Michal</option>
+          <option>Erik</option><option>Lukáš</option><option>Mário</option>
+          <option>Tom</option><option>Kuba</option><option>Petr</option>
+          <option>Miriam</option><option>Filip</option><option>Eve</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Zadal</label>
+        <select id="f-zadal" onchange="onZadalChange()">
+          <option value="">— nevyplněno —</option>
+          <option>Ondra</option><option>David</option><option>Michal</option>
+          <option>Erik</option><option>Lukáš</option><option>Mário</option>
+          <option>Tom</option><option>Kuba</option><option>Petr</option>
+          <option>Miriam</option><option>Filip</option><option>Eve</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Stav</label>
+        <select id="f-stav">
+          <option>Čeká na výrobu</option>
+          <option>Ve výrobě</option>
+          <option>Hotovo</option>
+          <option>Vydáno zákazníkovi</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Email zákazníka</label><input type="email" id="f-email" placeholder="pro notifikaci o vydání"></div>
+      <div class="form-group"><label>Tel. technika</label><input type="tel" id="f-tel-technik" placeholder="+420..."></div>
+      <div class="form-group"><label>Tel. zadavatele</label><input type="tel" id="f-tel-zadal" placeholder="+420..."></div>
+      <div class="form-group full"><label>Poznámka</label><textarea id="f-poznamka" placeholder="Specifika výroby, materiál, rozměry..."></textarea></div>
+    </div>
+    <div id="modal-footer">
+      <button id="btn-delete" onclick="deleteRecord()" style="display:none">🗑 Smazat</button>
+      <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
+      <button class="btn-save" onclick="saveRecord()">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<div id="saving-overlay">
+  <div id="saving-box">
+    <div class="saving-title" id="saving-title">Ukládám...</div>
+    <div class="saving-sub" id="saving-sub">Komunikuji s Google Sheets</div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBVbjLotrlstadbsSHLvrl-SLPp7Kpopc7NfazwnTcTDWeviT93LP_pYP-LH9UfFD5/exec';
+const COLS = ['id','obj','zakaznik','typ','narocnost','priorita','datum_zalozeni','deadline','technik','zadal','stav','email','tel_technik','tel_zadal','poznamka'];
+
+const STATUS_CLASS = {
+  'Čeká na výrobu':                's-ceka',
+  'Ve výrobě':           's-vyroba',
+  'Hotovo':              's-hotovo',
+  'Vydáno zákazníkovi':  's-vydano',
+};
+const NAROCNOST_CLASS = { 'Jednoduchá':'narocnost-1', 'Střední':'narocnost-2', 'Složitá':'narocnost-3' };
+
+let data=[], filterVal='aktivni', sortCol='deadline', sortDir=1, editId=null;
+const today=new Date();
+
+function toInputDate(d){
+  if(!d||d==='') return '';
+  if(typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  const dt=new Date(d); if(isNaN(dt)) return '';
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+}
+function fmtDate(d){ const s=toInputDate(d); if(!s) return '—'; const [y,m,day]=s.split('-'); return `${day}.${m}.${y}`; }
+function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+function calcCountdown(deadline, stav){
+  if(stav==='Vydáno zákazníkovi') return {text:'Vydáno',cls:'countdown-done'};
+  if(stav==='Hotovo') return {text:'Hotovo',cls:'countdown-done'};
+  const d=toInputDate(deadline); if(!d) return {text:'—',cls:''};
+  const diff=Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
+  if(diff<0)  return {text:`-${Math.abs(diff)} dní`,cls:'countdown-red'};
+  if(diff===0) return {text:'Dnes!',cls:'countdown-red'};
+  if(diff<=2) return {text:`${diff} dny`,cls:'countdown-warn'};
+  if(diff<=5) return {text:`${diff} dní`,cls:'countdown-warn'};
+  return {text:`${diff} dní`,cls:'countdown-ok'};
+}
+
+function syncStatus(state,text){ document.getElementById('sync-dot').className=state; document.getElementById('sync-text').textContent=text; }
+
+async function loadData(){
+  syncStatus('loading','Načítám data...');
+  try {
+    const res=await fetch(SCRIPT_URL+'?modul=vyroba');
+    const json=await res.json();
+    data=json.data||[];
+    syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
+    renderTable();
+  } catch(e){ syncStatus('error','Chyba: '+e.message); }
+}
+
+async function apiPost(payload){
+  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({...payload,modul:'vyroba'})});
+  const json=await res.json();
+  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+}
+
+function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderTable(); }
+function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTable(); }
+
+function getFiltered(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  return data.filter(r=>{
+    if(filterVal==='aktivni') { if(r.stav==='Vydáno zákazníkovi') return false; }
+    else if(filterVal==='Urgentní') { if(r.priorita!=='Urgentní') return false; }
+    else if(filterVal!=='vse') { if(r.stav!==filterVal) return false; }
+    if(q&&![r.obj,r.zakaznik,r.typ,r.technik,r.zadal,r.poznamka].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b)=>{
+    const va=a[sortCol]||'', vb=b[sortCol]||'';
+    // Urgentní vždy nahoře
+    if(sortCol==='priorita'){
+      if(a.priorita==='Urgentní'&&b.priorita!=='Urgentní') return -1;
+      if(a.priorita!=='Urgentní'&&b.priorita==='Urgentní') return 1;
+      return 0;
+    }
+    return va<vb?-sortDir:va>vb?sortDir:0;
+  });
+}
+
+function renderTable(){
+  const rows=getFiltered();
+
+  // Statistiky
+  document.getElementById('stat-total').textContent=data.filter(r=>r.stav!=='Vydáno zákazníkovi').length;
+  document.getElementById('stat-ceka').textContent=data.filter(r=>r.stav==='Čeká na výrobu').length;
+  document.getElementById('stat-vyroba').textContent=data.filter(r=>r.stav==='Ve výrobě').length;
+  document.getElementById('stat-hotovo').textContent=data.filter(r=>r.stav==='Hotovo').length;
+  document.getElementById('stat-urgent').textContent=data.filter(r=>r.priorita==='Urgentní'&&r.stav!=='Vydáno zákazníkovi').length;
+
+  // Urgentní upozornění
+  const todayStr=dateStr(today);
+  const urgent=data.filter(r=>r.priorita==='Urgentní'&&r.stav!=='Vydáno zákazníkovi'&&r.stav!=='Hotovo');
+  const blizici=data.filter(r=>{
+    const d=toInputDate(r.deadline); if(!d) return false;
+    const diff=Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
+    return diff<=2&&diff>=0&&r.stav!=='Vydáno zákazníkovi'&&r.stav!=='Hotovo';
+  });
+  const bar=document.getElementById('urgent-bar');
+  const msgs=[];
+  if(urgent.length) msgs.push(`${urgent.length}× urgentní zakázka`);
+  blizici.forEach(r=>{ const cd=calcCountdown(r.deadline,r.stav); msgs.push(`${r.obj} (${r.zakaznik}) — ${cd.text}`); });
+  if(msgs.length){ bar.classList.add('show'); document.getElementById('urgent-text').textContent=msgs.join(' · '); }
+  else bar.classList.remove('show');
+
+  // Řazení hlaviček
+  document.querySelectorAll('thead th[data-col]').forEach(th=>{
+    th.classList.toggle('sorted',th.dataset.col===sortCol);
+    th.querySelector('.sort-arrow').textContent=th.dataset.col===sortCol?(sortDir===1?' ↓':' ↑'):'';
+  });
+
+  const tbody=document.getElementById('tbody');
+  if(!rows.length){ tbody.innerHTML=''; document.getElementById('empty-state').style.display='block'; return; }
+  document.getElementById('empty-state').style.display='none';
+
+  const cd_map=rows.map(r=>calcCountdown(r.deadline,r.stav));
+
+  tbody.innerHTML=rows.map((r,i)=>`
+    <tr data-id="${r.id}" data-priorita="${r.priorita}" onclick="openModal('${r.id}')">
+      <td>${r.priorita==='Urgentní'?'<span class="prio-urgent">⚡ URGENTNÍ</span>':'<span class="prio-normal">—</span>'}</td>
+      <td class="obj">${r.obj||'—'}</td>
+      <td class="zakaznik">${r.zakaznik||'—'}</td>
+      <td style="font-size:11px;">${r.typ||'—'}</td>
+      <td><span class="${NAROCNOST_CLASS[r.narocnost]||''}" style="font-size:11px;font-weight:700;">${r.narocnost||'—'}</span></td>
+      <td class="datum">${fmtDate(r.datum_zalozeni)}</td>
+      <td class="datum">${fmtDate(r.deadline)}</td>
+      <td><span class="${cd_map[i].cls}" style="font-size:11px;">${cd_map[i].text}</span></td>
+      <td>${r.technik||'—'}</td>
+      <td style="font-size:11px;color:#8890a0;">${r.zadal||'—'}</td>
+      <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
+      <td style="font-size:11px;color:#8890a0;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.poznamka||''}</td>
+    </tr>`).join('');
+}
+
+function openModal(id){
+  const r=id?data.find(x=>x.id===String(id)):null;
+  editId=r?String(r.id):null;
+  document.getElementById('modal-title').textContent=r?'Upravit výrobu':'Nová výroba';
+  document.getElementById('btn-delete').style.display=r?'inline-flex':'none';
+  if(r){
+    document.getElementById('f-obj').value=r.obj||'';
+    document.getElementById('f-zakaznik').value=r.zakaznik||'';
+    document.getElementById('f-typ').value=r.typ||'Pájení';
+    document.getElementById('f-narocnost').value=r.narocnost||'Jednoduchá';
+    document.getElementById('f-priorita').value=r.priorita||'Normální';
+    document.getElementById('f-datum-zalozeni').value=toInputDate(r.datum_zalozeni);
+    document.getElementById('f-deadline').value=toInputDate(r.deadline);
+    document.getElementById('f-technik').value=r.technik||'';
+    document.getElementById('f-zadal').value=r.zadal||'';
+    document.getElementById('f-stav').value=r.stav||'Čeká na výrobu';
+    document.getElementById('f-email').value=r.email||'';
+    document.getElementById('f-tel-technik').value=r.tel_technik||'';
+    document.getElementById('f-tel-zadal').value=r.tel_zadal||'';
+    document.getElementById('f-poznamka').value=r.poznamka||'';
+  } else {
+    ['f-obj','f-zakaznik','f-email','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
+    document.getElementById('f-typ').value='Pájení';
+    document.getElementById('f-narocnost').value='Jednoduchá';
+    document.getElementById('f-priorita').value='Normální';
+    document.getElementById('f-stav').value='Čeká na výrobu';
+    document.getElementById('f-technik').value='';
+    document.getElementById('f-zadal').value='';
+    document.getElementById('f-datum-zalozeni').value=toInputDate(today);
+    document.getElementById('f-deadline').value='';
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); editId=null; }
+function overlayClick(e){ if(e.target===document.getElementById('modal-overlay')) closeModal(); }
+function showSaving(t,s){ document.getElementById('saving-title').textContent=t; document.getElementById('saving-sub').textContent=s; document.getElementById('saving-overlay').classList.add('open'); }
+function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
+
+async function saveRecord(){
+  const isEdit=!!editId;
+  const currentId=editId?String(editId):String(Date.now());
+  const rec={
+    id:             currentId,
+    obj:            document.getElementById('f-obj').value.trim(),
+    zakaznik:       document.getElementById('f-zakaznik').value.trim(),
+    typ:            document.getElementById('f-typ').value,
+    narocnost:      document.getElementById('f-narocnost').value,
+    priorita:       document.getElementById('f-priorita').value,
+    datum_zalozeni: document.getElementById('f-datum-zalozeni').value,
+    deadline:       document.getElementById('f-deadline').value,
+    technik:        document.getElementById('f-technik').value,
+    zadal:          document.getElementById('f-zadal').value,
+    stav:           document.getElementById('f-stav').value,
+    email:          document.getElementById('f-email').value.trim(),
+    tel_technik:    document.getElementById('f-tel-technik').value.trim(),
+    tel_zadal:      document.getElementById('f-tel-zadal').value.trim(),
+    poznamka:       document.getElementById('f-poznamka').value.trim(),
+  };
+  closeModal();
+  showSaving(isEdit?'Ukládám změny...':'Přidávám zakázku...','Komunikuji s Google Sheets');
+  try {
+    await apiPost({action:isEdit?'update':'append',record:rec});
+    showSaving('Hotovo!','Data uložena');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+async function deleteRecord(){
+  if(!editId||!confirm('Opravdu smazat tuto zakázku?')) return;
+  const id=editId; closeModal();
+  showSaving('Mažu...','');
+  try {
+    await apiPost({action:'delete',id:String(id)});
+    showSaving('Smazáno!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+const ZAMESTNANCI = ['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];
+
+function getTel(jmeno){ return localStorage.getItem('tel_'+jmeno)||''; }
+function setTel(jmeno,tel){ localStorage.setItem('tel_'+jmeno,tel); }
+
+function toggleNastaveni(){
+  const p=document.getElementById('nastaveni-panel');
+  p.style.display=p.style.display==='none'?'block':'none';
+  if(p.style.display==='block'){
+    document.getElementById('tel-inputs').innerHTML=ZAMESTNANCI.map(z=>`
+      <div>
+        <div style="font-size:10px;color:#555;margin-bottom:4px;">${z}</div>
+        <input type="tel" id="tel_${z}" value="${getTel(z)}" placeholder="+420..."
+          style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:6px 10px;font-size:12px;outline:none;width:100%;">
+      </div>`).join('');
+  }
+}
+
+function saveNastaveniVyroba(){
+  ZAMESTNANCI.forEach(z=>{
+    const el=document.getElementById('tel_'+z);
+    if(el) setTel(z,el.value.trim());
+  });
+  toggleNastaveni();
+}
+
+// Předvyplnit telefony při změně technika/zadavatele
+function onTechnikChange(){
+  const jmeno=document.getElementById('f-technik').value;
+  const tel=getTel(jmeno);
+  if(tel) document.getElementById('f-tel-technik').value=tel;
+}
+function onZadalChange(){
+  const jmeno=document.getElementById('f-zadal').value;
+  const tel=getTel(jmeno);
+  if(tel) document.getElementById('f-tel-zadal').value=tel;
+}
+
+loadData();
+setInterval(loadData,60000);
+</script>
+</body>
+</html>
