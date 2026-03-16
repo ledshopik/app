@@ -415,7 +415,7 @@ function renderTable(){
 
   tbody.innerHTML=rows.map((r,i)=>`
     <tr data-id="${r.id}" data-priorita="${r.priorita}" onclick="openModal('${r.id}')">
-      <td>${r.priorita==='Urgentní'?'<span class="prio-urgent">⚡ URGENTNÍ</span>':'<span class="prio-normal">—</span>'}</td>
+      <td>${r.priorita==='Urgentní'?'<span class="prio-urgent">⚡ URGENTNÍ</span>':'<span class="prio-normal">Normální</span>'}</td>
       <td class="obj">${r.obj||'—'}</td>
       <td class="zakaznik">${r.zakaznik||'—'}</td>
       <td style="font-size:11px;">${r.typ||'—'}</td>
