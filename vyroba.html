@@ -177,11 +177,19 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #2a
 
 <div id="nastaveni-panel" style="display:none;background:#161820;border-bottom:1px solid #2a2d3a;padding:16px 32px;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-    <div style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#f07030;">⚙ NASTAVENÍ — Uložené telefony techniků</div>
+    <div style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#f07030;">⚙ NASTAVENÍ — Telegram Chat ID</div>
     <button onclick="saveNastaveniVyroba()" style="background:#f07030;color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:11px;font-weight:700;cursor:pointer;">Uložit</button>
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;" id="tel-inputs"></div>
-  <div style="font-size:10px;color:#555;margin-top:8px;">Telefony se automaticky předvyplní při zadávání nové výroby podle zvoleného jména.</div>
+  <div style="margin-top:16px;padding-top:14px;border-top:1px solid #2a2d3a;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#f07030;margin-bottom:8px;">NOTIFIKACE — STAV HOTOVO</div>
+    <div>
+      <div style="font-size:10px;color:#555;margin-bottom:4px;">Chat ID příjemce</div>
+      <input type="text" id="hotovo_chat_id" placeholder="např. 8703966707"
+        style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:6px 10px;font-size:12px;outline:none;width:300px;">
+    </div>
+  </div>
+  <div style="font-size:10px;color:#555;margin-top:8px;">Chat ID se automaticky předvyplní při zadávání nové výroby podle zvoleného jména. Chat ID zjistíš přes @ledshopik_notifikace_bot → /start.</div>
 </div>
 
 <div id="urgent-bar">
@@ -291,7 +299,7 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #2a
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBVbjLotrlstadbsSHLvrl-SLPp7Kpopc7NfazwnTcTDWeviT93LP_pYP-LH9UfFD5/exec';
-const COLS = ['id','obj','zakaznik','typ','narocnost','priorita','datum_zalozeni','deadline','technik','zadal','stav','email','tel_technik','tel_zadal','poznamka'];
+const COLS = ['id','obj','zakaznik','typ','narocnost','priorita','datum_zalozeni','deadline','technik','zadal','stav','tel_technik','tel_zadal','chat_id_hotovo','poznamka'];
 
 const STATUS_CLASS = {
   'Čeká na výrobu':                's-ceka',
@@ -516,6 +524,7 @@ function toggleNastaveni(){
   const p=document.getElementById('nastaveni-panel');
   p.style.display=p.style.display==='none'?'block':'none';
   if(p.style.display==='block'){
+    const hotovoChatIdEl=document.getElementById('hotovo_chat_id'); if(hotovoChatIdEl) hotovoChatIdEl.value=localStorage.getItem('hotovo_chat_id')||'';
     document.getElementById('tel-inputs').innerHTML=ZAMESTNANCI.map(z=>`
       <div>
         <div style="font-size:10px;color:#555;margin-bottom:4px;">${z}</div>
@@ -530,6 +539,8 @@ function saveNastaveniVyroba(){
     const el=document.getElementById('tel_'+z);
     if(el) setTel(z,el.value.trim());
   });
+  const hotovoChatId=document.getElementById('hotovo_chat_id');
+  if(hotovoChatId) localStorage.setItem('hotovo_chat_id',hotovoChatId.value.trim());
   toggleNastaveni();
 }
 

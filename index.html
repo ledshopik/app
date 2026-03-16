@@ -148,11 +148,11 @@ button, input, select { font-family: inherit; }
 <div id="user-bar">
   <a href="index.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#e2b830;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:6px;border-bottom:2px solid #e2b830;">⌂ Dashboard</a>
   <a href="instalace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e2b830'" onmouseout="this.style.color='#555'">Instalace</a>
+  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#f07030'" onmouseout="this.style.color='#555'">Výroba</a>
   <a href="obhlidky.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#3ab0a0'" onmouseout="this.style.color='#555'">Obhlídky</a>
   <a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e05050'" onmouseout="this.style.color='#555'">Reklamace</a>
   <a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#a070e0'" onmouseout="this.style.color='#555'">Konfigurátor</a>
   <a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#555'">Docházka</a>
-  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#f07030'" onmouseout="this.style.color='#555'">Výroba</a>
   <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
     <div class="user-label">Zobrazit jako:</div>
     <select id="user-select" onchange="setUser(this.value)">
@@ -414,12 +414,12 @@ function getCalEvents(){
     const d=toInputDate(r.datum); if(!d) return;
     const start=new Date(d+'T00:00:00');
     const end=new Date(start); end.setDate(end.getDate()+Math.max(1,Number(r.delka)||1)-1);
-    events.push({label:r.misto||r.obj,start,end,cls:'ev-inst',id:r.id,url:'instalace.html'});
+    events.push({label:(r.misto||r.obj)+' · INS',start,end,cls:'ev-inst',id:r.id,url:'instalace.html'});
   });
   filterByUser(dataObh,'technik').filter(r=>r.datum).forEach(r=>{
     const d=toInputDate(r.datum); if(!d) return;
     const start=new Date(d+'T00:00:00');
-    events.push({label:r.misto||r.zakaznik,start,end:start,cls:'ev-obh',id:r.id,url:'obhlidky.html'});
+    events.push({label:(r.misto||r.zakaznik)+' · OBH',start,end:start,cls:'ev-obh',id:r.id,url:'obhlidky.html'});
   });
   // Absence
   const DOV_CLS={'Dovolená':'ev-dov','Neschopenka':'ev-nesc','Neplacené volno':'ev-nepl'};
@@ -429,7 +429,7 @@ function getCalEvents(){
     const d=toInputDate(r.deadline); if(!d) return;
     const start=new Date(d+'T00:00:00');
     const urgent=r.priorita==='Urgentní';
-    events.push({label:(urgent?'⚡ ':'')+r.obj+' '+r.zakaznik,start,end:start,cls:'ev-vyr',id:r.id,url:'vyroba.html'});
+    events.push({label:(urgent?'⚡ ':'')+r.obj+' '+r.zakaznik+' · VYR',start,end:start,cls:'ev-vyr',id:r.id,url:'vyroba.html'});
   });
   const filtDoch = currentUser==='vse' ? dataDoch : dataDoch.filter(r=>(r.zamestnanec||'').toLowerCase()===currentUser.toLowerCase());
   filtDoch.filter(r=>r.datum_od&&r.datum_do).forEach(r=>{
