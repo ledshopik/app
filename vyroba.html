@@ -67,7 +67,7 @@ td.zakaznik { font-weight: 600; color: #e8e4dc; }
 tbody tr[data-priorita="Urgentní"] { background: #1a0d05; }
 tbody tr[data-priorita="Urgentní"]:hover { background: #200f08; }
 tbody tr[data-priorita="Urgentní"] td:first-child { border-left: 3px solid #f07030; }
-tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #555; }
+tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #2a2d3a; }
 
 /* Stav badges */
 .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; }
@@ -137,6 +137,7 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #55
 <div id="nav">
   <a href="index.html">⌂ Dashboard</a>
   <a href="instalace.html">Instalace</a>
+  <a href="vyroba.html" class="active">Výroba</a>
   <a href="obhlidky.html">Obhlídky</a>
   <a href="reklamace.html">Reklamace</a>
   <a href="konfigurator.html">Konfigurátor</a>
@@ -199,7 +200,7 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #55
       <th onclick="sortBy('narocnost')"     data-col="narocnost">    Náročnost     <span class="sort-arrow"></span></th>
       <th onclick="sortBy('datum_zalozeni')" data-col="datum_zalozeni">Založeno   <span class="sort-arrow"></span></th>
       <th onclick="sortBy('deadline')"      data-col="deadline">     Deadline      <span class="sort-arrow"></span></th>
-      <th>Zbývá</th>
+      <th onclick="sortBy('countdown_val')" data-col="countdown_val" style="cursor:pointer;">Zbývá <span class="sort-arrow"></span></th>
       <th onclick="sortBy('technik')"       data-col="technik">      Technik       <span class="sort-arrow"></span></th>
       <th onclick="sortBy('zadal')"         data-col="zadal">        Zadal         <span class="sort-arrow"></span></th>
       <th onclick="sortBy('stav')"          data-col="stav">         Stav          <span class="sort-arrow"></span></th>
@@ -270,7 +271,6 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #55
           <option>Vydáno zákazníkovi</option>
         </select>
       </div>
-      <div class="form-group"><label>Email zákazníka</label><input type="email" id="f-email" placeholder="pro notifikaci o vydání"></div>
       <div class="form-group"><label>Tel. technika</label><input type="tel" id="f-tel-technik" placeholder="+420..."></div>
       <div class="form-group"><label>Tel. zadavatele</label><input type="tel" id="f-tel-zadal" placeholder="+420..."></div>
       <div class="form-group full"><label>Poznámka</label><textarea id="f-poznamka" placeholder="Specifika výroby, materiál, rozměry..."></textarea></div>
@@ -348,6 +348,12 @@ async function apiPost(payload){
 function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderTable(); }
 function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTable(); }
 
+function getCountdownDays(deadline, stav){
+  if(stav==='Vydáno zákazníkovi'||stav==='Hotovo') return 9999;
+  const d=toInputDate(deadline); if(!d) return 9998;
+  return Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
+}
+
 function getFiltered(){
   const q=(document.getElementById('search').value||'').toLowerCase();
   return data.filter(r=>{
@@ -363,6 +369,9 @@ function getFiltered(){
       if(a.priorita==='Urgentní'&&b.priorita!=='Urgentní') return -1;
       if(a.priorita!=='Urgentní'&&b.priorita==='Urgentní') return 1;
       return 0;
+    }
+    if(sortCol==='countdown_val'){
+      return (getCountdownDays(a.deadline,a.stav) - getCountdownDays(b.deadline,b.stav)) * sortDir;
     }
     return va<vb?-sortDir:va>vb?sortDir:0;
   });
@@ -438,12 +447,11 @@ function openModal(id){
     document.getElementById('f-technik').value=r.technik||'';
     document.getElementById('f-zadal').value=r.zadal||'';
     document.getElementById('f-stav').value=r.stav||'Čeká na výrobu';
-    document.getElementById('f-email').value=r.email||'';
     document.getElementById('f-tel-technik').value=r.tel_technik||'';
     document.getElementById('f-tel-zadal').value=r.tel_zadal||'';
     document.getElementById('f-poznamka').value=r.poznamka||'';
   } else {
-    ['f-obj','f-zakaznik','f-email','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
+    ['f-obj','f-zakaznik','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('f-typ').value='Pájení';
     document.getElementById('f-narocnost').value='Jednoduchá';
     document.getElementById('f-priorita').value='Normální';
@@ -476,7 +484,6 @@ async function saveRecord(){
     technik:        document.getElementById('f-technik').value,
     zadal:          document.getElementById('f-zadal').value,
     stav:           document.getElementById('f-stav').value,
-    email:          document.getElementById('f-email').value.trim(),
     tel_technik:    document.getElementById('f-tel-technik').value.trim(),
     tel_zadal:      document.getElementById('f-tel-zadal').value.trim(),
     poznamka:       document.getElementById('f-poznamka').value.trim(),
