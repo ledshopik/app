@@ -48,7 +48,7 @@ button, input, select { font-family: inherit; }
 #main { max-width: 1100px; margin: 0 auto; padding: 24px 32px; }
 
 /* Module cards */
-.modules-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; margin-bottom: 2px; }
+.modules-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-bottom: 2px; }
 .module-card {
   background: #1c1f2a; padding: 20px; cursor: pointer;
   border-top: 2px solid transparent;
@@ -99,6 +99,7 @@ button, input, select { font-family: inherit; }
 .ev-dov  { background: #1a3a20; color: #40c060; }
 .ev-nesc { background: #2a1a1a; color: #e05050; }
 .ev-vyr  { background: #2a1500; color: #f07030; }
+.ev-zas  { background: #1a1800; color: #c8a830; }
 .ev-nepl { background: #2a2010; color: #e2b830; }
 
 /* Schedule */
@@ -153,6 +154,7 @@ button, input, select { font-family: inherit; }
   <a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e05050'" onmouseout="this.style.color='#555'">Reklamace</a>
   <a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#a070e0'" onmouseout="this.style.color='#555'">Konfigurátor</a>
   <a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#555'">Docházka</a>
+  <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#c8a830'" onmouseout="this.style.color='#555'">Zásobování</a>
   <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
     <div class="user-label">Zobrazit jako:</div>
     <select id="user-select" onchange="setUser(this.value)">
@@ -229,6 +231,15 @@ button, input, select { font-family: inherit; }
       </div>
       <div class="mod-footer" style="color:#a070e0;">OTEVŘÍT →</div>
     </a>
+    <a href="zasobovani.html" class="module-card" style="border-top-color:#c8a830;">
+      <div class="mod-label" style="color:#c8a830;">Zásobování</div>
+      <div class="mod-count" id="mc-zas-total">—</div>
+      <div class="mod-stats">
+        <div class="mod-stat-row"><span class="lbl">Na cestě</span><span class="val" id="mc-zas-cesta" style="color:#4090d0;">—</span></div>
+        <div class="mod-stat-row"><span class="lbl">Na celnici</span><span class="val" id="mc-zas-celnice" style="color:#e08030;">—</span></div>
+      </div>
+      <div class="mod-footer" style="color:#c8a830;">OTEVŘÍT →</div>
+    </a>
   </div>
 
   <!-- Calendar -->
@@ -244,6 +255,7 @@ button, input, select { font-family: inherit; }
           <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#1a2a20;"></div>Obhlídka</div>
           <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#1a3a20;"></div>Dovolená</div>
           <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#2a1500;"></div>Výroba</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#1a1800;"></div>Zásobování</div>
           <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#2a1a1a;"></div>Neschopenka</div>
         </div>
         <div class="cal-nav">
@@ -307,12 +319,13 @@ button, input, select { font-family: inherit; }
 // ── Konfigurace ────────────────────────────────────────────────────────────────
 const SCRIPT_INSTALACE = 'https://script.google.com/macros/s/AKfycbx9Jig_9A16cEdpuFJfVHvc34iXiBGq42FSBw2OuIoeRNiI5j0BfZQx2j-8549R1VTjQg/exec'; // URL scriptu pro instalace+obhlidky
 const SCRIPT_VYROBA    = 'https://script.google.com/macros/s/AKfycbyBVbjLotrlstadbsSHLvrl-SLPp7Kpopc7NfazwnTcTDWeviT93LP_pYP-LH9UfFD5/exec';
-const SCRIPT_REKLAMACE = 'https://script.google.com/macros/s/AKfycby1CrDyJardzxDfKV0Bog2DznHIOPmOAL8tI6TgnWDKiWPTdH-kanpx0ZTeJi17WnDhOA/exec'; // URL scriptu pro reklamace
+const SCRIPT_ZASOBOVANI = 'https://script.google.com/macros/s/AKfycbx3P3afYwkaVnC7Wh3_iTP5XS5PvC2pbwogDrkmOsQdCW3yQ8AX_p0dB_nICvmAr76E6A/exec';
+  const SCRIPT_REKLAMACE = 'https://script.google.com/macros/s/AKfycby1CrDyJardzxDfKV0Bog2DznHIOPmOAL8tI6TgnWDKiWPTdH-kanpx0ZTeJi17WnDhOA/exec'; // URL scriptu pro reklamace
 
 const MONTHS_CS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const today = new Date();
 let calYear = today.getFullYear(), calMonth = today.getMonth();
-let dataInst=[], dataObh=[], dataRek=[], dataDoch=[], dataVyr=[], currentUser='vse';
+let dataInst=[], dataObh=[], dataRek=[], dataDoch=[], dataVyr=[], dataZas=[], currentUser='vse';
 let tasks = JSON.parse(localStorage.getItem('dashboard_tasks')||'[]');
 
 // ── Header datum ──────────────────────────────────────────────────────────────
@@ -342,18 +355,20 @@ function syncStatus(state,text){
 async function loadAll(){
   syncStatus('loading','Načítám...');
   try {
-    const [rInst, rObh, rRek, rDoch, rVyr] = await Promise.all([
+    const [rInst, rObh, rRek, rDoch, rVyr, rZas] = await Promise.all([
       fetch(SCRIPT_INSTALACE).then(r=>r.json()),
       fetch(SCRIPT_INSTALACE+'?modul=obhlidky').then(r=>r.json()),
       fetch(SCRIPT_REKLAMACE).then(r=>r.json()),
       fetch(SCRIPT_INSTALACE+'?modul=dochazka').then(r=>r.json()),
       fetch(SCRIPT_VYROBA).then(r=>r.json()),
+      fetch(SCRIPT_ZASOBOVANI+'?modul=zasilky').then(r=>r.json()),
     ]);
     dataInst = rInst.data||[];
     dataObh  = rObh.data||[];
     dataRek  = rRek.data||[];
     dataDoch = rDoch.data||[];
     dataVyr  = rVyr.data||[];
+    dataZas  = rZas.data||[];
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderAll();
   } catch(e){
@@ -394,6 +409,10 @@ function renderModuleCards(){
   document.getElementById('mc-vyr-ceka').textContent   = dataVyr.filter(r=>r.stav==='Čeká na výrobu').length;
   document.getElementById('mc-vyr-vyroba').textContent = dataVyr.filter(r=>r.stav==='Ve výrobě').length;
   document.getElementById('mc-vyr-urgent').textContent = dataVyr.filter(r=>r.priorita==='Urgentní'&&r.stav!=='Vydáno zákazníkovi').length;
+
+  document.getElementById('mc-zas-total').textContent  = dataZas.filter(r=>r.stav!=='Doručeno'&&r.stav!=='Zrušeno').length||'0';
+  document.getElementById('mc-zas-cesta').textContent  = dataZas.filter(r=>r.stav==='Odesláno').length;
+  document.getElementById('mc-zas-celnice').textContent = dataZas.filter(r=>r.stav==='Na celnici').length;
 }
 
 // ── Calendar ──────────────────────────────────────────────────────────────────
@@ -424,6 +443,12 @@ function getCalEvents(){
   // Absence
   const DOV_CLS={'Dovolená':'ev-dov','Neschopenka':'ev-nesc','Neplacené volno':'ev-nepl'};
   const DOV_SHORT={'Dovolená':'DOV','Neschopenka':'NESC','Neplacené volno':'NEPL'};
+  // Zásobování v kalendáři
+  dataZas.filter(r=>r.ocekavane_doruceni&&r.stav!=='Doručeno'&&r.stav!=='Zrušeno').forEach(r=>{
+    const d=toInputDate(r.ocekavane_doruceni); if(!d) return;
+    const start=new Date(d+'T00:00:00');
+    events.push({label:(r.dodavatel||r.cislo_obj)+' · ZAS',start,end:start,cls:'ev-zas',id:r.id,url:'zasobovani.html'});
+  });
   // Výroba v kalendáři
   dataVyr.filter(r=>r.deadline&&r.stav!=='Vydáno zákazníkovi').forEach(r=>{
     const d=toInputDate(r.deadline); if(!d) return;

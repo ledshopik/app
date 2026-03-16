@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDshopik – Zásobování</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Arial Narrow', Arial, sans-serif; background: #0f1117; color: #e8e4dc; min-height: 100vh; }
+button, input, select, textarea { font-family: inherit; }
+
+#nav { background: #0a0c12; border-bottom: 1px solid #1e2230; padding: 0 24px; display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; }
+#nav a { padding: 10px 16px; font-size: 12px; font-weight: 700; letter-spacing: .1em; color: #555; text-decoration: none; text-transform: uppercase; display: flex; align-items: center; border-bottom: 2px solid transparent; }
+#nav a.active { color: #c8a830; border-bottom-color: #c8a830; }
+#nav a:hover { color: #e8e4dc; }
+
+#header { background: #0f1117; border-bottom: 1px solid #1e2230; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #4a5060; text-transform: uppercase; margin-bottom: 4px; }
+.header-left .title { font-size: 22px; font-weight: 900; letter-spacing: .06em; }
+.header-left .title span { color: #c8a830; }
+
+.stats { display: flex; gap: 6px; flex-wrap: wrap; }
+.stat { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+.stat .num { font-size: 18px; font-weight: 800; line-height: 1; }
+.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; margin-top: 2px; }
+
+#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4a5060; }
+#sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #4a5060; }
+#sync-dot.ok { background: #40a050; }
+#sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
+#sync-dot.error { background: #c05050; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* Záložky */
+#tabs { background: #0a0c12; border-bottom: 1px solid #1e2230; padding: 0 32px; display: flex; gap: 0; }
+.tab-btn { padding: 10px 20px; font-size: 11px; font-weight: 700; letter-spacing: .1em; color: #555; text-transform: uppercase; cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; transition: all .15s; }
+.tab-btn:hover { color: #c8a830; }
+.tab-btn.active { color: #c8a830; border-bottom-color: #c8a830; }
+
+#tab-zasilky, #tab-dodavatele { display: block; }
+
+#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #1e2230; background: #0f1117; }
+.filter-btn { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+.filter-btn:hover { border-color: #3a3d4a; color: #c0c8d0; }
+.filter-btn.active { background: #c8a830; color: #000; border-color: #c8a830; }
+.filter-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+#search-wrap { margin-left: auto; position: relative; }
+#search-wrap input { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; }
+#search-wrap input:focus { border-color: #c8a830; }
+#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #4a5060; }
+#btn-add { background: #c8a830; color: #000; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
+#btn-add:hover { background: #e0c040; }
+#btn-refresh { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+
+/* Tabulka */
+#table-wrap { padding: 0 32px 32px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+thead th { background: #1a1d26; color: #4a5060; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2d3a; white-space: nowrap; cursor: pointer; user-select: none; }
+thead th:hover { color: #c8a830; }
+thead th.sorted { color: #c8a830; }
+thead th .sort-arrow { margin-left: 4px; font-size: 9px; }
+tbody tr { border-bottom: 1px solid #1a1d26; transition: background .12s; cursor: pointer; }
+tbody tr:hover { background: #161820; }
+tbody td { padding: 10px 14px; font-size: 12px; vertical-align: middle; color: #c0c8d0; }
+td.cislo { font-weight: 700; color: #e8e4dc; font-size: 13px; }
+td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
+
+/* Stavy */
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+.s-objednano   { background: #1a2235; color: #6080c0; border: 1px solid #2a3555; } .s-objednano .badge-dot   { background: #6080c0; }
+.s-potvrzeno   { background: #252010; color: #c8a830; border: 1px solid #504010; } .s-potvrzeno .badge-dot   { background: #c8a830; }
+.s-odeslano    { background: #102030; color: #4090d0; border: 1px solid #204060; } .s-odeslano .badge-dot    { background: #4090d0; }
+.s-celnice     { background: #2a1a00; color: #e08030; border: 1px solid #603010; } .s-celnice .badge-dot     { background: #e08030; }
+.s-doruceno    { background: #1a2a1a; color: #40a050; border: 1px solid #204530; } .s-doruceno .badge-dot    { background: #40a050; }
+.s-zruseno     { background: #2a1a1a; color: #c05050; border: 1px solid #552020; } .s-zruseno .badge-dot     { background: #c05050; }
+
+/* Odpočet */
+.countdown-red  { color: #e05050; font-weight: 700; }
+.countdown-warn { color: #e2b830; font-weight: 700; }
+.countdown-ok   { color: #40a050; }
+.countdown-done { color: #3ab0a0; }
+
+/* Odkaz faktura */
+.faktura-link { color: #c8a830; text-decoration: none; font-size: 11px; }
+.faktura-link:hover { text-decoration: underline; }
+
+#empty-state { text-align: center; padding: 60px 20px; color: #4a5060; display: none; }
+
+/* Dodavatelé tabulka */
+#dodavatele-wrap { padding: 0 32px 32px; overflow-x: auto; display: none; }
+#dodavatele-wrap table { min-width: 800px; }
+#toolbar-dod { padding: 14px 32px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #1e2230; background: #0f1117; display: none; }
+
+/* Modal */
+#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#modal-overlay.open { display: flex; }
+#modal { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; }
+#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #1e2230; display: flex; align-items: center; justify-content: space-between; }
+#modal-title { font-size: 16px; font-weight: 800; }
+#modal-close { background: none; border: none; color: #4a5060; font-size: 20px; cursor: pointer; }
+#modal-close:hover { color: #e8e4dc; }
+#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; }
+.form-group input, .form-group select, .form-group textarea { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #c8a830; }
+.form-group select option { background: #1a1d26; }
+.form-group textarea { resize: vertical; min-height: 60px; }
+#modal-footer { padding: 16px 24px; border-top: 1px solid #1e2230; display: flex; gap: 10px; justify-content: flex-end; }
+#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #552020; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-cancel { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-save { background: #c8a830; color: #000; border: none; border-radius: 6px; padding: 8px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-save:hover { background: #e0c040; }
+
+/* Modal dodavatel */
+#modal-dod-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#modal-dod-overlay.open { display: flex; }
+#modal-dod { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; width: 100%; max-width: 500px; }
+
+#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; align-items: center; justify-content: center; }
+#saving-overlay.open { display: flex; }
+#saving-box { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; padding: 24px 36px; text-align: center; }
+#saving-box .saving-title { font-size: 14px; font-weight: 700; color: #c8a830; margin-bottom: 6px; }
+#saving-box .saving-sub { font-size: 12px; color: #4a5060; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<div id="nav">
+  <a href="index.html">⌂ Dashboard</a>
+  <a href="instalace.html">Instalace</a>
+  <a href="vyroba.html">Výroba</a>
+  <a href="obhlidky.html">Obhlídky</a>
+  <a href="reklamace.html">Reklamace</a>
+  <a href="konfigurator.html">Konfigurátor</a>
+  <a href="dochazka.html">Docházka</a>
+  <a href="zasobovani.html" class="active">Zásobování</a>
+</div>
+
+<div id="header">
+  <div class="header-left">
+    <div class="eyebrow">LEDshopik · Nákup</div>
+    <div class="title">ZÁSOBOVÁNÍ <span>&</span> DODAVATELÉ</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-total"  style="color:#e8e4dc">0</div><div class="lbl">Celkem</div></div>
+      <div class="stat"><div class="num" id="stat-cesta"  style="color:#4090d0">0</div><div class="lbl">Na cestě</div></div>
+      <div class="stat"><div class="num" id="stat-celnice" style="color:#e08030">0</div><div class="lbl">Celnice</div></div>
+      <div class="stat"><div class="num" id="stat-doruceno" style="color:#40a050">0</div><div class="lbl">Doručeno</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="tabs">
+  <button class="tab-btn active" onclick="switchTab('zasilky')">📦 Zásilky</button>
+  <button class="tab-btn" onclick="switchTab('dodavatele')">🏭 Dodavatelé</button>
+</div>
+
+<!-- Upozornění na zpoždění -->
+<div id="delay-bar" style="display:none;background:#1e0a0a;border-bottom:2px solid #e05050;padding:10px 32px;align-items:center;gap:10px;">
+  <span style="background:#e05050;color:#fff;font-size:9px;font-weight:900;padding:2px 8px;border-radius:2px;flex-shrink:0;">⚠</span>
+  <span id="delay-text" style="font-size:11px;color:#c0c8d0;"></span>
+</div>
+
+<!-- Statistiky panel -->
+<div id="stats-panel" style="display:none;background:#161820;border-bottom:1px solid #2a2d3a;padding:16px 32px;">
+  <div style="font-size:11px;font-weight:700;letter-spacing:.1em;color:#c8a830;margin-bottom:12px;">📊 PRŮMĚRNÁ DOBA DODÁNÍ</div>
+  <div id="stats-content" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;"></div>
+</div>
+
+<!-- ZÁSILKY TAB -->
+<div id="tab-zasilky">
+  <div id="toolbar">
+    <button class="filter-btn active" data-filter="aktivni" onclick="setFilter('aktivni')">Aktivní</button>
+    <button class="filter-btn" data-filter="vse" onclick="setFilter('vse')">Vše</button>
+    <button class="filter-btn" data-filter="Objednáno"  onclick="setFilter('Objednáno')"><span class="filter-dot" style="background:#6080c0"></span>Objednáno</button>
+    <button class="filter-btn" data-filter="Potvrzeno"  onclick="setFilter('Potvrzeno')"><span class="filter-dot" style="background:#c8a830"></span>Potvrzeno</button>
+    <button class="filter-btn" data-filter="Odesláno"   onclick="setFilter('Odesláno')"><span class="filter-dot" style="background:#4090d0"></span>Odesláno</button>
+    <button class="filter-btn" data-filter="Na celnici" onclick="setFilter('Na celnici')"><span class="filter-dot" style="background:#e08030"></span>Na celnici</button>
+    <button class="filter-btn" data-filter="Doručeno"   onclick="setFilter('Doručeno')"><span class="filter-dot" style="background:#40a050"></span>Doručeno</button>
+    <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
+    <button id="btn-refresh" onclick="loadData()">↻</button>
+    <button onclick="exportXLSX()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;">↓ XLSX</button>
+    <button onclick="toggleStats()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;">📊 Statistiky</button>
+    <button id="btn-add" onclick="openModal()">+ Nová zásilka</button>
+  </div>
+
+  <div id="table-wrap">
+    <table>
+      <thead><tr>
+        <th onclick="sortBy('cislo_obj')" data-col="cislo_obj">OBJ. Č. <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('dodavatel')" data-col="dodavatel">Dodavatel <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('zeme')" data-col="zeme">Země <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('obsah')" data-col="obsah">Obsah <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('pocet_ks')" data-col="pocet_ks">Ks <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('hodnota')" data-col="hodnota">Hodnota <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('zpusob_dopravy')" data-col="zpusob_dopravy">Doprava <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('datum_objednani')" data-col="datum_objednani">Objednáno <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('termin_zakaznik')" data-col="termin_zakaznik">Termín zákazník <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('termin_dodavatel')" data-col="termin_dodavatel">Termín dodavatel <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('ocekavane_doruceni')" data-col="ocekavane_doruceni">Doručení <span class="sort-arrow"></span></th>
+        <th>Zbývá</th>
+        <th>Tracking</th>
+        <th onclick="sortBy('vazba_zakazka')" data-col="vazba_zakazka">Vazba <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('stav')" data-col="stav">Stav <span class="sort-arrow"></span></th>
+        <th>Faktura</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div id="empty-state"><div style="font-size:36px;margin-bottom:10px;">📦</div><p>Žádné zásilky</p></div>
+  </div>
+</div>
+
+<!-- DODAVATELÉ TAB -->
+<div id="tab-dodavatele" style="display:none;">
+  <div id="toolbar-dod" style="display:flex;padding:14px 32px;gap:10px;border-bottom:1px solid #1e2230;background:#0f1117;">
+    <button onclick="openModalDod()" style="background:#c8a830;color:#000;border:none;border-radius:6px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;">+ Nový dodavatel</button>
+  </div>
+  <div id="dodavatele-wrap" style="display:block;padding:0 32px 32px;overflow-x:auto;">
+    <table>
+      <thead><tr>
+        <th>Název</th>
+        <th>Země</th>
+        <th>Kontakt</th>
+        <th>Email</th>
+        <th>Web</th>
+        <th>Výchozí doprava</th>
+        <th>Poznámka</th>
+        <th></th>
+      </tr></thead>
+      <tbody id="tbody-dod"></tbody>
+    </table>
+    <div id="empty-dod" style="text-align:center;padding:60px 20px;color:#4a5060;display:none;"><div style="font-size:36px;margin-bottom:10px;">🏭</div><p>Žádní dodavatelé</p></div>
+  </div>
+</div>
+
+<!-- Modal zásilka -->
+<div id="modal-overlay" onclick="overlayClick(event)">
+  <div id="modal">
+    <div id="modal-header">
+      <div id="modal-title">Nová zásilka</div>
+      <button id="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body">
+      <div class="form-group"><label>OBJ. Č.</label><input type="text" id="f-cislo" placeholder="např. 2024-CN-001"></div>
+      <div class="form-group"><label>Dodavatel</label>
+        <select id="f-dodavatel"><option value="">— vyberte —</option></select>
+      </div>
+      <div class="form-group"><label>Země původu</label>
+        <select id="f-zeme">
+          <option>Čína</option><option>Německo</option><option>Itálie</option>
+          <option>Polsko</option><option>Taiwan</option><option>Jižní Korea</option>
+          <option>USA</option><option>Jiné</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Způsob dopravy</label>
+        <select id="f-doprava">
+          <option>Letecky</option><option>Lodí</option>
+          <option>Kurýr DHL</option><option>Kurýr FedEx</option>
+          <option>Kurýr UPS</option><option>Silnice</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Obsah zásilky</label><input type="text" id="f-obsah" placeholder="Co je v zásilce"></div>
+      <div class="form-group"><label>Počet ks / balení</label><input type="text" id="f-pocet" placeholder="např. 500 ks / 10 krabic"></div>
+      <div class="form-group" style="display:flex;gap:8px;">
+        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+          <label>Hodnota</label><input type="number" id="f-hodnota" placeholder="0" step="0.01">
+        </div>
+        <div style="width:90px;display:flex;flex-direction:column;gap:5px;">
+          <label>Měna</label>
+          <select id="f-mena"><option>USD</option><option>EUR</option><option>CZK</option><option>CNY</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Datum objednání</label><input type="date" id="f-datum-obj"></div>
+      <div class="form-group"><label>Termín zákazník</label><input type="date" id="f-termin-zak"></div>
+      <div class="form-group"><label>Termín dodavatel</label><input type="date" id="f-termin-dod"></div>
+      <div class="form-group"><label>Očekávané doručení</label><input type="date" id="f-doruceni"></div>
+      <div class="form-group"><label>Tracking číslo</label><input type="text" id="f-tracking" placeholder="např. 1Z999AA1..."></div>
+      <div class="form-group"><label>Vazba na zakázku</label><input type="text" id="f-vazba" placeholder="OBJ. Č. zákazníka"></div>
+      <div class="form-group"><label>Stav</label>
+        <select id="f-stav">
+          <option>Objednáno</option><option>Potvrzeno dodavatelem</option>
+          <option>Odesláno</option><option>Na celnici</option>
+          <option>Doručeno</option><option>Zrušeno</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Odkaz na fakturu</label><input type="url" id="f-faktura" placeholder="https://drive.google.com/..."></div>
+      <div class="form-group full"><label>Poznámka</label><textarea id="f-poznamka" placeholder="Celní údaje, poznámky..."></textarea></div>
+    </div>
+    <div id="modal-footer">
+      <button id="btn-delete" onclick="deleteRecord()" style="display:none">🗑 Smazat</button>
+      <button id="btn-duplicate" onclick="duplicateRecord()" style="display:none;background:#1a1d26;color:#c8a830;border:1px solid #c8a830;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">⧉ Duplikovat</button>
+      <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
+      <button class="btn-save" onclick="saveRecord()">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal dodavatel -->
+<div id="modal-dod-overlay" onclick="overlayClickDod(event)">
+  <div id="modal-dod">
+    <div id="modal-header" style="padding:20px 24px 16px;border-bottom:1px solid #1e2230;display:flex;align-items:center;justify-content:space-between;">
+      <div id="modal-dod-title" style="font-size:16px;font-weight:800;">Nový dodavatel</div>
+      <button onclick="closeModalDod()" style="background:none;border:none;color:#4a5060;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="form-group"><label>Název</label><input type="text" id="fd-nazev" placeholder="Název firmy"></div>
+      <div class="form-group"><label>Země</label>
+        <select id="fd-zeme">
+          <option>Čína</option><option>Německo</option><option>Itálie</option>
+          <option>Polsko</option><option>Taiwan</option><option>Jižní Korea</option>
+          <option>USA</option><option>Jiné</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Kontaktní osoba</label><input type="text" id="fd-kontakt" placeholder="Jméno"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="fd-email" placeholder="email@firma.com"></div>
+      <div class="form-group"><label>Web</label><input type="url" id="fd-web" placeholder="https://..."></div>
+      <div class="form-group"><label>Výchozí doprava</label>
+        <select id="fd-doprava">
+          <option>Letecky</option><option>Lodí</option>
+          <option>Kurýr DHL</option><option>Kurýr FedEx</option>
+          <option>Kurýr UPS</option><option>Silnice</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:1/-1;"><label>Poznámka</label><textarea id="fd-poznamka" style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:8px 12px;font-size:13px;outline:none;width:100%;resize:vertical;min-height:60px;"></textarea></div>
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid #1e2230;display:flex;gap:10px;justify-content:flex-end;">
+      <button id="btn-dod-delete" onclick="deleteDodavatel()" style="display:none;margin-right:auto;background:none;color:#c05050;border:1px solid #552020;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">🗑 Smazat</button>
+      <button class="btn-cancel" onclick="closeModalDod()">Zrušit</button>
+      <button class="btn-save" onclick="saveDodavatel()">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<div id="saving-overlay">
+  <div id="saving-box">
+    <div class="saving-title" id="saving-title">Ukládám...</div>
+    <div class="saving-sub" id="saving-sub">Komunikuji s Google Sheets</div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3P3afYwkaVnC7Wh3_iTP5XS5PvC2pbwogDrkmOsQdCW3yQ8AX_p0dB_nICvmAr76E6A/exec';
+const COLS_ZAS = ['id','cislo_obj','dodavatel','zeme','zpusob_dopravy','obsah','pocet_ks','hodnota','mena','datum_objednani','termin_zakaznik','termin_dodavatel','ocekavane_doruceni','tracking','vazba_zakazka','stav','faktura','poznamka'];
+const COLS_DOD = ['id','nazev','zeme','kontakt','email','web','doprava_vychozi','poznamka'];
+
+const STATUS_CLASS = {
+  'Objednáno':             's-objednano',
+  'Potvrzeno dodavatelem': 's-potvrzeno',
+  'Odesláno':              's-odeslano',
+  'Na celnici':            's-celnice',
+  'Doručeno':              's-doruceno',
+  'Zrušeno':               's-zruseno',
+};
+
+let dataZas=[], dataDod=[], filterVal='aktivni', sortCol='ocekavane_doruceni', sortDir=1, editId=null, editDodId=null;
+const today=new Date();
+
+function toInputDate(d){
+  if(!d||d==='') return '';
+  if(typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  const dt=new Date(d); if(isNaN(dt)) return '';
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+}
+function fmtDate(d){ const s=toInputDate(d); if(!s) return '—'; const [y,m,day]=s.split('-'); return `${day}.${m}.${y}`; }
+
+function calcCountdown(doruceni, stav){
+  if(stav==='Doručeno'||stav==='Zrušeno') return {text:stav==='Doručeno'?'✓':'—',cls:'countdown-done'};
+  const d=toInputDate(doruceni); if(!d) return {text:'—',cls:''};
+  const diff=Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
+  if(diff<0)  return {text:`+${Math.abs(diff)} dní`,cls:'countdown-red'};
+  if(diff===0) return {text:'Dnes',cls:'countdown-red'};
+  if(diff<=3) return {text:`${diff} dny`,cls:'countdown-warn'};
+  if(diff<=7) return {text:`${diff} dní`,cls:'countdown-warn'};
+  return {text:`${diff} dní`,cls:'countdown-ok'};
+}
+
+function syncStatus(state,text){ document.getElementById('sync-dot').className=state; document.getElementById('sync-text').textContent=text; }
+
+async function loadData(){
+  syncStatus('loading','Načítám data...');
+  try {
+    const [rZas, rDod] = await Promise.all([
+      fetch(SCRIPT_URL+'?modul=zasilky').then(r=>r.json()),
+      fetch(SCRIPT_URL+'?modul=dodavatele').then(r=>r.json())
+    ]);
+    dataZas = rZas.data||[];
+    dataDod  = rDod.data||[];
+    syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
+    renderTable();
+    renderDodavatele();
+    updateDodavatelSelect();
+  } catch(e){ syncStatus('error','Chyba: '+e.message); }
+}
+
+async function apiPost(payload){
+  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});
+  const json=await res.json();
+  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===(tab==='zasilky'?0:1)));
+  document.getElementById('tab-zasilky').style.display = tab==='zasilky'?'block':'none';
+  document.getElementById('tab-dodavatele').style.display = tab==='dodavatele'?'block':'none';
+}
+
+function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderTable(); }
+function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTable(); }
+
+function getFiltered(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  return dataZas.filter(r=>{
+    if(filterVal==='aktivni'){ if(r.stav==='Doručeno'||r.stav==='Zrušeno') return false; }
+    else if(filterVal!=='vse'){ if(r.stav!==filterVal) return false; }
+    if(q&&![r.cislo_obj,r.dodavatel,r.obsah,r.tracking,r.vazba_zakazka].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b)=>{
+    const va=a[sortCol]||'', vb=b[sortCol]||'';
+    return va<vb?-sortDir:va>vb?sortDir:0;
+  });
+}
+
+function renderTable(){
+  const rows=getFiltered();
+  document.getElementById('stat-total').textContent=dataZas.filter(r=>r.stav!=='Doručeno'&&r.stav!=='Zrušeno').length;
+  document.getElementById('stat-cesta').textContent=dataZas.filter(r=>r.stav==='Odesláno').length;
+  document.getElementById('stat-celnice').textContent=dataZas.filter(r=>r.stav==='Na celnici').length;
+  document.getElementById('stat-doruceno').textContent=dataZas.filter(r=>r.stav==='Doručeno').length;
+  checkDelays();
+
+  document.querySelectorAll('thead th[data-col]').forEach(th=>{
+    th.classList.toggle('sorted',th.dataset.col===sortCol);
+    th.querySelector('.sort-arrow').textContent=th.dataset.col===sortCol?(sortDir===1?' ↓':' ↑'):'';
+  });
+
+  const tbody=document.getElementById('tbody');
+  if(!rows.length){ tbody.innerHTML=''; document.getElementById('empty-state').style.display='block'; return; }
+  document.getElementById('empty-state').style.display='none';
+
+  tbody.innerHTML=rows.map(r=>{
+    const cd=calcCountdown(r.ocekavane_doruceni, r.stav);
+    const isDelay = r.ocekavane_doruceni && toInputDate(r.ocekavane_doruceni)<=toInputDate(today) && r.stav!=='Doručeno' && r.stav!=='Zrušeno';
+    const hodnota=r.hodnota?`${parseFloat(r.hodnota).toLocaleString('cs-CZ')} ${r.mena||''}`:' —';
+    const faktura=r.faktura?`<a href="${r.faktura}" target="_blank" class="faktura-link">📄 Faktura</a>`:'—';
+    let trackingUrl='';
+    if(r.tracking){
+      const d=(r.zpusob_dopravy||'').toLowerCase();
+      if(d.includes('dhl')) trackingUrl=`https://www.dhl.com/cz-cs/home/tracking.html?tracking-id=${r.tracking}`;
+      else if(d.includes('fedex')) trackingUrl=`https://www.fedex.com/fedextrack/?trknbr=${r.tracking}`;
+      else if(d.includes('ups')) trackingUrl=`https://www.ups.com/track?tracknum=${r.tracking}`;
+      else trackingUrl=`https://www.google.com/search?q=${r.tracking}+tracking`;
+    }
+    const tracking=r.tracking?`<a href="${trackingUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;font-family:monospace;color:#c8a830;text-decoration:none;" title="Sledovat zásilku">🔍 ${r.tracking}</a>`:'—';
+    return `<tr data-id="${r.id}" style="${isDelay?'background:#1e0808;':''}" onclick="openModal('${r.id}')">
+      <td class="cislo">${r.cislo_obj||'—'}</td>
+      <td class="dodavatel-name">${r.dodavatel||'—'}</td>
+      <td style="font-size:11px;">${r.zeme||'—'}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.obsah||'—'}</td>
+      <td style="text-align:center;">${r.pocet_ks||'—'}</td>
+      <td style="font-weight:700;color:#c8a830;">${hodnota}</td>
+      <td style="font-size:11px;">${r.zpusob_dopravy||'—'}</td>
+      <td class="datum">${fmtDate(r.datum_objednani)}</td>
+      <td class="datum">${fmtDate(r.termin_zakaznik)}</td>
+      <td class="datum">${fmtDate(r.termin_dodavatel)}</td>
+      <td class="datum">${fmtDate(r.ocekavane_doruceni)}</td>
+      <td><span class="${cd.cls}" style="font-size:11px;">${cd.text}</span></td>
+      <td>${tracking}</td>
+      <td style="font-size:11px;color:#8890a0;">${r.vazba_zakazka||'—'}</td>
+      <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
+      <td onclick="event.stopPropagation()">${faktura}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderDodavatele(){
+  const tbody=document.getElementById('tbody-dod');
+  if(!dataDod.length){ tbody.innerHTML=''; document.getElementById('empty-dod').style.display='block'; return; }
+  document.getElementById('empty-dod').style.display='none';
+  tbody.innerHTML=dataDod.map(d=>`
+    <tr onclick="openModalDod('${d.id}')" style="cursor:pointer;border-bottom:1px solid #1a1d26;">
+      <td style="font-weight:700;color:#e8e4dc;padding:10px 14px;">${d.nazev||'—'}</td>
+      <td style="padding:10px 14px;font-size:12px;">${d.zeme||'—'}</td>
+      <td style="padding:10px 14px;font-size:12px;">${d.kontakt||'—'}</td>
+      <td style="padding:10px 14px;font-size:12px;"><a href="mailto:${d.email}" onclick="event.stopPropagation()" style="color:#c8a830;">${d.email||'—'}</a></td>
+      <td style="padding:10px 14px;font-size:12px;"><a href="${d.web}" target="_blank" onclick="event.stopPropagation()" style="color:#c8a830;">${d.web?'🔗 Web':'—'}</a></td>
+      <td style="padding:10px 14px;font-size:11px;">${d.doprava_vychozi||'—'}</td>
+      <td style="padding:10px 14px;font-size:11px;color:#8890a0;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.poznamka||''}</td>
+      <td style="padding:10px 14px;"><button onclick="event.stopPropagation();openModalDod('${d.id}')" style="background:#1a1d26;border:1px solid #2a2d3a;color:#8890a0;border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;">Upravit</button></td>
+    </tr>`).join('');
+}
+
+function updateDodavatelSelect(){
+  const sel=document.getElementById('f-dodavatel');
+  const current=sel.value;
+  sel.innerHTML='<option value="">— vyberte —</option>'+dataDod.map(d=>`<option value="${d.nazev}">${d.nazev} (${d.zeme})</option>`).join('');
+  if(current) sel.value=current;
+}
+
+function openModal(id){
+  const r=id?dataZas.find(x=>x.id===String(id)):null;
+  editId=r?String(r.id):null;
+  document.getElementById('modal-title').textContent=r?'Upravit zásilku':'Nová zásilka';
+  document.getElementById('btn-delete').style.display=r?'inline-flex':'none';
+  document.getElementById('btn-duplicate').style.display=r?'inline-flex':'none';
+  updateDodavatelSelect();
+  if(r){
+    document.getElementById('f-cislo').value=r.cislo_obj||'';
+    document.getElementById('f-dodavatel').value=r.dodavatel||'';
+    document.getElementById('f-zeme').value=r.zeme||'Čína';
+    document.getElementById('f-doprava').value=r.zpusob_dopravy||'Letecky';
+    document.getElementById('f-obsah').value=r.obsah||'';
+    document.getElementById('f-pocet').value=r.pocet_ks||'';
+    document.getElementById('f-hodnota').value=r.hodnota||'';
+    document.getElementById('f-mena').value=r.mena||'USD';
+    document.getElementById('f-datum-obj').value=toInputDate(r.datum_objednani);
+    document.getElementById('f-termin-zak').value=toInputDate(r.termin_zakaznik);
+    document.getElementById('f-termin-dod').value=toInputDate(r.termin_dodavatel);
+    document.getElementById('f-doruceni').value=toInputDate(r.ocekavane_doruceni);
+    document.getElementById('f-tracking').value=r.tracking||'';
+    document.getElementById('f-vazba').value=r.vazba_zakazka||'';
+    document.getElementById('f-stav').value=r.stav||'Objednáno';
+    document.getElementById('f-faktura').value=r.faktura||'';
+    document.getElementById('f-poznamka').value=r.poznamka||'';
+  } else {
+    ['f-cislo','f-obsah','f-pocet','f-hodnota','f-tracking','f-vazba','f-faktura','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
+    document.getElementById('f-dodavatel').value='';
+    document.getElementById('f-zeme').value='Čína';
+    document.getElementById('f-doprava').value='Letecky';
+    document.getElementById('f-mena').value='USD';
+    document.getElementById('f-stav').value='Objednáno';
+    document.getElementById('f-datum-obj').value=toInputDate(today);
+    ['f-termin-zak','f-termin-dod','f-doruceni'].forEach(fid=>document.getElementById(fid).value='');
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); editId=null; }
+function overlayClick(e){ if(e.target===document.getElementById('modal-overlay')) closeModal(); }
+
+function openModalDod(id){
+  const d=id?dataDod.find(x=>x.id===String(id)):null;
+  editDodId=d?String(d.id):null;
+  document.getElementById('modal-dod-title').textContent=d?'Upravit dodavatele':'Nový dodavatel';
+  document.getElementById('btn-dod-delete').style.display=d?'inline-flex':'none';
+  if(d){
+    document.getElementById('fd-nazev').value=d.nazev||'';
+    document.getElementById('fd-zeme').value=d.zeme||'Čína';
+    document.getElementById('fd-kontakt').value=d.kontakt||'';
+    document.getElementById('fd-email').value=d.email||'';
+    document.getElementById('fd-web').value=d.web||'';
+    document.getElementById('fd-doprava').value=d.doprava_vychozi||'Letecky';
+    document.getElementById('fd-poznamka').value=d.poznamka||'';
+  } else {
+    ['fd-nazev','fd-kontakt','fd-email','fd-web','fd-poznamka'].forEach(fid=>document.getElementById(fid).value='');
+    document.getElementById('fd-zeme').value='Čína';
+    document.getElementById('fd-doprava').value='Letecky';
+  }
+  document.getElementById('modal-dod-overlay').classList.add('open');
+}
+
+function closeModalDod(){ document.getElementById('modal-dod-overlay').classList.remove('open'); editDodId=null; }
+function overlayClickDod(e){ if(e.target===document.getElementById('modal-dod-overlay')) closeModalDod(); }
+function showSaving(t,s){ document.getElementById('saving-title').textContent=t; document.getElementById('saving-sub').textContent=s; document.getElementById('saving-overlay').classList.add('open'); }
+function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
+
+async function saveRecord(){
+  const isEdit=!!editId;
+  const rec={
+    id: editId||String(Date.now()),
+    cislo_obj:        document.getElementById('f-cislo').value.trim(),
+    dodavatel:        document.getElementById('f-dodavatel').value,
+    zeme:             document.getElementById('f-zeme').value,
+    zpusob_dopravy:   document.getElementById('f-doprava').value,
+    obsah:            document.getElementById('f-obsah').value.trim(),
+    pocet_ks:         document.getElementById('f-pocet').value.trim(),
+    hodnota:          document.getElementById('f-hodnota').value,
+    mena:             document.getElementById('f-mena').value,
+    datum_objednani:  document.getElementById('f-datum-obj').value,
+    termin_zakaznik:  document.getElementById('f-termin-zak').value,
+    termin_dodavatel: document.getElementById('f-termin-dod').value,
+    ocekavane_doruceni: document.getElementById('f-doruceni').value,
+    tracking:         document.getElementById('f-tracking').value.trim(),
+    vazba_zakazka:    document.getElementById('f-vazba').value.trim(),
+    stav:             document.getElementById('f-stav').value,
+    faktura:          document.getElementById('f-faktura').value.trim(),
+    poznamka:         document.getElementById('f-poznamka').value.trim(),
+  };
+  closeModal();
+  showSaving(isEdit?'Ukládám změny...':'Přidávám zásilku...','Komunikuji s Google Sheets');
+  try {
+    await apiPost({action:isEdit?'update':'append', modul:'zasilky', record:rec});
+    showSaving('Hotovo!','Data uložena');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+async function deleteRecord(){
+  if(!editId||!confirm('Opravdu smazat tuto zásilku?')) return;
+  const id=editId; closeModal();
+  showSaving('Mažu...','');
+  try {
+    await apiPost({action:'delete', modul:'zasilky', id:String(id)});
+    showSaving('Smazáno!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+async function saveDodavatel(){
+  const isEdit=!!editDodId;
+  const rec={
+    id:             editDodId||String(Date.now()),
+    nazev:          document.getElementById('fd-nazev').value.trim(),
+    zeme:           document.getElementById('fd-zeme').value,
+    kontakt:        document.getElementById('fd-kontakt').value.trim(),
+    email:          document.getElementById('fd-email').value.trim(),
+    web:            document.getElementById('fd-web').value.trim(),
+    doprava_vychozi: document.getElementById('fd-doprava').value,
+    poznamka:       document.getElementById('fd-poznamka').value.trim(),
+  };
+  closeModalDod();
+  showSaving(isEdit?'Ukládám dodavatele...':'Přidávám dodavatele...','');
+  try {
+    await apiPost({action:isEdit?'update':'append', modul:'dodavatele', record:rec});
+    showSaving('Hotovo!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+async function deleteDodavatel(){
+  if(!editDodId||!confirm('Opravdu smazat tohoto dodavatele?')) return;
+  const id=editDodId; closeModalDod();
+  showSaving('Mažu...','');
+  try {
+    await apiPost({action:'delete', modul:'dodavatele', id:String(id)});
+    showSaving('Smazáno!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+
+function toggleStats(){
+  const p=document.getElementById('stats-panel');
+  p.style.display=p.style.display==='none'?'block':'none';
+  if(p.style.display==='block') renderStats();
+}
+
+function renderStats(){
+  const dorucene=dataZas.filter(r=>r.stav==='Doručeno'&&r.datum_objednani&&r.ocekavane_doruceni);
+  
+  // Skupiny podle dopravce
+  const groups={};
+  dorucene.forEach(r=>{
+    const key=r.zpusob_dopravy||'Neznámý';
+    if(!groups[key]) groups[key]=[];
+    const d1=new Date(toInputDate(r.datum_objednani)+'T00:00:00');
+    const d2=new Date(toInputDate(r.ocekavane_doruceni)+'T00:00:00');
+    const days=Math.ceil((d2-d1)/(1000*60*60*24));
+    if(days>0) groups[key].push(days);
+  });
+
+  // Skupiny podle země
+  const groupsZ={};
+  dorucene.forEach(r=>{
+    const key=r.zeme||'Neznámá';
+    if(!groupsZ[key]) groupsZ[key]=[];
+    const d1=new Date(toInputDate(r.datum_objednani)+'T00:00:00');
+    const d2=new Date(toInputDate(r.ocekavane_doruceni)+'T00:00:00');
+    const days=Math.ceil((d2-d1)/(1000*60*60*24));
+    if(days>0) groupsZ[key].push(days);
+  });
+
+  const el=document.getElementById('stats-content');
+  if(!dorucene.length){ el.innerHTML='<div style="color:#555;font-size:12px;">Zatím žádná doručená zásilka pro statistiku.</div>'; return; }
+
+  const avg=arr=>Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
+  
+  let html='';
+  Object.entries(groups).forEach(([k,v])=>{
+    html+=`<div style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;padding:10px 14px;">
+      <div style="font-size:10px;color:#555;margin-bottom:4px;">Doprava: ${k}</div>
+      <div style="font-size:22px;font-weight:800;color:#c8a830;">${avg(v)} dní</div>
+      <div style="font-size:10px;color:#4a5060;">${v.length} zásilek</div>
+    </div>`;
+  });
+  Object.entries(groupsZ).forEach(([k,v])=>{
+    html+=`<div style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;padding:10px 14px;">
+      <div style="font-size:10px;color:#555;margin-bottom:4px;">Země: ${k}</div>
+      <div style="font-size:22px;font-weight:800;color:#c8a830;">${avg(v)} dní</div>
+      <div style="font-size:10px;color:#4a5060;">${v.length} zásilek</div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+function checkDelays(){
+  const todayStr=toInputDate(today);
+  const zpozde=dataZas.filter(r=>{
+    const d=toInputDate(r.ocekavane_doruceni);
+    return d && d<=todayStr && r.stav!=='Doručeno' && r.stav!=='Zrušeno';
+  });
+  const bar=document.getElementById('delay-bar');
+  if(zpozde.length){
+    bar.style.display='flex';
+    document.getElementById('delay-text').textContent=`${zpozde.length}× zásilka po termínu: `+zpozde.map(r=>(r.dodavatel||r.cislo_obj)).join(', ');
+  } else {
+    bar.style.display='none';
+  }
+}
+
+function exportXLSX(){
+  const rows=dataZas.map(r=>({
+    'OBJ. Č.': r.cislo_obj||'',
+    'Dodavatel': r.dodavatel||'',
+    'Země': r.zeme||'',
+    'Obsah': r.obsah||'',
+    'Počet ks': r.pocet_ks||'',
+    'Hodnota': r.hodnota||'',
+    'Měna': r.mena||'',
+    'Doprava': r.zpusob_dopravy||'',
+    'Objednáno': r.datum_objednani||'',
+    'Termín zákazník': r.termin_zakaznik||'',
+    'Termín dodavatel': r.termin_dodavatel||'',
+    'Očekávané doručení': r.ocekavane_doruceni||'',
+    'Tracking': r.tracking||'',
+    'Vazba': r.vazba_zakazka||'',
+    'Stav': r.stav||'',
+    'Faktura': r.faktura||'',
+    'Poznámka': r.poznamka||'',
+  }));
+  const ws=XLSX.utils.json_to_sheet(rows);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,'Zásilky',ws);
+  XLSX.writeFile(wb,`zasobovani_${toInputDate(today)}.xlsx`);
+}
+
+function duplicateRecord(){
+  if(!editId) return;
+  const r=dataZas.find(x=>x.id===String(editId));
+  if(!r) return;
+  closeModal();
+  // Otevři nový modal s předvyplněnými daty ale bez id a dat
+  setTimeout(()=>{
+    editId=null;
+    document.getElementById('modal-title').textContent='Nová zásilka (duplikát)';
+    document.getElementById('btn-delete').style.display='none';
+    document.getElementById('btn-duplicate').style.display='none';
+    document.getElementById('f-cislo').value='';
+    document.getElementById('f-dodavatel').value=r.dodavatel||'';
+    document.getElementById('f-zeme').value=r.zeme||'Čína';
+    document.getElementById('f-doprava').value=r.zpusob_dopravy||'Letecky';
+    document.getElementById('f-obsah').value=r.obsah||'';
+    document.getElementById('f-pocet').value=r.pocet_ks||'';
+    document.getElementById('f-hodnota').value=r.hodnota||'';
+    document.getElementById('f-mena').value=r.mena||'USD';
+    document.getElementById('f-stav').value='Objednáno';
+    document.getElementById('f-datum-obj').value=toInputDate(today);
+    ['f-termin-zak','f-termin-dod','f-doruceni','f-tracking','f-vazba','f-faktura'].forEach(fid=>{
+      const el=document.getElementById(fid); if(el) el.value='';
+    });
+    document.getElementById('f-poznamka').value=r.poznamka||'';
+    document.getElementById('modal-overlay').classList.add('open');
+  },100);
+}
+
+loadData();
+setInterval(loadData, 60000);
+</script>
+</body>
+</html>
