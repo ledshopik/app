@@ -399,7 +399,7 @@ a{color:var(--accent);text-decoration:none}
 
 /* ── LEDSHOPIK NAV ── */
 #ls-nav{background:#0a0c12;border-bottom:1px solid #1e2230;padding:0 24px;display:flex;align-items:stretch;gap:0;flex-wrap:wrap;flex-shrink:0;z-index:200;position:relative}
-#ls-nav a{padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;font-family:'Arial Narrow',Arial,sans-serif;transition:color .15s;white-space:nowrap}
+#ls-nav a{padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;transition:color .15s;white-space:nowrap}
 #ls-nav a.active{color:#e8a020;border-bottom-color:#e8a020}
 #ls-nav a:hover{color:#e8e4dc}
 </style>
@@ -967,7 +967,31 @@ async function importFromEshop() {
     if (!jm) throw new Error('AI nevrátila platná data — zkus to znovu');
 
     let p;
-    try { p = JSON.parse(jm[0]); } catch(e2) { throw new Error('Chyba parsování dat'); }
+    try {
+      // Auto-fix common AI JSON errors: unquoted values like IP20, 12mm, numbers without quotes
+      let jsonStr = jm[0];
+      // Fix unquoted string values: "key":VALUE → "key":"VALUE" (where VALUE is not a number, bool, null, {, [)
+      jsonStr = jsonStr.replace(/:([A-Za-z][A-Za-z0-9]*(?:\s*[A-Za-z0-9]+)*)\s*([,}])/g, (m, val, end) => {
+        // Don't quote true/false/null
+        if (['true','false','null'].includes(val.toLowerCase())) return m;
+        return `:"${val}"${end}`;
+      });
+      // Fix values like 12mm, IP20 without quotes after colon
+      jsonStr = jsonStr.replace(/:\s*([0-9]+[a-zA-Z][a-zA-Z0-9]*)\s*([,}])/g, ':"$1"$2');
+      p = JSON.parse(jsonStr);
+    } catch(e2) {
+      // Last resort: try to extract fields manually
+      try {
+        const extract = (key) => { const m = jm[0].match(new RegExp(`"${key}"\\s*:\\s*"?([^",}]+)"?`)); return m ? m[1].trim() : ''; };
+        p = {
+          name: extract('name'), type: extract('type'), watt: parseFloat(extract('watt'))||0,
+          lumen: parseFloat(extract('lumen'))||0, cct: extract('cct'), cri: extract('cri'),
+          ip: extract('ip'), dim: extract('dim'), price: parseFloat(extract('price'))||0,
+          note: extract('note'), image: extract('image')
+        };
+        if (!p.name) throw new Error('empty');
+      } catch(e3) { throw new Error('Chyba parsování dat — zkus import znovu'); }
+    }
     console.log('Parsed:', p);
 
     // Image: prefer proxy-found, fallback to AI-found
