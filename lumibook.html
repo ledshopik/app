@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUMIBOOK PRO — Kniha svítidel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════ */
+/* RESET & VARIABLES                      */
+/* ══════════════════════════════════════ */
+:root{
+  --bg:#08080a;--panel:#0f0f12;--panel2:#151519;--panel3:#1c1c21;--panel4:#232328;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);--border3:rgba(255,255,255,.16);
+  --accent:#e8a020;--accent2:#ff6b35;--accent-dim:rgba(232,160,32,.1);--accent-dim2:rgba(232,160,32,.2);
+  --blue:#4a9eff;--blue-dim:rgba(74,158,255,.12);
+  --green:#3ecf8e;--green-dim:rgba(62,207,142,.1);
+  --red:#ff5c5c;--red-dim:rgba(255,92,92,.1);
+  --purple:#a78bfa;--purple-dim:rgba(167,139,250,.1);
+  --cyan:#22d3ee;--cyan-dim:rgba(34,211,238,.1);
+  --text:#ede9e1;--text2:#b8b4ac;--muted:#5a5760;
+  --r:10px;--rs:7px;--rx:14px;
+  --font:'DM Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --head:'Syne',sans-serif;
+  /* CCT colors */
+  --cct-2700:#ffb347;--cct-3000:#ffc67a;--cct-3500:#ffd9a0;
+  --cct-4000:#ffe8c0;--cct-5000:#fff4e0;--cct-6500:#e8f0ff;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;font-size:13px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+::selection{background:var(--accent-dim2);color:var(--accent)}
+a{color:var(--accent);text-decoration:none}
+
+/* ══════════════════════════════════════ */
+/* LAYOUT                                 */
+/* ══════════════════════════════════════ */
+#app{display:flex;height:calc(100vh - 42px)}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  width:310px;min-width:310px;background:var(--panel);
+  border-right:1px solid var(--border);display:flex;
+  flex-direction:column;overflow:hidden;position:relative;z-index:10
+}
+.sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+
+/* Logo */
+.logo{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.logo-mark{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  box-shadow:0 4px 20px rgba(232,160,32,.25)
+}
+.logo-text{display:flex;flex-direction:column}
+.logo-brand{font-family:var(--head);font-size:19px;font-weight:800;letter-spacing:.04em}
+.logo-sub{font-size:9px;color:var(--muted);letter-spacing:.16em;text-transform:uppercase;margin-top:1px}
+
+/* Sections */
+.sec{padding:14px 18px;border-bottom:1px solid var(--border)}
+.sec-head{
+  font-family:var(--head);font-size:9px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:10px;
+  display:flex;align-items:center;gap:6px
+}
+.sec-head .ic{font-size:11px;opacity:.6}
+
+/* Fields */
+.fld{margin-bottom:8px}
+.fld label{display:block;font-size:10.5px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.fld input,.fld textarea,.fld select{
+  width:100%;background:var(--panel2);border:1px solid var(--border);
+  border-radius:var(--rs);padding:8px 11px;color:var(--text);
+  font-family:var(--font);font-size:12px;outline:none;transition:border-color .2s
+}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--accent)}
+.fld textarea{resize:vertical;min-height:52px}
+.fld select{cursor:pointer;appearance:none;padding-right:28px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%235a5760'%3E%3Cpath d='M1 3l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center}
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.fld-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+
+/* Buttons */
+.btn{
+  padding:9px 14px;border-radius:var(--rs);cursor:pointer;
+  font-family:var(--font);font-size:11.5px;font-weight:600;
+  border:1px solid var(--border);background:var(--panel2);color:var(--text);
+  transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#000}
+.btn.primary:hover{opacity:.9;color:#000}
+.btn.sm{padding:6px 10px;font-size:10.5px}
+.btn.danger:hover{border-color:var(--red);color:var(--red)}
+.btn.blue{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
+.btn.blue:hover{background:rgba(74,158,255,.2)}
+
+/* ── ESHOP IMPORT ── */
+.import-box{
+  background:linear-gradient(135deg,rgba(74,158,255,.06),rgba(232,160,32,.04));
+  border:1px solid rgba(74,158,255,.15);border-radius:var(--r);padding:12px;
+  margin-bottom:8px
+}
+.import-url-row{display:flex;gap:5px;margin-bottom:6px}
+.import-url-row input{flex:1;font-size:11px;padding:8px 10px;background:var(--panel2);border:1px solid var(--border2);color:var(--text);border-radius:var(--rs)}
+.import-url-row .btn{flex-shrink:0}
+.import-status{font-size:10.5px;color:var(--muted);min-height:16px;display:flex;align-items:center;gap:5px}
+.import-status.loading{color:var(--blue)}
+.import-status.success{color:var(--green)}
+.import-status.error{color:var(--red)}
+.spin{display:inline-block;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* API key */
+.api-row{display:flex;gap:5px;align-items:center}
+.api-row input{flex:1;font-size:10px;padding:7px 9px;font-family:var(--mono);background:var(--panel)}
+
+/* ── DB LIST ── */
+.db-item{
+  display:flex;align-items:center;gap:8px;padding:7px 9px;
+  border-radius:var(--rs);cursor:pointer;transition:background .12s;margin-bottom:2px
+}
+.db-item:hover{background:var(--panel3)}
+.db-item .dbi-img{
+  width:32px;height:32px;border-radius:6px;background:var(--panel3);
+  border:1px solid var(--border);overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:14px
+}
+.db-item .dbi-img img{width:100%;height:100%;object-fit:cover}
+.db-item .dbi-info{flex:1;min-width:0}
+.db-item .dbi-name{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.db-item .dbi-spec{font-size:9.5px;color:var(--muted);margin-top:1px}
+.db-item .dbi-add{
+  width:22px;height:22px;border-radius:5px;background:var(--accent-dim);
+  border:none;color:var(--accent);cursor:pointer;font-size:12px;
+  display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s
+}
+.db-item:hover .dbi-add{opacity:1}
+.db-search{
+  width:100%;background:var(--panel2);border:1px solid var(--border);
+  border-radius:var(--rs);padding:7px 10px 7px 28px;color:var(--text);
+  font-family:var(--font);font-size:11px;outline:none;margin-bottom:8px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235a5760'%3E%3Ccircle cx='5.5' cy='5.5' r='4' stroke='%235a5760' fill='none' stroke-width='1.3'/%3E%3Cline x1='8.5' y1='8.5' x2='11' y2='11' stroke='%235a5760' stroke-width='1.3'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:9px center;transition:border-color .2s
+}
+.db-search:focus{border-color:var(--accent)}
+
+/* ── SIDEBAR FOOTER ── */
+.sb-foot{padding:10px 18px;border-top:1px solid var(--border);display:flex;gap:6px;background:var(--panel)}
+.sb-foot .btn{flex:1;justify-content:center}
+
+/* ══════════════════════════════════════ */
+/* MAIN                                   */
+/* ══════════════════════════════════════ */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+
+/* Topbar */
+.topbar{
+  height:52px;min-height:52px;background:var(--panel);
+  border-bottom:1px solid var(--border);display:flex;
+  align-items:center;padding:0 20px;gap:12px
+}
+.tb-title{font-family:var(--head);font-size:14px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-stats{display:flex;gap:10px;align-items:center}
+.chip{
+  display:flex;align-items:center;gap:4px;font-size:10.5px;
+  padding:4px 9px;border-radius:16px;background:var(--panel2);border:1px solid var(--border)
+}
+.chip .cv{font-weight:700;font-family:var(--mono);font-size:10px}
+.chip.a .cv{color:var(--accent)}.chip.g .cv{color:var(--green)}
+.chip.b .cv{color:var(--blue)}.chip.p .cv{color:var(--purple)}
+
+.vtog{display:flex;background:var(--panel2);border-radius:var(--rs);padding:3px;gap:2px}
+.vtog button{
+  padding:4px 10px;border:none;border-radius:5px;cursor:pointer;
+  font-family:var(--font);font-size:10px;font-weight:600;
+  color:var(--muted);background:transparent;transition:all .12s
+}
+.vtog button.on{background:var(--panel3);color:var(--text)}
+
+/* Content */
+.content{flex:1;overflow-y:auto;padding:16px 20px}
+
+/* ── ROOM TABS ── */
+.room-tabs{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
+.room-tab{
+  padding:6px 12px;border-radius:var(--rs);cursor:pointer;
+  font-size:10.5px;font-weight:600;border:1px solid var(--border);
+  background:var(--panel);color:var(--text2);transition:all .15s
+}
+.room-tab:hover{border-color:var(--border2)}
+.room-tab.on{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.room-tab .rt-count{
+  font-family:var(--mono);font-size:9px;background:var(--panel3);
+  padding:1px 5px;border-radius:8px;margin-left:4px
+}
+.room-tab.on .rt-count{background:var(--accent-dim2)}
+.add-room-btn{
+  padding:6px 10px;border-radius:var(--rs);cursor:pointer;
+  font-size:11px;border:1px dashed var(--border2);
+  background:transparent;color:var(--muted);transition:all .15s
+}
+.add-room-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── FIXTURE CARDS ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+
+.card{
+  background:var(--panel);border:1px solid var(--border);border-radius:var(--r);
+  overflow:hidden;transition:border-color .2s,transform .15s,box-shadow .2s;position:relative
+}
+.card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+
+.card-head{display:flex;align-items:center;gap:8px;padding:12px 12px 0}
+.card-tag{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  background:var(--accent-dim);color:var(--accent);padding:3px 7px;
+  border-radius:4px;letter-spacing:.05em
+}
+.card-room{font-size:9px;color:var(--muted);background:var(--panel3);padding:2px 7px;border-radius:4px}
+.card-acts{margin-left:auto;display:flex;gap:3px}
+.card-btn{
+  width:24px;height:24px;border:1px solid var(--border);border-radius:5px;
+  background:var(--panel2);color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .12s
+}
+.card-btn:hover{color:var(--text);border-color:var(--border2)}
+.card-btn.del:hover{color:var(--red);border-color:var(--red)}
+
+.card-img{
+  height:110px;margin:10px 12px 0;border-radius:8px;background:var(--panel2);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative
+}
+.card-img img{width:100%;height:100%;object-fit:contain;padding:6px}
+.card-img .ph{color:var(--muted);font-size:26px;opacity:.3}
+
+.card-body{padding:10px 12px 0}
+.card-name{font-size:13px;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:calc(2em * 1.3)}
+.card-type{font-size:10px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-link{font-size:9px;color:var(--blue);display:inline-flex;align-items:center;gap:3px;margin-top:3px}
+.card-link:hover{text-decoration:underline}
+
+/* CCT bar */
+.cct-bar{
+  height:4px;border-radius:2px;margin:8px 0 4px;overflow:hidden;
+  background:var(--panel3)
+}
+.cct-fill{height:100%;border-radius:2px;transition:width .3s}
+
+/* Params grid */
+.params{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:8px 0}
+.pm{background:var(--panel2);border-radius:5px;padding:6px;text-align:center}
+.pm .pv{font-family:var(--mono);font-size:11px;font-weight:600}
+.pm .pl{font-size:7.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+
+.card-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px 10px;border-top:1px solid var(--border);margin-top:8px
+}
+.qty-ctrl{display:flex;align-items:center;gap:5px}
+.qty-ctrl button{
+  width:22px;height:22px;border:1px solid var(--border);border-radius:5px;
+  background:var(--panel2);color:var(--text);cursor:pointer;font-size:12px;
+  display:flex;align-items:center;justify-content:center;transition:all .12s
+}
+.qty-ctrl button:hover{border-color:var(--accent);color:var(--accent)}
+.qty-ctrl .qv{font-family:var(--mono);font-size:12px;font-weight:700;min-width:18px;text-align:center}
+.card-price{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--green)}
+.card-note{margin:6px 12px 12px;padding:0;font-size:10px;color:var(--muted);line-height:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:28px;max-height:28px}
+
+/* ── TABLE VIEW ── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{
+  font-size:8.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--bg);z-index:2
+}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:11.5px;vertical-align:middle}
+.tbl tr:hover td{background:rgba(255,255,255,.015)}
+.tbl .tn{font-weight:600}.tbl .tt{font-family:var(--mono);font-size:9px;font-weight:700;background:var(--accent-dim);color:var(--accent);padding:2px 5px;border-radius:3px}
+.tbl .tm{font-family:var(--mono);font-size:10.5px}
+.tbl .tp{color:var(--green);font-weight:700}
+.tbl .ta{display:flex;gap:3px}
+
+/* ── EMPTY STATE ── */
+.empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:60vh;color:var(--muted);text-align:center;gap:10px
+}
+.empty .e-ic{font-size:48px;opacity:.25}
+.empty .e-t{font-size:16px;font-weight:700;color:var(--text);opacity:.4}
+.empty .e-s{font-size:12px;max-width:340px;line-height:1.6}
+
+/* ══════════════════════════════════════ */
+/* MODAL                                  */
+/* ══════════════════════════════════════ */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px)
+}
+.modal-bg.open{opacity:1;pointer-events:auto}
+.modal{
+  background:var(--panel);border:1px solid var(--border2);border-radius:var(--rx);
+  width:560px;max-width:94vw;max-height:88vh;overflow-y:auto;
+  transform:translateY(16px) scale(.98);transition:transform .25s
+}
+.modal-bg.open .modal{transform:translateY(0) scale(1)}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--panel);z-index:2
+}
+.modal-head h3{font-family:var(--head);font-size:15px;font-weight:700}
+.modal-x{
+  width:28px;height:28px;border:1px solid var(--border);border-radius:7px;
+  background:var(--panel2);color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s
+}
+.modal-x:hover{color:var(--text);border-color:var(--border2)}
+.modal-body{padding:18px 20px}
+.modal-foot{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:7px;justify-content:flex-end}
+
+/* Image upload */
+.img-zone{
+  height:120px;border:2px dashed var(--border2);border-radius:var(--r);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;cursor:pointer;transition:border-color .2s;margin-bottom:10px;
+  overflow:hidden;position:relative;background:var(--panel2)
+}
+.img-zone:hover{border-color:var(--accent)}
+.img-zone .zi{font-size:24px;opacity:.3}.img-zone .zt{font-size:10.5px;color:var(--muted)}
+.img-zone img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:8px;background:var(--panel2)}
+.img-zone input[type=file]{display:none}
+.img-url-row{display:flex;gap:5px;margin-bottom:10px}
+.img-url-row input{flex:1;font-size:10.5px}
+
+/* ══════════════════════════════════════ */
+/* PDF                                    */
+/* ══════════════════════════════════════ */
+#pdf-box{
+  position:fixed;left:-9999px;top:0;width:780px;
+  background:#fff;color:#1a1a1a;font-family:'DM Sans',Arial,sans-serif;padding:36px 40px
+}
+.pdf-h{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:2.5px solid #e8a020;padding-bottom:14px;margin-bottom:20px}
+.pdf-logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#e8a020}
+.pdf-logo-sub{font-size:9px;color:#999;margin-top:1px}
+.pdf-proj{text-align:right}
+.pdf-proj .pp{font-size:14px;font-weight:700}.pdf-proj .pc{font-size:11px;color:#666;margin-top:1px}
+.pdf-proj .pd{font-size:10px;color:#999;margin-top:1px}
+.pdf-note{font-size:11px;color:#555;background:#f8f6f2;border-left:3px solid #e8a020;padding:10px 14px;border-radius:0 6px 6px 0;margin-bottom:18px;line-height:1.5}
+.pdf-room-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#e8a020;margin:18px 0 8px;padding-bottom:5px;border-bottom:1px solid #eee}
+.pdf-tbl{width:100%;border-collapse:collapse;margin-bottom:6px;font-size:10.5px}
+.pdf-tbl th{background:#f5f0e8;font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8a7a60;padding:7px 8px;text-align:left;border-bottom:2px solid #e8d8b8}
+.pdf-tbl td{padding:8px;border-bottom:1px solid #f0ece5;vertical-align:middle}
+.pdf-tbl tr:nth-child(even) td{background:#fdfcfa}
+.pdf-tag{background:#fef3e0;color:#c87800;padding:2px 5px;border-radius:3px;font-size:8px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.pdf-cct{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.pdf-total{background:#fef9f0!important}
+.pdf-total td{font-weight:700!important;border-top:2px solid #e8a020!important;font-size:11.5px}
+.pdf-summary{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin:16px 0}
+.pdf-sum-card{background:#f8f6f2;border-radius:8px;padding:12px;text-align:center;border:1px solid #efe8d8}
+.pdf-sum-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#c87800}
+.pdf-sum-label{font-size:8px;color:#999;text-transform:uppercase;letter-spacing:.12em;margin-top:3px}
+.pdf-foot{text-align:center;font-size:9px;color:#bbb;margin-top:24px;padding-top:12px;border-top:1px solid #eee}
+
+/* ══════════════════════════════════════ */
+/* TOAST                                  */
+/* ══════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:20px;right:20px;z-index:200;
+  background:var(--panel);border:1px solid var(--green);border-radius:var(--r);
+  padding:10px 16px;font-size:12px;font-weight:600;color:var(--green);
+  transform:translateY(70px);opacity:0;transition:all .3s;
+  box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;align-items:center;gap:7px
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err{border-color:var(--red);color:var(--red)}
+
+/* ══════════════════════════════════════ */
+/* SETTINGS PANEL                         */
+/* ══════════════════════════════════════ */
+.settings-panel{
+  position:fixed;top:0;right:-380px;width:360px;height:100vh;
+  background:var(--panel);border-left:1px solid var(--border);
+  z-index:90;transition:right .3s;overflow-y:auto;padding:20px
+}
+.settings-panel.open{right:0}
+.settings-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:89;
+  opacity:0;pointer-events:none;transition:opacity .2s
+}
+.settings-overlay.open{opacity:1;pointer-events:auto}
+</style>
+</head>
+<body>
+<div id="ls-nav">
+  <a href="index.html">⌂ Dashboard</a>
+  <a href="instalace.html">Instalace</a>
+  <a href="vyroba.html">Výroba</a>
+  <a href="obhlidky.html">Obhlídky</a>
+  <a href="reklamace.html">Reklamace</a>
+  <a href="konfigurator.html">Konfigurátor</a>
+  <a href="dochazka.html">Docházka</a>
+  <a href="zasobovani.html">Zásobování</a>
+  <a href="lumibook.html" class="active">Lumibook</a>
+</div>
+<div id="app">
+  <!-- ═══ SIDEBAR ═══ -->
+  <div id="sidebar">
+    <div class="logo">
+      <div class="logo-mark">📋</div>
+      <div class="logo-text">
+        <div class="logo-brand">LUMIBOOK <span style="font-weight:400;font-size:11px;color:var(--accent2)">PRO</span></div>
+        <div class="logo-sub">Kniha svítidel by LEDshopik.cz</div>
+      </div>
+    </div>
+
+    <div class="sb-scroll">
+      <!-- PROJECT -->
+      <div class="sec">
+        <div class="sec-head"><span class="ic">📐</span> Projekt</div>
+        <div class="fld"><label>Název projektu</label><input id="p-name" placeholder="např. Byt Ostrava - Poruba"></div>
+        <div class="fld-row">
+          <div class="fld"><label>Zákazník</label><input id="p-client" placeholder="Jméno"></div>
+          <div class="fld"><label>Datum</label><input type="date" id="p-date"></div>
+        </div>
+        <div class="fld-row">
+          <div class="fld"><label>Číslo projektu</label><input id="p-num" placeholder="P-2026-001"></div>
+          <div class="fld"><label>Zpracoval</label><input id="p-author" placeholder="Vaše jméno" list="author-list"><datalist id="author-list"></datalist></div>
+        </div>
+        <div class="fld"><label>Poznámka</label><textarea id="p-note" placeholder="Volitelná poznámka..."></textarea></div>
+      </div>
+
+      <!-- ESHOP IMPORT -->
+      <div class="sec">
+        <div class="sec-head"><span class="ic">🔗</span> Import z eshopu</div>
+        <div class="import-box">
+          <div class="import-url-row">
+            <input id="eshop-url" placeholder="Vlož odkaz z eshopu...">
+            <button class="btn blue sm" onclick="importFromEshop()">⚡ Načíst</button>
+          </div>
+          <div class="import-status" id="import-status"></div>
+        </div>
+      </div>
+
+      <!-- DATABASE -->
+      <div class="sec">
+        <div class="sec-head"><span class="ic">💾</span> Databáze produktů <span style="margin-left:auto;font-family:var(--mono);font-size:9px" id="db-count">0</span></div>
+        <input class="db-search" id="db-search" placeholder="Hledat v databázi...">
+        <div id="db-list" style="max-height:220px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <div class="sb-foot">
+      <button class="btn primary" onclick="openAddModal()">＋ Nové svítidlo</button>
+      <button class="btn" onclick="openSettings()" title="Nastavení">⚙</button>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN ═══ -->
+  <div id="main">
+    <div class="topbar">
+      <div class="tb-title" id="tb-title">Kniha svítidel</div>
+      <div class="tb-stats">
+        <div class="chip a"><span>Typů:</span><span class="cv" id="s-types">0</span></div>
+        <div class="chip b"><span>Kusů:</span><span class="cv" id="s-qty">0</span></div>
+        <div class="chip p"><span>Σ W:</span><span class="cv" id="s-watt">0</span></div>
+        <div class="chip g"><span>Cena:</span><span class="cv" id="s-price">0 Kč</span></div>
+      </div>
+      <div class="vtog">
+        <button class="on" onclick="setView('grid',this)">☷ Karty</button>
+        <button onclick="setView('table',this)">☰ Tabulka</button>
+      </div>
+      <button class="btn primary sm" onclick="exportPDF()">📄 Export PDF</button>
+    </div>
+
+    <div class="content" id="content">
+      <div class="room-tabs" id="room-tabs"></div>
+      <div id="fixtures-area"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EDIT MODAL ═══ -->
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="m-title">Přidat svítidlo</h3>
+      <button class="modal-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <div style="flex:1">
+          <div class="img-zone" id="img-zone" onclick="document.getElementById('img-file').click()">
+            <div class="zi">🖼️</div><div class="zt">Klikni nebo vlož URL</div>
+            <input type="file" id="img-file" accept="image/*">
+          </div>
+          <div class="img-url-row">
+            <input class="fld" id="f-img-url" placeholder="URL obrázku..." style="margin:0;font-size:10px;padding:6px 8px">
+            <button class="btn sm" onclick="loadImgFromUrl()">Načíst</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="fld-row">
+        <div class="fld"><label>Název svítidla *</label><input id="f-name" placeholder="LED profil CORNER"></div>
+        <div class="fld"><label>Typ / kategorie</label>
+          <select id="f-type" onchange="updModalLabels()">
+            <option>LED pásek</option><option>Alu profil + pásek</option><option>Alu profil</option>
+            <option>Závěsné svítidlo</option><option>Stropní svítidlo</option>
+            <option>Nástěnné svítidlo</option><option>Downlight</option>
+            <option>Spot / Track</option><option>Venkovní svítidlo</option>
+            <option>Zemní svítidlo</option><option>Napájecí zdroj</option>
+            <option>Ovladač / Dimmer</option><option>Příslušenství</option><option>Jiné</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fld-row-3">
+        <div class="fld"><label>Příkon (W)</label><input type="number" id="f-watt" step="0.1"></div>
+        <div class="fld"><label id="lbl-lumen">Světelný tok (lm)</label><input type="number" id="f-lumen"></div>
+        <div class="fld"><label>CCT (K)</label>
+          <input id="f-cct" list="cct-list" value="3000K" placeholder="">
+          <datalist id="cct-list">
+            <option value="2700K">teplá</option><option value="3000K">teplá</option>
+            <option value="3500K">neutrální</option><option value="4000K">neutrální</option>
+            <option value="5000K">denní</option><option value="6500K">studená</option>
+            <option value="TW">Tunable White</option><option value="RGB"></option><option value="RGBW"></option>
+          </datalist>
+        </div>
+      </div>
+
+      <div class="fld-row-3">
+        <div class="fld"><label>CRI (Ra)</label>
+          <select id="f-cri"><option value="">—</option><option>80</option><option>90</option><option>95</option><option>97</option></select>
+        </div>
+        <div class="fld"><label>IP krytí</label>
+          <select id="f-ip"><option value="">—</option><option>IP20</option><option>IP44</option><option>IP54</option><option>IP65</option><option>IP67</option><option>IP68</option></select>
+        </div>
+        <div class="fld"><label>Rozměr / délka | šířka</label><input id="f-dim"></div>
+      </div>
+
+      <div class="fld-row-3">
+        <div class="fld"><label id="lbl-qty">Množství (ks)</label><input type="number" id="f-qty" value="1" min="1"></div>
+        <div class="fld"><label id="lbl-price">Cena za ks (Kč)</label><input type="number" id="f-price"></div>
+        <div class="fld"><label>Místnost / zóna</label>
+          <select id="f-room">
+            <option value="">— Bez místnosti —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fld"><label>Odkaz na eshop</label><input id="f-url" placeholder="https://vas-eshop.cz/produkt/..."></div>
+      <div class="fld"><label>Poznámka</label><textarea id="f-note" placeholder="Volitelná poznámka..."></textarea></div>
+      <div class="fld"><label>Poznámka do PDF <span style="font-weight:400;color:var(--muted)">(zobrazí se pod produktem v exportu)</span></label><textarea id="f-pdf-note" placeholder="Doplňková informace pro zákazníka..." style="min-height:40px;font-size:11px"></textarea></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <label style="font-size:10.5px;color:var(--text2);display:flex;align-items:center;gap:5px;cursor:pointer">
+          <input type="checkbox" id="f-save-db" checked> Uložit do databáze produktů
+        </label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal()">Zrušit</button>
+      <button class="btn primary" id="m-save" onclick="saveFixture()">Přidat</button>
+    </div>
+  </div>
+</div>
+
+<!-- PDF RENDER -->
+<div id="pdf-box"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- SETTINGS OVERLAY -->
+<div class="settings-overlay" id="set-overlay" onclick="closeSettings()"></div>
+<div class="settings-panel" id="set-panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h3 style="font-family:var(--head);font-size:16px;font-weight:700">⚙ Nastavení</h3>
+    <button class="modal-x" onclick="closeSettings()">✕</button>
+  </div>
+  <div class="sec-head" style="margin-bottom:8px">🔑 API klíč</div>
+  <div class="fld" style="margin-bottom:4px">
+    <label>Anthropic API klíč (pro import z eshopu)</label>
+    <div class="api-row">
+      <input id="api-key" type="password" placeholder="sk-ant-..." value="">
+      <button class="btn sm" onclick="toggleApiKey()" title="Zobrazit/skrýt">👁</button>
+    </div>
+  </div>
+  <div style="font-size:9px;color:var(--muted);line-height:1.4;margin-bottom:16px">Klíč se ukládá lokálně. <a href="https://console.anthropic.com/settings/keys" target="_blank">Získat klíč →</a><br>Pro sdílení s kolegy: vlož klíč → klikni „Zapéct" → pošli soubor.</div>
+  <button class="btn sm" onclick="bakeApiKey()" style="margin-bottom:16px">🔒 Zapéct klíč do souboru</button>
+  <div class="sec-head" style="margin-bottom:8px">💾 Data</div>
+  <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:18px">
+    <button class="btn" onclick="exportJSON()" style="justify-content:center">📥 Export databáze (JSON)</button>
+    <button class="btn" onclick="document.getElementById('import-json').click()" style="justify-content:center">📤 Import databáze (JSON)</button>
+    <input type="file" id="import-json" accept=".json" style="display:none">
+    <button class="btn danger" onclick="clearAll()" style="justify-content:center">🗑 Vymazat vše</button>
+  </div>
+  <div class="sec-head" style="margin-bottom:8px">📋 Projekt</div>
+  <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:18px">
+    <button class="btn" onclick="exportProjectJSON()" style="justify-content:center">📥 Export projektu (JSON)</button>
+    <button class="btn" onclick="document.getElementById('import-proj').click()" style="justify-content:center">📤 Import projektu (JSON)</button>
+    <input type="file" id="import-proj" accept=".json" style="display:none">
+    <button class="btn danger" onclick="clearProject()" style="justify-content:center">🗑 Vymazat projekt</button>
+  </div>
+  <div class="sec-head" style="margin-bottom:8px">ℹ️ Info</div>
+  <div style="font-size:11px;color:var(--muted);line-height:1.6">
+    LUMIBOOK PRO v1.0<br>
+    Klávesové zkratky:<br>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text2)">Ctrl+N</span> — nové svítidlo<br>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text2)">Ctrl+P</span> — export PDF<br>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text2)">Esc</span> — zavřít dialog
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+const BAKED_API_KEY = '';
+let fixtures = [];        // Current project fixtures
+
+const LB_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzDy6sULzCqDsxZ76fNxn7vNdpT2OoU4XdpbZPWAXBeABaxz1lKk4HK3YKVT5T-RcOmkA/exec';
+let dbFromSheets = false;
+
+let database = [];        // Saved product database
+let editIdx = -1;
+let view = 'grid';
+let tagN = 1;
+let activeRoom = '__all__';
+let customRooms = [];  // Manually created rooms
+let tempImg = null;
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+document.getElementById('p-date').valueAsDate = new Date();
+console.log('%c LUMIBOOK PRO v2.1 (2026-03-18 22:30) ', 'background:#e8a020;color:#000;font-weight:bold;font-size:14px');
+load();
+render();
+renderDB();
+
+// ══════════════════════════════════════
+// PERSISTENCE
+// ══════════════════════════════════════
+function save() {
+  try {
+    localStorage.setItem('lb-fixtures', JSON.stringify(fixtures));
+    localStorage.setItem('lb-tagN', tagN);
+    localStorage.setItem('lb-project', JSON.stringify(getProjectInfo()));
+  } catch(e) {}
+}
+function saveDB() {
+  try { localStorage.setItem('lb-database', JSON.stringify(database)); } catch(e) {}
+  // Sync to shared Google Sheets (non-blocking)
+  if(LB_SHEETS_URL && LB_SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbzDy6sULzCqDsxZ76fNxn7vNdpT2OoU4XdpbZPWAXBeABaxz1lKk4HK3YKVT5T-RcOmkA/exec') {
+    fetch(LB_SHEETS_URL, {
+      method: 'POST',
+      body: JSON.stringify({action: 'syncDB', database: database})
+    }).catch(() => {}); // ignore errors silently
+  }
+}
+
+async function loadDBFromSheets() {
+  if(!LB_SHEETS_URL || LB_SHEETS_URL === 'https://script.google.com/macros/s/AKfycbzDy6sULzCqDsxZ76fNxn7vNdpT2OoU4XdpbZPWAXBeABaxz1lKk4HK3YKVT5T-RcOmkA/exec') return;
+  try {
+    const res = await fetch(LB_SHEETS_URL + '?modul=database');
+    const json = await res.json();
+    if(json.data && json.data.length > 0) {
+      database = json.data;
+      localStorage.setItem('lb-database', JSON.stringify(database));
+      renderDB();
+    }
+  } catch(e) {} // fallback to localStorage silently
+}
+function load() {
+  try {
+    const f = localStorage.getItem('lb-fixtures');
+    if (f) { fixtures = JSON.parse(f); tagN = fixtures.length + 1; }
+    const t = localStorage.getItem('lb-tagN');
+    if (t) tagN = Math.max(tagN, parseInt(t));
+    const d = localStorage.getItem('lb-database');
+    if (d) database = JSON.parse(d);
+    const cr = localStorage.getItem('lb-rooms');
+    if (cr) customRooms = JSON.parse(cr);
+    const k = BAKED_API_KEY || localStorage.getItem('lb-apikey');
+    if (k) document.getElementById('api-key').value = k;
+    const p = localStorage.getItem('lb-project');
+    if (p) {
+      const pi = JSON.parse(p);
+      if(pi.name) document.getElementById('p-name').value = pi.name;
+      if(pi.client) document.getElementById('p-client').value = pi.client;
+      if(pi.date) document.getElementById('p-date').value = pi.date;
+      if(pi.num) document.getElementById('p-num').value = pi.num;
+      if(pi.author) document.getElementById('p-author').value = pi.author;
+      if(pi.note) document.getElementById('p-note').value = pi.note;
+    }
+  } catch(e) {}
+}
+function getProjectInfo() {
+  return {
+    name: document.getElementById('p-name').value,
+    client: document.getElementById('p-client').value,
+    date: document.getElementById('p-date').value,
+    num: document.getElementById('p-num').value,
+    author: document.getElementById('p-author').value,
+    note: document.getElementById('p-note').value
+  };
+}
+// Auto-save project fields
+['p-name','p-client','p-date','p-num','p-author','p-note'].forEach(id =>
+  document.getElementById(id).addEventListener('input', () => { save(); updateStats(); })
+);
+// Save API key
+document.getElementById('api-key').addEventListener('change', e => {
+  try { localStorage.setItem('lb-apikey', e.target.value); } catch(e2){}
+});
+// Save authors for autocomplete
+function saveAuthor() {
+  const v = document.getElementById('p-author').value.trim();
+  if (!v) return;
+  try {
+    let authors = JSON.parse(localStorage.getItem('lb-authors') || '[]');
+    if (!authors.includes(v)) { authors.push(v); localStorage.setItem('lb-authors', JSON.stringify(authors)); }
+    updateAuthorList();
+  } catch(e){}
+}
+function updateAuthorList() {
+  try {
+    const authors = JSON.parse(localStorage.getItem('lb-authors') || '[]');
+    document.getElementById('author-list').innerHTML = authors.map(a => `<option value="${a}">`).join('');
+  } catch(e){}
+}
+document.getElementById('p-author').addEventListener('change', saveAuthor);
+updateAuthorList();
+
+// ══════════════════════════════════════
+// CCT HELPERS
+// ══════════════════════════════════════
+function cctNorm(cct) { return String(cct).replace(/K$/i,'').trim(); }
+function cctColor(cct) {
+  const c = cctNorm(cct);
+  const map = {'2700':'#ffb347','3000':'#ffc67a','3500':'#ffd9a0','4000':'#ffe8c0','5000':'#fff4e0','6500':'#e8f0ff','TW':'linear-gradient(90deg,#ffb347,#e8f0ff)','RGB':'linear-gradient(90deg,#ff4444,#44ff44,#4444ff)','RGBW':'linear-gradient(90deg,#ff4444,#44ff44,#4444ff,#fff)'};
+  return map[c] || '#ffd9a0';
+}
+function cctLabel(cct) {
+  const c = cctNorm(cct);
+  if (['TW','RGB','RGBW'].includes(c)) return c;
+  return c ? c+'K' : cct;
+}
+
+// ══════════════════════════════════════
+// ROOMS
+// ══════════════════════════════════════
+function getRooms() {
+  const rooms = new Set(customRooms);
+  fixtures.forEach(f => { if (f.room) rooms.add(f.room); });
+  return [...rooms].sort((a,b) => a.localeCompare(b,'cs'));
+}
+function renderRoomTabs() {
+  const rooms = getRooms();
+  const el = document.getElementById('room-tabs');
+  const allCount = fixtures.length;
+  let html = `<div class="room-tab ${activeRoom==='__all__'?'on':''}" onclick="setRoom('__all__')">Vše <span class="rt-count">${allCount}</span></div>`;
+  rooms.forEach(r => {
+    const count = fixtures.filter(f => f.room === r).length;
+    html += `<div class="room-tab ${activeRoom===r?'on':''}" onclick="setRoom('${r.replace(/'/g,"\\'")}')">
+      ${r} <span class="rt-count">${count}</span>
+      <span onclick="event.stopPropagation();deleteRoom('${r.replace(/'/g,"\\'")}')" style="margin-left:4px;cursor:pointer;opacity:.4;font-size:10px" title="Smazat místnost">✕</span>
+    </div>`;
+  });
+  html += `<button class="add-room-btn" onclick="addRoom()">+ místnost</button>`;
+  el.innerHTML = html;
+  // Update room select in modal
+  const sel = document.getElementById('f-room');
+  const curVal = sel.value;
+  sel.innerHTML = '<option value="">— Bez místnosti —</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+  if (curVal) sel.value = curVal;
+}
+function setRoom(r) { activeRoom = r; render(); }
+function deleteRoom(r) {
+  const count = fixtures.filter(f => f.room === r).length;
+  const msg = count > 0 
+    ? 'Smazat místnost "' + r + '"? (' + count + ' svítidel se přesune do nezařazených)'
+    : 'Smazat místnost "' + r + '"?';
+  if (!confirm(msg)) return;
+  // Remove from custom rooms
+  customRooms = customRooms.filter(cr => cr !== r);
+  try { localStorage.setItem('lb-rooms', JSON.stringify(customRooms)); } catch(e){}
+  // Unassign fixtures from this room
+  fixtures.forEach(f => { if (f.room === r) f.room = ''; });
+  if (activeRoom === r) activeRoom = '__all__';
+  render();
+  toast('✓ Místnost smazána');
+}
+function addRoom() {
+  const name = prompt('Název místnosti / zóny:');
+  if (!name || !name.trim()) return;
+  const trimmed = name.trim();
+  // Save to custom rooms
+  if (!customRooms.includes(trimmed)) {
+    customRooms.push(trimmed);
+    try { localStorage.setItem('lb-rooms', JSON.stringify(customRooms)); } catch(e){}
+  }
+  // Offer to assign unassigned fixtures
+  const unassigned = fixtures.filter(f => !f.room);
+  if (unassigned.length > 0) {
+    if (confirm('Přiřadit ' + unassigned.length + ' nezařazených svítidel do "' + trimmed + '"?')) {
+      unassigned.forEach(f => f.room = trimmed);
+    }
+  }
+  render();
+  toast('✓ Místnost "' + trimmed + '" vytvořena');
+}
+
+// ══════════════════════════════════════
+// IMPORT FROM ESHOP
+// ══════════════════════════════════════
+async function importFromEshop() {
+  const url = document.getElementById('eshop-url').value.trim();
+  const key = document.getElementById('api-key').value.trim();
+  const status = document.getElementById('import-status');
+
+  if (!url) { status.className='import-status error'; status.textContent='Zadej URL produktové stránky'; return; }
+  if (!key) { status.className='import-status error'; status.textContent='Zadej API klíč (v ⚙ Nastavení)'; return; }
+  if (/\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url)) {
+    status.className='import-status error';
+    status.textContent='Tohle je odkaz na obrázek. Vlož URL produktové stránky.';
+    return;
+  }
+
+  status.className = 'import-status loading';
+  status.innerHTML = '<span class="spin">⟳</span> Stahuji stránku...';
+
+  try {
+    // ── STEP 1: Try to fetch page HTML via CORS proxy ──
+    let pageText = '';
+    let foundImage = '';
+    let usedProxy = false;
+
+    try {
+      const proxies = ['https://api.allorigins.win/raw?url='];
+      for (const proxy of proxies) {
+        try {
+          const r = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(3000)});
+          if (r.ok) {
+            const html = await r.text();
+            
+            // Extract meta tags from raw HTML (works even on JS-rendered pages!)
+            const ogMatch = html.match(/property=["']og:image["']\s+content=["']([^"']+)["']/i) 
+                         || html.match(/content=["']([^"']+)["']\s+property=["']og:image["']/i);
+            if (ogMatch) foundImage = ogMatch[1];
+            
+            // Also try product image patterns specific to eshop
+            if (!foundImage) {
+              const imgPat = html.match(/["'](https?:\/\/[^"']*\/fotky\/[^"']*\.(?:jpg|png|webp)[^"']*)["']/i);
+              if (imgPat) foundImage = imgPat[1];
+            }
+
+            // Extract og:title and og:description (available in static <head>)
+            const ogTitle = html.match(/property=["']og:title["']\s+content=["']([^"']+)["']/i)
+                         || html.match(/content=["']([^"']+)["']\s+property=["']og:title["']/i);
+            const ogDesc = html.match(/property=["']og:description["']\s+content=["']([^"']+)["']/i)
+                        || html.match(/content=["']([^"']+)["']\s+property=["']og:description["']/i);
+            const metaDesc = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
+            const titleTag = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+
+            // Build page text from meta tags if body is JS-rendered
+            let metaText = '';
+            if (ogTitle) metaText += ogTitle[1] + '. ';
+            else if (titleTag) metaText += titleTag[1] + '. ';
+            if (ogDesc) metaText += ogDesc[1] + '. ';
+            else if (metaDesc) metaText += metaDesc[1] + '. ';
+            
+            // Try to get JSON-LD structured data (many eshops have this)
+            const jsonLd = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+            if (jsonLd) {
+              jsonLd.forEach(block => {
+                const content = block.replace(/<\/?script[^>]*>/gi, '');
+                metaText += content + ' ';
+              });
+            }
+
+            // Parse body text
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            doc.querySelectorAll('script,style,nav,footer,header,iframe').forEach(el => el.remove());
+            
+            if (foundImage && !foundImage.startsWith('http')) {
+              try { foundImage = new URL(foundImage, url).href; } catch(e) {}
+            }
+            console.log('Image found:', foundImage);
+
+            pageText = (doc.body ? (doc.body.innerText || doc.body.textContent || '') : '').replace(/\s+/g,' ').trim();
+            
+            // If body is useless but we have meta text, use that
+            if (pageText.length < 200 || pageText.includes('JavaScript') || pageText.includes('cookies')) {
+              if (metaText.length > 50) {
+                pageText = metaText;
+                usedProxy = true;
+                console.log('Using META TEXT (body was JS-rendered):', metaText.slice(0, 300));
+              } else {
+                pageText = '';
+              }
+            } else {
+              usedProxy = true;
+            }
+            break;
+          }
+        } catch(e) { continue; }
+      }
+    } catch(e) { /* proxy failed, will use web search */ }
+
+    status.innerHTML = '<span class="spin">⟳</span> Analyzuji parametry...';
+
+    let aiResponse;
+
+    if (usedProxy && pageText) {
+      // ── PATH A: Have page content → use cheap Haiku ──
+      console.log('Using PROXY path, page text length:', pageText.length);
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001', max_tokens: 400,
+          system: 'Extrahuj data z textu e-shopu. POUZE JSON. NEVYMÝŠLEJ údaje.',
+          messages: [{role:'user', content: 'Text stránky:\n' + pageText.slice(0,3000) + '\n\nJSON: {"name":"","type":"Alu profil|LED pásek|Alu profil + pásek|Stropní svítidlo|Závěsné svítidlo|Downlight|Nástěnné svítidlo|Venkovní svítidlo|Napájecí zdroj|Ovladač / Dimmer|Příslušenství|Jiné","watt":0,"lumen":0,"cct":"","cri":"","ip":"","dim":"","price":0,"note":"popis max 2 věty"}\nProfil BEZ pásku: watt=0,lumen=0,cct="",cri="". Pásek: W/m,lm/m. dim=rozměry VŽDY vyplň (šířka, průměr, délka).'}]
+        })
+      });
+      if (!resp.ok) throw new Error('API chyba ' + resp.status);
+      aiResponse = await resp.json();
+    } else {
+      // ── PATH B: JS-rendered page → use Sonnet + web_search ──
+      console.log('Using WEB SEARCH path (page not readable via proxy)');
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514', max_tokens: 500,
+          system: 'Extrahuj produktová data z e-shopu. POUZE JSON. Pokud údaj nenajdeš dej 0 nebo "". NEVYMÝŠLEJ.',
+          tools: [{type:'web_search_20250305', name:'web_search'}],
+          messages: [{role:'user', content: 'Vyhledej tento produkt a zjisti jeho skutečné parametry: ' + url + '\n\nVrať POUZE JSON:\n{"name":"","type":"Alu profil|LED pásek|Alu profil + pásek|Stropní svítidlo|Závěsné svítidlo|Downlight|Nástěnné svítidlo|Venkovní svítidlo|Napájecí zdroj|Ovladač / Dimmer|Příslušenství|Jiné","watt":0,"lumen":0,"cct":"","cri":"","ip":"","dim":"","price":0,"image":"URL obrázku","note":"popis max 2 věty"}\nPROFIL (ne pásek): watt=0,lumen=0,cct="",cri="". PÁSEK: W/m a lm/m. dim=rozměry VŽDY vyplň. NEVYMÝŠLEJ hodnoty!'}]
+        })
+      });
+      if (!resp.ok) throw new Error('API chyba ' + resp.status);
+      aiResponse = await resp.json();
+    }
+
+    // ── Extract JSON from AI response ──
+    let aiText = '';
+    if (aiResponse.content) aiResponse.content.forEach(b => { if (b.type === 'text') aiText += b.text; });
+    console.log('AI text:', aiText.slice(0, 400));
+
+    aiText = aiText.replace(/```json\s*/gi,'').replace(/```\s*/g,'');
+    const jm = aiText.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/);
+    if (!jm) throw new Error('AI nevrátila platná data — zkus to znovu');
+
+    let p;
+    try { p = JSON.parse(jm[0]); } catch(e2) { throw new Error('Chyba parsování dat'); }
+    console.log('Parsed:', p);
+
+    // Image: prefer proxy-found, fallback to AI-found
+    if (!p.image && foundImage) p.image = foundImage;
+    if (!p.name) p.name = url.split('/').pop().replace(/[-_]x?\d*$/,'').replace(/-/g,' ');
+
+    // ── Detect product category from name ──
+    const nl = (p.name || url).toLowerCase();
+    const isProfile = nl.includes('profil') && !nl.includes('pásek') && !nl.includes('pasek') && !nl.includes('strip') && !nl.includes('+');
+    const isPSU = (nl.includes('zdroj') || nl.includes('mean well') || nl.includes('driver')) && !nl.includes('pásek');
+    const isDimmer = nl.includes('dimmer') || nl.includes('ovlada') || nl.includes('stmiv');
+    console.log('Category detect:', {name: nl, isProfile, isPSU, isDimmer});
+
+    // ── Fill modal ──
+    editIdx = -1;
+    document.getElementById('m-title').textContent = 'Importovaný produkt';
+    document.getElementById('m-save').textContent = 'Přidat do projektu';
+    clearForm();
+
+    // Name always
+    document.getElementById('f-name').value = p.name || '';
+    document.getElementById('f-url').value = url;
+    document.getElementById('f-dim').value = p.dim || '';
+    document.getElementById('f-img-url').value = p.image || '';
+    
+    // Filter garbage notes
+    const noteVal = p.note || '';
+    const badWords = ['javascript','cookie','nalezen','not found','unavailable','error','vyžaduje'];
+    document.getElementById('f-note').value = badWords.some(w => noteVal.toLowerCase().includes(w)) ? '' : noteVal;
+
+    if (isProfile) {
+      // ── ALU PROFIL: only name, price, dim, note ──
+      document.getElementById('f-type').value = 'Alu profil';
+      document.getElementById('f-watt').value = '';
+      document.getElementById('f-lumen').value = '';
+      document.getElementById('f-cct').value = '';
+      document.getElementById('f-cri').value = '';
+      document.getElementById('f-ip').value = '';
+      document.getElementById('f-price').value = (p.price > 0) ? p.price : '';
+      console.log('PROFILE MODE: watt/lumen/cct/cri/ip forced empty');
+    } else if (isPSU) {
+      document.getElementById('f-type').value = 'Napájecí zdroj';
+      document.getElementById('f-watt').value = (p.watt > 0) ? p.watt : '';
+      document.getElementById('f-lumen').value = '';
+      document.getElementById('f-cct').value = '';
+      document.getElementById('f-cri').value = '';
+      document.getElementById('f-ip').value = (p.ip && p.ip !== 'IP20') ? p.ip : '';
+      document.getElementById('f-price').value = (p.price > 0) ? p.price : '';
+    } else if (isDimmer) {
+      document.getElementById('f-type').value = 'Ovladač / Dimmer';
+      document.getElementById('f-watt').value = (p.watt > 0) ? p.watt : '';
+      document.getElementById('f-lumen').value = '';
+      document.getElementById('f-cct').value = '';
+      document.getElementById('f-cri').value = '';
+      document.getElementById('f-ip').value = '';
+      document.getElementById('f-price').value = (p.price > 0) ? p.price : '';
+    } else {
+      // ── Normal product: use all AI values ──
+      const ts = document.getElementById('f-type');
+      let typeOk = false;
+      for (let o of ts.options) { if (o.value === p.type) { ts.value = o.value; typeOk = true; break; } }
+      if (!typeOk) ts.value = 'Jiné';
+      document.getElementById('f-watt').value = (p.watt > 0) ? p.watt : '';
+      document.getElementById('f-lumen').value = (p.lumen > 0) ? p.lumen : '';
+      document.getElementById('f-cct').value = p.cct || '';
+      if (p.cri) setSelectVal('f-cri', String(p.cri));
+      if (p.ip) setSelectVal('f-ip', p.ip);
+      document.getElementById('f-price').value = (p.price > 0) ? p.price : '';
+    }
+    
+    document.getElementById('f-qty').value = '1';
+    updModalLabels();
+    
+    console.log('FINAL form values:', {
+      watt: document.getElementById('f-watt').value,
+      lumen: document.getElementById('f-lumen').value,
+      cct: document.getElementById('f-cct').value,
+      type: document.getElementById('f-type').value
+    });
+
+    if (p.image) {
+      tempImg = p.image;
+      document.getElementById('img-zone').innerHTML = '<img src="' + p.image + '" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'"><input type="file" id="img-file" accept="image/*">';
+      bindImgUpload();
+    }
+
+    document.getElementById('modal-bg').classList.add('open');
+    status.className = 'import-status success';
+    status.textContent = '✓ Produkt načten — zkontroluj a uprav';
+    document.getElementById('eshop-url').value = '';
+  } catch(e) {
+    status.className = 'import-status error';
+    status.textContent = '✗ ' + (e.message || 'Neznámá chyba');
+    console.error('Import error:', e);
+  }
+}
+function setSelectVal(id, val) {
+  const sel = document.getElementById(id);
+  for (let o of sel.options) {
+    if (o.value === val || o.textContent.startsWith(val)) { sel.value = o.value; return; }
+  }
+}
+
+function toggleApiKey() {
+  const inp = document.getElementById('api-key');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ══════════════════════════════════════
+// DATABASE
+// ══════════════════════════════════════
+function renderDB(filter = '') {
+  const el = document.getElementById('db-list');
+  const f = filter.toLowerCase();
+  const items = database.filter(d => !f || d.name.toLowerCase().includes(f) || (d.type||'').toLowerCase().includes(f));
+  document.getElementById('db-count').textContent = database.length;
+
+  if (items.length === 0) {
+    el.innerHTML = `<div style="text-align:center;padding:16px;color:var(--muted);font-size:11px">${database.length===0?'Databáze je prázdná.<br>Importuj produkty z eshopu.':'Nic nenalezeno.'}</div>`;
+    return;
+  }
+
+  el.innerHTML = items.map((d, i) => {
+    const origIdx = database.indexOf(d);
+    const imgHtml = d.image ? `<img src="${d.image}" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML='💡'">` : '💡';
+    return `<div class="db-item" ondblclick="addFromDB(${origIdx})">
+      <div class="dbi-img">${imgHtml}</div>
+      <div class="dbi-info">
+        <div class="dbi-name">${d.name}</div>
+        <div class="dbi-spec">${d.type||'—'} · ${d.watt||0}W · ${d.price?d.price+'Kč':'—'}</div>
+      </div>
+      <button class="dbi-add" onclick="event.stopPropagation();addFromDB(${origIdx})" title="Přidat do projektu">＋</button>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('db-search').addEventListener('input', e => renderDB(e.target.value));
+
+function addFromDB(idx) {
+  const d = database[idx];
+  fixtures.push({
+    ...JSON.parse(JSON.stringify(d)),
+    tag: 'S' + String(tagN++).padStart(2, '0'),
+    qty: d.qty || 1
+  });
+  render();
+  toast('✓ Přidáno: ' + d.name);
+}
+
+function addToDB(item) {
+  // Check if already exists by name+type
+  const exists = database.findIndex(d => d.name === item.name && d.type === item.type);
+  if (exists >= 0) {
+    database[exists] = { ...database[exists], ...item };
+  } else {
+    database.push({ ...item });
+  }
+  saveDB();
+  renderDB();
+}
+
+// ══════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════
+function openAddModal() {
+  editIdx = -1;
+  document.getElementById('m-title').textContent = 'Přidat svítidlo';
+  document.getElementById('m-save').textContent = 'Přidat';
+  clearForm();
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openEditModal(idx) {
+  editIdx = idx;
+  const f = fixtures[idx];
+  document.getElementById('m-title').textContent = 'Upravit svítidlo';
+  document.getElementById('m-save').textContent = 'Uložit';
+  document.getElementById('f-name').value = f.name || '';
+  setSelectVal('f-type', f.type);
+  document.getElementById('f-watt').value = f.watt || '';
+  document.getElementById('f-lumen').value = f.lumen || '';
+  document.getElementById('f-cct').value = f.cct || '3000K';
+  setSelectVal('f-cri', String(f.cri));
+  setSelectVal('f-ip', f.ip);
+  document.getElementById('f-dim').value = f.dim || '';
+  document.getElementById('f-qty').value = f.qty || 1;
+  document.getElementById('f-price').value = f.price || '';
+  document.getElementById('f-room').value = f.room || '';
+  document.getElementById('f-url').value = f.url || '';
+  document.getElementById('f-note').value = f.note || '';
+  document.getElementById('f-pdf-note').value = f.pdfNote || '';
+  document.getElementById('f-img-url').value = '';
+
+  const zone = document.getElementById('img-zone');
+  if (f.image) {
+    tempImg = f.image;
+    zone.innerHTML = `<img src="${f.image}" referrerpolicy="no-referrer" onerror="this.style.display='none'"><input type="file" id="img-file" accept="image/*">`;
+  } else {
+    resetImgZone();
+  }
+  bindImgUpload();
+  updModalLabels();
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal-bg').classList.remove('open'); }
+
+function clearForm() {
+  ['f-name','f-watt','f-lumen','f-dim','f-room','f-url','f-note','f-pdf-note','f-img-url'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-type').selectedIndex = 0;
+  document.getElementById('f-cct').value = '3000K';
+  document.getElementById('f-cri').value = '90';
+  document.getElementById('f-ip').value = 'IP20';
+  document.getElementById('f-qty').value = '1';
+  document.getElementById('f-price').value = '';
+  document.getElementById('f-save-db').checked = true;
+  tempImg = null;
+  resetImgZone();
+}
+
+function resetImgZone() {
+  const zone = document.getElementById('img-zone');
+  zone.innerHTML = `<div class="zi">🖼️</div><div class="zt">Klikni nebo vlož URL</div><input type="file" id="img-file" accept="image/*">`;
+  bindImgUpload();
+}
+
+function bindImgUpload() {
+  const inp = document.getElementById('img-file');
+  if (!inp) return;
+  inp.addEventListener('change', e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      tempImg = ev.target.result;
+      document.getElementById('img-zone').innerHTML = `<img src="${tempImg}"><input type="file" id="img-file" accept="image/*">`;
+      bindImgUpload();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+bindImgUpload();
+
+function loadImgFromUrl() {
+  const url = document.getElementById('f-img-url').value.trim();
+  if (!url) return;
+  tempImg = url;
+  document.getElementById('img-zone').innerHTML = `<img src="${url}" referrerpolicy="no-referrer" onerror="this.style.display='none'"><input type="file" id="img-file" accept="image/*">`;
+  bindImgUpload();
+}
+
+function saveFixture() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Zadej název svítidla'); return; }
+
+  const data = {
+    name,
+    type: document.getElementById('f-type').value,
+    watt: parseFloat(document.getElementById('f-watt').value) || 0,
+    lumen: parseFloat(document.getElementById('f-lumen').value) || 0,
+    cct: document.getElementById('f-cct').value,
+    cri: document.getElementById('f-cri').value,
+    ip: document.getElementById('f-ip').value,
+    dim: document.getElementById('f-dim').value,
+    qty: parseFloat(document.getElementById('f-qty').value) || 1,
+    price: parseFloat(document.getElementById('f-price').value) || 0,
+    room: document.getElementById('f-room').value,
+    url: document.getElementById('f-url').value,
+    note: document.getElementById('f-note').value,
+    pdfNote: document.getElementById('f-pdf-note').value,
+    image: tempImg || (editIdx >= 0 ? fixtures[editIdx].image : null)
+  };
+
+  if (editIdx >= 0) {
+    data.tag = fixtures[editIdx].tag;
+    fixtures[editIdx] = data;
+    toast('✓ Upraveno: ' + name);
+  } else {
+    data.tag = 'S' + String(tagN++).padStart(2, '0');
+    fixtures.push(data);
+    toast('✓ Přidáno: ' + name);
+  }
+
+  // Save to database if checked
+  if (document.getElementById('f-save-db').checked) {
+    const dbItem = { ...data };
+    delete dbItem.tag;
+    delete dbItem.qty;
+    delete dbItem.room;
+    addToDB(dbItem);
+  }
+
+  closeModal();
+  render();
+}
+
+// ══════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════
+function render() {
+  save();
+  updateStats();
+  renderRoomTabs();
+
+  const filtered = activeRoom === '__all__'
+    ? fixtures
+    : fixtures.filter(f => f.room === activeRoom);
+
+  const area = document.getElementById('fixtures-area');
+  if (fixtures.length === 0) {
+    area.innerHTML = `<div class="empty"><div class="e-ic">💡</div><div class="e-t">Zatím žádná svítidla</div><div class="e-s">Importuj z eshopu, přidej z databáze, nebo klikni „＋ Nové svítidlo".</div></div>`;
+    return;
+  }
+
+  if (view === 'grid') renderGrid(filtered);
+  else renderTable(filtered);
+}
+
+function renderGrid(items) {
+  const area = document.getElementById('fixtures-area');
+  if (items.length === 0) {
+    area.innerHTML = `<div class="empty" style="height:40vh"><div class="e-ic">📂</div><div class="e-t">Žádná svítidla v této místnosti</div></div>`;
+    return;
+  }
+
+  function cardHtml(f) {
+    const i = fixtures.indexOf(f);
+    const tp = f.qty * f.price;
+    const cctC = cctColor(f.cct);
+    const imgH = f.image ? `<img src="${f.image}" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML='<div class=ph>💡</div>'">` : '<div class="ph">💡</div>';
+    return `<div class="card">
+      <div class="card-head">
+        <span class="card-tag">${f.tag}</span>
+        ${f.room ? `<span class="card-room">📍 ${f.room}</span>` : ''}
+        <div class="card-acts">
+          <button class="card-btn" onclick="dupFixture(${i})" title="Duplikovat">⧉</button>
+          <button class="card-btn" onclick="openEditModal(${i})" title="Upravit">✎</button>
+          <button class="card-btn del" onclick="delFixture(${i})" title="Smazat">✕</button>
+        </div>
+      </div>
+      <div class="card-img">${imgH}</div>
+      <div class="card-body">
+        <div class="card-name">${f.name}</div>
+        <div class="card-type">${f.type}${f.dim ? ' · '+f.dim : ''}</div>
+        ${f.url ? `<a class="card-link" href="${f.url}" target="_blank">🔗 eshop</a>` : ''}
+        <div class="cct-bar"><div class="cct-fill" style="width:100%;background:${cctC}"></div></div>
+        <div class="params">
+          <div class="pm"><div class="pv">${f.watt ? f.watt+'W' : '—'}</div><div class="pl">Příkon</div></div>
+          <div class="pm"><div class="pv">${f.lumen||'—'}</div><div class="pl">${isLinear(f.type)?'lm/m':'Lumen'}</div></div>
+          <div class="pm"><div class="pv">${f.cct ? cctLabel(f.cct) : '—'}</div><div class="pl">CCT</div></div>
+          <div class="pm"><div class="pv">${f.cri ? 'Ra'+f.cri : '—'}</div><div class="pl">CRI</div></div>
+          <div class="pm"><div class="pv">${f.ip || '—'}</div><div class="pl">Krytí</div></div>
+          <div class="pm"><div class="pv">${(f.watt && f.watt*f.qty) ? Math.round(f.watt*f.qty)+'W' : '—'}</div><div class="pl">Σ příkon</div></div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <div class="qty-ctrl">
+          <button onclick="chgQty(${i},-1)">−</button>
+          <span class="qv">${f.qty}${getUnit(f)}</span>
+          <button onclick="chgQty(${i},1)">+</button>
+        </div>
+        <div class="card-price">${tp > 0 ? Math.round(tp).toLocaleString('cs')+' Kč' : '—'}</div>
+      </div>
+      <div class="card-note">${f.note || '&nbsp;'}</div>
+    </div>`;
+  }
+
+  // Group by room if viewing all
+  if (activeRoom === '__all__' && items.some(f => f.room)) {
+    const roomMap = new Map();
+    items.forEach(f => {
+      const r = f.room || '__none__';
+      if (!roomMap.has(r)) roomMap.set(r, []);
+      roomMap.get(r).push(f);
+    });
+    // Sort: named rooms first alphabetically, then unassigned
+    const sorted = [...roomMap.entries()].sort((a,b) => {
+      if (a[0]==='__none__') return 1;
+      if (b[0]==='__none__') return -1;
+      return a[0].localeCompare(b[0],'cs');
+    });
+    let html = '';
+    sorted.forEach(([room, rItems]) => {
+      const rWatt = rItems.reduce((a,f) => a + f.watt*f.qty, 0);
+      const label = room === '__none__' ? '📦 Nezařazené' : '📍 ' + room;
+      html += `<div style="margin:${html?'24px':'0'} 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+        <span style="font-family:var(--head);font-size:13px;font-weight:700;color:var(--accent)">${label}</span>
+        <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${rItems.length} ks · ${Math.round(rWatt)}W</span>
+      </div>`;
+      html += `<div class="grid">${rItems.map(f => cardHtml(f)).join('')}</div>`;
+    });
+    area.innerHTML = html;
+  } else {
+    area.innerHTML = `<div class="grid">${items.map(f => cardHtml(f)).join('')}</div>`;
+  }
+}
+
+function renderTable(items) {
+  const area = document.getElementById('fixtures-area');
+  const totals = items.reduce((a,f)=>({qty:a.qty+f.qty,watt:a.watt+f.watt*f.qty,price:a.price+f.price*f.qty}),{qty:0,watt:0,price:0});
+
+  area.innerHTML = `<table class="tbl"><thead><tr>
+    <th>Tag</th><th>Název</th><th>Typ</th><th>W</th><th>lm</th><th>CCT</th><th>CRI</th><th>IP</th><th>Ks</th><th>Σ W</th><th>Kč/ks</th><th>Celkem</th><th>Místnost</th><th></th>
+  </tr></thead><tbody>
+  ${items.map(f => {
+    const i = fixtures.indexOf(f);
+    return `<tr>
+      <td><span class="tt">${f.tag}</span></td>
+      <td class="tn">${f.name}${f.url?` <a href="${f.url}" target="_blank" style="font-size:9px">🔗</a>`:''}</td>
+      <td>${f.type}</td>
+      <td class="tm">${f.watt}</td><td class="tm">${f.lumen||'—'}</td>
+      <td class="tm">${cctLabel(f.cct)}</td><td class="tm">${f.cri}</td><td>${f.ip}</td>
+      <td class="tm">${f.qty}${isLinear(f.type)?'m':'×'}</td><td class="tm">${f.watt*f.qty}W</td>
+      <td class="tm">${f.price?f.price.toLocaleString('cs'):'—'}</td>
+      <td class="tp tm">${f.price*f.qty?(f.price*f.qty).toLocaleString('cs')+' Kč':'—'}</td>
+      <td>${f.room||'—'}</td>
+      <td><div class="ta">
+        <button class="card-btn" onclick="openEditModal(${i})" style="width:22px;height:22px;font-size:10px">✎</button>
+        <button class="card-btn del" onclick="delFixture(${i})" style="width:22px;height:22px;font-size:10px">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('')}
+  </tbody><tfoot><tr style="background:var(--accent-dim)">
+    <td colspan="8" style="font-weight:700;border-top:2px solid var(--accent)">CELKEM</td>
+    <td class="tm" style="font-weight:700;border-top:2px solid var(--accent)">${totals.qty}</td>
+    <td class="tm" style="font-weight:700;border-top:2px solid var(--accent)">${totals.watt}W</td>
+    <td style="border-top:2px solid var(--accent)"></td>
+    <td class="tp tm" style="font-weight:700;font-size:12px;border-top:2px solid var(--accent)">${totals.price.toLocaleString('cs')} Kč</td>
+    <td colspan="2" style="border-top:2px solid var(--accent)"></td>
+  </tr></tfoot></table>`;
+}
+
+// ══════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════
+function isLinear(t){return t==='LED pásek'||t==='Alu profil + pásek'}
+function getUnit(f){return isLinear(f.type)?'m':'×'}
+function updModalLabels(){const l=isLinear(document.getElementById('f-type').value);document.getElementById('lbl-qty').textContent=l?'Délka (m)':'Množství (ks)';document.getElementById('lbl-price').textContent=l?'Cena za m (Kč)':'Cena za ks (Kč)';document.getElementById('lbl-lumen').textContent=l?'Světelný tok (lm/m)':'Světelný tok (lm)';document.getElementById('f-qty').step=l?'0.5':'1';document.getElementById('f-qty').min=l?'0.5':'1'}
+function chgQty(i,d){ const step=isLinear(fixtures[i].type)?0.5:1; fixtures[i].qty=Math.max(step,Math.round((fixtures[i].qty+d*step)*10)/10); render(); }
+function delFixture(i){ if(!confirm('Smazat "'+fixtures[i].name+'"?'))return; fixtures.splice(i,1); render(); toast('Svítidlo odstraněno'); }
+function dupFixture(i){ const c=JSON.parse(JSON.stringify(fixtures[i])); c.tag='S'+String(tagN++).padStart(2,'0'); fixtures.splice(i+1,0,c); render(); toast('✓ Duplikováno'); }
+function setView(v,btn){ view=v; document.querySelectorAll('.vtog button').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); render(); }
+
+function updateStats() {
+  const t = fixtures.reduce((a,f)=>({c:a.c+1,q:a.q+f.qty,w:a.w+f.watt*f.qty,p:a.p+f.price*f.qty}),{c:0,q:0,w:0,p:0});
+  document.getElementById('s-types').textContent = t.c;
+  document.getElementById('s-qty').textContent = t.q;
+  document.getElementById('s-watt').textContent = t.w+'W';
+  document.getElementById('s-price').textContent = t.p.toLocaleString('cs')+' Kč';
+  document.getElementById('tb-title').textContent = document.getElementById('p-name').value || 'Kniha svítidel';
+}
+
+// ══════════════════════════════════════
+// PDF EXPORT
+// ══════════════════════════════════════
+function exportPDF() {
+  if (!fixtures.length) { alert('Přidej nejprve svítidla'); return; }
+  const pi = getProjectInfo();
+  const rooms = getRooms();
+  const noRoom = fixtures.filter(f => !f.room);
+
+  // Detect which columns have data
+  const hasPrice = fixtures.some(f => f.price > 0);
+  const hasLumen = fixtures.some(f => f.lumen > 0);
+  const hasImg = fixtures.some(f => f.image);
+  const hasDim = fixtures.some(f => f.dim);
+
+  let rowNum = 0;
+  function makeTable(items) {
+    return `<table class="t"><thead><tr>
+      <th style="width:24px">#</th>
+      ${hasImg?'<th style="width:50px">Fotka</th>':''}
+      <th>Tag</th><th>Název</th><th>Typ</th>
+      ${hasDim?'<th>Rozměr</th>':''}
+      <th>W</th>
+      ${hasLumen?'<th>lm</th>':''}
+      <th>CCT</th><th>CRI</th><th>IP</th><th>Mn.</th><th>Σ W</th>
+      ${hasPrice?'<th>Kč/j</th><th>Celkem</th>':''}
+    </tr></thead><tbody>
+    ${items.map(f=>{
+      rowNum++;
+      const cc = cctColor(f.cct);
+      const isSimple = !cc.startsWith('linear');
+      return `<tr>
+        <td style="color:#999;font-size:9px;text-align:center">${rowNum}</td>
+        ${hasImg?'<td>'+(f.image?`<img src="${f.image}" style="width:44px;height:33px;object-fit:contain;border-radius:3px;border:1px solid #eee">`:'')+'</td>':''}
+        <td><span class="tg">${f.tag}</span></td>
+        <td><div style="font-weight:600">${f.name}</div>${f.pdfNote?'<div style="font-size:9px;color:#888;margin-top:2px;line-height:1.3">'+f.pdfNote+'</div>':''}</td>
+        <td>${f.type}</td>
+        ${hasDim?`<td>${f.dim||''}</td>`:''}
+        <td>${f.watt}</td>
+        ${hasLumen?`<td>${f.lumen||'—'}</td>`:''}
+        <td>${isSimple?`<span class="cc" style="background:${cc}"></span>`:''}${cctLabel(f.cct)}</td>
+        <td>Ra${f.cri}</td><td>${f.ip}</td>
+        <td>${f.qty}${isLinear(f.type)?'m':'ks'}</td>
+        <td>${Math.round(f.watt*f.qty)}W</td>
+        ${hasPrice?`<td>${f.price?f.price.toLocaleString('cs'):'—'}</td>
+        <td style="font-weight:700;color:#1a8c5e">${f.price*f.qty?Math.round(f.price*f.qty).toLocaleString('cs')+' Kč':'—'}</td>`:''}
+      </tr>`;
+    }).join('')}
+    </tbody></table>`;
+  }
+
+  let roomsHtml = '';
+  rowNum = 0;
+  if (rooms.length > 0) {
+    rooms.forEach(r => {
+      const items = fixtures.filter(f => f.room === r);
+      roomsHtml += `<div class="rh">📍 ${r}</div>${makeTable(items)}`;
+    });
+    if (noRoom.length > 0) {
+      roomsHtml += `<div class="rh">📍 Nezařazeno</div>${makeTable(noRoom)}`;
+    }
+  } else {
+    roomsHtml = makeTable(fixtures);
+  }
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Kniha svítidel — ${pi.name||'Projekt'}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',Arial,sans-serif;padding:32px 36px;color:#1a1a1a;font-size:11px;background:#fff}
+.hdr{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:2.5px solid #e8a020;padding-bottom:14px;margin-bottom:20px}
+.lg{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#e8a020}
+.ls{font-size:9px;color:#999;margin-top:1px}
+.pj{text-align:right}
+.pn{font-size:14px;font-weight:700}
+.pc{font-size:11px;color:#666;margin-top:1px}
+.pd{font-size:10px;color:#999;margin-top:1px}
+.nt{font-size:11px;color:#555;background:#f8f6f2;border-left:3px solid #e8a020;padding:10px 14px;border-radius:0 6px 6px 0;margin-bottom:18px;line-height:1.5}
+.rh{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#e8a020;margin:18px 0 8px;padding-bottom:5px;border-bottom:1px solid #eee}
+.t{width:100%;border-collapse:collapse;margin-bottom:6px;font-size:10.5px}
+.t th{background:#f5f0e8;font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8a7a60;padding:7px 8px;text-align:left;border-bottom:2px solid #e8d8b8}
+.t td{padding:7px 8px;border-bottom:1px solid #f0ece5;vertical-align:top}
+.t tr:nth-child(even) td{background:#fdfcfa}
+.tg{background:#fef3e0;color:#c87800;padding:2px 5px;border-radius:3px;font-size:8px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.cc{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.ft{text-align:center;font-size:9px;color:#bbb;margin-top:24px;padding-top:12px;border-top:1px solid #eee}
+@media print{body{padding:20px}@page{margin:12mm}}
+</style></head><body>
+<div class="hdr">
+  <div><div class="lg">LUMIBOOK PRO</div><div class="ls">Kniha svítidel by LEDshopik.cz</div></div>
+  <div class="pj">
+    <div class="pn">${pi.name||'Projekt'}</div>
+    ${pi.client?`<div class="pc">Zákazník: ${pi.client}</div>`:''}
+    ${pi.date?`<div class="pd">${new Date(pi.date).toLocaleDateString('cs')}</div>`:''}
+    ${pi.num?`<div class="pd">Č. ${pi.num}</div>`:''}
+    ${pi.author?`<div class="pd">Zpracoval: ${pi.author}</div>`:''}
+  </div>
+</div>
+${pi.note?`<div class="nt">${pi.note}</div>`:''}
+${roomsHtml}
+<div class="ft">LUMIBOOK PRO by LEDshopik.cz · ${new Date().toLocaleDateString('cs')} · ${pi.name||'Projekt'}</div>
+</body></html>`;
+
+  const w = window.open('','_blank','width=900,height=700');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => {
+    w.print();
+    toast('📄 Ulož jako PDF v tiskovém dialogu');
+  }, 800);
+}
+
+// ══════════════════════════════════════
+// IMPORT / EXPORT
+// ══════════════════════════════════════
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(database, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'lumibook-databaze.json';
+  a.click(); toast('📥 Databáze exportována');
+}
+function exportProjectJSON() {
+  const data = { project: getProjectInfo(), fixtures, tagN };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `projekt_${(getProjectInfo().name||'export').replace(/\s+/g,'_')}.json`;
+  a.click(); toast('📥 Projekt exportován');
+}
+document.getElementById('import-json').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (Array.isArray(data)) { database = data; }
+      else if (data.database) { database = data.database; }
+      saveDB(); renderDB();
+      toast('✓ Databáze importována (' + database.length + ' produktů)');
+    } catch(e) { toast('✗ Chyba při importu', true); }
+  };
+  reader.readAsText(file); e.target.value = '';
+});
+document.getElementById('import-proj').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.fixtures) fixtures = data.fixtures;
+      if (data.tagN) tagN = data.tagN;
+      if (data.project) {
+        const pi = data.project;
+        if(pi.name) document.getElementById('p-name').value = pi.name;
+        if(pi.client) document.getElementById('p-client').value = pi.client;
+        if(pi.date) document.getElementById('p-date').value = pi.date;
+        if(pi.num) document.getElementById('p-num').value = pi.num;
+        if(pi.author) document.getElementById('p-author').value = pi.author;
+        if(pi.note) document.getElementById('p-note').value = pi.note;
+      }
+      render(); toast('✓ Projekt importován');
+    } catch(e) { toast('✗ Chyba při importu', true); }
+  };
+  reader.readAsText(file); e.target.value = '';
+});
+function clearAll() {
+  if (!confirm('Opravdu vymazat databázi i projekt?')) return;
+  database = []; fixtures = []; tagN = 1;
+  localStorage.clear(); save(); saveDB(); render(); renderDB();
+  toast('Vše vymazáno');
+}
+function clearProject() {
+  if (!confirm('Vymazat aktuální projekt (knihu svítidel)?')) return;
+  fixtures = []; tagN = 1; save(); render();
+  toast('Projekt vymazán');
+}
+
+// ══════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════
+function openSettings() {
+  document.getElementById('set-panel').classList.add('open');
+  document.getElementById('set-overlay').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('set-panel').classList.remove('open');
+  document.getElementById('set-overlay').classList.remove('open');
+}
+
+function bakeApiKey() {
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) { toast('Zadej API klíč', true); return; }
+  let html = document.documentElement.outerHTML;
+  html = html.replace(/const BAKED_API_KEY = '[^']*'/, "const BAKED_API_KEY = '" + key + "'");
+  html = '<!DOCTYPE html>\n<html lang="cs">' + html.slice(html.indexOf('<head'));
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'lumibook-pro-team.html';
+  a.click();
+  toast('✓ Soubor s klíčem stažen — pošli kolegům');
+}
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+function toast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (err ? ' err' : '');
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+// ══════════════════════════════════════
+// KEYBOARD
+// ══════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeSettings(); }
+  if (e.ctrlKey && e.key === 'n') { e.preventDefault(); openAddModal(); }
+  if (e.ctrlKey && e.key === 'p') { e.preventDefault(); exportPDF(); }
+});
+</script>
+</body>
+</html>
