@@ -10,15 +10,15 @@
 /* RESET & VARIABLES                      */
 /* ══════════════════════════════════════ */
 :root{
-  --bg:#0f1117;--panel:#1a1d26;--panel2:#161820;--panel3:#1e2130;--panel4:#252840;
-  --border:#1e2230;--border2:#2a2d3a;--border3:#3a3d4a;
+  --bg:#f4f2ed;--panel:#fff;--panel2:#f8f6f0;--panel3:#f0ede6;--panel4:#e8e4dc;
+  --border:#e8e4dc;--border2:#ddd;--border3:#bbb;
   --accent:#e8a020;--accent2:#ff6b35;--accent-dim:rgba(232,160,32,.1);--accent-dim2:rgba(232,160,32,.2);
   --blue:#4a9eff;--blue-dim:rgba(74,158,255,.12);
   --green:#3ecf8e;--green-dim:rgba(62,207,142,.1);
   --red:#ff5c5c;--red-dim:rgba(255,92,92,.1);
   --purple:#a78bfa;--purple-dim:rgba(167,139,250,.1);
   --cyan:#22d3ee;--cyan-dim:rgba(34,211,238,.1);
-  --text:#e8e4dc;--text2:#c0c8d0;--muted:#4a5060;
+  --text:#1a1a1a;--text2:#444;--muted:#888;
   --r:10px;--rs:7px;--rx:14px;
   --font:'DM Sans',system-ui,sans-serif;
   --mono:'JetBrains Mono',monospace;
@@ -214,7 +214,7 @@ a{color:var(--accent);text-decoration:none}
   background:var(--panel);border:1px solid var(--border);border-radius:var(--r);
   overflow:hidden;transition:border-color .2s,transform .15s,box-shadow .2s;position:relative
 }
-.card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,0,0,.08)}
 
 .card-head{display:flex;align-items:center;gap:8px;padding:12px 12px 0}
 .card-tag{
@@ -282,7 +282,7 @@ a{color:var(--accent);text-decoration:none}
   position:sticky;top:0;background:var(--bg);z-index:2
 }
 .tbl td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:11.5px;vertical-align:middle}
-.tbl tr:hover td{background:rgba(255,255,255,.015)}
+.tbl tr:hover td{background:rgba(0,0,0,.02)}
 .tbl .tn{font-weight:600}.tbl .tt{font-family:var(--mono);font-size:9px;font-weight:700;background:var(--accent-dim);color:var(--accent);padding:2px 5px;border-radius:3px}
 .tbl .tm{font-family:var(--mono);font-size:10.5px}
 .tbl .tp{color:var(--green);font-weight:700}
@@ -301,7 +301,7 @@ a{color:var(--accent);text-decoration:none}
 /* MODAL                                  */
 /* ══════════════════════════════════════ */
 .modal-bg{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;
+  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;
   display:flex;align-items:center;justify-content:center;
   opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px)
 }
@@ -377,7 +377,7 @@ a{color:var(--accent);text-decoration:none}
   background:var(--panel);border:1px solid var(--green);border-radius:var(--r);
   padding:10px 16px;font-size:12px;font-weight:600;color:var(--green);
   transform:translateY(70px);opacity:0;transition:all .3s;
-  box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;align-items:center;gap:7px
+  box-shadow:0 8px 30px rgba(0,0,0,.12);display:flex;align-items:center;gap:7px
 }
 .toast.show{transform:translateY(0);opacity:1}
 .toast.err{border-color:var(--red);color:var(--red)}
@@ -392,14 +392,14 @@ a{color:var(--accent);text-decoration:none}
 }
 .settings-panel.open{right:0}
 .settings-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:89;
+  position:fixed;inset:0;background:rgba(0,0,0,.2);z-index:89;
   opacity:0;pointer-events:none;transition:opacity .2s
 }
 .settings-overlay.open{opacity:1;pointer-events:auto}
 
 /* ── LEDSHOPIK NAV ── */
-#ls-nav{background:#0a0c12;border-bottom:1px solid #1e2230;padding:0 24px;display:flex;align-items:stretch;gap:0;flex-wrap:wrap;flex-shrink:0;z-index:200;position:relative}
-#ls-nav a{padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;transition:color .15s;white-space:nowrap}
+#ls-nav{background:#1a1a1a;border-bottom:1px solid #333;padding:0 24px;display:flex;align-items:stretch;gap:0;flex-wrap:wrap;flex-shrink:0;z-index:200;position:relative}
+#ls-nav a{padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#999;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;transition:color .15s;white-space:nowrap}
 #ls-nav a.active{color:#e8a020;border-bottom-color:#e8a020}
 #ls-nav a:hover{color:#e8e4dc}
 </style>
