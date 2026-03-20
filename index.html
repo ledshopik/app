@@ -6,101 +6,101 @@
 <title>LEDshopik – Dashboard</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Arial Narrow', Arial, sans-serif; background: #13151c; color: #e8e4dc; min-height: 100vh; }
+body { font-family: 'Arial Narrow', Arial, sans-serif; background: #f4f2ed; color: #1a1a1a; min-height: 100vh; }
 button, input, select { font-family: inherit; }
 
 #header {
-  background: #13151c;
-  border-bottom: 1px solid #1e2230;
+  background: #1a1a1a;
+  border-bottom: 1px solid #e8e4dc;
   padding: 20px 32px;
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 100;
 }
 .header-accent { width: 4px; height: 48px; background: #e2b830; border-radius: 2px; flex-shrink: 0; }
 .header-title-wrap { margin-left: 14px; }
-.header-eyebrow { font-size: 10px; letter-spacing: .3em; color: #555; text-transform: uppercase; margin-bottom: 4px; }
-.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; }
+.header-eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; color: #fff; }
 .header-date { text-align: right; }
 .header-date .day { font-size: 24px; font-weight: 900; color: #e2b830; letter-spacing: .02em; line-height: 1; }
-.header-date .month { font-size: 10px; color: #555; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
+.header-date .month { font-size: 10px; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
 
 #user-bar {
-  background: #1c1f2a;
-  border-bottom: 1px solid #1e2230;
+  background: #1a1a1a;
+  border-bottom: 3px solid #e2b830;
   padding: 0 32px;
   display: flex; align-items: stretch; gap: 0;
   flex-wrap: wrap;
 }
-#user-bar .user-label { font-size: 10px; color: #555; letter-spacing: .1em; text-transform: uppercase; }
+#user-bar .user-label { font-size: 10px; color: #888; letter-spacing: .1em; text-transform: uppercase; }
 #user-select {
-  background: #13151c; border: 1px solid #2a2d3a; border-radius: 4px;
-  color: #e8e4dc; padding: 4px 10px; font-size: 12px; outline: none; cursor: pointer;
+  background: #333; border: 1px solid #555; border-radius: 4px;
+  color: #fff; padding: 4px 10px; font-size: 12px; outline: none; cursor: pointer;
 }
-#sync-status { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 11px; color: #555; }
-#sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #555; }
+#sync-status { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; }
+#sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #888; }
 #sync-dot.ok { background: #40a050; }
 #sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
 #sync-dot.error { background: #c05050; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-#btn-refresh-all { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
-#btn-refresh-all:hover { color: #e8e4dc; }
+#btn-refresh-all { background: #333; color: #999; border: 1px solid #555; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
+#btn-refresh-all:hover { color: #fff; }
 
 #main { max-width: 1100px; margin: 0 auto; padding: 24px 32px; }
 
 /* Module cards */
 .modules-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 2px; }
 .module-card {
-  background: #1c1f2a; padding: 20px; cursor: pointer;
+  background: #fff; padding: 20px; cursor: pointer;
   border-top: 2px solid transparent;
   transition: background .15s;
   text-decoration: none; color: inherit; display: block;
 }
-.module-card:hover { background: #21253a; }
+.module-card:hover { background: #f0ede6; }
 .module-card .mod-label { font-size: 9px; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 12px; }
-.module-card .mod-count { font-size: 44px; font-weight: 900; line-height: 1; color: #fff; margin-bottom: 14px; }
-.module-card .mod-count.text { font-size: 16px; color: #e8e4dc; margin: 16px 0 14px; }
+.module-card .mod-count { font-size: 44px; font-weight: 900; line-height: 1; color: #1a1a1a; margin-bottom: 14px; }
+.module-card .mod-count.text { font-size: 16px; color: #1a1a1a; margin: 16px 0 14px; }
 .mod-stats { display: flex; flex-direction: column; gap: 6px; }
 .mod-stat-row { display: flex; justify-content: space-between; align-items: center; }
-.mod-stat-row .lbl { font-size: 11px; color: #555; }
+.mod-stat-row .lbl { font-size: 11px; color: #888; }
 .mod-stat-row .val { font-size: 13px; font-weight: 700; }
-.mod-footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid #2a2d3a; font-size: 10px; letter-spacing: .1em; }
+.mod-footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid #ddd; font-size: 10px; letter-spacing: .1em; }
 
 /* Bottom panels */
 .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
-.panel { background: #1c1f2a; padding: 20px; }
-.panel-title { font-size: 9px; letter-spacing: .2em; color: #555; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.panel { background: #fff; padding: 20px; }
+.panel-title { font-size: 9px; letter-spacing: .2em; color: #888; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .panel-title-line { height: 2px; width: 16px; border-radius: 1px; }
 
 /* Calendar */
 .cal-wrap { margin-bottom: 2px; }
-.cal-header-row { background: #1c1f2a; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
-.cal-header-row .cal-title { font-size: 9px; letter-spacing: .2em; color: #555; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.cal-header-row { background: #fff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+.cal-header-row .cal-title { font-size: 9px; letter-spacing: .2em; color: #888; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
 .cal-nav { display: flex; align-items: center; gap: 8px; }
-.cal-nav button { background: #13151c; border: 1px solid #2a2d3a; color: #8890a0; border-radius: 4px; padding: 3px 10px; font-size: 12px; cursor: pointer; }
-.cal-nav button:hover { color: #e8e4dc; }
+.cal-nav button { background: #fff; border: 1px solid #ddd; color: #999; border-radius: 4px; padding: 3px 10px; font-size: 12px; cursor: pointer; }
+.cal-nav button:hover { color: #1a1a1a; }
 .cal-month { font-size: 13px; font-weight: 700; min-width: 130px; text-align: center; }
 #btn-cal-today { background: #e2b830; color: #111; border: none; border-radius: 4px; padding: 3px 10px; font-size: 10px; font-weight: 700; cursor: pointer; }
-.cal-grid-wrap { background: #1c1f2a; padding: 16px 20px 20px; }
+.cal-grid-wrap { background: #fff; padding: 16px 20px 20px; }
 .cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 4px; }
-.cal-wd { text-align: center; font-size: 9px; letter-spacing: .1em; color: #555; text-transform: uppercase; padding: 4px 0; }
+.cal-wd { text-align: center; font-size: 9px; letter-spacing: .1em; color: #888; text-transform: uppercase; padding: 4px 0; }
 .cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.cal-day { min-height: 110px; background: #13151c; padding: 6px 8px; position: relative; cursor: default; }
+.cal-day { min-height: 110px; background: #fff; padding: 6px 8px; position: relative; cursor: default; }
 .cal-day.other { opacity: .3; }
 .cal-day.today { outline: 1px solid #e2b830; }
 .cal-day.today .dn { color: #e2b830; font-weight: 900; }
-.cal-day.weekend { background: #161820; }
-.dn { font-size: 10px; font-weight: 600; color: #555; margin-bottom: 3px; }
-.cal-day.has-ev .dn { color: #c0c8d0; }
+.cal-day.weekend { background: #f8f6f0; }
+.dn { font-size: 10px; font-weight: 600; color: #888; margin-bottom: 3px; }
+.cal-day.has-ev .dn { color: #444; }
 .cal-ev { font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 2px; margin-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
 .cal-ev:hover { opacity: .8; }
-.ev-inst { background: #2a2010; color: #e2b830; }
-.ev-obh  { background: #1a2a20; color: #3ab0a0; }
-.ev-rek  { background: #2a1010; color: #e05050; }
-.ev-dov  { background: #1a3a20; color: #40c060; }
-.ev-nesc { background: #2a1a1a; color: #e05050; }
-.ev-vyr  { background: #2a1500; color: #f07030; }
-.ev-zas  { background: #1a1800; color: #c8a830; }
-.ev-nepl { background: #2a2010; color: #e2b830; }
+.ev-inst { background: #fdf4d8; color: #a08020; }
+.ev-obh  { background: #e0f4e8; color: #208070; }
+.ev-rek  { background: #fce8e8; color: #c03030; }
+.ev-dov  { background: #e0f8e0; color: #30a050; }
+.ev-nesc { background: #fce8e8; color: #c03030; }
+.ev-vyr  { background: #fff0e0; color: #c05020; }
+.ev-zas  { background: #f8f4e0; color: #a09020; }
+.ev-nepl { background: #fdf4d8; color: #a08020; }
 
 /* Schedule */
 .sched-item { display: flex; align-items: stretch; gap: 0; margin-bottom: 8px; }
@@ -110,14 +110,14 @@ button, input, select { font-family: inherit; }
 /* Alerts */
 .alert-item { padding: 9px 14px; margin-bottom: 7px; display: flex; gap: 10px; align-items: center; border-left: 3px solid; }
 .alert-badge { font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 2px; flex-shrink: 0; }
-.alert-text { font-size: 11px; color: #8890a0; }
+.alert-text { font-size: 11px; color: #444; }
 
 /* Tasks */
-.task-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1e2230; cursor: pointer; }
+.task-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #e8e4dc; cursor: pointer; }
 .task-item:last-child { border-bottom: none; }
-.task-cb { width: 16px; height: 16px; border: 2px solid #2a2d3a; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: all .15s; }
+.task-cb { width: 16px; height: 16px; border: 2px solid #ddd; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: all .15s; }
 .task-item.done .task-cb { background: #40a050; border-color: #40a050; color: #fff; }
-.task-item.done .task-text { text-decoration: line-through; color: #555; }
+.task-item.done .task-text { text-decoration: line-through; color: #888; }
 .task-text { font-size: 12px; flex: 1; }
 .task-tag { font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
 
@@ -148,14 +148,14 @@ button, input, select { font-family: inherit; }
 
 <div id="user-bar">
   <a href="index.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#e2b830;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:6px;border-bottom:2px solid #e2b830;">⌂ Dashboard</a>
-  <a href="instalace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e2b830'" onmouseout="this.style.color='#555'">Instalace</a>
-  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#f07030'" onmouseout="this.style.color='#555'">Výroba</a>
-  <a href="obhlidky.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#3ab0a0'" onmouseout="this.style.color='#555'">Obhlídky</a>
-  <a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e05050'" onmouseout="this.style.color='#555'">Reklamace</a>
-  <a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#a070e0'" onmouseout="this.style.color='#555'">Konfigurátor</a>
-  <a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#555'">Docházka</a>
-  <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#c8a830'" onmouseout="this.style.color='#555'">Zásobování</a>
-  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#555'">Lumibook</a>
+  <a href="instalace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e2b830'" onmouseout="this.style.color='#888'">Instalace</a>
+  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#f07030'" onmouseout="this.style.color='#888'">Výroba</a>
+  <a href="obhlidky.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#3ab0a0'" onmouseout="this.style.color='#888'">Obhlídky</a>
+  <a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e05050'" onmouseout="this.style.color='#888'">Reklamace</a>
+  <a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#a070e0'" onmouseout="this.style.color='#888'">Konfigurátor</a>
+  <a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#888'">Docházka</a>
+  <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#c8a830'" onmouseout="this.style.color='#888'">Zásobování</a>
+  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#888'">Lumibook</a>
   <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
     <div class="user-label">Zobrazit jako:</div>
     <select id="user-select" onchange="setUser(this.value)">
@@ -261,12 +261,12 @@ button, input, select { font-family: inherit; }
       </div>
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#2a2010;"></div>Instalace</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#1a2a20;"></div>Obhlídka</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#1a3a20;"></div>Dovolená</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#2a1500;"></div>Výroba</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#1a1800;"></div>Zásobování</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#2a1a1a;"></div>Neschopenka</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fdf4d8;"></div>Instalace</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f4e8;"></div>Obhlídka</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f8e0;"></div>Dovolená</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fff0e0;"></div>Výroba</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#f8f4e0;"></div>Zásobování</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fce8e8;"></div>Neschopenka</div>
         </div>
         <div class="cal-nav">
           <button onclick="calNav(-1)">&#8592;</button>
@@ -296,7 +296,7 @@ button, input, select { font-family: inherit; }
         Dnešní program
       </div>
       <div id="schedule-list">
-        <div style="font-size:12px;color:#555;">Načítám...</div>
+        <div style="font-size:12px;color:#888;">Načítám...</div>
       </div>
     </div>
 
@@ -308,7 +308,7 @@ button, input, select { font-family: inherit; }
           Upozornění
         </div>
         <div id="alerts-list">
-          <div style="font-size:12px;color:#555;">Načítám...</div>
+          <div style="font-size:12px;color:#888;">Načítám...</div>
         </div>
       </div>
       <div class="panel" style="flex:1;">
@@ -318,7 +318,7 @@ button, input, select { font-family: inherit; }
         </div>
         <div id="tasks-list"></div>
         <div style="margin-top:10px;">
-          <input type="text" id="new-task-input" placeholder="Přidat úkol..." style="background:#13151c;border:1px solid #2a2d3a;border-radius:4px;color:#e8e4dc;padding:6px 10px;font-size:12px;width:100%;outline:none;">
+          <input type="text" id="new-task-input" placeholder="Přidat úkol..." style="background:#fff;border:1px solid #ddd;border-radius:4px;color:#1a1a1a;padding:6px 10px;font-size:12px;width:100%;outline:none;">
         </div>
       </div>
     </div>
@@ -494,7 +494,7 @@ function renderCalendar(){
     const isT=dateStr(cd)===dateStr(today),isSat=cd.getDay()===6,isSun=cd.getDay()===0,other=mo!==0;
     const evs=events.filter(ev=>cd>=ev.start&&cd<=ev.end);
     let evHtml=evs.slice(0,3).map(ev=>`<div class="cal-ev ${ev.cls}" onclick="window.location='${ev.url}'" title="${ev.label}">${ev.label}</div>`).join('');
-    if(evs.length>3) evHtml+=`<div style="font-size:8px;color:#555;">+${evs.length-3}</div>`;
+    if(evs.length>3) evHtml+=`<div style="font-size:8px;color:#888;">+${evs.length-3}</div>`;
     html+=`<div class="cal-day${other?' other':''}${isT?' today':''}${evs.length?' has-ev':''}${(isSat||isSun)?' weekend':''}">
       <div class="dn" style="${(isSat||isSun)?'color:#c05050;':''}">${dn}</div>${evHtml}
     </div>`;
@@ -507,13 +507,13 @@ function renderSchedule(){
   const todayStr=dateStr(today);
   const items=[];
   filterByUser(dataInst,'technik').filter(r=>toInputDate(r.datum)===todayStr).forEach(r=>{
-    items.push({color:'#e2b830',bg:'#2a2010',label:`Instalace — ${r.misto||r.obj}`,time:'Celý den'});
+    items.push({color:'#e2b830',bg:'#fdf4d8',label:`Instalace — ${r.misto||r.obj}`,time:'Celý den'});
   });
   filterByUser(dataObh,'technik').filter(r=>toInputDate(r.datum)===todayStr).forEach(r=>{
-    items.push({color:'#3ab0a0',bg:'#1a2820',label:`Obhlídka — ${r.misto||r.zakaznik}`,time:'Celý den'});
+    items.push({color:'#3ab0a0',bg:'#e0f4e8',label:`Obhlídka — ${r.misto||r.zakaznik}`,time:'Celý den'});
   });
   const el=document.getElementById('schedule-list');
-  if(!items.length){ el.innerHTML='<div style="font-size:12px;color:#555;">Dnes žádné akce</div>'; return; }
+  if(!items.length){ el.innerHTML='<div style="font-size:12px;color:#888;">Dnes žádné akce</div>'; return; }
   el.innerHTML=items.map(t=>`
     <div class="sched-item">
       <div class="sched-time" style="background:${t.color};color:#111;">${t.time}</div>
@@ -545,9 +545,9 @@ function renderAlerts(){
   });
 
   const el=document.getElementById('alerts-list');
-  if(!alerts.length){ el.innerHTML='<div style="font-size:12px;color:#555;">Žádná upozornění</div>'; return; }
+  if(!alerts.length){ el.innerHTML='<div style="font-size:12px;color:#888;">Žádná upozornění</div>'; return; }
   el.innerHTML=alerts.map(a=>`
-    <div class="alert-item" style="background:${a.type==='warn'?'#1a0f0f':'#0f1218'};border-color:${a.type==='warn'?'#e05050':'#6080c0'};">
+    <div class="alert-item" style="background:${a.type==='warn'?'#fff0f0':'#f0f4ff'};border-color:${a.type==='warn'?'#e05050':'#6080c0'};">
       <div class="alert-badge" style="background:${a.type==='warn'?'#e05050':'#6080c0'};color:${a.type==='warn'?'#fff':'#fff'};">${a.type==='warn'?'!':'i'}</div>
       <span class="alert-text">${a.text}</span>
     </div>`).join('');
@@ -558,12 +558,12 @@ function saveTasks(){ localStorage.setItem('dashboard_tasks',JSON.stringify(task
 
 function renderTasks(){
   const el=document.getElementById('tasks-list');
-  if(!tasks.length){ el.innerHTML='<div style="font-size:12px;color:#555;padding:4px 0;">Žádné úkoly</div>'; return; }
+  if(!tasks.length){ el.innerHTML='<div style="font-size:12px;color:#888;padding:4px 0;">Žádné úkoly</div>'; return; }
   el.innerHTML=tasks.map((t,i)=>`
     <div class="task-item${t.done?' done':''}" onclick="toggleTask(${i})">
       <div class="task-cb">${t.done?'✓':''}</div>
       <div class="task-text">${t.text}</div>
-      <div onclick="event.stopPropagation();deleteTask(${i})" style="font-size:11px;color:#555;cursor:pointer;padding:2px 6px;">✕</div>
+      <div onclick="event.stopPropagation();deleteTask(${i})" style="font-size:11px;color:#888;cursor:pointer;padding:2px 6px;">✕</div>
     </div>`).join('');
 }
 

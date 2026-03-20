@@ -6,64 +6,64 @@
 <title>LEDshopik – Reklamace</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Arial Narrow', Arial, sans-serif; background: #0f1117; color: #e8e4dc; min-height: 100vh; }
+body { font-family: 'Arial Narrow', Arial, sans-serif; background: #f4f2ed; color: #1a1a1a; min-height: 100vh; }
 button, input, select, textarea { font-family: inherit; }
 
-#header { background: #0f1117; border-bottom: 1px solid #1e2230; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
-.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #4a5060; text-transform: uppercase; margin-bottom: 4px; }
-.header-left .title { font-size: 22px; font-weight: 900; letter-spacing: .06em; color: #e8e4dc; line-height: 1; }
+#header { background: #f4f2ed; border-bottom: 1px solid #e8e4dc; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.header-left .title { font-size: 22px; font-weight: 900; letter-spacing: .06em; color: #1a1a1a; line-height: 1; }
 .header-left .title span { color: #e05050; }
 
 .stats { display: flex; gap: 6px; flex-wrap: wrap; }
-.stat { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+.stat { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
 .stat .num { font-size: 18px; font-weight: 800; line-height: 1; }
-.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; margin-top: 2px; }
+.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #888; text-transform: uppercase; margin-top: 2px; }
 
-#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4a5060; }
-#sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #4a5060; flex-shrink: 0; }
+#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; }
+#sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; flex-shrink: 0; }
 #sync-dot.ok      { background: #40a050; }
 #sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
 #sync-dot.error   { background: #c05050; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #1e2230; background: #0f1117; }
-.filter-btn { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
-.filter-btn:hover { border-color: #3a3d4a; color: #c0c8d0; }
+#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #e8e4dc; background: #f4f2ed; }
+.filter-btn { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+.filter-btn:hover { border-color: #bbb; color: #444; }
 .filter-btn.active { background: #e05050; color: #fff; border-color: #e05050; }
 .filter-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
 #search-wrap { margin-left: auto; position: relative; }
-#search-wrap input { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; transition: border-color .2s; }
+#search-wrap input { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; transition: border-color .2s; }
 #search-wrap input:focus { border-color: #e05050; }
-#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #4a5060; }
+#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #888; }
 
 #btn-add { background: #e05050; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
 #btn-add:hover { background: #f06060; }
-#btn-refresh { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
-#btn-refresh:hover { color: #e8e4dc; }
+#btn-refresh { background: #fff; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+#btn-refresh:hover { color: #1a1a1a; }
 
 #table-wrap { padding: 0 32px; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-thead th { background: #1a1d26; color: #4a5060; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2d3a; white-space: nowrap; cursor: pointer; user-select: none; transition: color .15s; }
+thead th { background: #f8f6f0; color: #888; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #ddd; white-space: nowrap; cursor: pointer; user-select: none; transition: color .15s; }
 thead th:hover { color: #e05050; }
 thead th.sorted { color: #e05050; }
 thead th .sort-arrow { margin-left: 4px; font-size: 9px; }
-tbody tr { border-bottom: 1px solid #1a1d26; transition: background .12s; cursor: pointer; }
-tbody tr:hover { background: #161820; }
-tbody td { padding: 12px 14px; font-size: 12px; vertical-align: top; color: #c0c8d0; }
-td.obj      { font-weight: 700; color: #e8e4dc; font-size: 13px; white-space: nowrap; }
-td.zakaznik { color: #e8e4dc; font-weight: 600; }
-td.popis    { color: #8890a0; font-size: 11px; max-width: 200px; }
+tbody tr { border-bottom: 1px solid #f0ede6; transition: background .12s; cursor: pointer; }
+tbody tr:hover { background: #f8f6f0; }
+tbody td { padding: 12px 14px; font-size: 12px; vertical-align: top; color: #444; }
+td.obj      { font-weight: 700; color: #1a1a1a; font-size: 13px; white-space: nowrap; }
+td.zakaznik { color: #1a1a1a; font-weight: 600; }
+td.popis    { color: #999; font-size: 11px; max-width: 200px; }
 td.datum    { white-space: nowrap; }
 
 /* Status badges */
 .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: .06em; white-space: nowrap; }
 .badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.s-nova         { background: #2a1a2a; color: #e050e0; border: 1px solid #552055; } .s-nova .badge-dot         { background: #e050e0; }
-.s-reseni       { background: #2a2010; color: #e2b830; border: 1px solid #554020; } .s-reseni .badge-dot       { background: #e2b830; }
-.s-dodavatel    { background: #1a2235; color: #6080c0; border: 1px solid #2a3555; } .s-dodavatel .badge-dot    { background: #6080c0; }
-.s-vyrizeno     { background: #1a2a1a; color: #40a050; border: 1px solid #204530; } .s-vyrizeno .badge-dot     { background: #40a050; }
-.s-zamitnuto    { background: #2a1a1a; color: #c05050; border: 1px solid #552020; } .s-zamitnuto .badge-dot    { background: #c05050; }
+.s-nova         { background: #f8e8f8; color: #e050e0; border: 1px solid #e8c0e8; } .s-nova .badge-dot         { background: #e050e0; }
+.s-reseni       { background: #fdf4d8; color: #e2b830; border: 1px solid #f0e0a0; } .s-reseni .badge-dot       { background: #e2b830; }
+.s-dodavatel    { background: #e8f0ff; color: #6080c0; border: 1px solid #c8d8f0; } .s-dodavatel .badge-dot    { background: #6080c0; }
+.s-vyrizeno     { background: #e0f0e0; color: #40a050; border: 1px solid #c0dcc0; } .s-vyrizeno .badge-dot     { background: #40a050; }
+.s-zamitnuto    { background: #fce8e8; color: #c05050; border: 1px solid #f0c8c8; } .s-zamitnuto .badge-dot    { background: #c05050; }
 
 tbody tr[data-stav="Nová"]                    td:first-child { border-left: 3px solid #e050e0; }
 tbody tr[data-stav="V řešení"]                td:first-child { border-left: 3px solid #e2b830; }
@@ -73,46 +73,46 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
 
 /* Priority */
 .prio { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 700; }
-.prio-vysoka  { background: #2a1a1a; color: #e05050; border: 1px solid #552020; }
-.prio-stredni { background: #2a2010; color: #e2b830; border: 1px solid #554020; }
-.prio-nizka   { background: #1a2a1a; color: #40a050; border: 1px solid #204530; }
+.prio-vysoka  { background: #fce8e8; color: #e05050; border: 1px solid #f0c8c8; }
+.prio-stredni { background: #fdf4d8; color: #e2b830; border: 1px solid #f0e0a0; }
+.prio-nizka   { background: #e0f0e0; color: #40a050; border: 1px solid #c0dcc0; }
 
 /* Deadline warning */
 .deadline-warn { color: #e05050 !important; font-weight: 700; }
 .deadline-ok   { color: #40a050 !important; }
 
-#empty-state { text-align: center; padding: 60px 20px; color: #4a5060; display: none; }
+#empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
 #empty-state .big { font-size: 36px; margin-bottom: 10px; }
 
 /* Modal */
-#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 #modal-overlay.open { display: flex; }
-#modal { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
-#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #1e2230; display: flex; align-items: center; justify-content: space-between; }
+#modal { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; }
 #modal-title { font-size: 16px; font-weight: 800; letter-spacing: .05em; }
-#modal-close { background: none; border: none; color: #4a5060; font-size: 20px; cursor: pointer; padding: 0 4px; }
-#modal-close:hover { color: #e8e4dc; }
+#modal-close { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; padding: 0 4px; }
+#modal-close:hover { color: #1a1a1a; }
 #modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group.full { grid-column: 1 / -1; }
-.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; }
-.form-group input, .form-group select, .form-group textarea { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
+.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; }
+.form-group input, .form-group select, .form-group textarea { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #e05050; }
 .form-group textarea { resize: vertical; min-height: 70px; }
-.form-group select option { background: #1a1d26; }
-#modal-footer { padding: 16px 24px; border-top: 1px solid #1e2230; display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
-#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #552020; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
-#btn-delete:hover { background: #2a1a1a; }
-.btn-cancel { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
-.btn-cancel:hover { color: #e8e4dc; }
+.form-group select option { background: #fff; }
+#modal-footer { padding: 16px 24px; border-top: 1px solid #e8e4dc; display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
+#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #f0c8c8; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
+#btn-delete:hover { background: #fce8e8; }
+.btn-cancel { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-cancel:hover { color: #1a1a1a; }
 .btn-save { background: #e05050; color: #fff; border: none; border-radius: 6px; padding: 8px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .btn-save:hover { background: #f06060; }
 
-#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; align-items: center; justify-content: center; }
+#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 300; align-items: center; justify-content: center; }
 #saving-overlay.open { display: flex; }
-#saving-box { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; padding: 24px 36px; text-align: center; }
+#saving-box { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 24px 36px; text-align: center; }
 #saving-box .saving-title { font-size: 14px; font-weight: 700; color: #e05050; margin-bottom: 6px; }
-#saving-box .saving-sub   { font-size: 12px; color: #4a5060; }
+#saving-box .saving-sub   { font-size: 12px; color: #888; }
 
 @media (max-width: 720px) {
   #header { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 8px; }
@@ -124,10 +124,10 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
 }
 </style>
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/app/sw.js")}</script></head>
-<body><div style="background:#0a0c12;border-bottom:1px solid #1e2230;padding:0 24px;display:flex;align-items:stretch;gap:2px;font-family:Arial Narrow,Arial,sans-serif;"><a href="index.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:6px;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8e4dc'" onmouseout="this.style.color='#555'">⌂ Dashboard</a><a href="instalace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e2b830'" onmouseout="this.style.color='#555'">Instalace</a>
-  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#f07030'" onmouseout="this.style.color='#555'">Výroba</a><a href="obhlidky.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#3ab0a0'" onmouseout="this.style.color='#555'">Obhlídky</a><a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e05050'" onmouseout="this.style.color='#555'">Reklamace</a><a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#a070e0'" onmouseout="this.style.color='#555'">Konfigurátor</a><a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#555'">Docházka</a>
-  <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#c8a830'" onmouseout="this.style.color='#555'">Zásobování</a>
-  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#555'">Lumibook</a></div>
+<body><div style="background:#1a1a1a;border-bottom:3px solid #e2b830;padding:0 24px;display:flex;align-items:stretch;gap:2px;font-family:Arial Narrow,Arial,sans-serif;"><a href="index.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:6px;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8e4dc'" onmouseout="this.style.color='#888'">⌂ Dashboard</a><a href="instalace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e2b830'" onmouseout="this.style.color='#888'">Instalace</a>
+  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#f07030'" onmouseout="this.style.color='#888'">Výroba</a><a href="obhlidky.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#3ab0a0'" onmouseout="this.style.color='#888'">Obhlídky</a><a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e05050'" onmouseout="this.style.color='#888'">Reklamace</a><a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#a070e0'" onmouseout="this.style.color='#888'">Konfigurátor</a><a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#888'">Docházka</a>
+  <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#c8a830'" onmouseout="this.style.color='#888'">Zásobování</a>
+  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#888'">Lumibook</a></div>
 
 <div id="header">
   <div class="header-left">
@@ -137,7 +137,7 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
   <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
     <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
     <div class="stats">
-      <div class="stat"><div class="num" id="stat-total" style="color:#e8e4dc">0</div><div class="lbl">Celkem</div></div>
+      <div class="stat"><div class="num" id="stat-total" style="color:#1a1a1a">0</div><div class="lbl">Celkem</div></div>
       <div class="stat"><div class="num" id="stat-nova"  style="color:#e050e0">0</div><div class="lbl">Nové</div></div>
       <div class="stat"><div class="num" id="stat-reseni" style="color:#e2b830">0</div><div class="lbl">V řešení</div></div>
       <div class="stat"><div class="num" id="stat-dodavatel" style="color:#6080c0">0</div><div class="lbl">Dodavatel</div></div>
@@ -216,9 +216,9 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
       <div class="form-group"><label>Deadline vyřízení</label><input type="date" id="f-datum-deadline"></div>
       <div class="form-group full"><label>Způsob vyřízení</label><textarea id="f-zpusob" placeholder="Jak byla reklamace vyřízena..."></textarea></div>
       <div class="form-group full"><label>Email zákazníka</label><input type="email" id="f-email" placeholder="email@zakaznik.cz"></div>
-      <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px;background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;padding:12px 16px;">
+      <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px;background:#f8f6f0;border:1px solid #ddd;border-radius:6px;padding:12px 16px;">
         <input type="checkbox" id="f-notifikovat" style="width:18px;height:18px;accent-color:#e05050;cursor:pointer;flex-shrink:0;">
-        <label for="f-notifikovat" style="font-size:13px;color:#c0c8d0;cursor:pointer;letter-spacing:0;text-transform:none;font-weight:400;">Notifikovat zákazníka emailem při uložení</label>
+        <label for="f-notifikovat" style="font-size:13px;color:#444;cursor:pointer;letter-spacing:0;text-transform:none;font-weight:400;">Notifikovat zákazníka emailem při uložení</label>
       </div>
     </div>
     <div id="modal-footer">
@@ -341,7 +341,7 @@ function renderTable(){
     <tr data-id="${r.id}" data-stav="${r.stav}" onclick="openModal('${r.id}')">
       <td class="obj">${r.obj||'—'}</td>
       <td class="zakaznik">${r.zakaznik||'—'}</td>
-      <td><span style="font-size:11px;color:#8890a0;">${r.typ||'—'}</span></td>
+      <td><span style="font-size:11px;color:#999;">${r.typ||'—'}</span></td>
       <td class="popis">${r.popis||''}</td>
       <td><span class="prio ${PRIO_CLASS[r.priorita]||''}">${r.priorita||'—'}</span></td>
       <td>${r.technik||'—'}</td>
@@ -349,8 +349,8 @@ function renderTable(){
       <td class="datum ${deadlineClass(r.datum_deadline)}">${fmtDate(r.datum_deadline)}</td>
       <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
       <td style="font-size:11px;color:#6080c0;">${r.email||'—'}</td>
-      <td style="text-align:center;">${r.notifikovat==='ano'?'<span style="color:#40a050;font-size:14px;">✓</span>':'<span style="color:#4a5060;">—</span>'}</td>
-      <td style="font-size:11px;color:#8890a0;max-width:180px;">${r.zpusob||''}</td>
+      <td style="text-align:center;">${r.notifikovat==='ano'?'<span style="color:#40a050;font-size:14px;">✓</span>':'<span style="color:#888;">—</span>'}</td>
+      <td style="font-size:11px;color:#999;max-width:180px;">${r.zpusob||''}</td>
     </tr>`).join('');
 }
 

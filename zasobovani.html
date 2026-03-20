@@ -6,25 +6,25 @@
 <title>LEDshopik – Zásobování</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Arial Narrow', Arial, sans-serif; background: #0f1117; color: #e8e4dc; min-height: 100vh; }
+body { font-family: 'Arial Narrow', Arial, sans-serif; background: #f4f2ed; color: #1a1a1a; min-height: 100vh; }
 button, input, select, textarea { font-family: inherit; }
 
-#nav { background: #0a0c12; border-bottom: 1px solid #1e2230; padding: 0 24px; display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; }
-#nav a { padding: 10px 16px; font-size: 12px; font-weight: 700; letter-spacing: .1em; color: #555; text-decoration: none; text-transform: uppercase; display: flex; align-items: center; border-bottom: 2px solid transparent; }
+#nav { background: #1a1a1a; border-bottom: 3px solid #e2b830; padding: 0 24px; display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; }
+#nav a { padding: 10px 16px; font-size: 12px; font-weight: 700; letter-spacing: .1em; color: #888; text-decoration: none; text-transform: uppercase; display: flex; align-items: center; border-bottom: 2px solid transparent; }
 #nav a.active { color: #c8a830; border-bottom-color: #c8a830; }
 #nav a:hover { color: #e8e4dc; }
 
-#header { background: #0f1117; border-bottom: 1px solid #1e2230; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
-.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #4a5060; text-transform: uppercase; margin-bottom: 4px; }
+#header { background: #f4f2ed; border-bottom: 1px solid #e8e4dc; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
 .header-left .title { font-size: 22px; font-weight: 900; letter-spacing: .06em; }
 .header-left .title span { color: #c8a830; }
 
 .stats { display: flex; gap: 6px; flex-wrap: wrap; }
-.stat { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+.stat { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
 .stat .num { font-size: 18px; font-weight: 800; line-height: 1; }
-.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; margin-top: 2px; }
+.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #888; text-transform: uppercase; margin-top: 2px; }
 
-#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4a5060; }
+#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; }
 #sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #4a5060; }
 #sync-dot.ok { background: #40a050; }
 #sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
@@ -32,49 +32,49 @@ button, input, select, textarea { font-family: inherit; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
 /* Záložky */
-#tabs { background: #0a0c12; border-bottom: 1px solid #1e2230; padding: 0 32px; display: flex; gap: 0; }
-.tab-btn { padding: 10px 20px; font-size: 11px; font-weight: 700; letter-spacing: .1em; color: #555; text-transform: uppercase; cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; transition: all .15s; }
+#tabs { background: #1a1a1a; border-bottom: 1px solid #e8e4dc; padding: 0 32px; display: flex; gap: 0; }
+.tab-btn { padding: 10px 20px; font-size: 11px; font-weight: 700; letter-spacing: .1em; color: #888; text-transform: uppercase; cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; transition: all .15s; }
 .tab-btn:hover { color: #c8a830; }
 .tab-btn.active { color: #c8a830; border-bottom-color: #c8a830; }
 
 #tab-zasilky, #tab-dodavatele { display: block; }
 
-#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #1e2230; background: #0f1117; }
-.filter-btn { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
-.filter-btn:hover { border-color: #3a3d4a; color: #c0c8d0; }
+#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #e8e4dc; background: #f4f2ed; }
+.filter-btn { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+.filter-btn:hover { border-color: #bbb; color: #444; }
 .filter-btn.active { background: #c8a830; color: #000; border-color: #c8a830; }
 .filter-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
 #search-wrap { margin-left: auto; position: relative; }
-#search-wrap input { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; }
+#search-wrap input { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; }
 #search-wrap input:focus { border-color: #c8a830; }
-#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #4a5060; }
+#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #888; }
 #btn-add { background: #c8a830; color: #000; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
 #btn-add:hover { background: #e0c040; }
-#btn-refresh { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+#btn-refresh { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
 
 /* Tabulka */
 #table-wrap { padding: 0 32px 32px; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-thead th { background: #1a1d26; color: #4a5060; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2d3a; white-space: nowrap; cursor: pointer; user-select: none; }
+thead th { background: #f8f6f0; color: #888; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #ddd; white-space: nowrap; cursor: pointer; user-select: none; }
 thead th:hover { color: #c8a830; }
 thead th.sorted { color: #c8a830; }
 thead th .sort-arrow { margin-left: 4px; font-size: 9px; }
-tbody tr { border-bottom: 1px solid #1a1d26; transition: background .12s; cursor: pointer; }
-tbody tr:hover { background: #161820; }
-tbody td { padding: 10px 14px; font-size: 12px; vertical-align: middle; color: #c0c8d0; }
-td.cislo { font-weight: 700; color: #e8e4dc; font-size: 13px; }
-td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
+tbody tr { border-bottom: 1px solid #f0ede6; transition: background .12s; cursor: pointer; }
+tbody tr:hover { background: #f8f6f0; }
+tbody td { padding: 10px 14px; font-size: 12px; vertical-align: middle; color: #444; }
+td.cislo { font-weight: 700; color: #1a1a1a; font-size: 13px; }
+td.dodavatel-name { font-weight: 600; color: #1a1a1a; }
 
 /* Stavy */
 .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
-.s-objednano   { background: #1a2235; color: #6080c0; border: 1px solid #2a3555; } .s-objednano .badge-dot   { background: #6080c0; }
-.s-potvrzeno   { background: #252010; color: #c8a830; border: 1px solid #504010; } .s-potvrzeno .badge-dot   { background: #c8a830; }
-.s-odeslano    { background: #102030; color: #4090d0; border: 1px solid #204060; } .s-odeslano .badge-dot    { background: #4090d0; }
-.s-celnice     { background: #2a1a00; color: #e08030; border: 1px solid #603010; } .s-celnice .badge-dot     { background: #e08030; }
-.s-doruceno    { background: #1a2a1a; color: #40a050; border: 1px solid #204530; } .s-doruceno .badge-dot    { background: #40a050; }
-.s-zruseno     { background: #2a1a1a; color: #c05050; border: 1px solid #552020; } .s-zruseno .badge-dot     { background: #c05050; }
+.s-objednano   { background: #e8f0ff; color: #6080c0; border: 1px solid #c8d8f0; } .s-objednano .badge-dot   { background: #6080c0; }
+.s-potvrzeno   { background: #fdf4d8; color: #c8a830; border: 1px solid #f0e0a0; } .s-potvrzeno .badge-dot   { background: #c8a830; }
+.s-odeslano    { background: #e0f0ff; color: #4090d0; border: 1px solid #c0d8f0; } .s-odeslano .badge-dot    { background: #4090d0; }
+.s-celnice     { background: #fff0e0; color: #e08030; border: 1px solid #f0c8c8; } .s-celnice .badge-dot     { background: #e08030; }
+.s-doruceno    { background: #e0f0e0; color: #40a050; border: 1px solid #c0dcc0; } .s-doruceno .badge-dot    { background: #40a050; }
+.s-zruseno     { background: #fce8e8; color: #c05050; border: 1px solid #f0c8c8; } .s-zruseno .badge-dot     { background: #c05050; }
 
 /* Odpočet */
 .countdown-red  { color: #e05050; font-weight: 700; }
@@ -86,45 +86,45 @@ td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
 .faktura-link { color: #c8a830; text-decoration: none; font-size: 11px; }
 .faktura-link:hover { text-decoration: underline; }
 
-#empty-state { text-align: center; padding: 60px 20px; color: #4a5060; display: none; }
+#empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
 
 /* Dodavatelé tabulka */
 #dodavatele-wrap { padding: 0 32px 32px; overflow-x: auto; display: none; }
 #dodavatele-wrap table { min-width: 800px; }
-#toolbar-dod { padding: 14px 32px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #1e2230; background: #0f1117; display: none; }
+#toolbar-dod { padding: 14px 32px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e8e4dc; background: #f4f2ed; display: none; }
 
 /* Modal */
-#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 #modal-overlay.open { display: flex; }
-#modal { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; }
-#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #1e2230; display: flex; align-items: center; justify-content: space-between; }
+#modal { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; }
+#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; }
 #modal-title { font-size: 16px; font-weight: 800; }
-#modal-close { background: none; border: none; color: #4a5060; font-size: 20px; cursor: pointer; }
-#modal-close:hover { color: #e8e4dc; }
+#modal-close { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; }
+#modal-close:hover { color: #1a1a1a; }
 #modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group.full { grid-column: 1 / -1; }
-.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; }
-.form-group input, .form-group select, .form-group textarea { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
+.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; }
+.form-group input, .form-group select, .form-group textarea { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #c8a830; }
-.form-group select option { background: #1a1d26; }
+.form-group select option { background: #fff; }
 .form-group textarea { resize: vertical; min-height: 60px; }
-#modal-footer { padding: 16px 24px; border-top: 1px solid #1e2230; display: flex; gap: 10px; justify-content: flex-end; }
-#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #552020; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
-.btn-cancel { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+#modal-footer { padding: 16px 24px; border-top: 1px solid #e8e4dc; display: flex; gap: 10px; justify-content: flex-end; }
+#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #f0c8c8; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-cancel { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .btn-save { background: #c8a830; color: #000; border: none; border-radius: 6px; padding: 8px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .btn-save:hover { background: #e0c040; }
 
 /* Modal dodavatel */
-#modal-dod-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#modal-dod-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 #modal-dod-overlay.open { display: flex; }
-#modal-dod { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; width: 100%; max-width: 500px; }
+#modal-dod { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 500px; }
 
-#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; align-items: center; justify-content: center; }
+#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 300; align-items: center; justify-content: center; }
 #saving-overlay.open { display: flex; }
-#saving-box { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; padding: 24px 36px; text-align: center; }
+#saving-box { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 24px 36px; text-align: center; }
 #saving-box .saving-title { font-size: 14px; font-weight: 700; color: #c8a830; margin-bottom: 6px; }
-#saving-box .saving-sub { font-size: 12px; color: #4a5060; }
+#saving-box .saving-sub { font-size: 12px; color: #888; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -139,7 +139,7 @@ td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
   <a href="konfigurator.html">Konfigurátor</a>
   <a href="dochazka.html">Docházka</a>
   <a href="zasobovani.html" class="active">Zásobování</a>
-  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#555'">Lumibook</a>
+  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#888'">Lumibook</a>
 </div>
 
 <div id="header">
@@ -150,7 +150,7 @@ td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
   <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
     <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
     <div class="stats">
-      <div class="stat"><div class="num" id="stat-total"  style="color:#e8e4dc">0</div><div class="lbl">Celkem</div></div>
+      <div class="stat"><div class="num" id="stat-total"  style="color:#1a1a1a">0</div><div class="lbl">Celkem</div></div>
       <div class="stat"><div class="num" id="stat-cesta"  style="color:#4090d0">0</div><div class="lbl">Na cestě</div></div>
       <div class="stat"><div class="num" id="stat-celnice" style="color:#e08030">0</div><div class="lbl">Celnice</div></div>
       <div class="stat"><div class="num" id="stat-doruceno" style="color:#40a050">0</div><div class="lbl">Doručeno</div></div>
@@ -164,13 +164,13 @@ td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
 </div>
 
 <!-- Upozornění na zpoždění -->
-<div id="delay-bar" style="display:none;background:#1e0a0a;border-bottom:2px solid #e05050;padding:10px 32px;align-items:center;gap:10px;">
+<div id="delay-bar" style="display:none;background:#fce8e8;border-bottom:2px solid #e05050;padding:10px 32px;align-items:center;gap:10px;">
   <span style="background:#e05050;color:#fff;font-size:9px;font-weight:900;padding:2px 8px;border-radius:2px;flex-shrink:0;">⚠</span>
-  <span id="delay-text" style="font-size:11px;color:#c0c8d0;"></span>
+  <span id="delay-text" style="font-size:11px;color:#444;"></span>
 </div>
 
 <!-- Statistiky panel -->
-<div id="stats-panel" style="display:none;background:#161820;border-bottom:1px solid #2a2d3a;padding:16px 32px;">
+<div id="stats-panel" style="display:none;background:#f8f6f0;border-bottom:1px solid #ddd;padding:16px 32px;">
   <div style="font-size:11px;font-weight:700;letter-spacing:.1em;color:#c8a830;margin-bottom:12px;">📊 PRŮMĚRNÁ DOBA DODÁNÍ</div>
   <div id="stats-content" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;"></div>
 </div>
@@ -187,8 +187,8 @@ td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
     <button class="filter-btn" data-filter="Doručeno"   onclick="setFilter('Doručeno')"><span class="filter-dot" style="background:#40a050"></span>Doručeno</button>
     <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
     <button id="btn-refresh" onclick="loadData()">↻</button>
-    <button onclick="exportXLSX()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;">↓ XLSX</button>
-    <button onclick="toggleStats()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;">📊 Statistiky</button>
+    <button onclick="exportXLSX()" style="background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;">↓ XLSX</button>
+    <button onclick="toggleStats()" style="background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;">📊 Statistiky</button>
     <button id="btn-add" onclick="openModal()">+ Nová zásilka</button>
   </div>
 
@@ -220,7 +220,7 @@ td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
 
 <!-- DODAVATELÉ TAB -->
 <div id="tab-dodavatele" style="display:none;">
-  <div id="toolbar-dod" style="display:flex;padding:14px 32px;gap:10px;border-bottom:1px solid #1e2230;background:#0f1117;">
+  <div id="toolbar-dod" style="display:flex;padding:14px 32px;gap:10px;border-bottom:1px solid #e8e4dc;background:#f4f2ed;">
     <button onclick="openModalDod()" style="background:#c8a830;color:#000;border:none;border-radius:6px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;">+ Nový dodavatel</button>
   </div>
   <div id="dodavatele-wrap" style="display:block;padding:0 32px 32px;overflow-x:auto;">
@@ -237,7 +237,7 @@ td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
       </tr></thead>
       <tbody id="tbody-dod"></tbody>
     </table>
-    <div id="empty-dod" style="text-align:center;padding:60px 20px;color:#4a5060;display:none;"><div style="font-size:36px;margin-bottom:10px;">🏭</div><p>Žádní dodavatelé</p></div>
+    <div id="empty-dod" style="text-align:center;padding:60px 20px;color:#888;display:none;"><div style="font-size:36px;margin-bottom:10px;">🏭</div><p>Žádní dodavatelé</p></div>
   </div>
 </div>
 
@@ -296,7 +296,7 @@ td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
     </div>
     <div id="modal-footer">
       <button id="btn-delete" onclick="deleteRecord()" style="display:none">🗑 Smazat</button>
-      <button id="btn-duplicate" onclick="duplicateRecord()" style="display:none;background:#1a1d26;color:#c8a830;border:1px solid #c8a830;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">⧉ Duplikovat</button>
+      <button id="btn-duplicate" onclick="duplicateRecord()" style="display:none;background:#f4f2ed;color:#c8a830;border:1px solid #c8a830;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">⧉ Duplikovat</button>
       <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
       <button class="btn-save" onclick="saveRecord()">Uložit</button>
     </div>
@@ -306,9 +306,9 @@ td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
 <!-- Modal dodavatel -->
 <div id="modal-dod-overlay" onclick="overlayClickDod(event)">
   <div id="modal-dod">
-    <div id="modal-header" style="padding:20px 24px 16px;border-bottom:1px solid #1e2230;display:flex;align-items:center;justify-content:space-between;">
+    <div id="modal-header" style="padding:20px 24px 16px;border-bottom:1px solid #e8e4dc;display:flex;align-items:center;justify-content:space-between;">
       <div id="modal-dod-title" style="font-size:16px;font-weight:800;">Nový dodavatel</div>
-      <button onclick="closeModalDod()" style="background:none;border:none;color:#4a5060;font-size:20px;cursor:pointer;">✕</button>
+      <button onclick="closeModalDod()" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer;">✕</button>
     </div>
     <div style="padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
       <div class="form-group"><label>Název</label><input type="text" id="fd-nazev" placeholder="Název firmy"></div>
@@ -329,10 +329,10 @@ td.dodavatel-name { font-weight: 600; color: #e8e4dc; }
           <option>Kurýr UPS</option><option>Silnice</option>
         </select>
       </div>
-      <div class="form-group" style="grid-column:1/-1;"><label>Poznámka</label><textarea id="fd-poznamka" style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:8px 12px;font-size:13px;outline:none;width:100%;resize:vertical;min-height:60px;"></textarea></div>
+      <div class="form-group" style="grid-column:1/-1;"><label>Poznámka</label><textarea id="fd-poznamka" style="background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a1a;padding:8px 12px;font-size:13px;outline:none;width:100%;resize:vertical;min-height:60px;"></textarea></div>
     </div>
-    <div style="padding:16px 24px;border-top:1px solid #1e2230;display:flex;gap:10px;justify-content:flex-end;">
-      <button id="btn-dod-delete" onclick="deleteDodavatel()" style="display:none;margin-right:auto;background:none;color:#c05050;border:1px solid #552020;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">🗑 Smazat</button>
+    <div style="padding:16px 24px;border-top:1px solid #e8e4dc;display:flex;gap:10px;justify-content:flex-end;">
+      <button id="btn-dod-delete" onclick="deleteDodavatel()" style="display:none;margin-right:auto;background:none;color:#c05050;border:1px solid #f0c8c8;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">🗑 Smazat</button>
       <button class="btn-cancel" onclick="closeModalDod()">Zrušit</button>
       <button class="btn-save" onclick="saveDodavatel()">Uložit</button>
     </div>
@@ -459,7 +459,7 @@ function renderTable(){
       else trackingUrl=`https://www.google.com/search?q=${r.tracking}+tracking`;
     }
     const tracking=r.tracking?`<a href="${trackingUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;font-family:monospace;color:#c8a830;text-decoration:none;" title="Sledovat zásilku">🔍 ${r.tracking}</a>`:'—';
-    return `<tr data-id="${r.id}" style="${isDelay?'background:#1e0808;':''}" onclick="openModal('${r.id}')">
+    return `<tr data-id="${r.id}" style="${isDelay?'background:#fce8e8;':''}" onclick="openModal('${r.id}')">
       <td class="cislo">${r.cislo_obj||'—'}</td>
       <td class="dodavatel-name">${r.dodavatel||'—'}</td>
       <td style="font-size:11px;">${r.zeme||'—'}</td>
@@ -473,7 +473,7 @@ function renderTable(){
       <td class="datum">${fmtDate(r.ocekavane_doruceni)}</td>
       <td><span class="${cd.cls}" style="font-size:11px;">${cd.text}</span></td>
       <td>${tracking}</td>
-      <td style="font-size:11px;color:#8890a0;">${r.vazba_zakazka||'—'}</td>
+      <td style="font-size:11px;color:#999;">${r.vazba_zakazka||'—'}</td>
       <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
       <td onclick="event.stopPropagation()">${faktura}</td>
     </tr>`;
@@ -485,15 +485,15 @@ function renderDodavatele(){
   if(!dataDod.length){ tbody.innerHTML=''; document.getElementById('empty-dod').style.display='block'; return; }
   document.getElementById('empty-dod').style.display='none';
   tbody.innerHTML=dataDod.map(d=>`
-    <tr onclick="openModalDod('${d.id}')" style="cursor:pointer;border-bottom:1px solid #1a1d26;">
-      <td style="font-weight:700;color:#e8e4dc;padding:10px 14px;">${d.nazev||'—'}</td>
+    <tr onclick="openModalDod('${d.id}')" style="cursor:pointer;border-bottom:1px solid #f0ede6;">
+      <td style="font-weight:700;color:#1a1a1a;padding:10px 14px;">${d.nazev||'—'}</td>
       <td style="padding:10px 14px;font-size:12px;">${d.zeme||'—'}</td>
       <td style="padding:10px 14px;font-size:12px;">${d.kontakt||'—'}</td>
       <td style="padding:10px 14px;font-size:12px;"><a href="mailto:${d.email}" onclick="event.stopPropagation()" style="color:#c8a830;">${d.email||'—'}</a></td>
       <td style="padding:10px 14px;font-size:12px;"><a href="${d.web}" target="_blank" onclick="event.stopPropagation()" style="color:#c8a830;">${d.web?'🔗 Web':'—'}</a></td>
       <td style="padding:10px 14px;font-size:11px;">${d.doprava_vychozi||'—'}</td>
-      <td style="padding:10px 14px;font-size:11px;color:#8890a0;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.poznamka||''}</td>
-      <td style="padding:10px 14px;"><button onclick="event.stopPropagation();openModalDod('${d.id}')" style="background:#1a1d26;border:1px solid #2a2d3a;color:#8890a0;border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;">Upravit</button></td>
+      <td style="padding:10px 14px;font-size:11px;color:#999;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.poznamka||''}</td>
+      <td style="padding:10px 14px;"><button onclick="event.stopPropagation();openModalDod('${d.id}')" style="background:#f4f2ed;border:1px solid #ddd;color:#888;border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;">Upravit</button></td>
     </tr>`).join('');
 }
 
@@ -678,23 +678,23 @@ function renderStats(){
   });
 
   const el=document.getElementById('stats-content');
-  if(!dorucene.length){ el.innerHTML='<div style="color:#555;font-size:12px;">Zatím žádná doručená zásilka pro statistiku.</div>'; return; }
+  if(!dorucene.length){ el.innerHTML='<div style="color:#888;font-size:12px;">Zatím žádná doručená zásilka pro statistiku.</div>'; return; }
 
   const avg=arr=>Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
   
   let html='';
   Object.entries(groups).forEach(([k,v])=>{
-    html+=`<div style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;padding:10px 14px;">
-      <div style="font-size:10px;color:#555;margin-bottom:4px;">Doprava: ${k}</div>
+    html+=`<div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:10px 14px;">
+      <div style="font-size:10px;color:#888;margin-bottom:4px;">Doprava: ${k}</div>
       <div style="font-size:22px;font-weight:800;color:#c8a830;">${avg(v)} dní</div>
-      <div style="font-size:10px;color:#4a5060;">${v.length} zásilek</div>
+      <div style="font-size:10px;color:#888;">${v.length} zásilek</div>
     </div>`;
   });
   Object.entries(groupsZ).forEach(([k,v])=>{
-    html+=`<div style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;padding:10px 14px;">
-      <div style="font-size:10px;color:#555;margin-bottom:4px;">Země: ${k}</div>
+    html+=`<div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:10px 14px;">
+      <div style="font-size:10px;color:#888;margin-bottom:4px;">Země: ${k}</div>
       <div style="font-size:22px;font-weight:800;color:#c8a830;">${avg(v)} dní</div>
-      <div style="font-size:10px;color:#4a5060;">${v.length} zásilek</div>
+      <div style="font-size:10px;color:#888;">${v.length} zásilek</div>
     </div>`;
   });
   el.innerHTML=html;
