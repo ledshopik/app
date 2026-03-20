@@ -383,6 +383,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
     <div id="modal-footer">
       <button id="btn-delete" onclick="deleteRecord()" style="display:none">🗑 Smazat</button>
       <button id="btn-duplicate" onclick="duplicateRecord()" style="display:none;background:#f4f2ed;color:#c8a830;border:1px solid #c8a830;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">⧉ Duplikovat</button>
+      <button id="btn-to-evidence" onclick="manualToEvidence()" style="display:none;background:#e0f0e0;color:#40a050;border:1px solid #c0dcc0;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">📦 → Evidence</button>
       <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
       <button class="btn-save" onclick="saveRecord()">Uložit</button>
     </div>
@@ -733,6 +734,9 @@ function openModal(id){
   document.getElementById('modal-title').textContent=r?'Upravit zásilku':'Nová zásilka';
   document.getElementById('btn-delete').style.display=r?'inline-flex':'none';
   document.getElementById('btn-duplicate').style.display=r?'inline-flex':'none';
+  // Zobraz tlačítko "→ Evidence" jen pro Doručeno zásilky, které ještě nejsou v evidenci
+  const alreadyInEvi = r && dataEvi.find(e => (e.vazby||'').split(',').includes(String(r.id)));
+  document.getElementById('btn-to-evidence').style.display = (r && r.stav === 'Doručeno' && !alreadyInEvi) ? 'inline-flex' : 'none';
   updateDodavatelSelect();
   if(r){
     document.getElementById('f-cislo').value=r.cislo_obj||'';
@@ -839,6 +843,19 @@ async function saveRecord(){
       await autoCreateEvidence(rec);
     }
     showSaving('Hotovo!','Data uložena');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+async function manualToEvidence(){
+  if(!editId) return;
+  const r = dataZas.find(x => String(x.id) === String(editId));
+  if(!r) return;
+  closeModal();
+  showSaving('Přidávám do evidence...','');
+  try {
+    await autoCreateEvidence(r);
+    showSaving('Hotovo!','Zásilka přidána do evidence');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
 }
