@@ -37,7 +37,7 @@ button, input, select, textarea { font-family: inherit; }
 .tab-btn:hover { color: #c8a830; }
 .tab-btn.active { color: #c8a830; border-bottom-color: #c8a830; }
 
-#tab-zasilky, #tab-dodavatele { display: block; }
+#tab-zasilky, #tab-dodavatele, #tab-evidence { display: block; }
 
 #toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #e8e4dc; background: #f4f2ed; }
 .filter-btn { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
@@ -192,6 +192,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
 <div id="tabs">
   <button class="tab-btn active" onclick="switchTab('zasilky')">📦 Zásilky</button>
   <button class="tab-btn" onclick="switchTab('dodavatele')">🏭 Dodavatelé</button>
+  <button class="tab-btn" onclick="switchTab('evidence')">📋 Evidence</button>
 </div>
 
 <!-- Upozornění na zpoždění -->
@@ -270,6 +271,41 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
       <tbody id="tbody-dod"></tbody>
     </table>
     <div id="empty-dod" style="text-align:center;padding:60px 20px;color:#888;display:none;"><div style="font-size:36px;margin-bottom:10px;">🏭</div><p>Žádní dodavatelé</p></div>
+  </div>
+</div>
+
+<!-- EVIDENCE TAB -->
+<div id="tab-evidence" style="display:none;">
+  <div id="toolbar-evi" style="display:flex;padding:14px 32px;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #e8e4dc;background:#f4f2ed;">
+    <button class="filter-btn active" data-efilter="aktivni" onclick="setEviFilter('aktivni')">Aktivní</button>
+    <button class="filter-btn" data-efilter="vse" onclick="setEviFilter('vse')">Vše</button>
+    <button class="filter-btn" data-efilter="Čeká na odeslání" onclick="setEviFilter('Čeká na odeslání')"><span class="filter-dot" style="background:#6080c0"></span>Čeká</button>
+    <button class="filter-btn" data-efilter="Odesláno" onclick="setEviFilter('Odesláno')"><span class="filter-dot" style="background:#4090d0"></span>Odesláno</button>
+    <button class="filter-btn" data-efilter="Na celnici" onclick="setEviFilter('Na celnici')"><span class="filter-dot" style="background:#e08030"></span>Na celnici</button>
+    <button class="filter-btn" data-efilter="Doručeno" onclick="setEviFilter('Doručeno')"><span class="filter-dot" style="background:#40a050"></span>Doručeno</button>
+    <div style="margin-left:auto;position:relative;"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:#888;">⌕</span><input type="text" id="evi-search" placeholder="Hledat..." oninput="renderEvidence()" style="background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a1a;padding:6px 12px 6px 32px;font-size:12px;width:200px;outline:none;"></div>
+    <button onclick="openModalEvi()" style="background:#c8a830;color:#000;border:none;border-radius:6px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;">+ Nový záznam</button>
+  </div>
+
+  <div style="padding:0 32px 32px;overflow-x:auto;">
+    <table>
+      <thead><tr>
+        <th onclick="sortEviBy('dodavatel')" data-ecol="dodavatel" style="cursor:pointer;">Dodavatel <span class="sort-arrow"></span></th>
+        <th onclick="sortEviBy('cislo_faktury')" data-ecol="cislo_faktury" style="cursor:pointer;">Č. faktury <span class="sort-arrow"></span></th>
+        <th>Faktura</th>
+        <th onclick="sortEviBy('datum_odeslani')" data-ecol="datum_odeslani" style="cursor:pointer;">Odesláno <span class="sort-arrow"></span></th>
+        <th onclick="sortEviBy('ocekavane_doruceni')" data-ecol="ocekavane_doruceni" style="cursor:pointer;">Doručení <span class="sort-arrow"></span></th>
+        <th>Na cestě</th>
+        <th>Tracking</th>
+        <th onclick="sortEviBy('zpusob_dopravy')" data-ecol="zpusob_dopravy" style="cursor:pointer;">Doprava <span class="sort-arrow"></span></th>
+        <th onclick="sortEviBy('hodnota')" data-ecol="hodnota" style="cursor:pointer;">Hodnota <span class="sort-arrow"></span></th>
+        <th onclick="sortEviBy('stav')" data-ecol="stav" style="cursor:pointer;">Stav <span class="sort-arrow"></span></th>
+        <th>Vazba</th>
+        <th>Akce</th>
+      </tr></thead>
+      <tbody id="tbody-evi"></tbody>
+    </table>
+    <div id="empty-evi" style="text-align:center;padding:60px 20px;color:#888;display:none;"><div style="font-size:36px;margin-bottom:10px;">📋</div><p>Žádné záznamy v evidenci</p></div>
   </div>
 </div>
 
@@ -432,6 +468,69 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
   </div>
 </div>
 
+<!-- Modal evidence -->
+<div id="modal-evi-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeModalEvi()">
+  <div style="background:#fff;border:1px solid #ddd;border-radius:10px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid #e8e4dc;display:flex;align-items:center;justify-content:space-between;">
+      <div id="modal-evi-title" style="font-size:16px;font-weight:800;">Nový záznam</div>
+      <button onclick="closeModalEvi()" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="form-group"><label>Dodavatel</label>
+        <select id="fe-dodavatel"><option value="">— vyberte —</option></select>
+      </div>
+      <div class="form-group"><label>Číslo faktury</label><input type="text" id="fe-cislo-faktury" placeholder="např. INV-2024-001"></div>
+      <div class="form-group"><label>Faktura</label>
+        <div class="file-upload-zone" id="evi-upload-zone">
+          <div class="upload-icon">📄</div>
+          <div class="upload-text">Přetáhněte soubor nebo klikněte</div>
+          <div class="upload-file-name" id="evi-upload-filename"></div>
+          <div class="file-upload-warning" id="evi-upload-warning"></div>
+          <input type="file" id="evi-upload-file" accept=".pdf,.xls,.xlsx,.doc,.docx,.jpg,.jpeg,.png,.webp">
+        </div>
+        <div class="file-upload-or">nebo URL</div>
+        <input type="url" id="fe-faktura-url" placeholder="https://drive.google.com/...">
+      </div>
+      <div class="form-group"><label>Způsob dopravy</label>
+        <select id="fe-doprava">
+          <option>Letecky</option><option>Lodí</option>
+          <option>Kurýr DHL</option><option>Kurýr FedEx</option>
+          <option>Kurýr UPS</option><option>Silnice</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Datum odeslání</label><input type="date" id="fe-datum-odeslani"></div>
+      <div class="form-group"><label>Očekávané doručení</label><input type="date" id="fe-doruceni"></div>
+      <div class="form-group"><label>Tracking číslo</label><input type="text" id="fe-tracking" placeholder="např. 1Z999AA1..."></div>
+      <div class="form-group"><label>Stav</label>
+        <select id="fe-stav">
+          <option>Čeká na odeslání</option><option>Odesláno</option>
+          <option>Na celnici</option><option>Doručeno</option>
+        </select>
+      </div>
+      <div class="form-group" style="display:flex;gap:8px;">
+        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+          <label>Hodnota</label><input type="number" id="fe-hodnota" placeholder="0" step="0.01">
+        </div>
+        <div style="width:90px;display:flex;flex-direction:column;gap:5px;">
+          <label>Měna</label>
+          <select id="fe-mena"><option>USD</option><option>EUR</option><option>CZK</option><option>CNY</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Datum doručení</label><input type="date" id="fe-datum-doruceni"></div>
+      <div class="form-group"><label>Vazba na zásilku</label>
+        <select id="fe-vazba"><option value="">— žádná —</option></select>
+      </div>
+      <div class="form-group"><label>Celní poplatky</label><input type="number" id="fe-celni" placeholder="0" step="0.01"></div>
+      <div class="form-group full"><label>Poznámka</label><textarea id="fe-poznamka" style="background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a1a;padding:8px 12px;font-size:13px;outline:none;width:100%;resize:vertical;min-height:60px;" placeholder="Celní údaje, poznámky..."></textarea></div>
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid #e8e4dc;display:flex;gap:10px;justify-content:flex-end;">
+      <button id="btn-evi-delete" onclick="deleteEvidence()" style="display:none;margin-right:auto;background:none;color:#c05050;border:1px solid #f0c8c8;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">🗑 Smazat</button>
+      <button class="btn-cancel" onclick="closeModalEvi()">Zrušit</button>
+      <button class="btn-save" onclick="saveEvidence()">Uložit</button>
+    </div>
+  </div>
+</div>
+
 <div id="saving-overlay">
   <div id="saving-box">
     <div class="saving-title" id="saving-title">Ukládám...</div>
@@ -491,16 +590,19 @@ function syncStatus(state,text){ document.getElementById('sync-dot').className=s
 async function loadData(){
   syncStatus('loading','Načítám data...');
   try {
-    const [rZas, rDod] = await Promise.all([
+    const [rZas, rDod, rEvi] = await Promise.all([
       fetch(SCRIPT_URL+'?modul=zasilky').then(r=>r.json()),
-      fetch(SCRIPT_URL+'?modul=dodavatele').then(r=>r.json())
+      fetch(SCRIPT_URL+'?modul=dodavatele').then(r=>r.json()),
+      fetch(SCRIPT_URL+'?modul=evidence').then(r=>r.json()).catch(()=>({data:[]}))
     ]);
     dataZas = rZas.data||[];
     dataDod  = rDod.data||[];
+    dataEvi  = rEvi.data||[];
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderTable();
     renderDodavatele();
     updateDodavatelSelect();
+    renderEvidence();
   } catch(e){ syncStatus('error','Chyba: '+e.message); }
 }
 
@@ -511,9 +613,14 @@ async function apiPost(payload){
 }
 
 function switchTab(tab){
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===(tab==='zasilky'?0:1)));
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    const tabs=['zasilky','dodavatele','evidence'];
+    b.classList.toggle('active', tabs[i]===tab);
+  });
   document.getElementById('tab-zasilky').style.display = tab==='zasilky'?'block':'none';
   document.getElementById('tab-dodavatele').style.display = tab==='dodavatele'?'block':'none';
+  document.getElementById('tab-evidence').style.display = tab==='evidence'?'block':'none';
+  if(tab==='evidence') renderEvidence();
 }
 
 function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderTable(); }
@@ -1099,6 +1206,241 @@ function handleFileUpload(file, filenameId, warningId, onLoaded) {
 // Init file upload zones on DOM ready
 setupFileUploadZone('modal-upload-zone', 'modal-upload-file', 'modal-upload-filename', 'modal-upload-warning', (data) => { modalUploadData = data; });
 setupFileUploadZone('bulk-upload-zone', 'bulk-upload-file', 'bulk-upload-filename', 'bulk-upload-warning', (data) => { bulkUploadData = data; });
+setupFileUploadZone('evi-upload-zone', 'evi-upload-file', 'evi-upload-filename', 'evi-upload-warning', (data) => { eviUploadData = data; });
+
+// === EVIDENCE ===
+const COLS_EVI = ['id','dodavatel','cislo_faktury','faktura','datum_odeslani','ocekavane_doruceni','tracking','zpusob_dopravy','hodnota','mena','stav','datum_doruceni','vazba_zasilka','celni_poplatky','poznamka'];
+let dataEvi = [], eviFilter = 'aktivni', eviSortCol = 'datum_odeslani', eviSortDir = -1, editEviId = null;
+let eviUploadData = '';
+
+function setEviFilter(f) {
+  eviFilter = f;
+  document.querySelectorAll('[data-efilter]').forEach(b => b.classList.toggle('active', b.dataset.efilter === f));
+  renderEvidence();
+}
+
+function sortEviBy(col) {
+  eviSortDir = eviSortCol === col ? eviSortDir * -1 : 1;
+  eviSortCol = col;
+  renderEvidence();
+}
+
+function getFilteredEvi() {
+  const q = (document.getElementById('evi-search')?.value || '').toLowerCase();
+  return dataEvi.filter(r => {
+    if (eviFilter === 'aktivni') { if (r.stav === 'Doručeno') return false; }
+    else if (eviFilter !== 'vse') { if (r.stav !== eviFilter) return false; }
+    if (q && ![r.dodavatel, r.cislo_faktury, r.tracking, r.poznamka].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a, b) => {
+    const va = a[eviSortCol] || '', vb = b[eviSortCol] || '';
+    return va < vb ? -eviSortDir : va > vb ? eviSortDir : 0;
+  });
+}
+
+function calcDaysInTransit(datumOdeslani, datumDoruceni, stav) {
+  if (!datumOdeslani) return { text: '—', cls: '' };
+  const start = new Date(toInputDate(datumOdeslani) + 'T00:00:00');
+  if (stav === 'Doručeno' && datumDoruceni) {
+    const end = new Date(toInputDate(datumDoruceni) + 'T00:00:00');
+    const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    return { text: days + ' dní ✓', cls: 'countdown-done' };
+  }
+  if (stav === 'Čeká na odeslání') return { text: '—', cls: '' };
+  const days = Math.ceil((today - start) / (1000 * 60 * 60 * 24));
+  if (days > 30) return { text: days + ' dní', cls: 'countdown-red' };
+  if (days > 14) return { text: days + ' dní', cls: 'countdown-warn' };
+  return { text: days + ' dní', cls: 'countdown-ok' };
+}
+
+function makeTrackingLink(tracking, doprava) {
+  if (!tracking) return '—';
+  let url = '';
+  const d = (doprava || '').toLowerCase();
+  if (d.includes('dhl')) url = 'https://www.dhl.com/cz-cs/home/tracking.html?tracking-id=' + tracking;
+  else if (d.includes('fedex')) url = 'https://www.fedex.com/fedextrack/?trknbr=' + tracking;
+  else if (d.includes('ups')) url = 'https://www.ups.com/track?tracknum=' + tracking;
+  else url = 'https://t.17track.net/en#nums=' + tracking;
+  return '<a href="' + url + '" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;font-family:monospace;color:#c8a830;text-decoration:none;" title="Sledovat zásilku">🔍 ' + tracking + '</a>';
+}
+
+function renderEvidence() {
+  const rows = getFilteredEvi();
+  const tbody = document.getElementById('tbody-evi');
+  if (!tbody) return;
+
+  // Sort arrows
+  document.querySelectorAll('[data-ecol]').forEach(th => {
+    const arrow = th.querySelector('.sort-arrow');
+    if (arrow) {
+      th.style.color = th.dataset.ecol === eviSortCol ? '#c8a830' : '';
+      arrow.textContent = th.dataset.ecol === eviSortCol ? (eviSortDir === 1 ? ' ↓' : ' ↑') : '';
+    }
+  });
+
+  if (!rows.length) { tbody.innerHTML = ''; document.getElementById('empty-evi').style.display = 'block'; return; }
+  document.getElementById('empty-evi').style.display = 'none';
+
+  tbody.innerHTML = rows.map(r => {
+    const transit = calcDaysInTransit(r.datum_odeslani, r.datum_doruceni, r.stav);
+    const hodnota = r.hodnota ? parseFloat(r.hodnota).toLocaleString('cs-CZ') + ' ' + (r.mena || '') : '—';
+    const faktura = r.faktura ? '<a href="' + r.faktura + '" target="_blank" class="faktura-link" onclick="event.stopPropagation()">📄 Faktura</a>' : '—';
+    const tracking = makeTrackingLink(r.tracking, r.zpusob_dopravy);
+    const stCls = r.stav === 'Doručeno' ? 's-doruceno' : r.stav === 'Odesláno' ? 's-odeslano' : r.stav === 'Na celnici' ? 's-celnice' : 's-objednano';
+    // Find linked zásilka
+    let vazbaText = '—';
+    if (r.vazba_zasilka) {
+      const linked = dataZas.find(z => z.id === r.vazba_zasilka);
+      vazbaText = linked ? '<span style="font-size:10px;color:#c8a830;cursor:pointer;" onclick="event.stopPropagation();switchTab(\'zasilky\');openModal(\'' + linked.id + '\')" title="Otevřít zásilku">🔗 ' + (linked.cislo_obj || linked.dodavatel || 'Zásilka') + '</span>' : '—';
+    }
+    // Quick action button
+    let quickBtn = '';
+    if (r.stav === 'Čeká na odeslání') quickBtn = '<button onclick="event.stopPropagation();quickEviStatus(\'' + r.id + '\',\'Odesláno\')" style="background:#e0f0ff;color:#4090d0;border:1px solid #c0d8f0;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;" title="Označit jako odesláno">→ Odesláno</button>';
+    else if (r.stav === 'Odesláno') quickBtn = '<button onclick="event.stopPropagation();quickEviStatus(\'' + r.id + '\',\'Na celnici\')" style="background:#fff0e0;color:#e08030;border:1px solid #f0c8c8;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;" title="Označit na celnici">→ Celnice</button>';
+    else if (r.stav === 'Na celnici') quickBtn = '<button onclick="event.stopPropagation();quickEviStatus(\'' + r.id + '\',\'Doručeno\')" style="background:#e0f0e0;color:#40a050;border:1px solid #c0dcc0;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;" title="Označit jako doručeno">✓ Doručeno</button>';
+
+    return '<tr onclick="openModalEvi(\'' + r.id + '\')" style="border-bottom:1px solid #f0ede6;cursor:pointer;' + (transit.cls === 'countdown-red' ? 'background:#fce8e8;' : '') + '">' +
+      '<td style="font-weight:700;color:#1a1a1a;padding:10px 14px;font-size:13px;">' + (r.dodavatel || '—') + '</td>' +
+      '<td style="padding:10px 14px;font-size:12px;color:#444;">' + (r.cislo_faktury || '—') + '</td>' +
+      '<td style="padding:10px 14px;">' + faktura + '</td>' +
+      '<td style="padding:10px 14px;font-size:12px;color:#444;">' + fmtDate(r.datum_odeslani) + '</td>' +
+      '<td style="padding:10px 14px;font-size:12px;color:#444;">' + fmtDate(r.ocekavane_doruceni) + '</td>' +
+      '<td style="padding:10px 14px;"><span class="' + transit.cls + '" style="font-size:11px;">' + transit.text + '</span></td>' +
+      '<td style="padding:10px 14px;">' + tracking + '</td>' +
+      '<td style="padding:10px 14px;font-size:11px;color:#444;">' + (r.zpusob_dopravy || '—') + '</td>' +
+      '<td style="padding:10px 14px;font-weight:700;color:#c8a830;">' + hodnota + '</td>' +
+      '<td style="padding:10px 14px;"><span class="badge ' + stCls + '"><span class="badge-dot"></span>' + (r.stav || '—') + '</span></td>' +
+      '<td style="padding:10px 14px;">' + vazbaText + '</td>' +
+      '<td style="padding:10px 14px;">' + quickBtn + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function updateEviVazbaSelect() {
+  const sel = document.getElementById('fe-vazba');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— žádná —</option>' + dataZas.map(z => '<option value="' + z.id + '">' + (z.cislo_obj || z.dodavatel || 'Zásilka') + ' (' + (z.stav || '') + ')</option>').join('');
+  if (current) sel.value = current;
+}
+
+function openModalEvi(id) {
+  const r = id ? dataEvi.find(x => x.id === String(id)) : null;
+  editEviId = r ? String(r.id) : null;
+  document.getElementById('modal-evi-title').textContent = r ? 'Upravit záznam' : 'Nový záznam';
+  document.getElementById('btn-evi-delete').style.display = r ? 'inline-flex' : 'none';
+
+  // Update selects
+  const dodSel = document.getElementById('fe-dodavatel');
+  dodSel.innerHTML = '<option value="">— vyberte —</option>' + dataDod.map(d => '<option value="' + d.nazev + '">' + d.nazev + ' (' + d.zeme + ')</option>').join('');
+  updateEviVazbaSelect();
+
+  if (r) {
+    dodSel.value = r.dodavatel || '';
+    document.getElementById('fe-cislo-faktury').value = r.cislo_faktury || '';
+    document.getElementById('fe-faktura-url').value = r.faktura || '';
+    document.getElementById('fe-doprava').value = r.zpusob_dopravy || 'Letecky';
+    document.getElementById('fe-datum-odeslani').value = toInputDate(r.datum_odeslani);
+    document.getElementById('fe-doruceni').value = toInputDate(r.ocekavane_doruceni);
+    document.getElementById('fe-tracking').value = r.tracking || '';
+    document.getElementById('fe-stav').value = r.stav || 'Čeká na odeslání';
+    document.getElementById('fe-hodnota').value = r.hodnota || '';
+    document.getElementById('fe-mena').value = r.mena || 'USD';
+    document.getElementById('fe-datum-doruceni').value = toInputDate(r.datum_doruceni);
+    document.getElementById('fe-vazba').value = r.vazba_zasilka || '';
+    document.getElementById('fe-celni').value = r.celni_poplatky || '';
+    document.getElementById('fe-poznamka').value = r.poznamka || '';
+    if (r.faktura && r.faktura.startsWith('http')) {
+      document.getElementById('evi-upload-filename').textContent = '✓ Faktura nahrána';
+    }
+  } else {
+    ['fe-cislo-faktury', 'fe-faktura-url', 'fe-tracking', 'fe-hodnota', 'fe-celni', 'fe-poznamka'].forEach(fid => document.getElementById(fid).value = '');
+    dodSel.value = '';
+    document.getElementById('fe-doprava').value = 'Letecky';
+    document.getElementById('fe-stav').value = 'Čeká na odeslání';
+    document.getElementById('fe-mena').value = 'USD';
+    document.getElementById('fe-datum-odeslani').value = '';
+    document.getElementById('fe-doruceni').value = '';
+    document.getElementById('fe-datum-doruceni').value = '';
+    document.getElementById('fe-vazba').value = '';
+    document.getElementById('evi-upload-filename').textContent = '';
+  }
+  eviUploadData = '';
+  document.getElementById('evi-upload-warning').style.display = 'none';
+  if (document.getElementById('evi-upload-file')) document.getElementById('evi-upload-file').value = '';
+  document.getElementById('modal-evi-overlay').style.display = 'flex';
+}
+
+function closeModalEvi() {
+  document.getElementById('modal-evi-overlay').style.display = 'none';
+  editEviId = null;
+  eviUploadData = '';
+}
+
+async function saveEvidence() {
+  const isEdit = !!editEviId;
+  const rec = {
+    id: editEviId || String(Date.now()),
+    dodavatel: document.getElementById('fe-dodavatel').value,
+    cislo_faktury: document.getElementById('fe-cislo-faktury').value.trim(),
+    faktura: eviUploadData || document.getElementById('fe-faktura-url').value.trim(),
+    datum_odeslani: document.getElementById('fe-datum-odeslani').value,
+    ocekavane_doruceni: document.getElementById('fe-doruceni').value,
+    tracking: document.getElementById('fe-tracking').value.trim(),
+    zpusob_dopravy: document.getElementById('fe-doprava').value,
+    hodnota: document.getElementById('fe-hodnota').value,
+    mena: document.getElementById('fe-mena').value,
+    stav: document.getElementById('fe-stav').value,
+    datum_doruceni: document.getElementById('fe-datum-doruceni').value,
+    vazba_zasilka: document.getElementById('fe-vazba').value,
+    celni_poplatky: document.getElementById('fe-celni').value,
+    poznamka: document.getElementById('fe-poznamka').value.trim(),
+  };
+  closeModalEvi();
+  showSaving(isEdit ? 'Ukládám změny...' : 'Přidávám záznam...', 'Komunikuji s Google Sheets');
+  try {
+    await apiPost({ action: isEdit ? 'update' : 'append', modul: 'evidence', record: rec });
+    showSaving('Hotovo!', 'Data uložena');
+    setTimeout(async () => { hideSaving(); await loadData(); }, 800);
+  } catch (e) { hideSaving(); alert('Chyba: ' + e.message); }
+}
+
+async function deleteEvidence() {
+  if (!editEviId || !confirm('Opravdu smazat tento záznam?')) return;
+  const id = editEviId;
+  closeModalEvi();
+  showSaving('Mažu...', '');
+  try {
+    await apiPost({ action: 'delete', modul: 'evidence', id: String(id) });
+    showSaving('Smazáno!', '');
+    setTimeout(async () => { hideSaving(); await loadData(); }, 800);
+  } catch (e) { hideSaving(); alert('Chyba: ' + e.message); }
+}
+
+async function quickEviStatus(id, newStav) {
+  const rec = dataEvi.find(r => String(r.id) === String(id));
+  if (!rec) return;
+  rec.stav = newStav;
+  if (newStav === 'Doručeno') {
+    rec.datum_doruceni = toInputDate(today);
+    // Auto-update linked zásilka
+    if (rec.vazba_zasilka) {
+      const linked = dataZas.find(z => z.id === rec.vazba_zasilka);
+      if (linked && linked.stav !== 'Doručeno') {
+        if (confirm('Zásilka "' + (linked.cislo_obj || linked.dodavatel) + '" — označit také jako doručenou?')) {
+          linked.stav = 'Doručeno';
+          try { await apiPost({ action: 'update', modul: 'zasilky', record: linked }); } catch (e) { console.warn(e); }
+        }
+      }
+    }
+  }
+  showSaving('Měním stav...', '');
+  try {
+    await apiPost({ action: 'update', modul: 'evidence', record: rec });
+    showSaving('Hotovo!', '');
+    setTimeout(async () => { hideSaving(); await loadData(); }, 800);
+  } catch (e) { hideSaving(); alert('Chyba: ' + e.message); }
+}
 
 loadData();
 setInterval(loadData, 60000);
