@@ -918,10 +918,10 @@ async function importFromEshop() {
     const lmMatch = bodyText.match(/(\d+(?:[.,]\d+)?)\s*lm\s*(?:\/\s*m|na\s*metr)/i) || bodyText.match(/(\d+(?:[.,]\d+)?)\s*lm/i);
     if (lmMatch) p.lumen = parseFloat(lmMatch[1].replace(',','.'));
 
-    // CCT
-    const cctMatch = bodyText.match(/(\d{4,5})\s*K/g);
-    if (cctMatch) p.cct = cctMatch.map(m => m.trim()).join(', ');
-    if (!p.cct) { const cctRange = bodyText.match(/(\d{4})\s*-\s*(\d{4,5})\s*K/); if (cctRange) p.cct = cctRange[1] + '-' + cctRange[2] + 'K'; }
+    // CCT — deduplicate and prefer range format
+    const cctRange = bodyText.match(/(\d{4})\s*[-–]\s*(\d{4,5})\s*K/);
+    if (cctRange) { p.cct = cctRange[1] + '-' + cctRange[2] + 'K'; }
+    else { const cctAll = bodyText.match(/(\d{4,5})\s*K/g); if (cctAll) { const unique = [...new Set(cctAll.map(m => m.trim()))]; p.cct = unique.join(', '); } }
 
     // CRI
     const criMatch = bodyText.match(/CRI[:\s>]*(\d+)/i) || bodyText.match(/Ra[:\s>]*(\d+)/i);
@@ -953,8 +953,17 @@ async function importFromEshop() {
     const nl = (p.name || url).toLowerCase();
     const isProfile = nl.includes('profil') && !nl.includes('pásek') && !nl.includes('pasek') && !nl.includes('strip') && !nl.includes('+');
     const isPSU = (nl.includes('zdroj') || nl.includes('mean well') || nl.includes('driver')) && !nl.includes('pásek');
-    const isDimmer = nl.includes('dimmer') || nl.includes('ovlada') || nl.includes('stmiv');
-    console.log('Category detect:', {name: nl, isProfile, isPSU, isDimmer});
+    const isDimmer = nl.includes('dimmer') || nl.includes('ovlada') || nl.includes('stmiv') || nl.includes('jednotk') || nl.includes('controller');
+    const isRail = nl.includes('lišta') || nl.includes('lista') || nl.includes('rail');
+    const isCeiling = (nl.includes('svítidlo') || nl.includes('svitidlo')) && (nl.includes('přisaz') || nl.includes('prisaz') || nl.includes('strop'));
+    const isPendant = (nl.includes('svítidlo') || nl.includes('svitidlo')) && (nl.includes('závěs') || nl.includes('zaves') || nl.includes('pendant'));
+    const isDownlight = nl.includes('downlight') || nl.includes('vestavné') || nl.includes('vestavne');
+    const isWall = (nl.includes('svítidlo') || nl.includes('svitidlo')) && (nl.includes('nástěn') || nl.includes('nasten') || nl.includes('wall'));
+    const isOutdoor = (nl.includes('svítidlo') || nl.includes('svitidlo')) && (nl.includes('venkov') || nl.includes('outdoor') || nl.includes('ip65') || nl.includes('ip66') || nl.includes('ip67'));
+    const isFixture = (nl.includes('svítidlo') || nl.includes('svitidlo')) && !isRail;
+    const isStrip = nl.includes('pásek') || nl.includes('pasek') || nl.includes('strip');
+    const isMagnetic = nl.includes('magnet') && (nl.includes('svítidlo') || nl.includes('svitidlo') || nl.includes('spot') || nl.includes('linear'));
+    console.log('Category detect:', {name: nl, isProfile, isPSU, isDimmer, isRail, isFixture, isMagnetic});
 
     // ── Fill modal ──
     editIdx = -1;
@@ -999,11 +1008,27 @@ async function importFromEshop() {
       document.getElementById('f-cri').value = '';
       document.getElementById('f-ip').value = '';
       document.getElementById('f-price').value = (p.price > 0) ? p.price : '';
+    } else if (isRail) {
+      document.getElementById('f-type').value = 'Příslušenství';
+      document.getElementById('f-watt').value = '';
+      document.getElementById('f-lumen').value = '';
+      document.getElementById('f-cct').value = '';
+      document.getElementById('f-cri').value = '';
+      document.getElementById('f-ip').value = '';
+      document.getElementById('f-price').value = (p.price > 0) ? p.price : '';
     } else {
-      // ── Normal product: use all AI values ──
+      // ── Auto-detect fixture type ──
+      let detectedType = 'Jiné';
+      if (isStrip) detectedType = 'LED pásek';
+      else if (isMagnetic) detectedType = 'Stropní svítidlo';
+      else if (isOutdoor) detectedType = 'Venkovní svítidlo';
+      else if (isDownlight) detectedType = 'Downlight';
+      else if (isWall) detectedType = 'Nástěnné svítidlo';
+      else if (isPendant) detectedType = 'Závěsné svítidlo';
+      else if (isCeiling || isFixture) detectedType = 'Stropní svítidlo';
       const ts = document.getElementById('f-type');
       let typeOk = false;
-      for (let o of ts.options) { if (o.value === p.type) { ts.value = o.value; typeOk = true; break; } }
+      for (let o of ts.options) { if (o.value === detectedType) { ts.value = o.value; typeOk = true; break; } }
       if (!typeOk) ts.value = 'Jiné';
       document.getElementById('f-watt').value = (p.watt > 0) ? p.watt : '';
       document.getElementById('f-lumen').value = (p.lumen > 0) ? p.lumen : '';
