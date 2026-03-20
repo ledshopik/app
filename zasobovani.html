@@ -328,7 +328,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
           <div class="upload-icon">📄</div>
           <div class="upload-text" id="modal-upload-text">Přetáhněte soubor nebo klikněte (PDF, XLS, obrázek)</div>
           <div class="upload-file-name" id="modal-upload-filename"></div>
-          <div class="file-upload-warning" id="modal-upload-warning">Soubor je příliš velký (max ~40KB base64)</div>
+          <div class="file-upload-warning" id="modal-upload-warning">Chyba při nahrávání souboru</div>
           <input type="file" id="modal-upload-file" accept=".pdf,.xls,.xlsx,.doc,.docx,.jpg,.jpeg,.png,.webp">
         </div>
         <div class="file-upload-or">nebo URL</div>
@@ -407,7 +407,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
     <div class="upload-icon">📄</div>
     <div class="upload-text">Přetáhněte soubor nebo klikněte (PDF, XLS, obrázek)</div>
     <div class="upload-file-name" id="bulk-upload-filename"></div>
-    <div class="file-upload-warning" id="bulk-upload-warning">Soubor je příliš velký (max ~40KB base64)</div>
+    <div class="file-upload-warning" id="bulk-upload-warning">Chyba při nahrávání souboru</div>
     <input type="file" id="bulk-upload-file" accept=".pdf,.xls,.xlsx,.doc,.docx,.jpg,.jpeg,.png,.webp">
   </div>
   <div class="file-upload-or">nebo zadejte URL</div>
@@ -548,11 +548,7 @@ function renderTable(){
     const hodnota=r.hodnota?`${parseFloat(r.hodnota).toLocaleString('cs-CZ')} ${r.mena||''}`:' —';
     let faktura='—';
     if(r.faktura){
-      if(r.faktura.startsWith('data:')){
-        faktura=`<a href="#" onclick="event.preventDefault();event.stopPropagation();openDataPdf('${r.id}')" class="faktura-link">📄 Faktura</a>`;
-      } else {
-        faktura=`<a href="${r.faktura}" target="_blank" class="faktura-link" onclick="event.stopPropagation()">📄 Faktura</a>`;
-      }
+      faktura=`<a href="${r.faktura}" target="_blank" class="faktura-link" onclick="event.stopPropagation()">📄 Faktura</a>`;
     }
     let trackingUrl='';
     if(r.tracking){
@@ -651,11 +647,9 @@ function openModal(id){
   document.getElementById('modal-upload-filename').textContent = '';
   document.getElementById('modal-upload-warning').style.display = 'none';
   if(document.getElementById('modal-upload-file')) document.getElementById('modal-upload-file').value = '';
-  // If existing record has a data URL faktura, show indicator
-  if(r && r.faktura && r.faktura.startsWith('data:')) {
-    document.getElementById('modal-upload-filename').textContent = '✓ PDF nahráno';
-    modalUploadData = r.faktura;
-    document.getElementById('f-faktura').value = '';
+  // If existing record has a faktura link, show indicator
+  if(r && r.faktura && r.faktura.startsWith('http')) {
+    document.getElementById('modal-upload-filename').textContent = '✓ Faktura nahrána';
   }
   document.getElementById('modal-overlay').classList.add('open');
 }
@@ -1043,47 +1037,32 @@ function handleFileUpload(file, filenameId, warningId, onLoaded) {
   const warningEl = document.getElementById(warningId);
   const filenameEl = document.getElementById(filenameId);
   warningEl.style.display = 'none';
-
-  if(!file.type.includes('pdf')) {
-    warningEl.textContent = 'Pouze PDF soubory';
-    warningEl.style.display = 'block';
-    return;
-  }
+  filenameEl.textContent = '⏳ Nahrávám na Drive...';
 
   const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    if(dataUrl.length > 40000) {
-      warningEl.textContent = 'Soubor je příliš velký (max ~40KB base64)';
+  reader.onload = async function(e) {
+    const base64 = e.target.result.split(',')[1];
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'uploadFile', filename: file.name, mimeType: file.type, data: base64 })
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || 'Chyba uploadu');
+      filenameEl.textContent = '✓ ' + file.name;
+      warningEl.style.display = 'none';
+      onLoaded(json.url);
+    } catch(err) {
+      warningEl.textContent = 'Chyba: ' + err.message;
       warningEl.style.display = 'block';
+      filenameEl.textContent = '';
       onLoaded('');
-      return;
     }
-    filenameEl.textContent = '✓ ' + file.name;
-    warningEl.style.display = 'none';
-    onLoaded(dataUrl);
   };
   reader.readAsDataURL(file);
 }
 
-function openDataPdf(id) {
-  const rec = dataZas.find(r => String(r.id) === String(id));
-  if(!rec || !rec.faktura) return;
-  // Convert data URL to blob and open
-  try {
-    const parts = rec.faktura.split(',');
-    const mime = parts[0].match(/:(.*?);/)[1];
-    const b64 = atob(parts[1]);
-    const arr = new Uint8Array(b64.length);
-    for(let i=0;i<b64.length;i++) arr[i]=b64.charCodeAt(i);
-    const blob = new Blob([arr], {type: mime});
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-  } catch(e) {
-    // Fallback: try opening data URL directly
-    window.open(rec.faktura, '_blank');
-  }
-}
+// openDataPdf removed — files are now stored on Google Drive as URLs
 
 // Init file upload zones on DOM ready
 setupFileUploadZone('modal-upload-zone', 'modal-upload-file', 'modal-upload-filename', 'modal-upload-warning', (data) => { modalUploadData = data; });
