@@ -725,7 +725,7 @@ function updateDodavatelSelect(){
 }
 
 function openModal(id){
-  const r=id?dataZas.find(x=>x.id===String(id)):null;
+  const r=id?dataZas.find(x=>String(x.id)===String(id)):null;
   editId=r?String(r.id):null;
   document.getElementById('modal-title').textContent=r?'Upravit zásilku':'Nová zásilka';
   document.getElementById('btn-delete').style.display=r?'inline-flex':'none';
@@ -775,7 +775,7 @@ function closeModal(){ document.getElementById('modal-overlay').classList.remove
 function overlayClick(e){ if(e.target===document.getElementById('modal-overlay')) closeModal(); }
 
 function openModalDod(id){
-  const d=id?dataDod.find(x=>x.id===String(id)):null;
+  const d=id?dataDod.find(x=>String(x.id)===String(id)):null;
   editDodId=d?String(d.id):null;
   document.getElementById('modal-dod-title').textContent=d?'Upravit dodavatele':'Nový dodavatel';
   document.getElementById('btn-dod-delete').style.display=d?'inline-flex':'none';
@@ -823,7 +823,7 @@ async function saveRecord(){
     poznamka:         document.getElementById('f-poznamka').value.trim(),
   };
   // Zjistit jestli se stav změnil na "Odesláno" (pro auto-evidenci)
-  const oldRec = isEdit ? dataZas.find(x => x.id === editId) : null;
+  const oldRec = isEdit ? dataZas.find(x => String(x.id) === String(editId)) : null;
   const stavChanged = oldRec && oldRec.stav !== rec.stav && rec.stav === 'Odesláno';
 
   closeModal();
@@ -981,7 +981,7 @@ function exportXLSX(){
 
 function duplicateRecord(){
   if(!editId) return;
-  const r=dataZas.find(x=>x.id===String(editId));
+  const r=dataZas.find(x=>String(x.id)===String(editId));
   if(!r) return;
   closeModal();
   // Otevři nový modal s předvyplněnými daty ale bez id a dat
@@ -1313,7 +1313,7 @@ function renderEvidence() {
     // Vazba na objednávku
     let vazbaText = '—';
     if (r.vazba_zasilka) {
-      const linked = dataZas.find(z => z.id === r.vazba_zasilka);
+      const linked = dataZas.find(z => String(z.id) === String(r.vazba_zasilka));
       vazbaText = linked ? '<span style="font-size:10px;color:#c8a830;cursor:pointer;" onclick="event.stopPropagation();switchTab(\'zasilky\');openModal(\'' + linked.id + '\')" title="Otevřít objednávku">🔗 ' + (linked.cislo_obj || linked.dodavatel) + '</span>' : '—';
     }
 
@@ -1424,7 +1424,7 @@ async function markDelivered(id) {
     await apiPost({ action: 'update', modul: 'evidence', record: rec });
     // Nabídnout aktualizaci propojené zásilky
     if (rec.vazba_zasilka) {
-      const linked = dataZas.find(z => z.id === rec.vazba_zasilka);
+      const linked = dataZas.find(z => String(z.id) === String(rec.vazba_zasilka));
       if (linked && linked.stav !== 'Doručeno') {
         if (confirm('Označit i objednávku „' + (linked.cislo_obj || linked.dodavatel) + '" jako doručenou?')) {
           linked.stav = 'Doručeno';
