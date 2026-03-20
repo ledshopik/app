@@ -1269,7 +1269,7 @@ function getFilteredEvi() {
 function makeTrackingLink(tracking, doprava) {
   if (!tracking) return '—';
   let url = '';
-  const d = (doprava || '').toLowerCase();
+  const d = String(doprava || '').toLowerCase();
   if (d.includes('dhl')) url = 'https://www.dhl.com/cz-cs/home/tracking.html?tracking-id=' + tracking;
   else if (d.includes('fedex')) url = 'https://www.fedex.com/fedextrack/?trknbr=' + tracking;
   else if (d.includes('ups')) url = 'https://www.ups.com/track?tracknum=' + tracking;
@@ -1279,7 +1279,7 @@ function makeTrackingLink(tracking, doprava) {
 
 // Najdi propojené objednávky z 1. záložky
 function getLinkedOrders(eviRec) {
-  const vazby = (eviRec.vazby || '').split('|').map(v => v.trim()).filter(Boolean);
+  const vazby = String(eviRec.vazby || '').split('|').map(v => v.trim()).filter(Boolean);
   return vazby.map(vid => dataZas.find(z => String(z.id) === vid)).filter(Boolean);
 }
 
@@ -1293,7 +1293,7 @@ function renderEvidence() {
   const totalHodnota = dataEvi.reduce((s,r) => s + (parseFloat(r.hodnota)||0), 0);
   const meny = [...new Set(dataEvi.map(r=>r.mena).filter(Boolean))];
   document.getElementById('evi-stat-hodnota').textContent = totalHodnota ? totalHodnota.toLocaleString('cs-CZ') + ' ' + (meny.length===1?meny[0]:'mix') : '0';
-  const totalObj = dataEvi.reduce((s,r) => s + (r.vazby ? r.vazby.split('|').filter(Boolean).length : 0), 0);
+  const totalObj = dataEvi.reduce((s,r) => s + (r.vazby ? String(r.vazby).split('|').filter(Boolean).length : 0), 0);
   document.getElementById('evi-stat-objednavek').textContent = totalObj;
 
   // Sort arrows
@@ -1358,7 +1358,7 @@ function openModalEvi(id) {
     if (linked.length) {
       wrap.style.display = '';
       document.getElementById('evi-linked-list').innerHTML = linked.map(z =>
-        '<div style="padding:3px 0;border-bottom:1px solid #eee;">🔗 <b>' + (z.cislo_obj || '—') + '</b> — ' + (z.dodavatel||'') + ' — ' + (z.obsah||'').substring(0,50) + ' — ' + (z.hodnota ? parseFloat(z.hodnota).toLocaleString('cs-CZ') + ' ' + (z.mena||'') : '') + '</div>'
+        '<div style="padding:3px 0;border-bottom:1px solid #eee;">🔗 <b>' + (z.cislo_obj || '—') + '</b> — ' + (z.dodavatel||'') + ' — ' + String(z.obsah||'').substring(0,50) + ' — ' + (z.hodnota ? parseFloat(z.hodnota).toLocaleString('cs-CZ') + ' ' + (z.mena||'') : '') + '</div>'
       ).join('');
     } else { wrap.style.display = 'none'; }
   } else {
