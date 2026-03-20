@@ -326,10 +326,10 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
       <div class="form-group"><label>Faktura</label>
         <div class="file-upload-zone" id="modal-upload-zone">
           <div class="upload-icon">📄</div>
-          <div class="upload-text" id="modal-upload-text">Přetáhněte PDF nebo klikněte</div>
+          <div class="upload-text" id="modal-upload-text">Přetáhněte soubor nebo klikněte (PDF, XLS, obrázek)</div>
           <div class="upload-file-name" id="modal-upload-filename"></div>
           <div class="file-upload-warning" id="modal-upload-warning">Soubor je příliš velký (max ~40KB base64)</div>
-          <input type="file" id="modal-upload-file" accept=".pdf,application/pdf">
+          <input type="file" id="modal-upload-file" accept=".pdf,.xls,.xlsx,.doc,.docx,.jpg,.jpeg,.png,.webp">
         </div>
         <div class="file-upload-or">nebo URL</div>
         <input type="url" id="f-faktura" placeholder="https://drive.google.com/...">
@@ -405,10 +405,10 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
   <label>Faktura pro vybrané zásilky</label>
   <div class="file-upload-zone" id="bulk-upload-zone">
     <div class="upload-icon">📄</div>
-    <div class="upload-text">Přetáhněte PDF nebo klikněte</div>
+    <div class="upload-text">Přetáhněte soubor nebo klikněte (PDF, XLS, obrázek)</div>
     <div class="upload-file-name" id="bulk-upload-filename"></div>
     <div class="file-upload-warning" id="bulk-upload-warning">Soubor je příliš velký (max ~40KB base64)</div>
-    <input type="file" id="bulk-upload-file" accept=".pdf,application/pdf">
+    <input type="file" id="bulk-upload-file" accept=".pdf,.xls,.xlsx,.doc,.docx,.jpg,.jpeg,.png,.webp">
   </div>
   <div class="file-upload-or">nebo zadejte URL</div>
   <input type="url" id="bulk-faktura-url" placeholder="https://drive.google.com/...">
