@@ -830,11 +830,9 @@ function addRoom() {
 // ══════════════════════════════════════
 async function importFromEshop() {
   const url = document.getElementById('eshop-url').value.trim();
-  const key = document.getElementById('api-key').value.trim();
   const status = document.getElementById('import-status');
 
   if (!url) { status.className='import-status error'; status.textContent='Zadej URL produktové stránky'; return; }
-  if (!key) { status.className='import-status error'; status.textContent='Zadej API klíč (v ⚙ Nastavení)'; return; }
   if (/\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url)) {
     status.className='import-status error';
     status.textContent='Tohle je odkaz na obrázek. Vlož URL produktové stránky.';
@@ -845,158 +843,109 @@ async function importFromEshop() {
   status.innerHTML = '<span class="spin">⟳</span> Stahuji stránku...';
 
   try {
-    // ── STEP 1: Try to fetch page HTML via CORS proxy ──
-    let pageText = '';
-    let foundImage = '';
-    let usedProxy = false;
-
-    try {
-      const proxies = ['https://api.allorigins.win/raw?url=','https://corsproxy.io/?url=','https://api.codetabs.com/v1/proxy?quest='];
-      for (const proxy of proxies) {
-        try {
-          const r = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(8000)});
-          if (r.ok) {
-            const html = await r.text();
-            
-            // Extract meta tags from raw HTML (works even on JS-rendered pages!)
-            const ogMatch = html.match(/property=["']og:image["']\s+content=["']([^"']+)["']/i) 
-                         || html.match(/content=["']([^"']+)["']\s+property=["']og:image["']/i);
-            if (ogMatch) foundImage = ogMatch[1];
-            
-            // Also try product image patterns specific to eshop
-            if (!foundImage) {
-              const imgPat = html.match(/["'](https?:\/\/[^"']*\/fotky\/[^"']*\.(?:jpg|png|webp)[^"']*)["']/i);
-              if (imgPat) foundImage = imgPat[1];
-            }
-
-            // Extract og:title and og:description (available in static <head>)
-            const ogTitle = html.match(/property=["']og:title["']\s+content=["']([^"']+)["']/i)
-                         || html.match(/content=["']([^"']+)["']\s+property=["']og:title["']/i);
-            const ogDesc = html.match(/property=["']og:description["']\s+content=["']([^"']+)["']/i)
-                        || html.match(/content=["']([^"']+)["']\s+property=["']og:description["']/i);
-            const metaDesc = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
-            const titleTag = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-
-            // Build page text from meta tags if body is JS-rendered
-            let metaText = '';
-            if (ogTitle) metaText += ogTitle[1] + '. ';
-            else if (titleTag) metaText += titleTag[1] + '. ';
-            if (ogDesc) metaText += ogDesc[1] + '. ';
-            else if (metaDesc) metaText += metaDesc[1] + '. ';
-            
-            // Try to get JSON-LD structured data (many eshops have this)
-            const jsonLd = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
-            if (jsonLd) {
-              jsonLd.forEach(block => {
-                const content = block.replace(/<\/?script[^>]*>/gi, '');
-                metaText += content + ' ';
-              });
-            }
-
-            // Parse body text
-            const doc = new DOMParser().parseFromString(html, 'text/html');
-            doc.querySelectorAll('script,style,nav,footer,header,iframe').forEach(el => el.remove());
-            
-            if (foundImage && !foundImage.startsWith('http')) {
-              try { foundImage = new URL(foundImage, url).href; } catch(e) {}
-            }
-            console.log('Image found:', foundImage);
-
-            pageText = (doc.body ? (doc.body.innerText || doc.body.textContent || '') : '').replace(/\s+/g,' ').trim();
-            
-            // If body is useless but we have meta text, use that
-            if (pageText.length < 200 || pageText.includes('JavaScript') || pageText.includes('cookies')) {
-              if (metaText.length > 50) {
-                pageText = metaText;
-                usedProxy = true;
-                console.log('Using META TEXT (body was JS-rendered):', metaText.slice(0, 300));
-              } else {
-                pageText = '';
-              }
-            } else {
-              usedProxy = true;
-            }
-            break;
-          }
-        } catch(e) { continue; }
-      }
-    } catch(e) { /* proxy failed, will use web search */ }
+    // ── STEP 1: Fetch page HTML via CORS proxy ──
+    let html = '';
+    const proxies = ['https://corsproxy.io/?url=','https://api.allorigins.win/raw?url=','https://api.codetabs.com/v1/proxy?quest='];
+    for (const proxy of proxies) {
+      try {
+        const r = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(10000)});
+        if (r.ok) { html = await r.text(); break; }
+      } catch(e) { continue; }
+    }
+    if (!html) throw new Error('Nepodařilo se stáhnout stránku — zkus to znovu');
 
     status.innerHTML = '<span class="spin">⟳</span> Analyzuji parametry...';
 
-    let aiResponse;
+    // ── STEP 2: Extract JSON-LD structured data (free, no API!) ──
+    let p = { name:'', type:'', watt:0, lumen:0, cct:'', cri:'', ip:'', dim:'', price:0, note:'', image:'' };
+    let foundProduct = false;
 
-    if (usedProxy && pageText) {
-      // ── PATH A: Have page content → use cheap Haiku ──
-      console.log('Using PROXY path, page text length:', pageText.length);
-      const resp = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2024-10-22','anthropic-dangerous-direct-browser-access':'true'},
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001', max_tokens: 400,
-          system: 'Extrahuj data z textu e-shopu. POUZE JSON. NEVYMÝŠLEJ údaje.',
-          messages: [{role:'user', content: 'Text stránky:\n' + pageText.slice(0,3000) + '\n\nJSON: {"name":"","type":"Alu profil|LED pásek|Alu profil + pásek|Stropní svítidlo|Závěsné svítidlo|Downlight|Nástěnné svítidlo|Venkovní svítidlo|Napájecí zdroj|Ovladač / Dimmer|Příslušenství|Jiné","watt":0,"lumen":0,"cct":"","cri":"","ip":"","dim":"","price":0,"note":"popis max 2 věty"}\nProfil BEZ pásku: watt=0,lumen=0,cct="",cri="". Pásek: W/m,lm/m. dim=rozměry VŽDY vyplň (šířka, průměr, délka).'}]
-        })
-      });
-      if (!resp.ok) { const errBody = await resp.text(); console.error('API error:', errBody); throw new Error('API chyba ' + resp.status + ': ' + (JSON.parse(errBody).error?.message || errBody).slice(0,120)); }
-      aiResponse = await resp.json();
-    } else {
-      // ── PATH B: JS-rendered page → use Sonnet + web_search ──
-      console.log('Using WEB SEARCH path (page not readable via proxy)');
-      const resp = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2024-10-22','anthropic-dangerous-direct-browser-access':'true'},
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514', max_tokens: 500,
-          system: 'Extrahuj produktová data z e-shopu. POUZE JSON. Pokud údaj nenajdeš dej 0 nebo "". NEVYMÝŠLEJ.',
-          tools: [{type:'web_search_20250305', name:'web_search'}],
-          messages: [{role:'user', content: 'Vyhledej tento produkt a zjisti jeho skutečné parametry: ' + url + '\n\nVrať POUZE JSON:\n{"name":"","type":"Alu profil|LED pásek|Alu profil + pásek|Stropní svítidlo|Závěsné svítidlo|Downlight|Nástěnné svítidlo|Venkovní svítidlo|Napájecí zdroj|Ovladač / Dimmer|Příslušenství|Jiné","watt":0,"lumen":0,"cct":"","cri":"","ip":"","dim":"","price":0,"image":"URL obrázku","note":"popis max 2 věty"}\nPROFIL (ne pásek): watt=0,lumen=0,cct="",cri="". PÁSEK: W/m a lm/m. dim=rozměry VŽDY vyplň. NEVYMÝŠLEJ hodnoty!'}]
-        })
-      });
-      if (!resp.ok) { const errBody = await resp.text(); console.error('API error:', errBody); throw new Error('API chyba ' + resp.status + ': ' + (JSON.parse(errBody).error?.message || errBody).slice(0,120)); }
-      aiResponse = await resp.json();
-    }
-
-    // ── Extract JSON from AI response ──
-    let aiText = '';
-    if (aiResponse.content) aiResponse.content.forEach(b => { if (b.type === 'text') aiText += b.text; });
-    console.log('AI text:', aiText.slice(0, 400));
-
-    aiText = aiText.replace(/```json\s*/gi,'').replace(/```\s*/g,'');
-    const jm = aiText.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/);
-    if (!jm) throw new Error('AI nevrátila platná data — zkus to znovu');
-
-    let p;
-    try {
-      // Auto-fix common AI JSON errors: unquoted values like IP20, 12mm, numbers without quotes
-      let jsonStr = jm[0];
-      // Fix unquoted string values: "key":VALUE → "key":"VALUE" (where VALUE is not a number, bool, null, {, [)
-      jsonStr = jsonStr.replace(/:([A-Za-z][A-Za-z0-9]*(?:\s*[A-Za-z0-9]+)*)\s*([,}])/g, (m, val, end) => {
-        // Don't quote true/false/null
-        if (['true','false','null'].includes(val.toLowerCase())) return m;
-        return `:"${val}"${end}`;
-      });
-      // Fix values like 12mm, IP20 without quotes after colon
-      jsonStr = jsonStr.replace(/:\s*([0-9]+[a-zA-Z][a-zA-Z0-9]*)\s*([,}])/g, ':"$1"$2');
-      p = JSON.parse(jsonStr);
-    } catch(e2) {
-      // Last resort: try to extract fields manually
+    // Parse JSON-LD blocks (can be object or array)
+    const jsonLdBlocks = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi) || [];
+    for (const block of jsonLdBlocks) {
       try {
-        const extract = (key) => { const m = jm[0].match(new RegExp(`"${key}"\\s*:\\s*"?([^",}]+)"?`)); return m ? m[1].trim() : ''; };
-        p = {
-          name: extract('name'), type: extract('type'), watt: parseFloat(extract('watt'))||0,
-          lumen: parseFloat(extract('lumen'))||0, cct: extract('cct'), cri: extract('cri'),
-          ip: extract('ip'), dim: extract('dim'), price: parseFloat(extract('price'))||0,
-          note: extract('note'), image: extract('image')
-        };
-        if (!p.name) throw new Error('empty');
-      } catch(e3) { throw new Error('Chyba parsování dat — zkus import znovu'); }
+        const content = block.replace(/<\/?script[^>]*>/gi, '');
+        let parsed = JSON.parse(content);
+        // If array, find Product inside
+        const items = Array.isArray(parsed) ? parsed : [parsed];
+        for (const ld of items) {
+          if (ld['@type'] === 'Product') {
+            p.name = ld.name || '';
+            p.note = ld.description || '';
+            p.image = ld.image || '';
+            if (ld.offers) p.price = parseFloat(ld.offers.price) || 0;
+            if (ld.sku) p.note = (p.note ? p.note + ' | ' : '') + 'SKU: ' + ld.sku;
+            foundProduct = true;
+          }
+        }
+      } catch(e) { continue; }
     }
-    console.log('Parsed:', p);
 
-    // Image: prefer proxy-found, fallback to AI-found
-    if (!p.image && foundImage) p.image = foundImage;
+    // Fallback: try og: meta tags
+    if (!p.name) {
+      const ogTitle = html.match(/property=["']og:title["']\s+content=["']([^"']+)["']/i)
+                   || html.match(/content=["']([^"']+)["']\s+property=["']og:title["']/i);
+      if (ogTitle) p.name = ogTitle[1];
+    }
+    if (!p.image) {
+      const ogImg = html.match(/property=["']og:image["']\s+content=["']([^"']+)["']/i)
+                 || html.match(/content=["']([^"']+)["']\s+property=["']og:image["']/i);
+      if (ogImg) p.image = ogImg[1];
+    }
+    if (!p.note) {
+      const metaDesc = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
+      if (metaDesc) p.note = metaDesc[1];
+    }
+    // Fallback image: eshop-specific patterns
+    if (!p.image) {
+      const imgPat = html.match(/["'](https?:\/\/[^"']*\/fotky\/[^"']*\.(?:jpg|png|webp)[^"']*)["']/i);
+      if (imgPat) p.image = imgPat[1];
+    }
+    // Fix relative image URLs
+    if (p.image && !p.image.startsWith('http')) {
+      try { p.image = new URL(p.image, url).href; } catch(e) {}
+    }
+
+    // ── STEP 3: Extract technical params from page text ──
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const bodyText = (doc.body ? doc.body.textContent : '').replace(/\s+/g, ' ');
+
+    // Watt
+    const wattMatch = bodyText.match(/(\d+(?:[.,]\d+)?)\s*W\s*(?:\/\s*m|na\s*metr)/i) || bodyText.match(/příkon[^:]*?(\d+(?:[.,]\d+)?)\s*W/i);
+    if (wattMatch) p.watt = parseFloat(wattMatch[1].replace(',','.'));
+
+    // Lumen
+    const lmMatch = bodyText.match(/(\d+(?:[.,]\d+)?)\s*lm\s*(?:\/\s*m|na\s*metr)/i) || bodyText.match(/(\d+(?:[.,]\d+)?)\s*lm/i);
+    if (lmMatch) p.lumen = parseFloat(lmMatch[1].replace(',','.'));
+
+    // CCT
+    const cctMatch = bodyText.match(/(\d{4,5})\s*K/g);
+    if (cctMatch) p.cct = cctMatch.map(m => m.trim()).join(', ');
+    if (!p.cct) { const cctRange = bodyText.match(/(\d{4})\s*-\s*(\d{4,5})\s*K/); if (cctRange) p.cct = cctRange[1] + '-' + cctRange[2] + 'K'; }
+
+    // CRI
+    const criMatch = bodyText.match(/CRI[:\s>]*(\d+)/i) || bodyText.match(/Ra[:\s>]*(\d+)/i);
+    if (criMatch) p.cri = criMatch[1];
+
+    // IP
+    const ipMatch = bodyText.match(/IP\s*(\d{2})/i);
+    if (ipMatch) p.ip = 'IP' + ipMatch[1];
+
+    // Dimensions from name or body
+    const dimMatch = bodyText.match(/(\d+(?:[.,]\d+)?)\s*(?:x|×)\s*(\d+(?:[.,]\d+)?)\s*(?:x|×)?\s*(\d+(?:[.,]\d+)?)?\s*mm/i);
+    if (dimMatch) p.dim = dimMatch[0].trim();
+    if (!p.dim) { const widthMatch = (p.name + ' ' + bodyText).match(/(\d+)\s*mm/i); if (widthMatch) p.dim = widthMatch[1] + 'mm'; }
+
+    // Price fallback from body text
+    if (!p.price) { const priceMatch = bodyText.match(/(\d[\d\s]*(?:[.,]\d+)?)\s*Kč\s*(?:s\s*DPH)?/i); if (priceMatch) p.price = parseFloat(priceMatch[1].replace(/\s/g,'').replace(',','.')); }
+
+    // Fallback name from URL
     if (!p.name) p.name = url.split('/').pop().replace(/[-_]x?\d*$/,'').replace(/-/g,' ');
+
+    // Truncate note to 2 sentences
+    if (p.note && p.note.length > 150) p.note = p.note.split(/[.!]/).slice(0,2).join('. ').trim();
+
+    console.log('Parsed (no AI):', p);
 
     // ── Detect product category from name ──
     const nl = (p.name || url).toLowerCase();
