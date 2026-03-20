@@ -851,10 +851,10 @@ async function importFromEshop() {
     let usedProxy = false;
 
     try {
-      const proxies = ['https://api.allorigins.win/raw?url='];
+      const proxies = ['https://api.allorigins.win/raw?url=','https://corsproxy.io/?url=','https://api.codetabs.com/v1/proxy?quest='];
       for (const proxy of proxies) {
         try {
-          const r = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(3000)});
+          const r = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(8000)});
           if (r.ok) {
             const html = await r.text();
             
@@ -931,21 +931,21 @@ async function importFromEshop() {
       console.log('Using PROXY path, page text length:', pageText.length);
       const resp = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: {'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        headers: {'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2024-10-22','anthropic-dangerous-direct-browser-access':'true'},
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001', max_tokens: 400,
           system: 'Extrahuj data z textu e-shopu. POUZE JSON. NEVYMÝŠLEJ údaje.',
           messages: [{role:'user', content: 'Text stránky:\n' + pageText.slice(0,3000) + '\n\nJSON: {"name":"","type":"Alu profil|LED pásek|Alu profil + pásek|Stropní svítidlo|Závěsné svítidlo|Downlight|Nástěnné svítidlo|Venkovní svítidlo|Napájecí zdroj|Ovladač / Dimmer|Příslušenství|Jiné","watt":0,"lumen":0,"cct":"","cri":"","ip":"","dim":"","price":0,"note":"popis max 2 věty"}\nProfil BEZ pásku: watt=0,lumen=0,cct="",cri="". Pásek: W/m,lm/m. dim=rozměry VŽDY vyplň (šířka, průměr, délka).'}]
         })
       });
-      if (!resp.ok) throw new Error('API chyba ' + resp.status);
+      if (!resp.ok) { const errBody = await resp.text(); console.error('API error:', errBody); throw new Error('API chyba ' + resp.status + ': ' + (JSON.parse(errBody).error?.message || errBody).slice(0,120)); }
       aiResponse = await resp.json();
     } else {
       // ── PATH B: JS-rendered page → use Sonnet + web_search ──
       console.log('Using WEB SEARCH path (page not readable via proxy)');
       const resp = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: {'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        headers: {'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2024-10-22','anthropic-dangerous-direct-browser-access':'true'},
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514', max_tokens: 500,
           system: 'Extrahuj produktová data z e-shopu. POUZE JSON. Pokud údaj nenajdeš dej 0 nebo "". NEVYMÝŠLEJ.',
@@ -953,7 +953,7 @@ async function importFromEshop() {
           messages: [{role:'user', content: 'Vyhledej tento produkt a zjisti jeho skutečné parametry: ' + url + '\n\nVrať POUZE JSON:\n{"name":"","type":"Alu profil|LED pásek|Alu profil + pásek|Stropní svítidlo|Závěsné svítidlo|Downlight|Nástěnné svítidlo|Venkovní svítidlo|Napájecí zdroj|Ovladač / Dimmer|Příslušenství|Jiné","watt":0,"lumen":0,"cct":"","cri":"","ip":"","dim":"","price":0,"image":"URL obrázku","note":"popis max 2 věty"}\nPROFIL (ne pásek): watt=0,lumen=0,cct="",cri="". PÁSEK: W/m a lm/m. dim=rozměry VŽDY vyplň. NEVYMÝŠLEJ hodnoty!'}]
         })
       });
-      if (!resp.ok) throw new Error('API chyba ' + resp.status);
+      if (!resp.ok) { const errBody = await resp.text(); console.error('API error:', errBody); throw new Error('API chyba ' + resp.status + ': ' + (JSON.parse(errBody).error?.message || errBody).slice(0,120)); }
       aiResponse = await resp.json();
     }
 
