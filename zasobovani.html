@@ -1312,7 +1312,7 @@ function renderEvidence() {
 }
 
 function openModalEvi(id) {
-  const r = id ? dataEvi.find(x => x.id === String(id)) : null;
+  const r = id ? dataEvi.find(x => String(x.id) === String(id)) : null;
   editEviId = r ? String(r.id) : null;
   document.getElementById('modal-evi-title').textContent = r ? 'Upravit zásilku' : 'Nová zásilka ze zahraničí';
   document.getElementById('btn-evi-delete').style.display = r ? 'inline-flex' : 'none';
@@ -1420,7 +1420,7 @@ async function markDelivered(id) {
 // AUTO-VYTVOŘENÍ EVIDENCE: když zásilka přejde na "Odesláno"
 async function autoCreateEvidence(zasilkaRec) {
   // Zkontroluj jestli už evidence pro tuto zásilku neexistuje
-  const exists = dataEvi.find(e => e.vazba_zasilka === String(zasilkaRec.id));
+  const exists = dataEvi.find(e => String(e.vazba_zasilka) === String(zasilkaRec.id));
   if (exists) return; // už existuje, netvořit duplicitu
 
   const eviRec = {
