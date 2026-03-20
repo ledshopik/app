@@ -1463,6 +1463,8 @@ async function autoCreateEvidence(zasilkaRec) {
     poznamka: 'Auto z obj. ' + String(zasilkaRec.cislo_obj || ''),
   };
   await apiPost({ action: 'append', modul: 'evidence', record: eviRec });
+  // Přidej do lokálního pole aby další zásilky ve stejné smyčce mohly sloučit
+  dataEvi.push(eviRec);
 }
 
 loadData();
