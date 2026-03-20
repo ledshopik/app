@@ -476,7 +476,6 @@ a{color:var(--accent);text-decoration:none}
       <div class="tb-stats">
         <div class="chip a"><span>Typů:</span><span class="cv" id="s-types">0</span></div>
         <div class="chip b"><span>Kusů:</span><span class="cv" id="s-qty">0</span></div>
-        <div class="chip p"><span>Σ W:</span><span class="cv" id="s-watt">0</span></div>
         <div class="chip g"><span>Cena:</span><span class="cv" id="s-price">0 Kč</span></div>
       </div>
       <div class="vtog">
@@ -591,16 +590,26 @@ a{color:var(--accent);text-decoration:none}
     <h3 style="font-family:var(--head);font-size:16px;font-weight:700">⚙ Nastavení</h3>
     <button class="modal-x" onclick="closeSettings()">✕</button>
   </div>
-  <div class="sec-head" style="margin-bottom:8px">🔑 API klíč</div>
-  <div class="fld" style="margin-bottom:4px">
-    <label>Anthropic API klíč (pro import z eshopu)</label>
-    <div class="api-row">
-      <input id="api-key" type="password" placeholder="sk-ant-..." value="">
-      <button class="btn sm" onclick="toggleApiKey()" title="Zobrazit/skrýt">👁</button>
+  <div class="sec-head" style="margin-bottom:8px">🔧 Volby parametrů</div>
+  <div style="margin-bottom:14px">
+    <div class="fld" style="margin-bottom:6px">
+      <label>Typy / kategorie <span style="font-weight:400;color:var(--muted)">(po řádcích)</span></label>
+      <textarea id="set-types" style="min-height:90px;font-size:10.5px" onchange="saveParamChoices()"></textarea>
     </div>
+    <div class="fld" style="margin-bottom:6px">
+      <label>CRI hodnoty <span style="font-weight:400;color:var(--muted)">(oddělené čárkou)</span></label>
+      <input id="set-cri" style="font-size:10.5px" onchange="saveParamChoices()">
+    </div>
+    <div class="fld" style="margin-bottom:6px">
+      <label>IP krytí <span style="font-weight:400;color:var(--muted)">(oddělené čárkou)</span></label>
+      <input id="set-ip" style="font-size:10.5px" onchange="saveParamChoices()">
+    </div>
+    <div class="fld" style="margin-bottom:6px">
+      <label>CCT hodnoty <span style="font-weight:400;color:var(--muted)">(oddělené čárkou)</span></label>
+      <input id="set-cct" style="font-size:10.5px" onchange="saveParamChoices()">
+    </div>
+    <button class="btn sm" onclick="resetParamChoices()" style="margin-bottom:4px">↺ Obnovit výchozí</button>
   </div>
-  <div style="font-size:9px;color:var(--muted);line-height:1.4;margin-bottom:16px">Klíč se ukládá lokálně. <a href="https://console.anthropic.com/settings/keys" target="_blank">Získat klíč →</a><br>Pro sdílení s kolegy: vlož klíč → klikni „Zapéct" → pošli soubor.</div>
-  <button class="btn sm" onclick="bakeApiKey()" style="margin-bottom:16px">🔒 Zapéct klíč do souboru</button>
   <div class="sec-head" style="margin-bottom:8px">💾 Data</div>
   <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:18px">
     <button class="btn" onclick="exportJSON()" style="justify-content:center">📥 Export databáze (JSON)</button>
@@ -629,7 +638,6 @@ a{color:var(--accent);text-decoration:none}
 // ══════════════════════════════════════
 // STATE
 // ══════════════════════════════════════
-const BAKED_API_KEY = '';
 let fixtures = [];        // Current project fixtures
 
 const LB_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzDy6sULzCqDsxZ76fNxn7vNdpT2OoU4XdpbZPWAXBeABaxz1lKk4HK3YKVT5T-RcOmkA/exec';
@@ -695,8 +703,8 @@ function load() {
     if (d) database = JSON.parse(d);
     const cr = localStorage.getItem('lb-rooms');
     if (cr) customRooms = JSON.parse(cr);
-    const k = BAKED_API_KEY || localStorage.getItem('lb-apikey');
-    if (k) document.getElementById('api-key').value = k;
+    // Load custom param choices
+    loadParamChoices();
     const p = localStorage.getItem('lb-project');
     if (p) {
       const pi = JSON.parse(p);
@@ -723,10 +731,6 @@ function getProjectInfo() {
 ['p-name','p-client','p-date','p-num','p-author','p-note'].forEach(id =>
   document.getElementById(id).addEventListener('input', () => { save(); updateStats(); })
 );
-// Save API key
-document.getElementById('api-key').addEventListener('change', e => {
-  try { localStorage.setItem('lb-apikey', e.target.value); } catch(e2){}
-});
 // Save authors for autocomplete
 function saveAuthor() {
   const v = document.getElementById('p-author').value.trim();
@@ -934,12 +938,21 @@ async function importFromEshop() {
     const ipMatch = bodyText.match(/IP\s*(\d{2})/i);
     if (ipMatch) p.ip = 'IP' + ipMatch[1];
 
-    // Dimensions from name or body — try "NxN mm" or "Rozměry: NxN" first
+    // Dimensions from name or body
+    // 1) "Rozměr: NxN mm" pattern
     const dimMatch = bodyText.match(/[Rr]ozměr[^:]*?:\s*(\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?)\s*(?:\(?\s*mm)?/i)
                   || bodyText.match(/(\d+(?:[.,]\d+)?)\s*(?:x|×)\s*(\d+(?:[.,]\d+)?)\s*(?:(?:x|×)\s*(\d+(?:[.,]\d+)?)\s*)?(?:\(?\s*mm)/i);
     if (dimMatch) { p.dim = (dimMatch[1] || dimMatch[0]).replace(/[()]/g,'').trim(); if (!/mm/i.test(p.dim)) p.dim += ' mm'; }
+    // 2) "šířka: N mm" pattern
     if (!p.dim) { const widthMatch = bodyText.match(/šíř\w*[:\s]*(\d+(?:[.,]\d+)?)\s*mm/i); if (widthMatch) p.dim = widthMatch[1] + 'mm šířka'; }
-    if (!p.dim) { const widthMatch2 = (p.name + ' ' + bodyText).match(/(\d{2,})\s*mm/i); if (widthMatch2) p.dim = widthMatch2[1] + 'mm'; }
+    // 3) "Ø N mm" pattern
+    if (!p.dim) { const diaMatch = bodyText.match(/Ø\s*(\d+(?:[.,]\d+)?)\s*mm/i); if (diaMatch) p.dim = 'Ø' + diaMatch[1] + ' mm'; }
+    // 4) Pipe-separated product names: "| 10MM |" pattern
+    if (!p.dim) { const pipeMatch = (p.name || '').match(/\|\s*(\d+)\s*MM\s*\|?/i); if (pipeMatch) p.dim = pipeMatch[1] + 'mm'; }
+    // 5) Generic "Nmm" fallback — but NOT if N is followed by W, V, LED, K, A, lm (units)
+    if (!p.dim) { const widthMatch2 = (p.name + ' ' + bodyText).match(/(\d{2,})\s*mm(?!\s*[²³])\b/i); if (widthMatch2) { const pre = (p.name + ' ' + bodyText).substring(0, widthMatch2.index + widthMatch2[0].length); const numStr = widthMatch2[1]; const beforeNum = (p.name + ' ' + bodyText).substring(Math.max(0, widthMatch2.index - 1), widthMatch2.index); if (!/\d/.test(beforeNum)) p.dim = numStr + 'mm'; else p.dim = numStr + 'mm'; } }
+    // 6) Validate: reject false positives where a number+unit was misread as mm
+    if (p.dim) { const dimNum = p.dim.match(/^(\d+)/); if (dimNum) { const n = dimNum[1]; const nameUpper = (p.name || '').toUpperCase(); const checkPat = new RegExp(n + '\\s*(?:W|V|LED|K|A|lm)\\b', 'i'); const mmPat = new RegExp(n + '\\s*MM\\b', 'i'); if (checkPat.test(p.name) && !mmPat.test(p.name)) p.dim = ''; } }
 
     // Price fallback from body text
     if (!p.price) { const priceMatch = bodyText.match(/(\d[\d\s]*(?:[.,]\d+)?)\s*Kč\s*(?:s\s*DPH)?/i); if (priceMatch) p.price = parseFloat(priceMatch[1].replace(/\s/g,'').replace(',','.')); }
@@ -1072,11 +1085,6 @@ function setSelectVal(id, val) {
   for (let o of sel.options) {
     if (o.value === val || o.textContent.startsWith(val)) { sel.value = o.value; return; }
   }
-}
-
-function toggleApiKey() {
-  const inp = document.getElementById('api-key');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
 // ══════════════════════════════════════
@@ -1417,7 +1425,6 @@ function updateStats() {
   const t = fixtures.reduce((a,f)=>({c:a.c+1,q:a.q+f.qty,w:a.w+f.watt*f.qty,p:a.p+f.price*f.qty}),{c:0,q:0,w:0,p:0});
   document.getElementById('s-types').textContent = t.c;
   document.getElementById('s-qty').textContent = t.q;
-  document.getElementById('s-watt').textContent = t.w+'W';
   document.getElementById('s-price').textContent = t.p.toLocaleString('cs')+' Kč';
   document.getElementById('tb-title').textContent = document.getElementById('p-name').value || 'Kniha svítidel';
 }
@@ -1612,18 +1619,64 @@ function closeSettings() {
   document.getElementById('set-overlay').classList.remove('open');
 }
 
-function bakeApiKey() {
-  const key = document.getElementById('api-key').value.trim();
-  if (!key) { toast('Zadej API klíč', true); return; }
-  let html = document.documentElement.outerHTML;
-  html = html.replace(/const BAKED_API_KEY = '[^']*'/, "const BAKED_API_KEY = '" + key + "'");
-  html = '<!DOCTYPE html>\n<html lang="cs">' + html.slice(html.indexOf('<head'));
-  const blob = new Blob([html], {type:'text/html'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'lumibook-pro-team.html';
-  a.click();
-  toast('✓ Soubor s klíčem stažen — pošli kolegům');
+// ══════════════════════════════════════
+// CUSTOM PARAMETER CHOICES
+// ══════════════════════════════════════
+const DEFAULT_TYPES = ['LED pásek','Alu profil + pásek','Alu profil','Závěsné svítidlo','Stropní svítidlo','Nástěnné svítidlo','Downlight','Spot / Track','Venkovní svítidlo','Zemní svítidlo','Napájecí zdroj','Ovladač / Dimmer','Příslušenství','Jiné'];
+const DEFAULT_CRI = ['80','90','95','97'];
+const DEFAULT_IP = ['IP20','IP44','IP54','IP65','IP67','IP68'];
+const DEFAULT_CCT = ['2700K','3000K','3500K','4000K','5000K','6500K','TW','RGB','RGBW'];
+
+function loadParamChoices() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('lb-param-choices') || 'null');
+    const types = saved?.types || DEFAULT_TYPES;
+    const cri = saved?.cri || DEFAULT_CRI;
+    const ip = saved?.ip || DEFAULT_IP;
+    const cct = saved?.cct || DEFAULT_CCT;
+    document.getElementById('set-types').value = types.join('\n');
+    document.getElementById('set-cri').value = cri.join(', ');
+    document.getElementById('set-ip').value = ip.join(', ');
+    document.getElementById('set-cct').value = cct.join(', ');
+    applyParamChoices(types, cri, ip, cct);
+  } catch(e) {}
+}
+function saveParamChoices() {
+  const types = document.getElementById('set-types').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const cri = document.getElementById('set-cri').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const ip = document.getElementById('set-ip').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const cct = document.getElementById('set-cct').value.split(',').map(s=>s.trim()).filter(Boolean);
+  try { localStorage.setItem('lb-param-choices', JSON.stringify({types,cri,ip,cct})); } catch(e) {}
+  applyParamChoices(types, cri, ip, cct);
+}
+function resetParamChoices() {
+  document.getElementById('set-types').value = DEFAULT_TYPES.join('\n');
+  document.getElementById('set-cri').value = DEFAULT_CRI.join(', ');
+  document.getElementById('set-ip').value = DEFAULT_IP.join(', ');
+  document.getElementById('set-cct').value = DEFAULT_CCT.join(', ');
+  try { localStorage.removeItem('lb-param-choices'); } catch(e) {}
+  applyParamChoices(DEFAULT_TYPES, DEFAULT_CRI, DEFAULT_IP, DEFAULT_CCT);
+  toast('✓ Výchozí volby obnoveny');
+}
+function applyParamChoices(types, cri, ip, cct) {
+  // Update type select
+  const ts = document.getElementById('f-type');
+  const curType = ts.value;
+  ts.innerHTML = types.map(t => `<option>${t}</option>`).join('');
+  if (curType) ts.value = curType;
+  // Update CRI select
+  const cs = document.getElementById('f-cri');
+  const curCri = cs.value;
+  cs.innerHTML = '<option value="">—</option>' + cri.map(c => `<option>${c}</option>`).join('');
+  if (curCri) cs.value = curCri;
+  // Update IP select
+  const is2 = document.getElementById('f-ip');
+  const curIp = is2.value;
+  is2.innerHTML = '<option value="">—</option>' + ip.map(i => `<option>${i}</option>`).join('');
+  if (curIp) is2.value = curIp;
+  // Update CCT datalist
+  const dl = document.getElementById('cct-list');
+  dl.innerHTML = cct.map(c => `<option value="${c}">`).join('');
 }
 
 // ══════════════════════════════════════
