@@ -939,16 +939,16 @@ async function importFromEshop() {
     if (ipMatch) p.ip = 'IP' + ipMatch[1];
 
     // Dimensions from name or body
-    // 1) "Rozměr: NxN mm" pattern
-    const dimMatch = bodyText.match(/[Rr]ozměr[^:]*?:\s*(\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?)\s*(?:\(?\s*mm)?/i)
+    // 1) Pipe-separated product names: "| 10MM |" — most reliable
+    { const pipeMatch = (p.name || '').match(/\|\s*(\d+)\s*MM\s*\|/i); if (pipeMatch) p.dim = pipeMatch[1] + 'mm'; }
+    // 2) "Rozměr: NxN mm" pattern
+    if (!p.dim) { const dimMatch = bodyText.match(/[Rr]ozměr[^:]*?:\s*(\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?)\s*(?:\(?\s*mm)?/i)
                   || bodyText.match(/(\d+(?:[.,]\d+)?)\s*(?:x|×)\s*(\d+(?:[.,]\d+)?)\s*(?:(?:x|×)\s*(\d+(?:[.,]\d+)?)\s*)?(?:\(?\s*mm)/i);
-    if (dimMatch) { p.dim = (dimMatch[1] || dimMatch[0]).replace(/[()]/g,'').trim(); if (!/mm/i.test(p.dim)) p.dim += ' mm'; }
-    // 2) "šířka: N mm" pattern
+    if (dimMatch) { p.dim = (dimMatch[1] || dimMatch[0]).replace(/[()]/g,'').trim(); if (!/mm/i.test(p.dim)) p.dim += ' mm'; } }
+    // 3) "šířka: N mm" pattern
     if (!p.dim) { const widthMatch = bodyText.match(/šíř\w*[:\s]*(\d+(?:[.,]\d+)?)\s*mm/i); if (widthMatch) p.dim = widthMatch[1] + 'mm šířka'; }
-    // 3) "Ø N mm" pattern
+    // 4) "Ø N mm" pattern
     if (!p.dim) { const diaMatch = bodyText.match(/Ø\s*(\d+(?:[.,]\d+)?)\s*mm/i); if (diaMatch) p.dim = 'Ø' + diaMatch[1] + ' mm'; }
-    // 4) Pipe-separated product names: "| 10MM |" pattern
-    if (!p.dim) { const pipeMatch = (p.name || '').match(/\|\s*(\d+)\s*MM\s*\|?/i); if (pipeMatch) p.dim = pipeMatch[1] + 'mm'; }
     // 5) Generic "Nmm" fallback — but NOT if N is followed by W, V, LED, K, A, lm (units)
     if (!p.dim) { const widthMatch2 = (p.name + ' ' + bodyText).match(/(\d{2,})\s*mm(?!\s*[²³])\b/i); if (widthMatch2) { const pre = (p.name + ' ' + bodyText).substring(0, widthMatch2.index + widthMatch2[0].length); const numStr = widthMatch2[1]; const beforeNum = (p.name + ' ' + bodyText).substring(Math.max(0, widthMatch2.index - 1), widthMatch2.index); if (!/\d/.test(beforeNum)) p.dim = numStr + 'mm'; else p.dim = numStr + 'mm'; } }
     // 6) Validate: reject false positives where a number+unit was misread as mm
