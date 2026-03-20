@@ -1039,16 +1039,25 @@ function handleFileUpload(file, filenameId, warningId, onLoaded) {
   warningEl.style.display = 'none';
   filenameEl.textContent = '⏳ Nahrávám na Drive...';
 
+  // Check file size (Google Apps Script has ~50MB limit, but practical limit ~10MB)
+  if (file.size > 10 * 1024 * 1024) {
+    warningEl.textContent = 'Soubor je příliš velký (max 10 MB)';
+    warningEl.style.display = 'block';
+    filenameEl.textContent = '';
+    return;
+  }
+
   const reader = new FileReader();
   reader.onload = async function(e) {
     const base64 = e.target.result.split(',')[1];
     try {
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'uploadFile', filename: file.name, mimeType: file.type, data: base64 })
-      });
-      const json = await res.json();
+      const payload = JSON.stringify({ action: 'uploadFile', filename: file.name, mimeType: file.type, data: base64 });
+      const res = await fetch(SCRIPT_URL, { method: 'POST', body: payload, redirect: 'follow' });
+      const text = await res.text();
+      let json;
+      try { json = JSON.parse(text); } catch(pe) { throw new Error('Neplatná odpověď serveru'); }
       if (!json.ok) throw new Error(json.error || 'Chyba uploadu');
+      if (!json.url) throw new Error('Server nevrátil URL souboru');
       filenameEl.textContent = '✓ ' + file.name;
       warningEl.style.display = 'none';
       onLoaded(json.url);
@@ -1058,6 +1067,11 @@ function handleFileUpload(file, filenameId, warningId, onLoaded) {
       filenameEl.textContent = '';
       onLoaded('');
     }
+  };
+  reader.onerror = function() {
+    warningEl.textContent = 'Chyba čtení souboru';
+    warningEl.style.display = 'block';
+    filenameEl.textContent = '';
   };
   reader.readAsDataURL(file);
 }
