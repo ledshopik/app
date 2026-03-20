@@ -1312,8 +1312,8 @@ function renderEvidence() {
   tbody.innerHTML = rows.map(r => {
     const hodnota = r.hodnota ? parseFloat(r.hodnota).toLocaleString('cs-CZ') + ' ' + (r.mena || '') : '—';
     const celni = r.celni_poplatky ? ' <span style="font-size:10px;color:#c05050;">(+' + parseFloat(r.celni_poplatky).toLocaleString('cs-CZ') + ' clo)</span>' : '';
-    const faktura = r.faktura ? '<a href="' + r.faktura + '" target="_blank" class="faktura-link" onclick="event.stopPropagation()">📄</a>' : '<span style="color:#ccc;font-size:10px;">—</span>';
-    const tracking = makeTrackingLink(r.tracking, r.zpusob_dopravy);
+    const faktura = r.faktura ? '<a href="' + r.faktura + '" target="_blank" onclick="event.stopPropagation()" style="color:#c8a830;text-decoration:none;font-size:12px;">📄 Faktura</a>' : '<span style="color:#ccc;font-size:10px;">—</span>';
+    const tracking = makeTrackingLink(String(r.tracking||''), String(r.zpusob_dopravy||''));
     const linked = getLinkedOrders(r);
     const linkedHtml = linked.length
       ? linked.map(z => '<span style="font-size:10px;color:#c8a830;cursor:pointer;" onclick="event.stopPropagation();switchTab(\'zasilky\');openModal(\'' + z.id + '\')" title="' + (z.obsah||'') + '">🔗 ' + (z.cislo_obj || z.dodavatel || '?') + '</span>').join('<br>')
@@ -1350,8 +1350,8 @@ function openModalEvi(id) {
     document.getElementById('fe-celni').value = r.celni_poplatky || '';
     document.getElementById('fe-vazby').value = r.vazby || '';
     document.getElementById('fe-poznamka').value = r.poznamka || '';
-    if (r.faktura && r.faktura.startsWith('http')) {
-      document.getElementById('evi-upload-filename').textContent = '✓ Faktura nahrána';
+    if (r.faktura && String(r.faktura).startsWith('http')) {
+      document.getElementById('evi-upload-filename').innerHTML = '<a href="' + r.faktura + '" target="_blank" style="color:#c8a830;text-decoration:none;">📄 Otevřít fakturu</a>';
     }
     // Zobraz propojené objednávky
     const linked = getLinkedOrders(r);
