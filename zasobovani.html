@@ -440,7 +440,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyWUGHk1qiq2-X93hIpygXEfFbijdm85gz6-uW86B6IudjfKIy6svpSqJM0hCenEYcjsg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLv_A2ztatFndTjLL4q-ziJP_l6ktvYi7E-pKqHOmlkMW66CgwIsqnU1ICZ89cV6aO1w/exec';
 const COLS_ZAS = ['id','cislo_obj','dodavatel','zeme','zpusob_dopravy','obsah','pocet_ks','hodnota','mena','datum_objednani','termin_zakaznik','termin_dodavatel','ocekavane_doruceni','tracking','vazba_zakazka','stav','faktura','poznamka'];
 const COLS_DOD = ['id','nazev','zeme','kontakt','email','web','doprava_vychozi','poznamka'];
 
@@ -1052,10 +1052,10 @@ function handleFileUpload(file, filenameId, warningId, onLoaded) {
     const base64 = e.target.result.split(',')[1];
     try {
       const payload = JSON.stringify({ action: 'uploadFile', filename: file.name, mimeType: file.type, data: base64 });
-      const res = await fetch(SCRIPT_URL, { method: 'POST', body: payload, redirect: 'follow' });
+      const res = await fetch(SCRIPT_URL, { method: 'POST', body: payload });
       const text = await res.text();
       let json;
-      try { json = JSON.parse(text); } catch(pe) { throw new Error('Neplatná odpověď serveru'); }
+      try { json = JSON.parse(text); } catch(pe) { throw new Error('Neplatná odpověď — zkuste obnovit stránku (Ctrl+Shift+R)'); }
       if (!json.ok) throw new Error(json.error || 'Chyba uploadu');
       if (!json.url) throw new Error('Server nevrátil URL souboru');
       filenameEl.textContent = '✓ ' + file.name;
