@@ -1148,11 +1148,11 @@ async function applyBulkStav() {
     for(const id of selectedIds) {
       const rec = dataZas.find(r => String(r.id) === id);
       if(rec) {
-        const wasNotOdeslano = rec.stav !== 'Odesláno';
+        const wasNotDoruceno = rec.stav !== 'Doručeno';
         rec.stav = stav;
         await apiPost({action:'update', modul:'zasilky', record: rec});
-        // Auto-evidence při přechodu na "Odesláno"
-        if (stav === 'Odesláno' && wasNotOdeslano) {
+        // Auto-evidence při přechodu na "Doručeno"
+        if (stav === 'Doručeno' && wasNotDoruceno) {
           await autoCreateEvidence(rec);
         }
       }
