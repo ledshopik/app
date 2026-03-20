@@ -521,12 +521,14 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
 </div>
 
 <script>
-// Odregistrovat starý Service Worker, který blokoval POST požadavky
+// Odregistrovat starý Service Worker a vyčistit cache
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(regs => {
     regs.forEach(r => r.unregister());
-    console.log('Service Workers odregistrovány');
   });
+}
+if ('caches' in window) {
+  caches.keys().then(names => names.forEach(n => caches.delete(n)));
 }
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLv_A2ztatFndTjLL4q-ziJP_l6ktvYi7E-pKqHOmlkMW66CgwIsqnU1ICZ89cV6aO1w/exec';
