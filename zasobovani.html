@@ -200,10 +200,11 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
   </div>
 </div>
 
-<div id="tabs">
+<div id="tabs" style="display:flex;align-items:center;">
   <button class="tab-btn active" onclick="switchTab('zasilky')">📦 Zásilky</button>
-  <button class="tab-btn" onclick="switchTab('dodavatele')">🏭 Dodavatelé</button>
   <button class="tab-btn" onclick="switchTab('evidence')">📋 Evidence</button>
+  <div style="flex:1;"></div>
+  <button class="tab-btn" onclick="switchTab('dodavatele')">🏭 Dodavatelé</button>
 </div>
 
 <!-- Upozornění na zpoždění -->
