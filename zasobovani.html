@@ -734,9 +734,9 @@ function openModal(id){
   document.getElementById('modal-title').textContent=r?'Upravit zásilku':'Nová zásilka';
   document.getElementById('btn-delete').style.display=r?'inline-flex':'none';
   document.getElementById('btn-duplicate').style.display=r?'inline-flex':'none';
-  // Zobraz tlačítko "→ Evidence" jen pro Doručeno zásilky, které ještě nejsou v evidenci
-  const alreadyInEvi = r && dataEvi.find(e => (e.vazby||'').split('|').includes(String(r.id)));
-  document.getElementById('btn-to-evidence').style.display = (r && r.stav === 'Doručeno' && !alreadyInEvi) ? 'inline-flex' : 'none';
+  // Zobraz tlačítko "→ Evidence" pro existující zásilky, které ještě nejsou v evidenci
+  const alreadyInEvi = r && dataEvi.find(e => String(e.vazby||'').split('|').includes(String(r.id)));
+  document.getElementById('btn-to-evidence').style.display = (r && !alreadyInEvi) ? 'inline-flex' : 'none';
   updateDodavatelSelect();
   if(r){
     document.getElementById('f-cislo').value=r.cislo_obj||'';
@@ -1427,45 +1427,42 @@ async function deleteEvidence() {
 // AUTO-VYTVOŘENÍ EVIDENCE: když zásilka přejde na "Doručeno"
 // Sloučí podle tracking čísla — více objednávek se stejným trackingem = jedna zásilka
 async function autoCreateEvidence(zasilkaRec) {
-  const tracking = (zasilkaRec.tracking || '').trim();
+  const tracking = String(zasilkaRec.tracking || '').trim();
+  const zasId = String(zasilkaRec.id);
 
   // Najdi existující evidenci se stejným trackingem → sloučit
   if (tracking) {
-    const existing = dataEvi.find(e => (e.tracking||'').trim() === tracking);
+    const existing = dataEvi.find(e => String(e.tracking||'').trim() === tracking);
     if (existing) {
       const vazby = String(existing.vazby || '').split('|').filter(Boolean);
-      if (!vazby.includes(String(zasilkaRec.id))) {
-        vazby.push(String(zasilkaRec.id));
+      if (!vazby.includes(zasId)) {
+        vazby.push(zasId);
         existing.vazby = vazby.join('|');
         existing.hodnota = String((parseFloat(existing.hodnota)||0) + (parseFloat(zasilkaRec.hodnota)||0));
-        try {
-          await apiPost({ action: 'update', modul: 'evidence', record: existing });
-        } catch(e) { console.warn('Auto-evidence merge error:', e); }
+        await apiPost({ action: 'update', modul: 'evidence', record: existing });
       }
       return;
     }
   }
 
   // Zkontroluj jestli už evidence pro tuto zásilku neexistuje (podle vazby)
-  const existsByVazba = dataEvi.find(e => String(e.vazby||'').split('|').includes(String(zasilkaRec.id)));
+  const existsByVazba = dataEvi.find(e => String(e.vazby||'').split('|').includes(zasId));
   if (existsByVazba) return;
 
   const eviRec = {
     id: String(Date.now()),
-    dodavatel: zasilkaRec.dodavatel || '',
+    dodavatel: String(zasilkaRec.dodavatel || ''),
     datum_doruceni: toInputDate(today),
     tracking: tracking,
-    zpusob_dopravy: zasilkaRec.zpusob_dopravy || '',
-    faktura: zasilkaRec.faktura || '',
-    hodnota: zasilkaRec.hodnota || '',
-    mena: zasilkaRec.mena || 'USD',
+    zpusob_dopravy: String(zasilkaRec.zpusob_dopravy || ''),
+    faktura: String(zasilkaRec.faktura || ''),
+    hodnota: String(zasilkaRec.hodnota || ''),
+    mena: String(zasilkaRec.mena || 'USD'),
     celni_poplatky: '',
-    vazby: String(zasilkaRec.id),
-    poznamka: 'Auto z objednávky ' + (zasilkaRec.cislo_obj || ''),
+    vazby: zasId,
+    poznamka: 'Auto z obj. ' + String(zasilkaRec.cislo_obj || ''),
   };
-  try {
-    await apiPost({ action: 'append', modul: 'evidence', record: eviRec });
-  } catch(e) { console.warn('Auto-evidence error:', e); }
+  await apiPost({ action: 'append', modul: 'evidence', record: eviRec });
 }
 
 loadData();
