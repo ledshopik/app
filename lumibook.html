@@ -896,8 +896,11 @@ async function importFromEshop() {
       const metaDesc = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
       if (metaDesc) p.note = metaDesc[1];
     }
-    // Fallback image: eshop-specific patterns
-    if (!p.image) {
+    // Try to find full-size (maxi) image first, then fallback
+    const maxiMatch = html.match(/["']([^"']*\/fotky\/maxi\/[^"']*\.(?:jpg|png|webp))[^"']*["']/i);
+    if (maxiMatch) {
+      p.image = maxiMatch[1];
+    } else if (!p.image) {
       const imgPat = html.match(/["'](https?:\/\/[^"']*\/fotky\/[^"']*\.(?:jpg|png|webp)[^"']*)["']/i);
       if (imgPat) p.image = imgPat[1];
     }
