@@ -10,8 +10,8 @@ body { font-family: 'Arial Narrow', Arial, sans-serif; background: #f4f2ed; colo
 button, input, select { font-family: inherit; }
 
 #header {
-  background: #1a1a1a;
-  border-bottom: 1px solid #e8e4dc;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
   padding: 20px 32px;
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 100;
@@ -19,22 +19,22 @@ button, input, select { font-family: inherit; }
 .header-accent { width: 4px; height: 48px; background: #e2b830; border-radius: 2px; flex-shrink: 0; }
 .header-title-wrap { margin-left: 14px; }
 .header-eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
-.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; color: #fff; }
+.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; color: #1a1a1a; }
 .header-date { text-align: right; }
 .header-date .day { font-size: 24px; font-weight: 900; color: #e2b830; letter-spacing: .02em; line-height: 1; }
 .header-date .month { font-size: 10px; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
 
 #user-bar {
-  background: #1a1a1a;
-  border-bottom: 3px solid #e2b830;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
   padding: 0 32px;
   display: flex; align-items: stretch; gap: 0;
   flex-wrap: wrap;
 }
 #user-bar .user-label { font-size: 10px; color: #888; letter-spacing: .1em; text-transform: uppercase; }
 #user-select {
-  background: #333; border: 1px solid #555; border-radius: 4px;
-  color: #fff; padding: 4px 10px; font-size: 12px; outline: none; cursor: pointer;
+  background: #f4f2ed; border: 1px solid #ddd; border-radius: 4px;
+  color: #1a1a1a; padding: 4px 10px; font-size: 12px; outline: none; cursor: pointer;
 }
 #sync-status { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; }
 #sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #888; }
@@ -42,8 +42,8 @@ button, input, select { font-family: inherit; }
 #sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
 #sync-dot.error { background: #c05050; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-#btn-refresh-all { background: #333; color: #999; border: 1px solid #555; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
-#btn-refresh-all:hover { color: #fff; }
+#btn-refresh-all { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
+#btn-refresh-all:hover { color: #1a1a1a; }
 
 #main { max-width: 1100px; margin: 0 auto; padding: 24px 32px; }
 
@@ -147,15 +147,15 @@ button, input, select { font-family: inherit; }
 </div>
 
 <div id="user-bar">
-  <a href="index.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#e2b830;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:6px;border-bottom:2px solid #e2b830;">⌂ Dashboard</a>
-  <a href="instalace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e2b830'" onmouseout="this.style.color='#888'">Instalace</a>
-  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#f07030'" onmouseout="this.style.color='#888'">Výroba</a>
-  <a href="obhlidky.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#3ab0a0'" onmouseout="this.style.color='#888'">Obhlídky</a>
-  <a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e05050'" onmouseout="this.style.color='#888'">Reklamace</a>
-  <a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#a070e0'" onmouseout="this.style.color='#888'">Konfigurátor</a>
-  <a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#888'">Docházka</a>
-  <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#c8a830'" onmouseout="this.style.color='#888'">Zásobování</a>
-  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#888;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#888'">Lumibook</a>
+  <a href="index.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#60a0e0;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:6px;border-bottom:2px solid #60a0e0;">⌂ Dashboard</a>
+  <a href="instalace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Instalace</a>
+  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Výroba</a>
+  <a href="obhlidky.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Obhlídky</a>
+  <a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Reklamace</a>
+  <a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Konfigurátor</a>
+  <a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Docházka</a>
+  <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Zásobování</a>
+  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Lumibook</a>
   <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
     <div class="user-label">Zobrazit jako:</div>
     <select id="user-select" onchange="setUser(this.value)">
