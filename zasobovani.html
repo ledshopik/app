@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LEDshopik – Zásobování</title>
+<script>
+// Odregistruj starý Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(regs) {
+    regs.forEach(function(r) { r.unregister(); });
+  });
+  caches.keys().then(function(keys) {
+    keys.forEach(function(k) { caches.delete(k); });
+  });
+}
+</script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Arial Narrow', Arial, sans-serif; background: #f4f2ed; color: #1a1a1a; min-height: 100vh; }
