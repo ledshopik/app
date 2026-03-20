@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ledshopik-v1';
+const CACHE_NAME = 'ledshopik-v2';
 const ASSETS = [
   '/app/index.html',
   '/app/instalace.html',
@@ -26,11 +26,10 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Google Scripts vždy ze sítě — nikdy z cache
-  if (e.request.url.includes('script.google.com')) {
-    e.respondWith(fetch(e.request));
-    return;
-  }
+  // POST požadavky a Google Scripts — nechat projít bez SW
+  if (e.request.method !== 'GET') return;
+  if (e.request.url.includes('script.google.com')) return;
+  if (e.request.url.includes('script.googleusercontent.com')) return;
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );
