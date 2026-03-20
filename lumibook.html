@@ -931,10 +931,12 @@ async function importFromEshop() {
     const ipMatch = bodyText.match(/IP\s*(\d{2})/i);
     if (ipMatch) p.ip = 'IP' + ipMatch[1];
 
-    // Dimensions from name or body
-    const dimMatch = bodyText.match(/(\d+(?:[.,]\d+)?)\s*(?:x|×)\s*(\d+(?:[.,]\d+)?)\s*(?:x|×)?\s*(\d+(?:[.,]\d+)?)?\s*mm/i);
-    if (dimMatch) p.dim = dimMatch[0].trim();
-    if (!p.dim) { const widthMatch = (p.name + ' ' + bodyText).match(/(\d+)\s*mm/i); if (widthMatch) p.dim = widthMatch[1] + 'mm'; }
+    // Dimensions from name or body — try "NxN mm" or "Rozměry: NxN" first
+    const dimMatch = bodyText.match(/[Rr]ozměr[^:]*?:\s*(\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?)\s*(?:\(?\s*mm)?/i)
+                  || bodyText.match(/(\d+(?:[.,]\d+)?)\s*(?:x|×)\s*(\d+(?:[.,]\d+)?)\s*(?:(?:x|×)\s*(\d+(?:[.,]\d+)?)\s*)?(?:\(?\s*mm)/i);
+    if (dimMatch) { p.dim = (dimMatch[1] || dimMatch[0]).replace(/[()]/g,'').trim(); if (!/mm/i.test(p.dim)) p.dim += ' mm'; }
+    if (!p.dim) { const widthMatch = bodyText.match(/šíř\w*[:\s]*(\d+(?:[.,]\d+)?)\s*mm/i); if (widthMatch) p.dim = widthMatch[1] + 'mm šířka'; }
+    if (!p.dim) { const widthMatch2 = (p.name + ' ' + bodyText).match(/(\d{2,})\s*mm/i); if (widthMatch2) p.dim = widthMatch2[1] + 'mm'; }
 
     // Price fallback from body text
     if (!p.price) { const priceMatch = bodyText.match(/(\d[\d\s]*(?:[.,]\d+)?)\s*Kč\s*(?:s\s*DPH)?/i); if (priceMatch) p.price = parseFloat(priceMatch[1].replace(/\s/g,'').replace(',','.')); }
