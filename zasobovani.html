@@ -602,9 +602,16 @@ async function loadData(){
 }
 
 async function apiPost(payload){
-  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});
-  const json=await res.json();
+  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload),redirect:'follow',headers:{'Content-Type':'text/plain'}});
+  const text=await res.text();
+  let json;
+  try { json=JSON.parse(text); } catch(e) {
+    const m=text.match(/\{[\s\S]*\}/);
+    if(m) try { json=JSON.parse(m[0]); } catch(e2){}
+    if(!json) throw new Error('Neplatná odpověď serveru');
+  }
   if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+  return json;
 }
 
 function switchTab(tab){
