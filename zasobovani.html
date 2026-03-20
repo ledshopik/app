@@ -125,6 +125,37 @@ td.dodavatel-name { font-weight: 600; color: #1a1a1a; }
 #saving-box { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 24px 36px; text-align: center; }
 #saving-box .saving-title { font-size: 14px; font-weight: 700; color: #c8a830; margin-bottom: 6px; }
 #saving-box .saving-sub { font-size: 12px; color: #888; }
+
+/* Checkbox column */
+.row-checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: #c8a830; }
+thead th.th-check, tbody td.td-check { width: 36px; text-align: center; padding: 10px 6px; }
+tbody tr.row-selected { background: #fdf8e0 !important; }
+
+/* Bulk action bar */
+#bulk-bar { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #fff; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,.15); padding: 10px 20px; z-index: 150; align-items: center; gap: 12px; }
+#bulk-bar.open { display: flex; }
+#bulk-bar .bulk-count { font-size: 13px; font-weight: 700; color: #c8a830; white-space: nowrap; }
+#bulk-bar button { background: #f4f2ed; border: 1px solid #ddd; border-radius: 6px; padding: 6px 14px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+#bulk-bar button:hover { border-color: #c8a830; color: #c8a830; }
+#bulk-bar .bulk-close { background: none; border: none; color: #888; font-size: 16px; padding: 4px 8px; }
+
+/* Bulk popups */
+.bulk-popup { display: none; position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #fff; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,.15); padding: 16px 20px; z-index: 160; min-width: 300px; }
+.bulk-popup.open { display: block; }
+.bulk-popup label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; display: block; margin-bottom: 6px; }
+.bulk-popup input, .bulk-popup select { width: 100%; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 8px 12px; font-size: 13px; outline: none; margin-bottom: 10px; }
+.bulk-popup input:focus, .bulk-popup select:focus { border-color: #c8a830; }
+.bulk-popup .bulk-popup-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* File upload zone */
+.file-upload-zone { border: 2px dashed #ddd; border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; margin-bottom: 8px; }
+.file-upload-zone:hover, .file-upload-zone.dragover { border-color: #c8a830; background: #fdf8e0; }
+.file-upload-zone .upload-icon { font-size: 24px; margin-bottom: 4px; }
+.file-upload-zone .upload-text { font-size: 11px; color: #888; }
+.file-upload-zone .upload-file-name { font-size: 12px; font-weight: 700; color: #40a050; margin-top: 4px; }
+.file-upload-zone input[type="file"] { display: none; }
+.file-upload-or { text-align: center; font-size: 10px; color: #aaa; margin: 6px 0; text-transform: uppercase; letter-spacing: .1em; }
+.file-upload-warning { color: #e05050; font-size: 11px; font-weight: 700; margin-top: 4px; display: none; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -195,6 +226,7 @@ td.dodavatel-name { font-weight: 600; color: #1a1a1a; }
   <div id="table-wrap">
     <table>
       <thead><tr>
+        <th class="th-check"><input type="checkbox" class="row-checkbox" id="check-all" onclick="toggleSelectAll(this)"></th>
         <th onclick="sortBy('cislo_obj')" data-col="cislo_obj">OBJ. Č. <span class="sort-arrow"></span></th>
         <th onclick="sortBy('dodavatel')" data-col="dodavatel">Dodavatel <span class="sort-arrow"></span></th>
         <th onclick="sortBy('zeme')" data-col="zeme">Země <span class="sort-arrow"></span></th>
@@ -291,7 +323,17 @@ td.dodavatel-name { font-weight: 600; color: #1a1a1a; }
           <option>Doručeno</option><option>Zrušeno</option>
         </select>
       </div>
-      <div class="form-group"><label>Odkaz na fakturu</label><input type="url" id="f-faktura" placeholder="https://drive.google.com/..."></div>
+      <div class="form-group"><label>Faktura</label>
+        <div class="file-upload-zone" id="modal-upload-zone">
+          <div class="upload-icon">📄</div>
+          <div class="upload-text" id="modal-upload-text">Přetáhněte PDF nebo klikněte</div>
+          <div class="upload-file-name" id="modal-upload-filename"></div>
+          <div class="file-upload-warning" id="modal-upload-warning">Soubor je příliš velký (max ~40KB base64)</div>
+          <input type="file" id="modal-upload-file" accept=".pdf,application/pdf">
+        </div>
+        <div class="file-upload-or">nebo URL</div>
+        <input type="url" id="f-faktura" placeholder="https://drive.google.com/...">
+      </div>
       <div class="form-group full"><label>Poznámka</label><textarea id="f-poznamka" placeholder="Celní údaje, poznámky..."></textarea></div>
     </div>
     <div id="modal-footer">
@@ -339,6 +381,57 @@ td.dodavatel-name { font-weight: 600; color: #1a1a1a; }
   </div>
 </div>
 
+<!-- Bulk action bar -->
+<div id="bulk-bar">
+  <span class="bulk-count" id="bulk-count">0 vybráno</span>
+  <button onclick="openBulkTracking()">📦 Tracking</button>
+  <button onclick="openBulkFaktura()">📄 Faktura</button>
+  <button onclick="openBulkStav()">🔄 Stav</button>
+  <button class="bulk-close" onclick="deselectAll()">✕</button>
+</div>
+
+<!-- Bulk tracking popup -->
+<div class="bulk-popup" id="bulk-tracking-popup">
+  <label>Tracking číslo pro vybrané zásilky</label>
+  <input type="text" id="bulk-tracking-input" placeholder="např. 1Z999AA1...">
+  <div class="bulk-popup-actions">
+    <button class="btn-cancel" onclick="closeBulkPopups()">Zrušit</button>
+    <button class="btn-save" onclick="applyBulkTracking()">Uložit</button>
+  </div>
+</div>
+
+<!-- Bulk faktura popup -->
+<div class="bulk-popup" id="bulk-faktura-popup">
+  <label>Faktura pro vybrané zásilky</label>
+  <div class="file-upload-zone" id="bulk-upload-zone">
+    <div class="upload-icon">📄</div>
+    <div class="upload-text">Přetáhněte PDF nebo klikněte</div>
+    <div class="upload-file-name" id="bulk-upload-filename"></div>
+    <div class="file-upload-warning" id="bulk-upload-warning">Soubor je příliš velký (max ~40KB base64)</div>
+    <input type="file" id="bulk-upload-file" accept=".pdf,application/pdf">
+  </div>
+  <div class="file-upload-or">nebo zadejte URL</div>
+  <input type="url" id="bulk-faktura-url" placeholder="https://drive.google.com/...">
+  <div class="bulk-popup-actions">
+    <button class="btn-cancel" onclick="closeBulkPopups()">Zrušit</button>
+    <button class="btn-save" onclick="applyBulkFaktura()">Uložit</button>
+  </div>
+</div>
+
+<!-- Bulk stav popup -->
+<div class="bulk-popup" id="bulk-stav-popup">
+  <label>Nový stav pro vybrané zásilky</label>
+  <select id="bulk-stav-select">
+    <option>Objednáno</option><option>Potvrzeno dodavatelem</option>
+    <option>Odesláno</option><option>Na celnici</option>
+    <option>Doručeno</option><option>Zrušeno</option>
+  </select>
+  <div class="bulk-popup-actions">
+    <button class="btn-cancel" onclick="closeBulkPopups()">Zrušit</button>
+    <button class="btn-save" onclick="applyBulkStav()">Uložit</button>
+  </div>
+</div>
+
 <div id="saving-overlay">
   <div id="saving-box">
     <div class="saving-title" id="saving-title">Ukládám...</div>
@@ -361,6 +454,9 @@ const STATUS_CLASS = {
 };
 
 let dataZas=[], dataDod=[], filterVal='aktivni', sortCol='ocekavane_doruceni', sortDir=1, editId=null, editDodId=null;
+const selectedIds = new Set();
+let modalUploadData = ''; // stores base64 data URL from modal file upload
+let bulkUploadData = ''; // stores base64 data URL from bulk file upload
 const today=new Date();
 
 function toInputDate(d){
@@ -448,8 +544,16 @@ function renderTable(){
   tbody.innerHTML=rows.map(r=>{
     const cd=calcCountdown(r.ocekavane_doruceni, r.stav);
     const isDelay = r.ocekavane_doruceni && toInputDate(r.ocekavane_doruceni)<=toInputDate(today) && r.stav!=='Doručeno' && r.stav!=='Zrušeno';
+    const isSelected = selectedIds.has(String(r.id));
     const hodnota=r.hodnota?`${parseFloat(r.hodnota).toLocaleString('cs-CZ')} ${r.mena||''}`:' —';
-    const faktura=r.faktura?`<a href="${r.faktura}" target="_blank" class="faktura-link">📄 Faktura</a>`:'—';
+    let faktura='—';
+    if(r.faktura){
+      if(r.faktura.startsWith('data:')){
+        faktura=`<a href="#" onclick="event.preventDefault();event.stopPropagation();openDataPdf('${r.id}')" class="faktura-link">📄 Faktura</a>`;
+      } else {
+        faktura=`<a href="${r.faktura}" target="_blank" class="faktura-link" onclick="event.stopPropagation()">📄 Faktura</a>`;
+      }
+    }
     let trackingUrl='';
     if(r.tracking){
       const d=(r.zpusob_dopravy||'').toLowerCase();
@@ -459,7 +563,8 @@ function renderTable(){
       else trackingUrl=`https://www.google.com/search?q=${r.tracking}+tracking`;
     }
     const tracking=r.tracking?`<a href="${trackingUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;font-family:monospace;color:#c8a830;text-decoration:none;" title="Sledovat zásilku">🔍 ${r.tracking}</a>`:'—';
-    return `<tr data-id="${r.id}" style="${isDelay?'background:#fce8e8;':''}" onclick="openModal('${r.id}')">
+    return `<tr data-id="${r.id}" class="${isSelected?'row-selected':''}" style="${isDelay&&!isSelected?'background:#fce8e8;':''}" onclick="openModal('${r.id}')">
+      <td class="td-check" onclick="event.stopPropagation()"><input type="checkbox" class="row-checkbox" ${isSelected?'checked':''} onchange="toggleSelect('${r.id}',this)"></td>
       <td class="cislo">${r.cislo_obj||'—'}</td>
       <td class="dodavatel-name">${r.dodavatel||'—'}</td>
       <td style="font-size:11px;">${r.zeme||'—'}</td>
@@ -475,9 +580,11 @@ function renderTable(){
       <td>${tracking}</td>
       <td style="font-size:11px;color:#999;">${r.vazba_zakazka||'—'}</td>
       <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
-      <td onclick="event.stopPropagation()">${faktura}</td>
+      <td>${faktura}</td>
     </tr>`;
   }).join('');
+  syncHeaderCheckbox();
+  updateBulkBar();
 }
 
 function renderDodavatele(){
@@ -539,10 +646,21 @@ function openModal(id){
     document.getElementById('f-datum-obj').value=toInputDate(today);
     ['f-termin-zak','f-termin-dod','f-doruceni'].forEach(fid=>document.getElementById(fid).value='');
   }
+  // Reset file upload zone
+  modalUploadData = '';
+  document.getElementById('modal-upload-filename').textContent = '';
+  document.getElementById('modal-upload-warning').style.display = 'none';
+  if(document.getElementById('modal-upload-file')) document.getElementById('modal-upload-file').value = '';
+  // If existing record has a data URL faktura, show indicator
+  if(r && r.faktura && r.faktura.startsWith('data:')) {
+    document.getElementById('modal-upload-filename').textContent = '✓ PDF nahráno';
+    modalUploadData = r.faktura;
+    document.getElementById('f-faktura').value = '';
+  }
   document.getElementById('modal-overlay').classList.add('open');
 }
 
-function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); editId=null; }
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); editId=null; modalUploadData=''; }
 function overlayClick(e){ if(e.target===document.getElementById('modal-overlay')) closeModal(); }
 
 function openModalDod(id){
@@ -590,7 +708,7 @@ async function saveRecord(){
     tracking:         document.getElementById('f-tracking').value.trim(),
     vazba_zakazka:    document.getElementById('f-vazba').value.trim(),
     stav:             document.getElementById('f-stav').value,
-    faktura:          document.getElementById('f-faktura').value.trim(),
+    faktura:          modalUploadData || document.getElementById('f-faktura').value.trim(),
     poznamka:         document.getElementById('f-poznamka').value.trim(),
   };
   closeModal();
@@ -769,6 +887,207 @@ function duplicateRecord(){
     document.getElementById('modal-overlay').classList.add('open');
   },100);
 }
+
+// === SELECTION & BULK ACTIONS ===
+
+function toggleSelect(id, checkbox) {
+  if(checkbox.checked) selectedIds.add(String(id));
+  else selectedIds.delete(String(id));
+  updateBulkBar();
+  // Update row highlight without full re-render
+  const row = checkbox.closest('tr');
+  if(row) row.classList.toggle('row-selected', checkbox.checked);
+  // Sync header checkbox
+  syncHeaderCheckbox();
+}
+
+function toggleSelectAll(headerCb) {
+  const rows = getFiltered();
+  if(headerCb.checked) {
+    rows.forEach(r => selectedIds.add(String(r.id)));
+  } else {
+    rows.forEach(r => selectedIds.delete(String(r.id)));
+  }
+  renderTable();
+  updateBulkBar();
+}
+
+function syncHeaderCheckbox() {
+  const rows = getFiltered();
+  const cb = document.getElementById('check-all');
+  if(!rows.length) { cb.checked = false; return; }
+  cb.checked = rows.every(r => selectedIds.has(String(r.id)));
+}
+
+function deselectAll() {
+  selectedIds.clear();
+  closeBulkPopups();
+  renderTable();
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const bar = document.getElementById('bulk-bar');
+  if(selectedIds.size > 0) {
+    bar.classList.add('open');
+    document.getElementById('bulk-count').textContent = selectedIds.size + ' vybráno';
+  } else {
+    bar.classList.remove('open');
+  }
+}
+
+function closeBulkPopups() {
+  document.getElementById('bulk-tracking-popup').classList.remove('open');
+  document.getElementById('bulk-faktura-popup').classList.remove('open');
+  document.getElementById('bulk-stav-popup').classList.remove('open');
+}
+
+function openBulkTracking() {
+  closeBulkPopups();
+  document.getElementById('bulk-tracking-input').value = '';
+  document.getElementById('bulk-tracking-popup').classList.add('open');
+}
+
+function openBulkFaktura() {
+  closeBulkPopups();
+  bulkUploadData = '';
+  document.getElementById('bulk-upload-filename').textContent = '';
+  document.getElementById('bulk-upload-warning').style.display = 'none';
+  document.getElementById('bulk-faktura-url').value = '';
+  document.getElementById('bulk-upload-file').value = '';
+  document.getElementById('bulk-faktura-popup').classList.add('open');
+}
+
+function openBulkStav() {
+  closeBulkPopups();
+  document.getElementById('bulk-stav-select').value = 'Objednáno';
+  document.getElementById('bulk-stav-popup').classList.add('open');
+}
+
+async function applyBulkTracking() {
+  const tracking = document.getElementById('bulk-tracking-input').value.trim();
+  if(!tracking) return;
+  closeBulkPopups();
+  showSaving('Ukládám tracking...', `${selectedIds.size} zásilek`);
+  try {
+    for(const id of selectedIds) {
+      const rec = dataZas.find(r => String(r.id) === id);
+      if(rec) {
+        rec.tracking = tracking;
+        await apiPost({action:'update', modul:'zasilky', record: rec});
+      }
+    }
+    showSaving('Hotovo!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e) { hideSaving(); alert('Chyba: '+e.message); }
+}
+
+async function applyBulkFaktura() {
+  const fakturaValue = bulkUploadData || document.getElementById('bulk-faktura-url').value.trim();
+  if(!fakturaValue) return;
+  closeBulkPopups();
+  showSaving('Ukládám faktury...', `${selectedIds.size} zásilek`);
+  try {
+    for(const id of selectedIds) {
+      const rec = dataZas.find(r => String(r.id) === id);
+      if(rec) {
+        rec.faktura = fakturaValue;
+        await apiPost({action:'update', modul:'zasilky', record: rec});
+      }
+    }
+    showSaving('Hotovo!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e) { hideSaving(); alert('Chyba: '+e.message); }
+}
+
+async function applyBulkStav() {
+  const stav = document.getElementById('bulk-stav-select').value;
+  closeBulkPopups();
+  showSaving('Měním stav...', `${selectedIds.size} zásilek`);
+  try {
+    for(const id of selectedIds) {
+      const rec = dataZas.find(r => String(r.id) === id);
+      if(rec) {
+        rec.stav = stav;
+        await apiPost({action:'update', modul:'zasilky', record: rec});
+      }
+    }
+    showSaving('Hotovo!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e) { hideSaving(); alert('Chyba: '+e.message); }
+}
+
+// === FILE UPLOAD (PDF) ===
+
+function setupFileUploadZone(zoneId, fileInputId, filenameId, warningId, onLoaded) {
+  const zone = document.getElementById(zoneId);
+  const fileInput = document.getElementById(fileInputId);
+  if(!zone || !fileInput) return;
+
+  zone.addEventListener('click', () => fileInput.click());
+  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if(file) handleFileUpload(file, filenameId, warningId, onLoaded);
+  });
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if(file) handleFileUpload(file, filenameId, warningId, onLoaded);
+  });
+}
+
+function handleFileUpload(file, filenameId, warningId, onLoaded) {
+  const warningEl = document.getElementById(warningId);
+  const filenameEl = document.getElementById(filenameId);
+  warningEl.style.display = 'none';
+
+  if(!file.type.includes('pdf')) {
+    warningEl.textContent = 'Pouze PDF soubory';
+    warningEl.style.display = 'block';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    if(dataUrl.length > 40000) {
+      warningEl.textContent = 'Soubor je příliš velký (max ~40KB base64)';
+      warningEl.style.display = 'block';
+      onLoaded('');
+      return;
+    }
+    filenameEl.textContent = '✓ ' + file.name;
+    warningEl.style.display = 'none';
+    onLoaded(dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
+
+function openDataPdf(id) {
+  const rec = dataZas.find(r => String(r.id) === String(id));
+  if(!rec || !rec.faktura) return;
+  // Convert data URL to blob and open
+  try {
+    const parts = rec.faktura.split(',');
+    const mime = parts[0].match(/:(.*?);/)[1];
+    const b64 = atob(parts[1]);
+    const arr = new Uint8Array(b64.length);
+    for(let i=0;i<b64.length;i++) arr[i]=b64.charCodeAt(i);
+    const blob = new Blob([arr], {type: mime});
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  } catch(e) {
+    // Fallback: try opening data URL directly
+    window.open(rec.faktura, '_blank');
+  }
+}
+
+// Init file upload zones on DOM ready
+setupFileUploadZone('modal-upload-zone', 'modal-upload-file', 'modal-upload-filename', 'modal-upload-warning', (data) => { modalUploadData = data; });
+setupFileUploadZone('bulk-upload-zone', 'bulk-upload-file', 'bulk-upload-filename', 'bulk-upload-warning', (data) => { bulkUploadData = data; });
 
 loadData();
 setInterval(loadData, 60000);
