@@ -49,13 +49,13 @@ button, input, select { font-family: inherit; }
 
 /* Module cards */
 .modules-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-bottom: 2px; }
-.tools-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top:18px; margin-bottom: 18px; background:#e8e3d8; border-radius:12px; padding:3px; border:2px solid #d0c8b8; }
-.tool-card { display:flex; align-items:center; gap:14px; background:#fdfcf9; padding:16px 22px; text-decoration:none; border-left:3px solid transparent; transition:all .15s; border-radius:9px; }
-.tool-card:hover { background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.08); }
-.tool-card .tool-icon { font-size:24px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:8px; background:#f0ede4; }
+.tools-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top:14px; margin-bottom: 14px; }
+.tool-card { display:flex; align-items:center; gap:14px; padding:16px 22px; text-decoration:none; border-left:3px solid transparent; transition:all .15s; }
+.tool-card:hover { filter:brightness(.97); }
+.tool-card .tool-icon { font-size:22px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; border-radius:8px; }
 .tool-card .tool-info { flex:1; }
 .tool-card .tool-label { font-size:10px; letter-spacing:.2em; text-transform:uppercase; margin-bottom:4px; font-weight:800; }
-.tool-card .tool-desc { font-size:12px; color:#888; }
+.tool-card .tool-desc { font-size:12px; color:#777; }
 .tool-card .tool-arrow { font-size:11px; font-weight:700; letter-spacing:.05em; }
 .module-card {
   background: #fff; padding: 20px; cursor: pointer;
@@ -259,16 +259,16 @@ button, input, select { font-family: inherit; }
     </a>
   </div>
   <div class="tools-row">
-    <a href="konfigurator.html" class="tool-card" style="border-left-color:#a070e0;">
-      <div class="tool-icon">⚙</div>
+    <a href="konfigurator.html" class="tool-card" style="border-left-color:#a070e0;background:#f8f4ff;">
+      <div class="tool-icon" style="background:#efe8ff;color:#a070e0;">⚙</div>
       <div class="tool-info">
         <div class="tool-label" style="color:#a070e0;">Konfigurátor</div>
         <div class="tool-desc">Ceník výroby svítidel RING · 7 parametrů</div>
       </div>
       <div class="tool-arrow" style="color:#a070e0;">OTEVŘÍT →</div>
     </a>
-    <a href="kalkulator-instalaci.html" class="tool-card" style="border-left-color:#b08820;">
-      <div class="tool-icon">🧮</div>
+    <a href="kalkulator-instalaci.html" class="tool-card" style="border-left-color:#b08820;background:#fdf8ee;">
+      <div class="tool-icon" style="background:#f5edda;color:#b08820;">🧮</div>
       <div class="tool-info">
         <div class="tool-label" style="color:#b08820;">Kalkulátor instalací</div>
         <div class="tool-desc">Odhad ceny montáže · doprava + práce + doplňky · ±20%</div>
