@@ -244,7 +244,7 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9Jig_9A16cEdpuFJfVHvc34iXiBGq42FSBw2OuIoeRNiI5j0BfZQx2j-8549R1VTjQg/exec';
+const SCRIPT_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
 const MONTHS_CS  = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const STATUS_CLASS = {'Naplánováno':'s-planovano','Probíhá':'s-probiha','Hotovo':'s-hotovo','Zrušeno':'s-zruseno','Čeká na potvrzení':'s-ceka'};
 const EV_CLASS     = {'Naplánováno':'ev-planovano','Probíhá':'ev-probiha','Hotovo':'ev-hotovo','Zrušeno':'ev-zruseno','Čeká na potvrzení':'ev-ceka'};
@@ -258,7 +258,7 @@ function syncStatus(state,text){ document.getElementById('sync-dot').className=s
 async function loadData(){
   syncStatus('loading','Načítám data...');
   try {
-    const res=await fetch(SCRIPT_URL);
+    const res=await fetch(SCRIPT_URL+'?modul=instalace');
     const json=await res.json();
     data=json.data||[];
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));

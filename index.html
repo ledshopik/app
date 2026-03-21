@@ -352,10 +352,10 @@ button, input, select { font-family: inherit; }
 
 <script>
 // ── Konfigurace ────────────────────────────────────────────────────────────────
-const SCRIPT_INSTALACE = 'https://script.google.com/macros/s/AKfycbx9Jig_9A16cEdpuFJfVHvc34iXiBGq42FSBw2OuIoeRNiI5j0BfZQx2j-8549R1VTjQg/exec'; // URL scriptu pro instalace+obhlidky
-const SCRIPT_VYROBA    = 'https://script.google.com/macros/s/AKfycbyBVbjLotrlstadbsSHLvrl-SLPp7Kpopc7NfazwnTcTDWeviT93LP_pYP-LH9UfFD5/exec';
-const SCRIPT_ZASOBOVANI = 'https://script.google.com/macros/s/AKfycbx3P3afYwkaVnC7Wh3_iTP5XS5PvC2pbwogDrkmOsQdCW3yQ8AX_p0dB_nICvmAr76E6A/exec';
-  const SCRIPT_REKLAMACE = 'https://script.google.com/macros/s/AKfycbzbRoAI2Vjzo9ZDQ6qT7TfhkX-vgE-Rxm9DTmNlh-WmWHh3XBi66NXOQKFtQcnGTIQJBw/exec'; // URL scriptu pro reklamace
+const SCRIPT_INSTALACE = 'https://ledshopik-backend-production.up.railway.app/api/compat';
+const SCRIPT_VYROBA    = 'https://ledshopik-backend-production.up.railway.app/api/compat';
+const SCRIPT_ZASOBOVANI = 'https://ledshopik-backend-production.up.railway.app/api/compat';
+const SCRIPT_REKLAMACE = 'https://ledshopik-backend-production.up.railway.app/api/compat';
 
 const MONTHS_CS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const today = new Date();
@@ -391,12 +391,12 @@ async function loadAll(){
   syncStatus('loading','Načítám...');
   try {
     const [rInst, rObh, rRek, rRekDod, rDoch, rVyr, rZas] = await Promise.all([
-      fetch(SCRIPT_INSTALACE).then(r=>r.json()),
+      fetch(SCRIPT_INSTALACE+'?modul=instalace').then(r=>r.json()),
       fetch(SCRIPT_INSTALACE+'?modul=obhlidky').then(r=>r.json()),
-      fetch(SCRIPT_REKLAMACE).then(r=>r.json()),
+      fetch(SCRIPT_REKLAMACE+'?modul=reklamace').then(r=>r.json()),
       fetch(SCRIPT_REKLAMACE+'?modul=reklamace_dodavatel').then(r=>r.json()).catch(()=>({data:[]})),
       fetch(SCRIPT_INSTALACE+'?modul=dochazka').then(r=>r.json()),
-      fetch(SCRIPT_VYROBA).then(r=>r.json()),
+      fetch(SCRIPT_VYROBA+'?modul=vyroba').then(r=>r.json()),
       fetch(SCRIPT_ZASOBOVANI+'?modul=zasilky').then(r=>r.json()),
     ]);
     dataInst = rInst.data||[];

@@ -369,8 +369,8 @@ tbody tr[data-stav="Přijato dodavatelem"]     td:first-child { border-left: 3px
 
 <script>
 // ── Konfigurace ──────────────────────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbRoAI2Vjzo9ZDQ6qT7TfhkX-vgE-Rxm9DTmNlh-WmWHh3XBi66NXOQKFtQcnGTIQJBw/exec';
-const SCRIPT_ZAS = 'https://script.google.com/macros/s/AKfycbwLv_A2ztatFndTjLL4q-ziJP_l6ktvYi7E-pKqHOmlkMW66CgwIsqnU1ICZ89cV6aO1w/exec';
+const SCRIPT_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
+const SCRIPT_ZAS = 'https://ledshopik-backend-production.up.railway.app/api/compat';
 
 const STATUS_CLASS = {
   'Nová':'s-nova','V řešení':'s-reseni','V řešení u dodavatele':'s-dodavatel',
@@ -442,7 +442,7 @@ async function loadData(){
   syncStatus('loading','Načítám data...');
   try {
     const [resZak, resDod, resDodList] = await Promise.all([
-      fetch(SCRIPT_URL).then(r=>r.json()),
+      fetch(SCRIPT_URL+'?modul=reklamace').then(r=>r.json()),
       fetch(SCRIPT_URL+'?modul=reklamace_dodavatel').then(r=>r.json()).catch(()=>({data:[]})),
       fetch(SCRIPT_ZAS+'?modul=dodavatele').then(r=>r.json()).catch(()=>({data:[]}))
     ]);
