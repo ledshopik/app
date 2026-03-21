@@ -48,7 +48,15 @@ button, input, select { font-family: inherit; }
 #main { max-width: 1100px; margin: 0 auto; padding: 24px 32px; }
 
 /* Module cards */
-.modules-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 2px; }
+.modules-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-bottom: 2px; }
+.tools-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-bottom: 2px; }
+.tool-card { display:flex; align-items:center; gap:14px; background:#fff; padding:14px 20px; text-decoration:none; border-left:3px solid transparent; transition:background .15s; }
+.tool-card:hover { background:#f0ede6; }
+.tool-card .tool-icon { font-size:22px; }
+.tool-card .tool-info { flex:1; }
+.tool-card .tool-label { font-size:9px; letter-spacing:.2em; text-transform:uppercase; margin-bottom:3px; }
+.tool-card .tool-desc { font-size:12px; color:#666; }
+.tool-card .tool-arrow { font-size:11px; font-weight:700; }
 .module-card {
   background: #fff; padding: 20px; cursor: pointer;
   border-top: 2px solid transparent;
@@ -128,6 +136,7 @@ button, input, select { font-family: inherit; }
 @media (max-width: 768px) {
   #main { padding: 16px; }
   .modules-grid { grid-template-columns: repeat(2,1fr); }
+  .tools-row { grid-template-columns: 1fr; }
   .bottom-grid { grid-template-columns: 1fr; }
   #header { padding: 14px 16px; }
   #user-bar { padding: 8px 16px; }
@@ -230,14 +239,6 @@ button, input, select { font-family: inherit; }
       </div>
       <div class="mod-footer" style="color:#e05050;">OTEVŘÍT →</div>
     </a>
-    <a href="konfigurator.html" class="module-card" style="border-top-color:#a070e0;">
-      <div class="mod-label" style="color:#a070e0;">Konfigurátor</div>
-      <div class="mod-count text">Ceník výroby svítidel RING</div>
-      <div class="mod-stats">
-        <div class="mod-stat-row"><span class="lbl">7 parametrů</span><span class="val" style="color:#a070e0;">✓</span></div>
-      </div>
-      <div class="mod-footer" style="color:#a070e0;">OTEVŘÍT →</div>
-    </a>
     <a href="zasobovani.html" class="module-card" style="border-top-color:#c8a830;">
       <div class="mod-label" style="color:#c8a830;">Zásobování</div>
       <div class="mod-count" id="mc-zas-total">—</div>
@@ -256,14 +257,23 @@ button, input, select { font-family: inherit; }
       </div>
       <div class="mod-footer" style="color:#e8a020;">OTEVŘÍT →</div>
     </a>
-    <a href="kalkulator-instalaci.html" class="module-card" style="border-top-color:#b08820;">
-      <div class="mod-label" style="color:#b08820;">Kalkulátor</div>
-      <div class="mod-count text">Odhad ceny instalace</div>
-      <div class="mod-stats">
-        <div class="mod-stat-row"><span class="lbl">Doprava + práce + doplňky</span></div>
-        <div class="mod-stat-row"><span class="lbl">Rozpětí ±20%</span></div>
+  </div>
+  <div class="tools-row">
+    <a href="konfigurator.html" class="tool-card" style="border-left-color:#a070e0;">
+      <div class="tool-icon">⚙</div>
+      <div class="tool-info">
+        <div class="tool-label" style="color:#a070e0;">Konfigurátor</div>
+        <div class="tool-desc">Ceník výroby svítidel RING · 7 parametrů</div>
       </div>
-      <div class="mod-footer" style="color:#b08820;">OTEVŘÍT →</div>
+      <div class="tool-arrow" style="color:#a070e0;">OTEVŘÍT →</div>
+    </a>
+    <a href="kalkulator-instalaci.html" class="tool-card" style="border-left-color:#b08820;">
+      <div class="tool-icon">🧮</div>
+      <div class="tool-info">
+        <div class="tool-label" style="color:#b08820;">Kalkulátor instalací</div>
+        <div class="tool-desc">Odhad ceny montáže · doprava + práce + doplňky · ±20%</div>
+      </div>
+      <div class="tool-arrow" style="color:#b08820;">OTEVŘÍT →</div>
     </a>
   </div>
 
