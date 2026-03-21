@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDshopik — Přihlášení</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#1a1a2e; min-height:100vh; display:flex; align-items:center; justify-content:center; }
+.login-box { background:#fff; border-radius:16px; padding:40px 32px; max-width:480px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,.3); }
+.login-title { text-align:center; margin-bottom:8px; font-size:24px; font-weight:700; color:#1a1a2e; }
+.login-subtitle { text-align:center; margin-bottom:28px; font-size:13px; color:#888; }
+.users-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.user-btn { background:#f4f6f9; border:2px solid transparent; border-radius:10px; padding:14px 8px; text-align:center; cursor:pointer; transition:all .15s; font-size:14px; font-weight:600; color:#333; }
+.user-btn:hover { background:#e8ecf2; border-color:#4080c0; transform:translateY(-2px); box-shadow:0 4px 12px rgba(64,128,192,.2); }
+.user-btn:active { transform:translateY(0); }
+.user-btn .avatar { width:40px; height:40px; border-radius:50%; background:#4080c0; color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:16px; font-weight:700; }
+.loading { text-align:center; padding:40px; color:#888; font-size:14px; }
+.error { text-align:center; padding:20px; color:#e05050; font-size:13px; }
+@media(max-width:400px){ .users-grid { grid-template-columns:repeat(2,1fr); } }
+</style>
+</head>
+<body>
+<div class="login-box">
+  <div class="login-title">🔐 LEDshopik</div>
+  <div class="login-subtitle">Vyber své jméno pro přihlášení</div>
+  <div id="users-container" class="loading">Načítám uživatele...</div>
+</div>
+<script>
+const API_URL = 'https://ledshopik-backend-production.up.railway.app';
+const COLORS = ['#4080c0','#40a050','#c8a830','#e06030','#8060c0','#c04080','#30a0a0','#6080d0','#a06030','#50b070','#d05050','#7070b0'];
+
+// Already logged in?
+if (localStorage.getItem('ledshopik_user')) {
+  window.location.href = 'index.html';
+}
+
+async function loadUsers() {
+  const container = document.getElementById('users-container');
+  try {
+    const res = await fetch(API_URL + '/api/auth/users');
+    const json = await res.json();
+    if (!json.ok || !json.data.length) {
+      container.innerHTML = '<div class="error">Žádní uživatelé</div>';
+      return;
+    }
+    container.className = 'users-grid';
+    container.innerHTML = json.data.map((u, i) => `
+      <div class="user-btn" onclick="login('${u.jmeno}')">
+        <div class="avatar" style="background:${COLORS[i % COLORS.length]}">${u.jmeno.charAt(0)}</div>
+        ${u.jmeno}
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = '<div class="error">Nelze načíst uživatele.<br>Zkuste obnovit stránku.</div>';
+  }
+}
+
+function login(jmeno) {
+  localStorage.setItem('ledshopik_user', jmeno);
+  window.location.href = 'index.html';
+}
+
+loadUsers();
+</script>
+</body>
+</html>
