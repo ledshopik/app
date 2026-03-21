@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDshopik – Kalkulátor instalací</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Arial Narrow', Arial, sans-serif; background: #f4f2ed; color: #1a1a1a; min-height: 100vh; }
+button, input, select, textarea { font-family: inherit; }
+
+:root { --accent: #8060c0; --accent-bg: #f0e8ff; --accent-border: #d0c0e8; }
+
+#header { background: #f4f2ed; border-bottom: 1px solid #e8e4dc; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.header-left .title { font-size: 22px; font-weight: 900; letter-spacing: .06em; color: #1a1a1a; line-height: 1; }
+.header-left .title span { color: var(--accent); }
+#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; }
+#sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; flex-shrink: 0; }
+#sync-dot.ok { background: #40a050; }
+#sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
+#sync-dot.error { background: #c05050; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #e8e4dc; background: #f4f2ed; }
+.tb-btn { background: #fff; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; letter-spacing: .06em; cursor: pointer; }
+.tb-btn:hover { color: #1a1a1a; border-color: #bbb; }
+.tb-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Main layout */
+#main { max-width: 900px; margin: 0 auto; padding: 24px 32px; }
+.section { background: #fff; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+.section-header { padding: 14px 20px; border-bottom: 1px solid #e8e4dc; font-size: 13px; font-weight: 800; letter-spacing: .06em; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+.section-body { padding: 20px; }
+
+/* Form elements */
+.fg { display: flex; flex-direction: column; gap: 5px; }
+.fg label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; }
+.fg input, .fg select { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
+.fg input:focus, .fg select:focus { border-color: var(--accent); }
+
+/* Doprava */
+.psc-row { display: flex; gap: 10px; align-items: center; }
+.psc-row input { width: 120px; }
+.psc-row button { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 8px 16px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.psc-row button:hover { opacity: .9; }
+.psc-row button:disabled { opacity: .5; }
+#dist-result { font-size: 12px; margin-top: 6px; min-height: 16px; }
+.doprava-fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 14px; }
+
+/* Položky */
+.polozka { background: #f8f6f0; border: 1px solid #e8e4dc; border-radius: 8px; padding: 14px; margin-bottom: 10px; position: relative; }
+.polozka-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.polozka-row2 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; margin-top: 10px; align-items: end; }
+.polozka-price { font-size: 14px; font-weight: 800; color: var(--accent); padding: 8px 0; white-space: nowrap; }
+.polozka-remove { background: none; border: 1px solid #f0c8c8; color: #c05050; border-radius: 6px; padding: 7px 10px; font-size: 13px; cursor: pointer; }
+.polozka-remove:hover { background: #fce8e8; }
+.btn-add-polozka { background: var(--accent-bg); color: var(--accent); border: 1px dashed var(--accent-border); border-radius: 8px; padding: 12px; font-size: 12px; font-weight: 700; cursor: pointer; width: 100%; text-align: center; }
+.btn-add-polozka:hover { background: #e8e0f8; }
+
+/* Doplňky */
+.doplnek-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0ede6; }
+.doplnek-row:last-child { border-bottom: none; }
+.doplnek-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+.doplnek-name { font-size: 13px; font-weight: 600; flex: 1; }
+.doplnek-price { font-size: 12px; color: var(--accent); font-weight: 700; }
+.doplnek-hours { width: 60px; }
+
+/* Výsledek */
+.result-grid { display: grid; grid-template-columns: 1fr auto; gap: 6px 20px; font-size: 13px; }
+.result-grid .lbl { color: #888; }
+.result-grid .val { text-align: right; font-weight: 700; color: #444; }
+.result-total { margin-top: 12px; padding-top: 12px; border-top: 2px solid var(--accent); display: flex; justify-content: space-between; align-items: center; }
+.result-total .lbl { font-size: 14px; font-weight: 800; color: var(--accent); }
+.result-total .val { font-size: 18px; font-weight: 900; color: var(--accent); }
+.result-actions { margin-top: 16px; display: flex; gap: 10px; }
+.btn-save-calc { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.btn-save-calc:hover { opacity: .9; }
+.btn-new-calc { background: #fff; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 10px 24px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.btn-new-calc:hover { color: #1a1a1a; }
+
+/* Nastavení */
+#nastaveni { display: none; margin: 0 32px 20px; background: #f8f6f0; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; max-width: 900px; margin-left: auto; margin-right: auto; }
+.nast-header { padding: 14px 20px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; }
+.nast-header h3 { font-size: 14px; font-weight: 800; letter-spacing: .06em; }
+.nast-body { padding: 20px; }
+.nast-section { margin-bottom: 20px; }
+.nast-section-title { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+.nast-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.nast-field { display: flex; align-items: center; gap: 8px; }
+.nast-field input { width: 90px; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 7px 10px; font-size: 13px; outline: none; }
+.nast-field input:focus { border-color: var(--accent); }
+.nast-field span { font-size: 12px; color: #888; }
+.nast-field label { font-size: 12px; color: #444; min-width: 100px; }
+/* Sazby tabulka */
+#sazby-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+#sazby-table th { background: #f0ede6; padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: .1em; color: #888; text-transform: uppercase; }
+#sazby-table td { padding: 6px 10px; border-bottom: 1px solid #f0ede6; }
+#sazby-table input { width: 80px; background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 5px 8px; font-size: 12px; text-align: right; }
+#sazby-table select { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 5px 8px; font-size: 12px; }
+.btn-nast { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-nast:hover { opacity: .9; }
+.btn-nast-cancel { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 7px 14px; font-size: 12px; cursor: pointer; }
+
+/* Historie */
+#historie { display: none; margin: 0 32px 20px; background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; max-width: 900px; margin-left: auto; margin-right: auto; }
+#historie table { width: 100%; border-collapse: collapse; }
+#historie th { background: #f8f6f0; padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: .1em; color: #888; text-transform: uppercase; }
+#historie td { padding: 10px 12px; border-bottom: 1px solid #f0ede6; font-size: 12px; color: #444; cursor: pointer; }
+#historie tr:hover td { background: #f8f6f0; }
+
+/* Saving overlay */
+#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 300; align-items: center; justify-content: center; }
+#saving-overlay.open { display: flex; }
+#saving-box { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 24px 36px; text-align: center; }
+#saving-box .saving-title { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+#saving-box .saving-sub { font-size: 12px; color: #888; }
+
+@media (max-width: 720px) {
+  #header { padding: 12px 16px; }
+  #toolbar { padding: 10px 16px; }
+  #main { padding: 16px; }
+  .polozka-grid, .polozka-row2 { grid-template-columns: 1fr; }
+  .doprava-fields { grid-template-columns: 1fr; }
+  .nast-grid { grid-template-columns: 1fr; }
+}
+</style>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#8060c0"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(x=>x.unregister()))}if('caches' in window){caches.keys().then(n=>n.forEach(k=>caches.delete(k)))}</script></head>
+<body>
+<div style="background:#fff;border-bottom:1px solid #e0e0e0;padding:0 24px;display:flex;align-items:stretch;gap:2px;font-family:Arial Narrow,Arial,sans-serif;flex-wrap:wrap;">
+  <a href="index.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:6px;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">⌂ Dashboard</a>
+  <a href="instalace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Instalace</a>
+  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Výroba</a>
+  <a href="obhlidky.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Obhlídky</a>
+  <a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Reklamace</a>
+  <a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Konfigurátor</a>
+  <a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Docházka</a>
+  <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Zásobování</a>
+  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Lumibook</a>
+  <a href="kalkulator-instalaci.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#8060c0;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid #8060c0;">Kalkulátor</a>
+</div>
+
+<div id="header">
+  <div class="header-left">
+    <div class="eyebrow">LEDshopik · Odhad ceny</div>
+    <div class="title">KALKULÁTOR <span>INSTALACÍ</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
+  </div>
+</div>
+
+<div id="toolbar">
+  <button class="tb-btn" id="btn-nast" onclick="toggleNastaveni()">⚙ Nastavení sazeb</button>
+  <button class="tb-btn" onclick="loadAllData()">↻ Obnovit</button>
+  <button class="tb-btn" id="btn-hist" onclick="toggleHistorie()">📋 Historie</button>
+  <div style="flex:1;"></div>
+  <button class="tb-btn" onclick="resetCalc()" style="color:#c05050;border-color:#f0c8c8;">✕ Nová kalkulace</button>
+</div>
+
+<!-- ═══ NASTAVENÍ ═══ -->
+<div id="nastaveni">
+  <div class="nast-header">
+    <h3>⚙ NASTAVENÍ SAZEB</h3>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-nast" onclick="saveAllSazby()">💾 Uložit vše</button>
+      <button class="btn-nast-cancel" onclick="toggleNastaveni()">Zavřít</button>
+    </div>
+  </div>
+  <div class="nast-body">
+    <div class="nast-section">
+      <div class="nast-section-title">Doprava &amp; obecné</div>
+      <div class="nast-grid">
+        <div class="nast-field"><label>Sazba za km</label><input type="number" id="n-km" min="0" step="1"><span>Kč/km</span></div>
+        <div class="nast-field"><label>Cestovní čas</label><input type="number" id="n-ces" min="0" step="10"><span>Kč/hod</span></div>
+        <div class="nast-field"><label>Hodinová sazba</label><input type="number" id="n-hodina" min="0" step="50"><span>Kč/hod/os</span></div>
+        <div class="nast-field"><label>Výchozí PSČ</label><input type="text" id="n-psc" maxlength="6"></div>
+      </div>
+    </div>
+    <div class="nast-section">
+      <div class="nast-section-title">Sazby za metr (práce)</div>
+      <div style="overflow-x:auto;">
+        <table id="sazby-table">
+          <thead><tr><th>Typ instalace</th><th>Montáž</th><th>Typ pásku</th><th>Příprava</th><th>Kč/metr</th><th></th></tr></thead>
+          <tbody id="sazby-tbody"></tbody>
+        </table>
+      </div>
+      <button onclick="addSazbaRow()" style="margin-top:10px;background:var(--accent-bg);color:var(--accent);border:1px dashed var(--accent-border);border-radius:6px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;">+ Přidat sazbu</button>
+    </div>
+    <div class="nast-section">
+      <div class="nast-section-title">Doplňkové práce</div>
+      <table id="doplnky-table" style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr><th style="background:#f0ede6;padding:8px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.1em;color:#888;text-transform:uppercase;">Název</th><th style="background:#f0ede6;padding:8px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.1em;color:#888;text-transform:uppercase;">Typ</th><th style="background:#f0ede6;padding:8px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.1em;color:#888;text-transform:uppercase;">Cena</th><th style="background:#f0ede6;padding:8px 10px;"></th></tr></thead>
+        <tbody id="doplnky-tbody"></tbody>
+      </table>
+      <button onclick="addDoplnekRow()" style="margin-top:10px;background:var(--accent-bg);color:var(--accent);border:1px dashed var(--accent-border);border-radius:6px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;">+ Přidat doplněk</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HISTORIE ═══ -->
+<div id="historie">
+  <div style="padding:14px 20px;border-bottom:1px solid #e8e4dc;display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-size:14px;font-weight:800;letter-spacing:.06em;">📋 HISTORIE KALKULACÍ</div>
+    <button class="btn-nast-cancel" onclick="toggleHistorie()">Zavřít</button>
+  </div>
+  <div style="overflow-x:auto;">
+    <table><thead><tr><th>Datum</th><th>Zákazník</th><th>PSČ</th><th>Km</th><th>Položky</th><th>Celkem (od–do)</th><th>Poznámka</th></tr></thead>
+    <tbody id="historie-tbody"></tbody></table>
+  </div>
+  <div id="historie-empty" style="text-align:center;padding:30px;color:#888;display:none;">Žádné uložené kalkulace</div>
+</div>
+
+<!-- ═══ KALKULÁTOR ═══ -->
+<div id="main">
+  <!-- Zákazník -->
+  <div class="section">
+    <div class="section-header">👤 Zákazník &amp; doprava</div>
+    <div class="section-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="fg"><label>Zákazník / zakázka</label><input type="text" id="c-zakaznik" placeholder="Jméno, firma nebo číslo zakázky"></div>
+        <div class="fg"><label>Poznámka</label><input type="text" id="c-poznamka" placeholder="Interní poznámka"></div>
+      </div>
+      <div class="fg">
+        <label>PSČ zákazníka</label>
+        <div class="psc-row">
+          <input type="text" id="c-psc" placeholder="70200" maxlength="6">
+          <button id="btn-calc-dist" onclick="calcDistance()">📍 Spočítat vzdálenost</button>
+        </div>
+        <div id="dist-result"></div>
+      </div>
+      <div class="doprava-fields">
+        <div class="fg"><label>Vzdálenost (km)</label><input type="number" id="c-km" min="0" oninput="recalc()"></div>
+        <div class="fg"><label>Čas jízdy (min)</label><input type="number" id="c-min" min="0" oninput="recalc()"></div>
+        <div class="fg"><label>Doprava celkem</label><div id="c-doprava-cena" style="padding:8px 0;font-size:14px;font-weight:800;color:var(--accent);">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Položky práce -->
+  <div class="section">
+    <div class="section-header">🔧 Položky práce</div>
+    <div class="section-body">
+      <div id="polozky-list"></div>
+      <button class="btn-add-polozka" onclick="addPolozka()">+ Přidat položku</button>
+    </div>
+  </div>
+
+  <!-- Doplňkové práce -->
+  <div class="section">
+    <div class="section-header">🔨 Doplňkové práce</div>
+    <div class="section-body" id="doplnky-calc-list">
+      <div style="color:#888;font-size:12px;">Načítám doplňky...</div>
+    </div>
+  </div>
+
+  <!-- Výsledek -->
+  <div class="section" style="border-color:var(--accent-border);">
+    <div class="section-header" style="background:var(--accent-bg);">💰 Výsledek kalkulace</div>
+    <div class="section-body">
+      <div class="result-grid">
+        <div class="lbl">Doprava (tam + zpět)</div><div class="val" id="r-doprava">—</div>
+        <div class="lbl">Práce (položky)</div><div class="val" id="r-prace">—</div>
+        <div class="lbl">Doplňkové práce</div><div class="val" id="r-doplnky">—</div>
+      </div>
+      <div class="result-total">
+        <div class="lbl">CELKEM (±20%)</div>
+        <div class="val" id="r-celkem">—</div>
+      </div>
+      <div class="result-actions">
+        <button class="btn-save-calc" onclick="saveKalkulace()">💾 Uložit kalkulaci</button>
+        <button class="btn-new-calc" onclick="resetCalc()">✕ Nová kalkulace</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="saving-overlay">
+  <div id="saving-box">
+    <div class="saving-title" id="saving-title">Ukládám...</div>
+    <div class="saving-sub" id="saving-sub">Komunikuji s Google Sheets</div>
+  </div>
+</div>
+
+<script>
+// ── Config ───────────────────────────────────────────────────────────────────
+const SCRIPT_URL = ''; // TODO: user fills after deploying Apps Script
+const HOME_PSC = '61900';
+
+// Data
+let dataSazby=[], dataDoplnky=[], dataKalkulace=[], config={};
+let polozkyCounter=0;
+
+// Defaults
+const DEF_CONFIG = { sazba_km:15, sazba_cestovni:300, sazba_hodina:1000, home_psc:'61900' };
+
+const TYPY_INSTALACE = ['LED pásek','Profil s páskem','Neon R25','Klasické svítidlo','Průmyslové svítidlo','Bodovky'];
+const ZPUSOBY_MONTAZE = ['Povrchová','Vestavná','Zavěšená','Rampa','Jiná'];
+const TYPY_PASKU = ['—','Jednobarva','CCT','RGB','RGBWW','RGBCCT'];
+const PRIPRAVY = ['Zákazník připraví','My děláme rozvod'];
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function syncStatus(s,t){ document.getElementById('sync-dot').className=s; document.getElementById('sync-text').textContent=t; }
+function showSaving(t,s){ document.getElementById('saving-title').textContent=t; document.getElementById('saving-sub').textContent=s; document.getElementById('saving-overlay').classList.add('open'); }
+function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
+function fmt(n){ return Math.round(n).toLocaleString('cs-CZ')+' Kč'; }
+function getConf(k){ return Number(config[k])||DEF_CONFIG[k]||0; }
+function getHomePSC(){ return String(config.home_psc||localStorage.getItem('home_psc')||HOME_PSC); }
+
+// ── API ──────────────────────────────────────────────────────────────────────
+async function apiPost(payload){
+  if(!SCRIPT_URL){ alert('Apps Script URL není nastavena! Otevři kód a doplň SCRIPT_URL.'); throw new Error('No SCRIPT_URL'); }
+  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload),redirect:'follow',headers:{'Content-Type':'text/plain'}});
+  const text=await res.text();
+  let json;
+  try { json=JSON.parse(text); } catch(e) {
+    const m=text.match(/\{[\s\S]*\}/);
+    if(m) try { json=JSON.parse(m[0]); } catch(e2){}
+    if(!json) throw new Error('Neplatná odpověď serveru');
+  }
+  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+  return json;
+}
+
+async function loadAllData(){
+  if(!SCRIPT_URL){ syncStatus('error','Nastav SCRIPT_URL v kódu'); renderDoplnkyCalc(); addPolozka(); return; }
+  syncStatus('loading','Načítám...');
+  try {
+    const [rSaz, rDop, rKal, rCfg] = await Promise.all([
+      fetch(SCRIPT_URL+'?modul=sazby').then(r=>r.json()).catch(()=>({data:[]})),
+      fetch(SCRIPT_URL+'?modul=doplnky').then(r=>r.json()).catch(()=>({data:[]})),
+      fetch(SCRIPT_URL+'?modul=kalkulace').then(r=>r.json()).catch(()=>({data:[]})),
+      fetch(SCRIPT_URL+'?modul=config').then(r=>r.json()).catch(()=>({data:[]})),
+    ]);
+    dataSazby=rSaz.data||[];
+    dataDoplnky=rDop.data||[];
+    dataKalkulace=rKal.data||[];
+    // Config: key-value pairs
+    config={};
+    (rCfg.data||[]).forEach(r=>{ if(r.klic) config[String(r.klic).trim()]=String(r.hodnota||'').trim(); });
+    syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
+  } catch(e){ syncStatus('error','Chyba: '+e.message); }
+  renderDoplnkyCalc();
+  if(!document.querySelectorAll('.polozka').length) addPolozka();
+  recalc();
+}
+
+// ── Doprava (reuse from obhlidky) ───────────────────────────────────────────
+async function geocodePSC(psc){
+  const url=`https://nominatim.openstreetmap.org/search?postalcode=${psc}&country=CZ&format=json&limit=1`;
+  const r=await fetch(url,{headers:{'Accept-Language':'cs','User-Agent':'LEDshopik-App'}});
+  const json=await r.json();
+  if(!json.length) return null;
+  return {lat:json[0].lat, lon:json[0].lon};
+}
+
+async function calcDistance(){
+  const psc=document.getElementById('c-psc').value.trim();
+  if(!psc){ alert('Zadej PSČ zákazníka'); return; }
+  const btn=document.getElementById('btn-calc-dist');
+  const res=document.getElementById('dist-result');
+  btn.textContent='⏳ Počítám...'; btn.disabled=true; res.textContent='';
+  try {
+    const homeGeo=await geocodePSC(getHomePSC());
+    const destGeo=await geocodePSC(psc);
+    if(!homeGeo) throw new Error('Nepodařilo se najít výchozí PSČ');
+    if(!destGeo) throw new Error('Nepodařilo se najít PSČ '+psc);
+    const url=`https://router.project-osrm.org/route/v1/driving/${homeGeo.lon},${homeGeo.lat};${destGeo.lon},${destGeo.lat}?overview=false`;
+    const r=await fetch(url); const json=await r.json();
+    if(json.code!=='Ok') throw new Error('Trasa nenalezena');
+    const km=Math.round(json.routes[0].distance/1000);
+    const min=Math.round(json.routes[0].duration/60);
+    document.getElementById('c-km').value=km;
+    document.getElementById('c-min').value=min;
+    res.textContent=`✓ ${km} km · ${min} min jízdy · tam a zpět: ${km*2} km`;
+    res.style.color='#40a050';
+    recalc();
+  } catch(e){ res.textContent='✗ '+e.message; res.style.color='#c05050'; }
+  finally { btn.textContent='📍 Spočítat vzdálenost'; btn.disabled=false; }
+}
+
+// ── Položky ──────────────────────────────────────────────────────────────────
+function addPolozka(){
+  const idx=polozkyCounter++;
+  const div=document.createElement('div');
+  div.className='polozka'; div.id='pol-'+idx;
+  div.innerHTML=`
+    <div class="polozka-grid">
+      <div class="fg"><label>Typ instalace</label><select onchange="recalc()" id="pol-typ-${idx}">${TYPY_INSTALACE.map(t=>`<option>${t}</option>`).join('')}</select></div>
+      <div class="fg"><label>Způsob montáže</label><select onchange="recalc()" id="pol-mont-${idx}">${ZPUSOBY_MONTAZE.map(t=>`<option>${t}</option>`).join('')}</select></div>
+      <div class="fg"><label>Typ pásku</label><select onchange="recalc()" id="pol-pasek-${idx}">${TYPY_PASKU.map(t=>`<option>${t}</option>`).join('')}</select></div>
+    </div>
+    <div class="polozka-row2">
+      <div class="fg"><label>Příprava</label><select onchange="recalc()" id="pol-prip-${idx}">${PRIPRAVY.map(t=>`<option>${t}</option>`).join('')}</select></div>
+      <div class="fg"><label>Metráž / ks</label><input type="number" id="pol-metry-${idx}" min="0" step="0.5" value="1" oninput="recalc()"></div>
+      <div class="fg"><label>Techniků</label><select onchange="recalc()" id="pol-tech-${idx}"><option>1</option><option>2</option></select></div>
+      <div class="fg"><label>Cena</label><div class="polozka-price" id="pol-cena-${idx}">—</div></div>
+      <button class="polozka-remove" onclick="removePolozka(${idx})" title="Odebrat">🗑</button>
+    </div>`;
+  document.getElementById('polozky-list').appendChild(div);
+  recalc();
+}
+
+function removePolozka(idx){
+  const el=document.getElementById('pol-'+idx);
+  if(el) el.remove();
+  recalc();
+}
+
+function getPolozky(){
+  const list=[];
+  document.querySelectorAll('.polozka').forEach(div=>{
+    const idx=div.id.replace('pol-','');
+    const typ=document.getElementById('pol-typ-'+idx)?.value||'';
+    const mont=document.getElementById('pol-mont-'+idx)?.value||'';
+    const pasek=document.getElementById('pol-pasek-'+idx)?.value||'';
+    const prip=document.getElementById('pol-prip-'+idx)?.value||'';
+    const metry=Number(document.getElementById('pol-metry-'+idx)?.value)||0;
+    const tech=Number(document.getElementById('pol-tech-'+idx)?.value)||1;
+    list.push({idx,typ,mont,pasek,prip,metry,tech});
+  });
+  return list;
+}
+
+function lookupSazba(typ,mont,pasek,prip){
+  // Try exact match first, then fallback to partial matches
+  let best=null;
+  dataSazby.forEach(s=>{
+    const sTyp=String(s.typ_instalace||'').trim();
+    const sMont=String(s.zpusob_montaze||'').trim();
+    const sPas=String(s.typ_pasku||'').trim();
+    const sPrip=String(s.priprava||'').trim();
+    const cena=Number(String(s.sazba_za_metr||'').replace(',','.'))||0;
+    if(!cena) return;
+    let score=0;
+    if(sTyp===typ) score+=4;
+    if(sMont===mont) score+=2;
+    if(sPas===pasek||sPas==='—'||!sPas) score+=1;
+    if(sPrip===prip||!sPrip) score+=1;
+    if(!best||score>best.score) best={cena,score};
+  });
+  return best?best.cena:0;
+}
+
+// ── Doplňky v kalkulátoru ────────────────────────────────────────────────────
+function renderDoplnkyCalc(){
+  const container=document.getElementById('doplnky-calc-list');
+  if(!dataDoplnky.length){
+    container.innerHTML='<div style="color:#888;font-size:12px;">Žádné doplňky v nastavení. Přidej je v ⚙ Nastavení sazeb.</div>';
+    return;
+  }
+  container.innerHTML=dataDoplnky.map((d,i)=>{
+    const typ=String(d.typ||'pausal').trim();
+    const cena=Number(String(d.cena||'0').replace(',','.'))||0;
+    const nazev=String(d.nazev||'').trim();
+    if(typ==='hodiny'){
+      return `<div class="doplnek-row">
+        <input type="checkbox" id="dop-chk-${i}" onchange="recalc()">
+        <div class="doplnek-name">${nazev}</div>
+        <input type="number" class="doplnek-hours" id="dop-hod-${i}" min="0" step="0.5" value="1" oninput="recalc()" style="background:#fff;border:1px solid #ddd;border-radius:4px;padding:5px 8px;font-size:12px;">
+        <span style="font-size:11px;color:#888;">hod × ${fmt(cena)}</span>
+      </div>`;
+    }
+    return `<div class="doplnek-row">
+      <input type="checkbox" id="dop-chk-${i}" onchange="recalc()">
+      <div class="doplnek-name">${nazev}</div>
+      <div class="doplnek-price">${fmt(cena)}</div>
+    </div>`;
+  }).join('');
+}
+
+function getDoplnkyCena(){
+  let total=0;
+  dataDoplnky.forEach((d,i)=>{
+    const chk=document.getElementById('dop-chk-'+i);
+    if(!chk||!chk.checked) return;
+    const typ=String(d.typ||'pausal').trim();
+    const cena=Number(String(d.cena||'0').replace(',','.'))||0;
+    if(typ==='hodiny'){
+      const hod=Number(document.getElementById('dop-hod-'+i)?.value)||0;
+      total+=hod*cena;
+    } else {
+      total+=cena;
+    }
+  });
+  return total;
+}
+
+// ── Přepočet ─────────────────────────────────────────────────────────────────
+function recalc(){
+  // Doprava
+  const km=Number(document.getElementById('c-km').value)||0;
+  const min=Number(document.getElementById('c-min').value)||0;
+  const sKm=getConf('sazba_km');
+  const sCes=getConf('sazba_cestovni');
+  const doprava=(km*2*sKm)+(min*2/60*sCes);
+  document.getElementById('c-doprava-cena').textContent=km>0?fmt(doprava):'—';
+  document.getElementById('r-doprava').textContent=km>0?fmt(doprava)+` (${km*2} km)`:'—';
+
+  // Položky
+  let praceTotal=0;
+  const polozky=getPolozky();
+  polozky.forEach(p=>{
+    const sazba=lookupSazba(p.typ,p.mont,p.pasek,p.prip);
+    const cena=p.metry*sazba*p.tech;
+    praceTotal+=cena;
+    const el=document.getElementById('pol-cena-'+p.idx);
+    if(el) el.textContent=sazba>0?fmt(cena)+(sazba?` (${p.metry}m × ${fmt(sazba)}`+(p.tech>1?` × ${p.tech} os`:'')+')':``):'⚠ Sazba nenastavena';
+    if(el&&!sazba) el.style.color='#c05050'; else if(el) el.style.color='var(--accent)';
+  });
+  document.getElementById('r-prace').textContent=praceTotal>0?fmt(praceTotal)+` (${polozky.length} položek)`:'—';
+
+  // Doplňky
+  const doplnky=getDoplnkyCena();
+  document.getElementById('r-doplnky').textContent=doplnky>0?fmt(doplnky):'—';
+
+  // Celkem
+  const celkem=doprava+praceTotal+doplnky;
+  if(celkem>0){
+    const od=Math.round(celkem*0.8);
+    const doo=Math.round(celkem*1.2);
+    document.getElementById('r-celkem').textContent=`${od.toLocaleString('cs-CZ')} – ${doo.toLocaleString('cs-CZ')} Kč`;
+  } else {
+    document.getElementById('r-celkem').textContent='—';
+  }
+}
+
+// ── Nastavení ────────────────────────────────────────────────────────────────
+function toggleNastaveni(){
+  const el=document.getElementById('nastaveni');
+  const show=el.style.display==='none';
+  el.style.display=show?'block':'none';
+  document.getElementById('btn-nast').classList.toggle('active',show);
+  if(show) fillNastaveni();
+}
+
+function fillNastaveni(){
+  document.getElementById('n-km').value=getConf('sazba_km');
+  document.getElementById('n-ces').value=getConf('sazba_cestovni');
+  document.getElementById('n-hodina').value=getConf('sazba_hodina');
+  document.getElementById('n-psc').value=getHomePSC();
+  // Sazby table
+  renderSazbyTable();
+  renderDoplnkyTable();
+}
+
+function renderSazbyTable(){
+  const tbody=document.getElementById('sazby-tbody');
+  tbody.innerHTML=dataSazby.map((s,i)=>`<tr>
+    <td><select id="st-typ-${i}">${TYPY_INSTALACE.map(t=>`<option${String(s.typ_instalace||'')=== t?' selected':''}>${t}</option>`).join('')}</select></td>
+    <td><select id="st-mont-${i}">${ZPUSOBY_MONTAZE.map(t=>`<option${String(s.zpusob_montaze||'')=== t?' selected':''}>${t}</option>`).join('')}</select></td>
+    <td><select id="st-pas-${i}">${TYPY_PASKU.map(t=>`<option${String(s.typ_pasku||'')=== t?' selected':''}>${t}</option>`).join('')}</select></td>
+    <td><select id="st-prip-${i}">${PRIPRAVY.map(t=>`<option${String(s.priprava||'')=== t?' selected':''}>${t}</option>`).join('')}</select></td>
+    <td><input type="number" id="st-cena-${i}" min="0" value="${Number(String(s.sazba_za_metr||'0').replace(',','.'))||''}"></td>
+    <td><button onclick="removeSazbaRow(${i})" style="background:none;border:1px solid #f0c8c8;color:#c05050;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:11px;">🗑</button></td>
+  </tr>`).join('');
+}
+
+function addSazbaRow(){
+  dataSazby.push({id:String(Date.now()),typ_instalace:TYPY_INSTALACE[0],zpusob_montaze:ZPUSOBY_MONTAZE[0],typ_pasku:'—',priprava:PRIPRAVY[0],sazba_za_metr:''});
+  renderSazbyTable();
+}
+
+function removeSazbaRow(i){
+  dataSazby.splice(i,1);
+  renderSazbyTable();
+}
+
+function renderDoplnkyTable(){
+  const tbody=document.getElementById('doplnky-tbody');
+  tbody.innerHTML=dataDoplnky.map((d,i)=>`<tr>
+    <td><input type="text" id="dt-naz-${i}" value="${String(d.nazev||'')}" style="width:180px;background:#fff;border:1px solid #ddd;border-radius:4px;padding:5px 8px;font-size:12px;"></td>
+    <td><select id="dt-typ-${i}" style="background:#fff;border:1px solid #ddd;border-radius:4px;padding:5px 8px;font-size:12px;"><option value="pausal"${String(d.typ)==='pausal'?' selected':''}>Paušál</option><option value="hodiny"${String(d.typ)==='hodiny'?' selected':''}>Za hodiny</option></select></td>
+    <td><input type="number" id="dt-cena-${i}" min="0" value="${Number(String(d.cena||'0').replace(',','.'))||''}" style="width:90px;background:#fff;border:1px solid #ddd;border-radius:4px;padding:5px 8px;font-size:12px;text-align:right;"><span style="font-size:11px;color:#888;margin-left:4px;">Kč</span></td>
+    <td><button onclick="removeDoplnekRow(${i})" style="background:none;border:1px solid #f0c8c8;color:#c05050;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:11px;">🗑</button></td>
+  </tr>`).join('');
+}
+
+function addDoplnekRow(){
+  dataDoplnky.push({id:String(Date.now()),nazev:'',typ:'pausal',cena:'',poznamka:''});
+  renderDoplnkyTable();
+}
+
+function removeDoplnekRow(i){
+  dataDoplnky.splice(i,1);
+  renderDoplnkyTable();
+}
+
+async function saveAllSazby(){
+  if(!SCRIPT_URL){ alert('Apps Script URL není nastavena!'); return; }
+  showSaving('Ukládám nastavení...','');
+  try {
+    // Read values from inputs
+    const newConfig=[
+      {klic:'sazba_km',hodnota:document.getElementById('n-km').value},
+      {klic:'sazba_cestovni',hodnota:document.getElementById('n-ces').value},
+      {klic:'sazba_hodina',hodnota:document.getElementById('n-hodina').value},
+      {klic:'home_psc',hodnota:document.getElementById('n-psc').value.trim()},
+    ];
+    // Read sazby from table
+    const newSazby=[];
+    document.querySelectorAll('#sazby-tbody tr').forEach((tr,i)=>{
+      newSazby.push({
+        id:dataSazby[i]?.id||String(Date.now()+i),
+        typ_instalace:document.getElementById('st-typ-'+i)?.value||'',
+        zpusob_montaze:document.getElementById('st-mont-'+i)?.value||'',
+        typ_pasku:document.getElementById('st-pas-'+i)?.value||'',
+        priprava:document.getElementById('st-prip-'+i)?.value||'',
+        sazba_za_metr:document.getElementById('st-cena-'+i)?.value||'0',
+      });
+    });
+    // Read doplnky from table
+    const newDoplnky=[];
+    document.querySelectorAll('#doplnky-tbody tr').forEach((tr,i)=>{
+      newDoplnky.push({
+        id:dataDoplnky[i]?.id||String(Date.now()+i),
+        nazev:document.getElementById('dt-naz-'+i)?.value||'',
+        typ:document.getElementById('dt-typ-'+i)?.value||'pausal',
+        cena:document.getElementById('dt-cena-'+i)?.value||'0',
+        poznamka:'',
+      });
+    });
+    // Save all in batch
+    await apiPost({action:'replaceAll',modul:'config',records:newConfig});
+    await apiPost({action:'replaceAll',modul:'sazby',records:newSazby});
+    await apiPost({action:'replaceAll',modul:'doplnky',records:newDoplnky});
+    // Also save PSC to localStorage
+    localStorage.setItem('home_psc',document.getElementById('n-psc').value.trim());
+    showSaving('Hotovo!','Nastavení uloženo');
+    setTimeout(async()=>{ hideSaving(); await loadAllData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+// ── Historie ─────────────────────────────────────────────────────────────────
+function toggleHistorie(){
+  const el=document.getElementById('historie');
+  const show=el.style.display==='none';
+  el.style.display=show?'block':'none';
+  document.getElementById('btn-hist').classList.toggle('active',show);
+  if(show) renderHistorie();
+}
+
+function renderHistorie(){
+  const tbody=document.getElementById('historie-tbody');
+  const empty=document.getElementById('historie-empty');
+  if(!dataKalkulace.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  // Sort newest first
+  const sorted=[...dataKalkulace].sort((a,b)=>String(b.datum||'').localeCompare(String(a.datum||'')));
+  tbody.innerHTML=sorted.map(k=>{
+    const od=Number(String(k.celkem_od||'0').replace(',','.'))||0;
+    const doo=Number(String(k.celkem_do||'0').replace(',','.'))||0;
+    let polCount='—';
+    try { polCount=JSON.parse(String(k.polozky_json||'[]')).length; } catch(e){}
+    return `<tr>
+      <td style="white-space:nowrap;">${String(k.datum||'—')}</td>
+      <td style="font-weight:700;">${String(k.zakaznik||'—')}</td>
+      <td>${String(k.psc||'—')}</td>
+      <td>${String(k.km||'—')}</td>
+      <td>${polCount}</td>
+      <td style="font-weight:700;color:var(--accent);">${od?od.toLocaleString('cs-CZ'):''} – ${doo?doo.toLocaleString('cs-CZ'):''} Kč</td>
+      <td style="font-size:11px;color:#888;">${String(k.poznamka||'')}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function saveKalkulace(){
+  const km=Number(document.getElementById('c-km').value)||0;
+  const polozky=getPolozky();
+  const doprava=km>0?(km*2*getConf('sazba_km'))+(Number(document.getElementById('c-min').value||0)*2/60*getConf('sazba_cestovni')):0;
+  let praceTotal=0;
+  polozky.forEach(p=>{ praceTotal+=p.metry*lookupSazba(p.typ,p.mont,p.pasek,p.prip)*p.tech; });
+  const doplnky=getDoplnkyCena();
+  const celkem=doprava+praceTotal+doplnky;
+  if(celkem<=0){ alert('Kalkulace je prázdná — přidej položky nebo dopravu.'); return; }
+
+  const rec={
+    id:String(Date.now()),
+    datum:new Date().toLocaleDateString('cs-CZ'),
+    zakaznik:document.getElementById('c-zakaznik').value.trim(),
+    psc:document.getElementById('c-psc').value.trim(),
+    km:String(km),
+    polozky_json:JSON.stringify(polozky.map(p=>({typ:p.typ,mont:p.mont,pasek:p.pasek,prip:p.prip,metry:p.metry,tech:p.tech}))),
+    doprava:String(Math.round(doprava)),
+    prace:String(Math.round(praceTotal)),
+    doplnky_cena:String(Math.round(doplnky)),
+    celkem_od:String(Math.round(celkem*0.8)),
+    celkem_do:String(Math.round(celkem*1.2)),
+    poznamka:document.getElementById('c-poznamka').value.trim(),
+  };
+
+  if(!SCRIPT_URL){ alert('Apps Script URL není nastavena!'); return; }
+  showSaving('Ukládám kalkulaci...','');
+  try {
+    await apiPost({action:'append',modul:'kalkulace',record:rec});
+    dataKalkulace.push(rec);
+    showSaving('Hotovo!','Kalkulace uložena');
+    setTimeout(()=>hideSaving(),800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+function resetCalc(){
+  document.getElementById('c-zakaznik').value='';
+  document.getElementById('c-poznamka').value='';
+  document.getElementById('c-psc').value='';
+  document.getElementById('c-km').value='';
+  document.getElementById('c-min').value='';
+  document.getElementById('dist-result').textContent='';
+  document.getElementById('polozky-list').innerHTML='';
+  polozkyCounter=0;
+  // Uncheck doplnky
+  dataDoplnky.forEach((d,i)=>{
+    const chk=document.getElementById('dop-chk-'+i);
+    if(chk) chk.checked=false;
+  });
+  addPolozka();
+  recalc();
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+loadAllData();
+</script>
+</body>
+</html>
