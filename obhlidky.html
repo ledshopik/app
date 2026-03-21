@@ -608,7 +608,12 @@ function calcCosts(){
 }
 
 loadData();
-setInterval(loadData,120000);
+// Auto-refresh every 30s (only when page visible and no modal open)
+setInterval(()=>{
+  if(document.hidden) return;
+  if(document.querySelector('.modal[style*="flex"],.modal[style*="block"],.overlay[style*="flex"],.overlay[style*="block"]')) return;
+  loadData();
+}, 30000);
 document.getElementById('user-bar-name').textContent=localStorage.getItem('ledshopik_user')||'';
 function logout(){localStorage.removeItem('ledshopik_user');window.location.href='login.html';}
 </script>
