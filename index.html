@@ -668,7 +668,7 @@ setInterval(()=>{
   if(document.hidden) return;
   if(document.querySelector('.modal[style*="flex"],.modal[style*="block"],.overlay[style*="flex"],.overlay[style*="block"]')) return;
   loadAll();
-}, 30000);
+}, 10000);
 document.getElementById('user-bar-name').textContent=localStorage.getItem('ledshopik_user')||'';
 function logout(){localStorage.removeItem('ledshopik_user');window.location.href='login.html';}
 </script>
