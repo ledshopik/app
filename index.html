@@ -224,6 +224,7 @@ button, input, select { font-family: inherit; }
       <div class="mod-stats">
         <div class="mod-stat-row"><span class="lbl">Nové</span><span class="val" id="mc-rek-nova" style="color:#e050e0;">—</span></div>
         <div class="mod-stat-row"><span class="lbl">V řešení</span><span class="val" id="mc-rek-res" style="color:#e2b830;">—</span></div>
+        <div class="mod-stat-row"><span class="lbl">U dodavatele</span><span class="val" id="mc-rek-dod" style="color:#6080c0;">—</span></div>
         <div class="mod-stat-row"><span class="lbl">Vyřízeno</span><span class="val" id="mc-rek-vyr" style="color:#40a050;">—</span></div>
       </div>
       <div class="mod-footer" style="color:#e05050;">OTEVŘÍT →</div>
@@ -339,7 +340,7 @@ const SCRIPT_ZASOBOVANI = 'https://script.google.com/macros/s/AKfycbx3P3afYwkaVn
 const MONTHS_CS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const today = new Date();
 let calYear = today.getFullYear(), calMonth = today.getMonth();
-let dataInst=[], dataObh=[], dataRek=[], dataDoch=[], dataVyr=[], dataZas=[], currentUser='vse';
+let dataInst=[], dataObh=[], dataRek=[], dataRekDod=[], dataDoch=[], dataVyr=[], dataZas=[], currentUser='vse';
 let tasks = JSON.parse(localStorage.getItem('dashboard_tasks')||'[]');
 
 // ── Header datum ──────────────────────────────────────────────────────────────
@@ -369,10 +370,11 @@ function syncStatus(state,text){
 async function loadAll(){
   syncStatus('loading','Načítám...');
   try {
-    const [rInst, rObh, rRek, rDoch, rVyr, rZas] = await Promise.all([
+    const [rInst, rObh, rRek, rRekDod, rDoch, rVyr, rZas] = await Promise.all([
       fetch(SCRIPT_INSTALACE).then(r=>r.json()),
       fetch(SCRIPT_INSTALACE+'?modul=obhlidky').then(r=>r.json()),
       fetch(SCRIPT_REKLAMACE).then(r=>r.json()),
+      fetch(SCRIPT_REKLAMACE+'?modul=reklamace_dodavatel').then(r=>r.json()).catch(()=>({data:[]})),
       fetch(SCRIPT_INSTALACE+'?modul=dochazka').then(r=>r.json()),
       fetch(SCRIPT_VYROBA).then(r=>r.json()),
       fetch(SCRIPT_ZASOBOVANI+'?modul=zasilky').then(r=>r.json()),
@@ -380,6 +382,7 @@ async function loadAll(){
     dataInst = rInst.data||[];
     dataObh  = rObh.data||[];
     dataRek  = rRek.data||[];
+    dataRekDod = rRekDod.data||[];
     dataDoch = rDoch.data||[];
     dataVyr  = rVyr.data||[];
     dataZas  = rZas.data||[];
@@ -417,6 +420,7 @@ function renderModuleCards(){
   document.getElementById('mc-rek-total').textContent = rek.length||'0';
   document.getElementById('mc-rek-nova').textContent  = rek.filter(r=>r.stav==='Nová').length;
   document.getElementById('mc-rek-res').textContent   = rek.filter(r=>r.stav==='V řešení'||r.stav==='V řešení u dodavatele').length;
+  document.getElementById('mc-rek-dod').textContent   = dataRekDod.filter(r=>String(r.stav)!=='Vyřízeno'&&String(r.stav)!=='Zamítnuto').length;
   document.getElementById('mc-rek-vyr').textContent   = rek.filter(r=>r.stav==='Vyřízené').length;
 
   document.getElementById('mc-vyr-total').textContent  = dataVyr.filter(r=>r.stav!=='Vydáno zákazníkovi').length||'0';

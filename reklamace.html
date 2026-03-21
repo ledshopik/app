@@ -26,24 +26,39 @@ button, input, select, textarea { font-family: inherit; }
 #sync-dot.error   { background: #c05050; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
+/* Tabs */
+#tabs { display: flex; align-items: center; padding: 0 32px; border-bottom: 1px solid #e8e4dc; background: #f4f2ed; }
+.tab-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 10px 20px; font-size: 12px; font-weight: 700; letter-spacing: .08em; color: #888; cursor: pointer; transition: all .15s; }
+.tab-btn:hover { color: #444; }
+.tab-btn.active { color: #e05050; border-bottom-color: #e05050; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Alert bar */
+#alert-bar { display: none; background: #fce8e8; border-bottom: 1px solid #f0c8c8; padding: 10px 32px; }
+#alert-bar.visible { display: block; }
+.alert-item { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #f0c8c8; border-radius: 6px; padding: 4px 12px; margin: 3px 4px; font-size: 11px; color: #c05050; font-weight: 700; cursor: pointer; }
+.alert-item:hover { background: #fce8e8; }
+.alert-title { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #c05050; text-transform: uppercase; margin-right: 8px; }
+
 #toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #e8e4dc; background: #f4f2ed; }
 .filter-btn { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
 .filter-btn:hover { border-color: #bbb; color: #444; }
 .filter-btn.active { background: #e05050; color: #fff; border-color: #e05050; }
 .filter-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
-#search-wrap { margin-left: auto; position: relative; }
-#search-wrap input { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; transition: border-color .2s; }
-#search-wrap input:focus { border-color: #e05050; }
-#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #888; }
+.search-wrap { margin-left: auto; position: relative; }
+.search-wrap input { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; transition: border-color .2s; }
+.search-wrap input:focus { border-color: #e05050; }
+.search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #888; }
 
-#btn-add { background: #e05050; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
-#btn-add:hover { background: #f06060; }
-#btn-refresh { background: #fff; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
-#btn-refresh:hover { color: #1a1a1a; }
+.btn-add { background: #e05050; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
+.btn-add:hover { background: #f06060; }
+.btn-refresh { background: #fff; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+.btn-refresh:hover { color: #1a1a1a; }
 
-#table-wrap { padding: 0 32px; overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+.table-wrap { padding: 0 32px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
 thead th { background: #f8f6f0; color: #888; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #ddd; white-space: nowrap; cursor: pointer; user-select: none; transition: color .15s; }
 thead th:hover { color: #e05050; }
 thead th.sorted { color: #e05050; }
@@ -65,11 +80,21 @@ td.datum    { white-space: nowrap; }
 .s-vyrizeno     { background: #e0f0e0; color: #40a050; border: 1px solid #c0dcc0; } .s-vyrizeno .badge-dot     { background: #40a050; }
 .s-zamitnuto    { background: #fce8e8; color: #c05050; border: 1px solid #f0c8c8; } .s-zamitnuto .badge-dot    { background: #c05050; }
 
+/* Dodavatel tab statuses */
+.sd-pripraveno  { background: #f8f0ff; color: #a050c0; border: 1px solid #e0c8f0; } .sd-pripraveno .badge-dot  { background: #a050c0; }
+.sd-odeslano    { background: #e8f0ff; color: #6080c0; border: 1px solid #c8d8f0; } .sd-odeslano .badge-dot    { background: #6080c0; }
+.sd-prijato     { background: #fdf4d8; color: #e2b830; border: 1px solid #f0e0a0; } .sd-prijato .badge-dot     { background: #e2b830; }
+.sd-vyrizeno    { background: #e0f0e0; color: #40a050; border: 1px solid #c0dcc0; } .sd-vyrizeno .badge-dot    { background: #40a050; }
+.sd-zamitnuto   { background: #fce8e8; color: #c05050; border: 1px solid #f0c8c8; } .sd-zamitnuto .badge-dot   { background: #c05050; }
+
 tbody tr[data-stav="Nová"]                    td:first-child { border-left: 3px solid #e050e0; }
 tbody tr[data-stav="V řešení"]                td:first-child { border-left: 3px solid #e2b830; }
 tbody tr[data-stav="V řešení u dodavatele"]   td:first-child { border-left: 3px solid #6080c0; }
 tbody tr[data-stav="Vyřízené"]                td:first-child { border-left: 3px solid #40a050; }
 tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px solid #c05050; }
+tbody tr[data-stav="Připraveno"]              td:first-child { border-left: 3px solid #a050c0; }
+tbody tr[data-stav="Odesláno"]                td:first-child { border-left: 3px solid #6080c0; }
+tbody tr[data-stav="Přijato dodavatelem"]     td:first-child { border-left: 3px solid #e2b830; }
 
 /* Priority */
 .prio { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 700; }
@@ -80,19 +105,21 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
 /* Deadline warning */
 .deadline-warn { color: #e05050 !important; font-weight: 700; }
 .deadline-ok   { color: #40a050 !important; }
+.days-waiting  { font-size: 10px; color: #888; }
+.days-warn     { font-size: 10px; color: #e05050; font-weight: 700; }
 
-#empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
-#empty-state .big { font-size: 36px; margin-bottom: 10px; }
+.empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
+.empty-state .big { font-size: 36px; margin-bottom: 10px; }
 
 /* Modal */
-#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
-#modal-overlay.open { display: flex; }
-#modal { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
-#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; }
-#modal-title { font-size: 16px; font-weight: 800; letter-spacing: .05em; }
-#modal-close { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; padding: 0 4px; }
-#modal-close:hover { color: #1a1a1a; }
-#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; }
+.modal { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+.modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 16px; font-weight: 800; letter-spacing: .05em; }
+.modal-close { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; padding: 0 4px; }
+.modal-close:hover { color: #1a1a1a; }
+.modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group.full { grid-column: 1 / -1; }
 .form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; }
@@ -100,13 +127,20 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #e05050; }
 .form-group textarea { resize: vertical; min-height: 70px; }
 .form-group select option { background: #fff; }
-#modal-footer { padding: 16px 24px; border-top: 1px solid #e8e4dc; display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
-#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #f0c8c8; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
-#btn-delete:hover { background: #fce8e8; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid #e8e4dc; display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
+.btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #f0c8c8; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-delete:hover { background: #fce8e8; }
 .btn-cancel { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .btn-cancel:hover { color: #1a1a1a; }
 .btn-save { background: #e05050; color: #fff; border: none; border-radius: 6px; padding: 8px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .btn-save:hover { background: #f06060; }
+.btn-secondary { background: #e8f0ff; color: #6080c0; border: 1px solid #c8d8f0; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-secondary:hover { background: #d8e8ff; }
+
+/* Linked records */
+.linked-box { background: #f8f6f0; border: 1px solid #ddd; border-radius: 6px; padding: 10px 14px; }
+.linked-box .linked-title { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; margin-bottom: 6px; }
+.linked-item { font-size: 12px; color: #444; padding: 2px 0; }
 
 #saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 300; align-items: center; justify-content: center; }
 #saving-overlay.open { display: flex; }
@@ -116,11 +150,12 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
 
 @media (max-width: 720px) {
   #header { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 8px; }
-  #toolbar { padding: 10px 12px; }
-  #table-wrap { padding: 0 12px; }
-  #search-wrap input { width: 140px; }
-  #modal-body { grid-template-columns: 1fr; }
+  #toolbar, .toolbar-dod { padding: 10px 12px; }
+  .table-wrap { padding: 0 12px; }
+  .search-wrap input { width: 140px; }
+  .modal-body { grid-template-columns: 1fr; }
   .form-group.full { grid-column: 1; }
+  #tabs { padding: 0 16px; }
 }
 </style>
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(x=>x.unregister()))}if('caches' in window){caches.keys().then(n=>n.forEach(k=>caches.delete(k)))}</script></head>
@@ -136,56 +171,100 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
   </div>
   <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
     <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
-    <div class="stats">
+    <div class="stats" id="stats-zak">
       <div class="stat"><div class="num" id="stat-total" style="color:#1a1a1a">0</div><div class="lbl">Celkem</div></div>
       <div class="stat"><div class="num" id="stat-nova"  style="color:#e050e0">0</div><div class="lbl">Nové</div></div>
       <div class="stat"><div class="num" id="stat-reseni" style="color:#e2b830">0</div><div class="lbl">V řešení</div></div>
       <div class="stat"><div class="num" id="stat-dodavatel" style="color:#6080c0">0</div><div class="lbl">Dodavatel</div></div>
       <div class="stat"><div class="num" id="stat-vyrizeno" style="color:#40a050">0</div><div class="lbl">Vyřízeno</div></div>
     </div>
+    <div class="stats" id="stats-dod" style="display:none;">
+      <div class="stat"><div class="num" id="sd-total" style="color:#1a1a1a">0</div><div class="lbl">Celkem</div></div>
+      <div class="stat"><div class="num" id="sd-odeslano" style="color:#6080c0">0</div><div class="lbl">Odesláno</div></div>
+      <div class="stat"><div class="num" id="sd-ceka" style="color:#e2b830">0</div><div class="lbl">Čeká</div></div>
+      <div class="stat"><div class="num" id="sd-vyrizeno" style="color:#40a050">0</div><div class="lbl">Vyřízeno</div></div>
+    </div>
   </div>
 </div>
 
-<div id="toolbar">
-  <button class="filter-btn active" data-filter="vse" onclick="setFilter('vse')">Vše</button>
-  <button class="filter-btn" data-filter="Nová"                  onclick="setFilter('Nová')"><span class="filter-dot" style="background:#e050e0"></span>Nová</button>
-  <button class="filter-btn" data-filter="V řešení"              onclick="setFilter('V řešení')"><span class="filter-dot" style="background:#e2b830"></span>V řešení</button>
-  <button class="filter-btn" data-filter="V řešení u dodavatele" onclick="setFilter('V řešení u dodavatele')"><span class="filter-dot" style="background:#6080c0"></span>U dodavatele</button>
-  <button class="filter-btn" data-filter="Vyřízené"              onclick="setFilter('Vyřízené')"><span class="filter-dot" style="background:#40a050"></span>Vyřízené</button>
-  <button class="filter-btn" data-filter="Zamítnuto"             onclick="setFilter('Zamítnuto')"><span class="filter-dot" style="background:#c05050"></span>Zamítnuto</button>
-  <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
-  <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
-  <button id="btn-add" onclick="openModal()">+ Nová reklamace</button>
+<div id="tabs">
+  <button class="tab-btn active" onclick="switchTab('zakaznicke')">📋 Zákaznické</button>
+  <button class="tab-btn" onclick="switchTab('dodavatele')">🏭 U dodavatele</button>
 </div>
 
-<div id="table-wrap">
-  <table>
-    <thead><tr>
-      <th onclick="sortBy('obj')"        data-col="obj">       OBJ. Č.      <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('zakaznik')"   data-col="zakaznik">  Zákazník     <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('typ')"        data-col="typ">        Typ          <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('popis')"      data-col="popis">      Popis        <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('priorita')"   data-col="priorita">   Priorita     <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('technik')"    data-col="technik">    Technik      <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('datum_nahlaseni')" data-col="datum_nahlaseni"> Nahlášeno <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('datum_deadline')"  data-col="datum_deadline">  Deadline  <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('stav')"       data-col="stav">       Stav         <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('email')" data-col="email">Email <span class="sort-arrow"></span></th>
-      <th>Notif.</th>
-      <th>Způsob vyřízení</th>
-    </tr></thead>
-    <tbody id="tbody"></tbody>
-  </table>
-  <div id="empty-state"><div class="big">📋</div><p>Žádné záznamy</p></div>
+<!-- Alert bar for overdue supplier claims -->
+<div id="alert-bar"><span class="alert-title">⚠ Bez odpovědi &gt;14 dní:</span><span id="alert-items"></span></div>
+
+<!-- ═══ TAB: Zákaznické reklamace ═══ -->
+<div id="tab-zakaznicke" class="tab-content active">
+  <div id="toolbar">
+    <button class="filter-btn active" data-filter="vse" onclick="setFilter('vse')">Vše</button>
+    <button class="filter-btn" data-filter="Nová"                  onclick="setFilter('Nová')"><span class="filter-dot" style="background:#e050e0"></span>Nová</button>
+    <button class="filter-btn" data-filter="V řešení"              onclick="setFilter('V řešení')"><span class="filter-dot" style="background:#e2b830"></span>V řešení</button>
+    <button class="filter-btn" data-filter="V řešení u dodavatele" onclick="setFilter('V řešení u dodavatele')"><span class="filter-dot" style="background:#6080c0"></span>U dodavatele</button>
+    <button class="filter-btn" data-filter="Vyřízené"              onclick="setFilter('Vyřízené')"><span class="filter-dot" style="background:#40a050"></span>Vyřízené</button>
+    <button class="filter-btn" data-filter="Zamítnuto"             onclick="setFilter('Zamítnuto')"><span class="filter-dot" style="background:#c05050"></span>Zamítnuto</button>
+    <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
+    <button class="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
+    <button class="btn-add" onclick="openModal()">+ Nová reklamace</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th onclick="sortBy('obj')"        data-col="obj">       OBJ. Č.      <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('zakaznik')"   data-col="zakaznik">  Zákazník     <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('typ')"        data-col="typ">        Typ          <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('popis')"      data-col="popis">      Popis        <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('priorita')"   data-col="priorita">   Priorita     <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('technik')"    data-col="technik">    Technik      <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('datum_nahlaseni')" data-col="datum_nahlaseni"> Nahlášeno <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('datum_deadline')"  data-col="datum_deadline">  Deadline  <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('stav')"       data-col="stav">       Stav         <span class="sort-arrow"></span></th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state"><div class="big">📋</div><p>Žádné záznamy</p></div>
+  </div>
 </div>
 
-<div id="modal-overlay" onclick="overlayClick(event)">
-  <div id="modal">
-    <div id="modal-header">
-      <div id="modal-title">Nová reklamace</div>
-      <button id="modal-close" onclick="closeModal()">✕</button>
+<!-- ═══ TAB: Reklamace u dodavatele ═══ -->
+<div id="tab-dodavatele" class="tab-content">
+  <div class="toolbar-dod" id="toolbar-dod" style="padding:14px 32px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid #e8e4dc;background:#f4f2ed;">
+    <button class="filter-btn active" data-filter-dod="vse" onclick="setFilterDod('vse')">Vše</button>
+    <button class="filter-btn" data-filter-dod="aktivni" onclick="setFilterDod('aktivni')"><span class="filter-dot" style="background:#e2b830"></span>Aktivní</button>
+    <button class="filter-btn" data-filter-dod="Vyřízeno" onclick="setFilterDod('Vyřízeno')"><span class="filter-dot" style="background:#40a050"></span>Vyřízeno</button>
+    <button class="filter-btn" data-filter-dod="Zamítnuto" onclick="setFilterDod('Zamítnuto')"><span class="filter-dot" style="background:#c05050"></span>Zamítnuto</button>
+    <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-dod" placeholder="Hledat..." oninput="renderDodTable()"></div>
+    <button class="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
+    <button class="btn-add" onclick="openDodModal()">+ Nová reklamace u dodavatele</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th onclick="sortByDod('dodavatel')"      data-col-dod="dodavatel">     Dodavatel     <span class="sort-arrow-dod"></span></th>
+        <th onclick="sortByDod('produkt')"         data-col-dod="produkt">       Produkt       <span class="sort-arrow-dod"></span></th>
+        <th onclick="sortByDod('datum_odeslani')"  data-col-dod="datum_odeslani">Odesláno      <span class="sort-arrow-dod"></span></th>
+        <th onclick="sortByDod('tracking')"        data-col-dod="tracking">      Tracking      <span class="sort-arrow-dod"></span></th>
+        <th onclick="sortByDod('stav')"            data-col-dod="stav">          Stav          <span class="sort-arrow-dod"></span></th>
+        <th>Čeká</th>
+        <th onclick="sortByDod('datum_vyrizeni')"  data-col-dod="datum_vyrizeni">Vyřízeno      <span class="sort-arrow-dod"></span></th>
+        <th>Vazba</th>
+        <th onclick="sortByDod('poznamka')"        data-col-dod="poznamka">      Poznámka      <span class="sort-arrow-dod"></span></th>
+      </tr></thead>
+      <tbody id="tbody-dod"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state-dod"><div class="big">🏭</div><p>Žádné reklamace u dodavatelů</p></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Zákaznická reklamace ═══ -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Nová reklamace</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-    <div id="modal-body">
+    <div class="modal-body">
       <div class="form-group"><label>OBJ. Č.</label><input type="text" id="f-obj" placeholder="např. 872804"></div>
       <div class="form-group"><label>Typ</label>
         <select id="f-typ">
@@ -203,7 +282,7 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
         </select>
       </div>
       <div class="form-group"><label>Stav</label>
-        <select id="f-stav">
+        <select id="f-stav" onchange="onStavChange()">
           <option>Nová</option>
           <option>V řešení</option>
           <option>V řešení u dodavatele</option>
@@ -220,11 +299,62 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
         <input type="checkbox" id="f-notifikovat" style="width:18px;height:18px;accent-color:#e05050;cursor:pointer;flex-shrink:0;">
         <label for="f-notifikovat" style="font-size:13px;color:#444;cursor:pointer;letter-spacing:0;text-transform:none;font-weight:400;">Notifikovat zákazníka emailem při uložení</label>
       </div>
+      <div class="form-group full" id="linked-dod-box" style="display:none;">
+        <div class="linked-box">
+          <div class="linked-title">Reklamace u dodavatele</div>
+          <div id="linked-dod-list"></div>
+        </div>
+      </div>
     </div>
-    <div id="modal-footer">
-      <button id="btn-delete" onclick="deleteRecord()" style="display:none">🗑 Smazat</button>
+    <div class="modal-footer">
+      <button class="btn-delete" id="btn-delete" onclick="deleteRecord()" style="display:none">🗑 Smazat</button>
+      <button class="btn-secondary" id="btn-to-dod" onclick="manualToDod()" style="display:none">🏭 → Dodavateli</button>
+      <button class="btn-secondary" id="btn-print" onclick="printProtocol()" style="display:none">🖨 Protokol</button>
       <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
       <button class="btn-save" onclick="saveRecord()">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Reklamace u dodavatele ═══ -->
+<div class="modal-overlay" id="modal-dod-overlay" onclick="if(event.target===this)closeDodModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-dod-title">Nová reklamace u dodavatele</div>
+      <button class="modal-close" onclick="closeDodModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Dodavatel</label>
+        <select id="fd-dodavatel"><option value="">— vyberte —</option></select>
+      </div>
+      <div class="form-group"><label>Stav</label>
+        <select id="fd-stav">
+          <option>Připraveno</option>
+          <option>Odesláno</option>
+          <option>Přijato dodavatelem</option>
+          <option>Vyřízeno</option>
+          <option>Zamítnuto</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Produkt / Zboží</label><input type="text" id="fd-produkt" placeholder="Co reklamujeme"></div>
+      <div class="form-group full"><label>Popis problému</label><textarea id="fd-popis" placeholder="Popis závady..."></textarea></div>
+      <div class="form-group"><label>Datum odeslání</label><input type="date" id="fd-datum-odeslani"></div>
+      <div class="form-group"><label>Tracking</label><input type="text" id="fd-tracking" placeholder="Číslo zásilky"></div>
+      <div class="form-group"><label>Datum vyřízení</label><input type="date" id="fd-datum-vyrizeni"></div>
+      <div class="form-group"><label>&nbsp;</label></div>
+      <div class="form-group full"><label>Řešení / Výsledek</label><textarea id="fd-reseni" placeholder="Jak dodavatel vyřídil..."></textarea></div>
+      <div class="form-group full"><label>Poznámka</label><textarea id="fd-poznamka" placeholder="Interní poznámka..." style="min-height:50px;"></textarea></div>
+      <div class="form-group full" id="linked-zak-box" style="display:none;">
+        <div class="linked-box">
+          <div class="linked-title">Navázané zákaznické reklamace</div>
+          <div id="linked-zak-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-delete" id="btn-dod-delete" onclick="deleteDodRecord()" style="display:none">🗑 Smazat</button>
+      <button class="btn-cancel" onclick="closeDodModal()">Zrušit</button>
+      <button class="btn-save" onclick="saveDodRecord()">Uložit</button>
     </div>
   </div>
 </div>
@@ -239,71 +369,113 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
 <script>
 // ── Konfigurace ──────────────────────────────────────────────────────────────
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1CrDyJardzxDfKV0Bog2DznHIOPmOAL8tI6TgnWDKiWPTdH-kanpx0ZTeJi17WnDhOA/exec';
-
-const COLS = ['id','obj','zakaznik','typ','popis','priorita','technik','datum_nahlaseni','datum_deadline','stav','zpusob'];
+const SCRIPT_ZAS = 'https://script.google.com/macros/s/AKfycbwLv_A2ztatFndTjLL4q-ziJP_l6ktvYi7E-pKqHOmlkMW66CgwIsqnU1ICZ89cV6aO1w/exec';
 
 const STATUS_CLASS = {
-  'Nová':                   's-nova',
-  'V řešení':               's-reseni',
-  'V řešení u dodavatele':  's-dodavatel',
-  'Vyřízené':               's-vyrizeno',
-  'Zamítnuto':              's-zamitnuto',
+  'Nová':'s-nova','V řešení':'s-reseni','V řešení u dodavatele':'s-dodavatel',
+  'Vyřízené':'s-vyrizeno','Zamítnuto':'s-zamitnuto'
+};
+const STATUS_DOD_CLASS = {
+  'Připraveno':'sd-pripraveno','Odesláno':'sd-odeslano','Přijato dodavatelem':'sd-prijato',
+  'Vyřízeno':'sd-vyrizeno','Zamítnuto':'sd-zamitnuto'
 };
 const PRIO_CLASS = { 'Vysoká':'prio-vysoka', 'Střední':'prio-stredni', 'Nízká':'prio-nizka' };
+const ALERT_DAYS = 14;
 
-let data=[], filterVal='vse', sortCol='datum_nahlaseni', sortDir=-1, editId=null;
+let data=[], dataDod=[], dodavatele=[];
+let filterVal='vse', sortCol='datum_nahlaseni', sortDir=-1, editId=null;
+let filterDod='vse', sortColDod='datum_odeslani', sortDirDod=-1, editDodId=null;
+let activeTab='zakaznicke';
 const today = new Date();
+const todayStr = toInputDate(today);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function toInputDate(d){
   if(!d||d==='') return '';
   if(typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
-  const dt=new Date(d);
-  if(isNaN(dt)) return '';
+  const dt=new Date(d); if(isNaN(dt)) return '';
   return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
 }
-
 function fmtDate(d){
-  const s=toInputDate(d);
-  if(!s) return '—';
-  const [y,m,day]=s.split('-');
-  return `${day}.${m}.${y}`;
+  const s=toInputDate(d); if(!s) return '—';
+  const [y,m,day]=s.split('-'); return `${day}.${m}.${y}`;
 }
-
 function deadlineClass(d){
-  const s=toInputDate(d);
-  if(!s) return '';
-  const dt=new Date(s+'T00:00:00');
-  const diff=Math.ceil((dt-today)/(1000*60*60*24));
-  if(diff<0) return 'deadline-warn';
-  if(diff<=3) return 'deadline-warn';
-  return 'deadline-ok';
+  const s=toInputDate(d); if(!s) return '';
+  const diff=Math.ceil((new Date(s+'T00:00:00')-today)/(86400000));
+  return diff<=3?'deadline-warn':'deadline-ok';
 }
-
+function daysBetween(from,to){
+  const a=new Date(from+'T00:00:00'), b=new Date(to+'T00:00:00');
+  return Math.floor((b-a)/86400000);
+}
 function syncStatus(state,text){ document.getElementById('sync-dot').className=state; document.getElementById('sync-text').textContent=text; }
+function showSaving(t,s){ document.getElementById('saving-title').textContent=t; document.getElementById('saving-sub').textContent=s; document.getElementById('saving-overlay').classList.add('open'); }
+function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
+
+// ── Tab switching ────────────────────────────────────────────────────────────
+function switchTab(tab){
+  activeTab=tab;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===(tab==='zakaznicke'?0:1)));
+  document.getElementById('tab-zakaznicke').classList.toggle('active',tab==='zakaznicke');
+  document.getElementById('tab-dodavatele').classList.toggle('active',tab==='dodavatele');
+  document.getElementById('stats-zak').style.display=tab==='zakaznicke'?'flex':'none';
+  document.getElementById('stats-dod').style.display=tab==='dodavatele'?'flex':'none';
+}
 
 // ── API ───────────────────────────────────────────────────────────────────────
+async function apiPost(payload){
+  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload),redirect:'follow',headers:{'Content-Type':'text/plain'}});
+  const text=await res.text();
+  let json;
+  try { json=JSON.parse(text); } catch(e) {
+    const m=text.match(/\{[\s\S]*\}/);
+    if(m) try { json=JSON.parse(m[0]); } catch(e2){}
+    if(!json) throw new Error('Neplatná odpověď serveru');
+  }
+  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+  return json;
+}
+
 async function loadData(){
   syncStatus('loading','Načítám data...');
   try {
-    const res=await fetch(SCRIPT_URL);
-    const json=await res.json();
-    data=json.data||[];
+    const [resZak, resDod, resDodList] = await Promise.all([
+      fetch(SCRIPT_URL).then(r=>r.json()),
+      fetch(SCRIPT_URL+'?modul=reklamace_dodavatel').then(r=>r.json()).catch(()=>({data:[]})),
+      fetch(SCRIPT_ZAS+'?modul=dodavatele').then(r=>r.json()).catch(()=>({data:[]}))
+    ]);
+    data = resZak.data || [];
+    dataDod = resDod.data || [];
+    dodavatele = resDodList.data || [];
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
-    renderTable();
-  } catch(e){ syncStatus('error','Chyba: '+e.message); }
+    renderAll();
+  } catch(e){ syncStatus('error','Chyba: '+e.message); console.error(e); }
 }
 
-async function apiPost(payload){
-  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});
-  const json=await res.json();
-  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+function renderAll(){
+  renderTable();
+  renderDodTable();
+  renderAlerts();
+  populateDodSelect();
 }
 
-// ── Filter & sort ─────────────────────────────────────────────────────────────
+// ── Dodavatel select ─────────────────────────────────────────────────────────
+function populateDodSelect(){
+  const sel=document.getElementById('fd-dodavatel');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— vyberte —</option>';
+  dodavatele.forEach(d=>{
+    const n=String(d.nazev||'').trim();
+    if(n) sel.innerHTML+=`<option value="${n}">${n}</option>`;
+  });
+  if(cur) sel.value=cur;
+}
+
+// ═══ ZÁKAZNICKÉ REKLAMACE ═══════════════════════════════════════════════════
 function setFilter(f){
   filterVal=f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f));
+  document.querySelectorAll('#toolbar .filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f));
   renderTable();
 }
 function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTable(); }
@@ -311,107 +483,123 @@ function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTab
 function getFiltered(){
   const q=(document.getElementById('search').value||'').toLowerCase();
   return data.filter(r=>{
-    if(filterVal!=='vse'&&r.stav!==filterVal) return false;
-    if(q&&![r.obj,r.zakaznik,r.typ,r.popis,r.technik,r.zpusob].join(' ').toLowerCase().includes(q)) return false;
+    if(filterVal!=='vse'&&String(r.stav)!==filterVal) return false;
+    if(q&&![String(r.obj||''),String(r.zakaznik||''),String(r.typ||''),String(r.popis||''),String(r.technik||''),String(r.zpusob||'')].join(' ').toLowerCase().includes(q)) return false;
     return true;
   }).sort((a,b)=>{
-    const va=a[sortCol]||'', vb=b[sortCol]||'';
+    const va=String(a[sortCol]||''), vb=String(b[sortCol]||'');
     return va<vb?-sortDir:va>vb?sortDir:0;
   });
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
 function renderTable(){
   const rows=getFiltered();
-  document.querySelectorAll('thead th[data-col]').forEach(th=>{
+  document.querySelectorAll('#tab-zakaznicke thead th[data-col]').forEach(th=>{
     th.classList.toggle('sorted',th.dataset.col===sortCol);
     th.querySelector('.sort-arrow').textContent=th.dataset.col===sortCol?(sortDir===1?' ↓':' ↑'):'';
   });
   document.getElementById('stat-total').textContent=data.length;
-  document.getElementById('stat-nova').textContent=data.filter(r=>r.stav==='Nová').length;
-  document.getElementById('stat-reseni').textContent=data.filter(r=>r.stav==='V řešení').length;
-  document.getElementById('stat-dodavatel').textContent=data.filter(r=>r.stav==='V řešení u dodavatele').length;
-  document.getElementById('stat-vyrizeno').textContent=data.filter(r=>r.stav==='Vyřízené').length;
+  document.getElementById('stat-nova').textContent=data.filter(r=>String(r.stav)==='Nová').length;
+  document.getElementById('stat-reseni').textContent=data.filter(r=>String(r.stav)==='V řešení').length;
+  document.getElementById('stat-dodavatel').textContent=data.filter(r=>String(r.stav)==='V řešení u dodavatele').length;
+  document.getElementById('stat-vyrizeno').textContent=data.filter(r=>String(r.stav)==='Vyřízené').length;
 
   const tbody=document.getElementById('tbody');
   if(!rows.length){ tbody.innerHTML=''; document.getElementById('empty-state').style.display='block'; return; }
   document.getElementById('empty-state').style.display='none';
 
   tbody.innerHTML=rows.map(r=>`
-    <tr data-id="${r.id}" data-stav="${r.stav}" onclick="openModal('${r.id}')">
-      <td class="obj">${r.obj||'—'}</td>
-      <td class="zakaznik">${r.zakaznik||'—'}</td>
-      <td><span style="font-size:11px;color:#999;">${r.typ||'—'}</span></td>
-      <td class="popis">${r.popis||''}</td>
-      <td><span class="prio ${PRIO_CLASS[r.priorita]||''}">${r.priorita||'—'}</span></td>
-      <td>${r.technik||'—'}</td>
+    <tr data-id="${r.id}" data-stav="${String(r.stav)}" onclick="openModal('${r.id}')">
+      <td class="obj">${String(r.obj||'')||'—'}</td>
+      <td class="zakaznik">${String(r.zakaznik||'')||'—'}</td>
+      <td><span style="font-size:11px;color:#999;">${String(r.typ||'')||'—'}</span></td>
+      <td class="popis">${String(r.popis||'')}</td>
+      <td><span class="prio ${PRIO_CLASS[r.priorita]||''}">${String(r.priorita||'')||'—'}</span></td>
+      <td>${String(r.technik||'')||'—'}</td>
       <td class="datum">${fmtDate(r.datum_nahlaseni)}</td>
       <td class="datum ${deadlineClass(r.datum_deadline)}">${fmtDate(r.datum_deadline)}</td>
-      <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
-      <td style="font-size:11px;color:#6080c0;">${r.email||'—'}</td>
-      <td style="text-align:center;">${r.notifikovat==='ano'?'<span style="color:#40a050;font-size:14px;">✓</span>':'<span style="color:#888;">—</span>'}</td>
-      <td style="font-size:11px;color:#999;max-width:180px;">${r.zpusob||''}</td>
+      <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${String(r.stav||'')||'—'}</span></td>
     </tr>`).join('');
 }
 
-// ── Modal ─────────────────────────────────────────────────────────────────────
+// ── Modal zákaznická ─────────────────────────────────────────────────────────
 function openModal(id){
-  const r=id?data.find(x=>x.id===String(id)):null;
+  const r=id?data.find(x=>String(x.id)===String(id)):null;
   editId=r?String(r.id):null;
   document.getElementById('modal-title').textContent=r?'Upravit reklamaci':'Nová reklamace';
   document.getElementById('btn-delete').style.display=r?'inline-flex':'none';
+  // Show buttons for existing records
+  document.getElementById('btn-to-dod').style.display=r?'inline-flex':'none';
+  document.getElementById('btn-print').style.display=r?'inline-flex':'none';
+
   if(r){
-    document.getElementById('f-obj').value=r.obj||'';
-    document.getElementById('f-zakaznik').value=r.zakaznik||'';
-    document.getElementById('f-typ').value=r.typ||'Reklamace produktu';
-    document.getElementById('f-popis').value=r.popis||'';
-    document.getElementById('f-priorita').value=r.priorita||'Střední';
-    document.getElementById('f-technik').value=r.technik||'';
+    document.getElementById('f-obj').value=String(r.obj||'');
+    document.getElementById('f-zakaznik').value=String(r.zakaznik||'');
+    document.getElementById('f-typ').value=String(r.typ||'Reklamace produktu');
+    document.getElementById('f-popis').value=String(r.popis||'');
+    document.getElementById('f-priorita').value=String(r.priorita||'Střední');
+    document.getElementById('f-technik').value=String(r.technik||'');
     document.getElementById('f-datum-nahlaseni').value=toInputDate(r.datum_nahlaseni);
     document.getElementById('f-datum-deadline').value=toInputDate(r.datum_deadline);
-    document.getElementById('f-stav').value=r.stav||'Nová';
-    document.getElementById('f-zpusob').value=r.zpusob||'';
-    document.getElementById('f-email').value=r.email||'';
-    document.getElementById('f-notifikovat').checked=r.notifikovat==='ano';
+    document.getElementById('f-stav').value=String(r.stav||'Nová');
+    document.getElementById('f-zpusob').value=String(r.zpusob||'');
+    document.getElementById('f-email').value=String(r.email||'');
+    document.getElementById('f-notifikovat').checked=String(r.notifikovat)==='ano';
+    // Show linked dodavatel records
+    const linked=dataDod.filter(d=>String(d.vazba_reklamace||'').split('|').includes(String(r.id)));
+    const box=document.getElementById('linked-dod-box');
+    if(linked.length){
+      box.style.display='block';
+      document.getElementById('linked-dod-list').innerHTML=linked.map(d=>
+        `<div class="linked-item">🏭 <strong>${String(d.dodavatel||'')}</strong> — ${String(d.produkt||'')} — <span class="badge ${STATUS_DOD_CLASS[d.stav]||''}"><span class="badge-dot"></span>${String(d.stav||'')}</span></div>`
+      ).join('');
+    } else { box.style.display='none'; }
   } else {
     ['f-obj','f-zakaznik','f-popis','f-technik','f-zpusob','f-email'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('f-notifikovat').checked=false;
     document.getElementById('f-typ').value='Reklamace produktu';
     document.getElementById('f-priorita').value='Střední';
     document.getElementById('f-stav').value='Nová';
-    // Dnešní datum jako výchozí pro nahlášení
     document.getElementById('f-datum-nahlaseni').value=toInputDate(new Date());
     document.getElementById('f-datum-deadline').value='';
+    document.getElementById('linked-dod-box').style.display='none';
   }
   document.getElementById('modal-overlay').classList.add('open');
 }
 function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); editId=null; }
-function overlayClick(e){ if(e.target===document.getElementById('modal-overlay')) closeModal(); }
-function showSaving(t,s){ document.getElementById('saving-title').textContent=t; document.getElementById('saving-sub').textContent=s; document.getElementById('saving-overlay').classList.add('open'); }
-function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
+
+function onStavChange(){
+  // Visual hint — no auto action here, auto-create happens on save
+}
 
 async function saveRecord(){
   const isEdit=!!editId;
+  const prevStav=isEdit?String((data.find(x=>String(x.id)===String(editId))||{}).stav||''):'';
   const currentId=editId?String(editId):String(Date.now());
+  const newStav=document.getElementById('f-stav').value;
   const rec={
-    id:               currentId,
-    obj:              document.getElementById('f-obj').value.trim(),
-    zakaznik:         document.getElementById('f-zakaznik').value.trim(),
-    typ:              document.getElementById('f-typ').value,
-    popis:            document.getElementById('f-popis').value.trim(),
-    priorita:         document.getElementById('f-priorita').value,
-    technik:          document.getElementById('f-technik').value.trim(),
-    datum_nahlaseni:  document.getElementById('f-datum-nahlaseni').value,
-    datum_deadline:   document.getElementById('f-datum-deadline').value,
-    stav:             document.getElementById('f-stav').value,
-    zpusob:           document.getElementById('f-zpusob').value.trim(),
-    email:            document.getElementById('f-email').value.trim(),
-    notifikovat:      document.getElementById('f-notifikovat').checked ? 'ano' : 'ne',
+    id:currentId,
+    obj:document.getElementById('f-obj').value.trim(),
+    zakaznik:document.getElementById('f-zakaznik').value.trim(),
+    typ:document.getElementById('f-typ').value,
+    popis:document.getElementById('f-popis').value.trim(),
+    priorita:document.getElementById('f-priorita').value,
+    technik:document.getElementById('f-technik').value.trim(),
+    datum_nahlaseni:document.getElementById('f-datum-nahlaseni').value,
+    datum_deadline:document.getElementById('f-datum-deadline').value,
+    stav:newStav,
+    zpusob:document.getElementById('f-zpusob').value.trim(),
+    email:document.getElementById('f-email').value.trim(),
+    notifikovat:document.getElementById('f-notifikovat').checked?'ano':'ne',
   };
   closeModal();
   showSaving(isEdit?'Ukládám změny...':'Přidávám reklamaci...','Komunikuji s Google Sheets');
   try {
     await apiPost({action:isEdit?'update':'append',record:rec});
+    // Auto-create dodavatel record when status changes to "V řešení u dodavatele"
+    if(newStav==='V řešení u dodavatele' && prevStav!=='V řešení u dodavatele'){
+      await autoCreateDod(rec);
+    }
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při ukládání: '+e.message); }
@@ -428,6 +616,262 @@ async function deleteRecord(){
   } catch(e){ hideSaving(); alert('Chyba při mazání: '+e.message); }
 }
 
+// Manual "→ Dodavateli" button
+async function manualToDod(){
+  if(!editId) return;
+  const r=data.find(x=>String(x.id)===String(editId));
+  if(!r) return;
+  closeModal();
+  showSaving('Vytvářím reklamaci u dodavatele...','');
+  try {
+    await autoCreateDod(r);
+    showSaving('Hotovo!','Reklamace přidána k dodavateli');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+// ── Auto-create dodavatel record ─────────────────────────────────────────────
+async function autoCreateDod(zakRec){
+  const zakId=String(zakRec.id);
+  // Check if already linked
+  const existing=dataDod.find(d=>String(d.vazba_reklamace||'').split('|').includes(zakId));
+  if(existing) return;
+  const dodRec={
+    id:String(Date.now()),
+    dodavatel:'',
+    produkt:String(zakRec.popis||'').substring(0,100),
+    popis:String(zakRec.popis||''),
+    datum_odeslani:'',
+    tracking:'',
+    stav:'Připraveno',
+    datum_vyrizeni:'',
+    reseni:'',
+    vazba_reklamace:zakId,
+    poznamka:'Auto z rekl. '+String(zakRec.obj||zakRec.id),
+  };
+  await apiPost({action:'append',modul:'reklamace_dodavatel',record:dodRec});
+  dataDod.push(dodRec);
+}
+
+// ═══ REKLAMACE U DODAVATELE ═════════════════════════════════════════════════
+function setFilterDod(f){
+  filterDod=f;
+  document.querySelectorAll('#toolbar-dod .filter-btn').forEach(b=>b.classList.toggle('active',(b.dataset.filterDod||'')=== f));
+  renderDodTable();
+}
+function sortByDod(col){ sortDirDod=sortColDod===col?sortDirDod*-1:1; sortColDod=col; renderDodTable(); }
+
+function getFilteredDod(){
+  const q=(document.getElementById('search-dod').value||'').toLowerCase();
+  return dataDod.filter(r=>{
+    const stav=String(r.stav||'');
+    if(filterDod==='aktivni'&&(stav==='Vyřízeno'||stav==='Zamítnuto')) return false;
+    if(filterDod!=='vse'&&filterDod!=='aktivni'&&stav!==filterDod) return false;
+    if(q&&![String(r.dodavatel||''),String(r.produkt||''),String(r.popis||''),String(r.tracking||''),String(r.poznamka||'')].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b)=>{
+    const va=String(a[sortColDod]||''), vb=String(b[sortColDod]||'');
+    return va<vb?-sortDirDod:va>vb?sortDirDod:0;
+  });
+}
+
+function renderDodTable(){
+  const rows=getFilteredDod();
+  document.querySelectorAll('#tab-dodavatele thead th[data-col-dod]').forEach(th=>{
+    th.classList.toggle('sorted',th.dataset.colDod===sortColDod);
+    const arrow=th.querySelector('.sort-arrow-dod');
+    if(arrow) arrow.textContent=th.dataset.colDod===sortColDod?(sortDirDod===1?' ↓':' ↑'):'';
+  });
+  // Stats
+  document.getElementById('sd-total').textContent=dataDod.length;
+  document.getElementById('sd-odeslano').textContent=dataDod.filter(r=>String(r.stav)==='Odesláno'||String(r.stav)==='Přijato dodavatelem').length;
+  document.getElementById('sd-ceka').textContent=dataDod.filter(r=>String(r.stav)==='Připraveno').length;
+  document.getElementById('sd-vyrizeno').textContent=dataDod.filter(r=>String(r.stav)==='Vyřízeno').length;
+
+  const tbody=document.getElementById('tbody-dod');
+  if(!rows.length){ tbody.innerHTML=''; document.getElementById('empty-state-dod').style.display='block'; return; }
+  document.getElementById('empty-state-dod').style.display='none';
+
+  tbody.innerHTML=rows.map(r=>{
+    const stav=String(r.stav||'');
+    const odesl=toInputDate(r.datum_odeslani);
+    let waitHtml='—';
+    if(odesl && stav!=='Vyřízeno' && stav!=='Zamítnuto'){
+      const days=daysBetween(odesl,todayStr);
+      waitHtml=days>=ALERT_DAYS?`<span class="days-warn">⚠ ${days} dní</span>`:`<span class="days-waiting">${days} dní</span>`;
+    }
+    const vazby=String(r.vazba_reklamace||'').split('|').filter(Boolean);
+    const vazbaHtml=vazby.map(vid=>{
+      const zak=data.find(z=>String(z.id)===vid);
+      return zak?`<span style="font-size:10px;color:#6080c0;cursor:pointer;" onclick="event.stopPropagation();switchTab('zakaznicke');openModal('${vid}')">${String(zak.obj||'#'+vid)}</span>`:'';
+    }).filter(Boolean).join(', ')||'—';
+    const tracking=String(r.tracking||'');
+    const trackHtml=tracking?`<span style="font-size:11px;">${tracking}</span>`:'—';
+    return `<tr data-stav="${stav}" onclick="openDodModal('${r.id}')">
+      <td style="font-weight:700;color:#1a1a1a;">${String(r.dodavatel||'')||'—'}</td>
+      <td style="font-size:11px;">${String(r.produkt||'')||'—'}</td>
+      <td class="datum">${fmtDate(r.datum_odeslani)}</td>
+      <td>${trackHtml}</td>
+      <td><span class="badge ${STATUS_DOD_CLASS[stav]||''}"><span class="badge-dot"></span>${stav||'—'}</span></td>
+      <td>${waitHtml}</td>
+      <td class="datum">${fmtDate(r.datum_vyrizeni)}</td>
+      <td>${vazbaHtml}</td>
+      <td style="font-size:11px;color:#999;max-width:180px;">${String(r.poznamka||'')}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Alert bar ────────────────────────────────────────────────────────────────
+function renderAlerts(){
+  const overdue=dataDod.filter(r=>{
+    const stav=String(r.stav||'');
+    if(stav==='Vyřízeno'||stav==='Zamítnuto'||stav==='Připraveno') return false;
+    const odesl=toInputDate(r.datum_odeslani);
+    if(!odesl) return false;
+    return daysBetween(odesl,todayStr)>=ALERT_DAYS;
+  });
+  const bar=document.getElementById('alert-bar');
+  if(!overdue.length){ bar.classList.remove('visible'); return; }
+  bar.classList.add('visible');
+  document.getElementById('alert-items').innerHTML=overdue.map(r=>
+    `<span class="alert-item" onclick="switchTab('dodavatele');openDodModal('${r.id}')">
+      ${String(r.dodavatel||'?')} — ${String(r.produkt||'').substring(0,30)} (${daysBetween(toInputDate(r.datum_odeslani),todayStr)} dní)
+    </span>`
+  ).join('');
+}
+
+// ── Modal dodavatel ──────────────────────────────────────────────────────────
+function openDodModal(id){
+  const r=id?dataDod.find(x=>String(x.id)===String(id)):null;
+  editDodId=r?String(r.id):null;
+  document.getElementById('modal-dod-title').textContent=r?'Upravit reklamaci u dodavatele':'Nová reklamace u dodavatele';
+  document.getElementById('btn-dod-delete').style.display=r?'inline-flex':'none';
+
+  if(r){
+    document.getElementById('fd-dodavatel').value=String(r.dodavatel||'');
+    document.getElementById('fd-stav').value=String(r.stav||'Připraveno');
+    document.getElementById('fd-produkt').value=String(r.produkt||'');
+    document.getElementById('fd-popis').value=String(r.popis||'');
+    document.getElementById('fd-datum-odeslani').value=toInputDate(r.datum_odeslani);
+    document.getElementById('fd-tracking').value=String(r.tracking||'');
+    document.getElementById('fd-datum-vyrizeni').value=toInputDate(r.datum_vyrizeni);
+    document.getElementById('fd-reseni').value=String(r.reseni||'');
+    document.getElementById('fd-poznamka').value=String(r.poznamka||'');
+    // Linked zákaznické
+    const vazby=String(r.vazba_reklamace||'').split('|').filter(Boolean);
+    const box=document.getElementById('linked-zak-box');
+    if(vazby.length){
+      box.style.display='block';
+      document.getElementById('linked-zak-list').innerHTML=vazby.map(vid=>{
+        const zak=data.find(z=>String(z.id)===vid);
+        return zak?`<div class="linked-item">📋 <strong>${String(zak.obj||'')}</strong> — ${String(zak.zakaznik||'')} — <span class="badge ${STATUS_CLASS[zak.stav]||''}"><span class="badge-dot"></span>${String(zak.stav||'')}</span></div>`:'';
+      }).filter(Boolean).join('');
+    } else { box.style.display='none'; }
+  } else {
+    ['fd-produkt','fd-popis','fd-tracking','fd-reseni','fd-poznamka'].forEach(fid=>document.getElementById(fid).value='');
+    document.getElementById('fd-dodavatel').value='';
+    document.getElementById('fd-stav').value='Připraveno';
+    document.getElementById('fd-datum-odeslani').value='';
+    document.getElementById('fd-datum-vyrizeni').value='';
+    document.getElementById('linked-zak-box').style.display='none';
+  }
+  document.getElementById('modal-dod-overlay').classList.add('open');
+}
+function closeDodModal(){ document.getElementById('modal-dod-overlay').classList.remove('open'); editDodId=null; }
+
+async function saveDodRecord(){
+  const isEdit=!!editDodId;
+  const currentId=editDodId?String(editDodId):String(Date.now());
+  // Preserve existing vazba
+  const existingVazba=isEdit?String((dataDod.find(x=>String(x.id)===currentId)||{}).vazba_reklamace||''):'';
+  const rec={
+    id:currentId,
+    dodavatel:document.getElementById('fd-dodavatel').value,
+    produkt:document.getElementById('fd-produkt').value.trim(),
+    popis:document.getElementById('fd-popis').value.trim(),
+    datum_odeslani:document.getElementById('fd-datum-odeslani').value,
+    tracking:document.getElementById('fd-tracking').value.trim(),
+    stav:document.getElementById('fd-stav').value,
+    datum_vyrizeni:document.getElementById('fd-datum-vyrizeni').value,
+    reseni:document.getElementById('fd-reseni').value.trim(),
+    vazba_reklamace:existingVazba,
+    poznamka:document.getElementById('fd-poznamka').value.trim(),
+  };
+  closeDodModal();
+  showSaving(isEdit?'Ukládám změny...':'Přidávám reklamaci...','Komunikuji s Google Sheets');
+  try {
+    await apiPost({action:isEdit?'update':'append',modul:'reklamace_dodavatel',record:rec});
+    showSaving('Hotovo!','Data uložena');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba při ukládání: '+e.message); }
+}
+
+async function deleteDodRecord(){
+  if(!editDodId||!confirm('Opravdu smazat tuto reklamaci u dodavatele?')) return;
+  const id=editDodId; closeDodModal();
+  showSaving('Mažu záznam...','Komunikuji s Google Sheets');
+  try {
+    await apiPost({action:'delete',modul:'reklamace_dodavatel',id:String(id)});
+    showSaving('Smazáno!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba při mazání: '+e.message); }
+}
+
+// ── Print reklamační protokol ─────────────────────────────────────────────────
+function printProtocol(){
+  if(!editId) return;
+  const r=data.find(x=>String(x.id)===String(editId));
+  if(!r) return;
+  const w=window.open('','_blank','width=800,height=900');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reklamační protokol – ${String(r.obj||'')}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;color:#111;padding:40px 50px;font-size:13px;line-height:1.5}
+h1{font-size:20px;text-align:center;margin-bottom:4px;letter-spacing:.05em}
+.subtitle{text-align:center;font-size:11px;color:#666;margin-bottom:30px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #333;margin-bottom:20px}
+.info-row{display:flex;border-bottom:1px solid #ccc;min-height:32px}
+.info-row:last-child{border-bottom:none}
+.info-label{background:#f0f0f0;font-weight:700;font-size:11px;padding:6px 12px;width:140px;flex-shrink:0;border-right:1px solid #ccc}
+.info-value{padding:6px 12px;flex:1}
+.full-row{grid-column:1/-1}
+.section{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.1em;background:#333;color:#fff;padding:6px 12px;grid-column:1/-1}
+.desc-box{border:1px solid #333;padding:14px;min-height:80px;margin-bottom:20px;white-space:pre-wrap}
+.desc-label{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;color:#333}
+.sign-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:50px}
+.sign-box{border-top:1px solid #333;padding-top:6px;text-align:center;font-size:11px;color:#666}
+.footer{margin-top:40px;font-size:10px;color:#999;text-align:center;border-top:1px solid #ddd;padding-top:10px}
+@media print{body{padding:20px 30px}@page{margin:15mm}}
+</style></head><body>
+<h1>REKLAMAČNÍ PROTOKOL</h1>
+<div class="subtitle">LEDshopik s.r.o. · Vyhotoveno: ${new Date().toLocaleDateString('cs-CZ')}</div>
+<div class="info-grid">
+  <div class="section">Údaje reklamace</div>
+  <div class="info-row"><div class="info-label">Číslo obj.</div><div class="info-value"><strong>${String(r.obj||'—')}</strong></div></div>
+  <div class="info-row"><div class="info-label">Datum nahlášení</div><div class="info-value">${fmtDate(r.datum_nahlaseni)}</div></div>
+  <div class="info-row full-row"><div class="info-label">Zákazník</div><div class="info-value"><strong>${String(r.zakaznik||'—')}</strong></div></div>
+  <div class="info-row full-row"><div class="info-label">Email</div><div class="info-value">${String(r.email||'—')}</div></div>
+  <div class="info-row"><div class="info-label">Typ</div><div class="info-value">${String(r.typ||'—')}</div></div>
+  <div class="info-row"><div class="info-label">Priorita</div><div class="info-value">${String(r.priorita||'—')}</div></div>
+  <div class="info-row"><div class="info-label">Stav</div><div class="info-value">${String(r.stav||'—')}</div></div>
+  <div class="info-row"><div class="info-label">Deadline</div><div class="info-value">${fmtDate(r.datum_deadline)}</div></div>
+  <div class="info-row full-row"><div class="info-label">Technik</div><div class="info-value">${String(r.technik||'—')}</div></div>
+</div>
+<div class="desc-label">Popis problému</div>
+<div class="desc-box">${String(r.popis||'—')}</div>
+<div class="desc-label">Způsob vyřízení</div>
+<div class="desc-box">${String(r.zpusob||'(dosud nevyplněno)')}</div>
+<div class="sign-grid">
+  <div><div class="sign-box">Podpis zákazníka</div></div>
+  <div><div class="sign-box">Podpis LEDshopik</div></div>
+</div>
+<div class="footer">Dokument vygenerován z LEDshopik systému · ${new Date().toLocaleDateString('cs-CZ')} ${new Date().toLocaleTimeString('cs-CZ')}</div>
+</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),300);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
 loadData();
 setInterval(loadData,120000);
 </script>
