@@ -192,6 +192,12 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
   </div>
 </div>
 
+<!-- Souhrn dovolené za měsíc -->
+<div id="vacation-summary" style="display:none;background:#f0f8f0;border-bottom:1px solid #c0dcc0;padding:10px 32px;">
+  <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#888;text-transform:uppercase;margin-bottom:6px;">Dovolená za období (pracovní dny)</div>
+  <div id="vacation-list" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
+</div>
+
 <!-- Upozornění na překryv -->
 <div id="overlap-bar" style="display:none;background:#fff0f0;border-bottom:2px solid #e05050;padding:10px 32px;align-items:center;gap:10px;">
   <span style="background:#e05050;color:#fff;font-size:9px;font-weight:900;padding:2px 8px;border-radius:2px;">!</span>
@@ -313,11 +319,62 @@ function toInputDate(d){
   return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
 }
 function fmtDate(d){ const s=toInputDate(d); if(!s) return '—'; const [y,m,day]=s.split('-'); return `${day}.${m}.${y}`; }
+// Výpočet Velikonoc (Gauss algorithm)
+function easterDate(year) {
+  const a=year%19, b=Math.floor(year/100), c=year%100;
+  const d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25);
+  const g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30;
+  const i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7;
+  const m=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m+114)/31), day=((h+l-7*m+114)%31)+1;
+  return new Date(year, month-1, day);
+}
+
+// České státní svátky pro daný rok
+function getCzechHolidays(year) {
+  const holidays = new Set();
+  const add = (m,d) => holidays.add(`${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+  add(1,1);   // Nový rok
+  add(5,1);   // Svátek práce
+  add(5,8);   // Den vítězství
+  add(7,5);   // Cyril a Metoděj
+  add(7,6);   // Jan Hus
+  add(9,28);  // Den české státnosti
+  add(10,28); // Vznik Československa
+  add(11,17); // Den boje za svobodu
+  add(12,24); // Štědrý den
+  add(12,25); // 1. svátek vánoční
+  add(12,26); // 2. svátek vánoční
+  // Velikonoce (Velký pátek + Velikonoční pondělí)
+  const easter = easterDate(year);
+  const goodFriday = new Date(easter); goodFriday.setDate(easter.getDate()-2);
+  const easterMonday = new Date(easter); easterMonday.setDate(easter.getDate()+1);
+  holidays.add(dateStr(goodFriday));
+  holidays.add(dateStr(easterMonday));
+  return holidays;
+}
+
+// Cache svátků
+const holidayCache = {};
+function isHoliday(dateString) {
+  const year = Number(dateString.split('-')[0]);
+  if (!holidayCache[year]) holidayCache[year] = getCzechHolidays(year);
+  return holidayCache[year].has(dateString);
+}
+
+// Počet pracovních dní (bez víkendů a svátků ČR)
 function countDays(od,doo){
   if(!od||!doo) return 0;
   const a=new Date(od+'T00:00:00'), b=new Date(doo+'T00:00:00');
   if(b<a) return 0;
-  return Math.round((b-a)/(1000*60*60*24))+1;
+  let count = 0;
+  const cur = new Date(a);
+  while(cur <= b) {
+    const dow = cur.getDay();
+    if(dow !== 0 && dow !== 6 && !isHoliday(dateStr(cur))) count++;
+    cur.setDate(cur.getDate()+1);
+  }
+  return count;
 }
 function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function syncStatus(state,text){ document.getElementById('sync-dot').className=state; document.getElementById('sync-text').textContent=text; }
@@ -390,7 +447,40 @@ function getFiltered(){
   });
 }
 
-function renderAll(){ renderStats(); checkOverlap(); renderCalendar(); renderTable(); }
+function renderAll(){ renderStats(); renderVacationSummary(); checkOverlap(); renderCalendar(); renderTable(); }
+
+function renderVacationSummary(){
+  const bar = document.getElementById('vacation-summary');
+  const list = document.getElementById('vacation-list');
+  const rok = Number(document.getElementById('filter-rok').value)||today.getFullYear();
+  const mesic = Number(document.getElementById('filter-mesic').value)||0;
+  if(!mesic){ bar.style.display='none'; return; }
+
+  // Začátek a konec vybraného měsíce
+  const mesStart = `${rok}-${String(mesic).padStart(2,'0')}-01`;
+  const lastDay = new Date(rok, mesic, 0).getDate();
+  const mesEnd = `${rok}-${String(mesic).padStart(2,'0')}-${lastDay}`;
+
+  // Spočítej pracovní dny dovolené za měsíc pro každého zaměstnance
+  const sums = {};
+  data.filter(r => r.typ === 'Dovolená').forEach(r => {
+    const od = toInputDate(r.datum_od), doo = toInputDate(r.datum_do);
+    if(!od || !doo || od > mesEnd || doo < mesStart) return;
+    // Ořízni na měsíc
+    const effOd = od < mesStart ? mesStart : od;
+    const effDo = doo > mesEnd ? mesEnd : doo;
+    const days = countDays(effOd, effDo);
+    if(days > 0){
+      sums[r.zamestnanec] = (sums[r.zamestnanec]||0) + days;
+    }
+  });
+
+  if(!Object.keys(sums).length){ bar.style.display='none'; return; }
+  bar.style.display='block';
+  list.innerHTML = Object.entries(sums).sort((a,b)=>b[1]-a[1]).map(([name,days]) =>
+    `<div style="background:#fff;border:1px solid #c0dcc0;border-radius:6px;padding:4px 12px;font-size:12px;"><b>${name}</b> <span style="color:#40a050;font-weight:800;">${days}d</span></div>`
+  ).join('');
+}
 
 function checkOverlap(){
   const bar=document.getElementById('overlap-bar');
@@ -493,7 +583,13 @@ function calcDays(){
   const od=document.getElementById('f-datum-od').value;
   const doo=document.getElementById('f-datum-do').value;
   const n=countDays(od,doo);
-  document.getElementById('days-info').textContent=n>0?`Celkem ${n} dní`:'';
+  if(n>0){
+    const a=new Date(od+'T00:00:00'), b=new Date(doo+'T00:00:00');
+    const total=Math.round((b-a)/(1000*60*60*24))+1;
+    document.getElementById('days-info').textContent=`${n} pracovních dní` + (total!==n ? ` (${total} kalendářních)` : '');
+  } else {
+    document.getElementById('days-info').textContent='';
+  }
 }
 
 function openModal(id){
