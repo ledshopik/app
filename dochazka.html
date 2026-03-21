@@ -302,7 +302,7 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
 <div id="saving-overlay">
   <div id="saving-box">
     <div class="saving-title" id="saving-title">Ukládám...</div>
-    <div class="saving-sub" id="saving-sub">Komunikuji s Google Sheets</div>
+    <div class="saving-sub" id="saving-sub">Ukládám data</div>
   </div>
 </div>
 
@@ -661,9 +661,9 @@ async function saveRecord(){
   };
   if(!rec.zamestnanec){ alert('Vyberte zaměstnance'); return; }
   closeModal();
-  showSaving(isEdit?'Ukládám změny...':'Přidávám absenci...','Komunikuji s Google Sheets');
+  showSaving(isEdit?'Ukládám změny...':'Přidávám absenci...','Ukládám data');
   try {
-    await apiPost({action:isEdit?'update':'append',record:rec});
+    await apiPost({action:isEdit?'update':'append',modul:'dochazka',record:rec});
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
@@ -674,7 +674,7 @@ async function deleteRecord(){
   const id=editId; closeModal();
   showSaving('Mažu...','');
   try {
-    await apiPost({action:'delete',id:String(id)});
+    await apiPost({action:'delete',modul:'dochazka',id:String(id)});
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }

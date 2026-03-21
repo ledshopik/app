@@ -363,7 +363,7 @@ tbody tr[data-stav="Přijato dodavatelem"]     td:first-child { border-left: 3px
 <div id="saving-overlay">
   <div id="saving-box">
     <div class="saving-title" id="saving-title">Ukládám...</div>
-    <div class="saving-sub"   id="saving-sub">Komunikuji s Google Sheets</div>
+    <div class="saving-sub"   id="saving-sub">Ukládám data</div>
   </div>
 </div>
 
@@ -594,9 +594,9 @@ async function saveRecord(){
     notifikovat:document.getElementById('f-notifikovat').checked?'ano':'ne',
   };
   closeModal();
-  showSaving(isEdit?'Ukládám změny...':'Přidávám reklamaci...','Komunikuji s Google Sheets');
+  showSaving(isEdit?'Ukládám změny...':'Přidávám reklamaci...','Ukládám data');
   try {
-    await apiPost({action:isEdit?'update':'append',record:rec});
+    await apiPost({action:isEdit?'update':'append',modul:'reklamace',record:rec});
     // Auto-create dodavatel record when status changes to "V řešení u dodavatele"
     if(newStav==='V řešení u dodavatele' && prevStav!=='V řešení u dodavatele'){
       await autoCreateDod(rec);
@@ -609,9 +609,9 @@ async function saveRecord(){
 async function deleteRecord(){
   if(!editId||!confirm('Opravdu smazat tuto reklamaci?')) return;
   const id=editId; closeModal();
-  showSaving('Mažu záznam...','Komunikuji s Google Sheets');
+  showSaving('Mažu záznam...','Ukládám data');
   try {
-    await apiPost({action:'delete',id:String(id)});
+    await apiPost({action:'delete',modul:'reklamace',id:String(id)});
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při mazání: '+e.message); }
@@ -799,7 +799,7 @@ async function saveDodRecord(){
     poznamka:document.getElementById('fd-poznamka').value.trim(),
   };
   closeDodModal();
-  showSaving(isEdit?'Ukládám změny...':'Přidávám reklamaci...','Komunikuji s Google Sheets');
+  showSaving(isEdit?'Ukládám změny...':'Přidávám reklamaci...','Ukládám data');
   try {
     await apiPost({action:isEdit?'update':'append',modul:'reklamace_dodavatel',record:rec});
     showSaving('Hotovo!','Data uložena');
@@ -810,7 +810,7 @@ async function saveDodRecord(){
 async function deleteDodRecord(){
   if(!editDodId||!confirm('Opravdu smazat tuto reklamaci u dodavatele?')) return;
   const id=editDodId; closeDodModal();
-  showSaving('Mažu záznam...','Komunikuji s Google Sheets');
+  showSaving('Mažu záznam...','Ukládám data');
   try {
     await apiPost({action:'delete',modul:'reklamace_dodavatel',id:String(id)});
     showSaving('Smazáno!','');

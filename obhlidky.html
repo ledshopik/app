@@ -296,7 +296,7 @@ tbody tr[data-stav="Čeká na rozhodnutí"] td:first-child { border-left: 3px so
 <div id="saving-overlay">
   <div id="saving-box">
     <div class="saving-title" id="saving-title">Ukládám...</div>
-    <div class="saving-sub"   id="saving-sub">Komunikuji s Google Sheets</div>
+    <div class="saving-sub"   id="saving-sub">Ukládám data</div>
   </div>
 </div>
 
@@ -533,9 +533,9 @@ async function saveRecord(){
     notifikovat: document.getElementById('f-notifikovat').checked?'ano':'ne',
   };
   closeModal();
-  showSaving(isEdit?'Ukládám změny...':'Přidávám obhlídku...','Komunikuji s Google Sheets');
+  showSaving(isEdit?'Ukládám změny...':'Přidávám obhlídku...','Ukládám data');
   try {
-    await apiPost({action:isEdit?'update':'append',record:rec});
+    await apiPost({action:isEdit?'update':'append',modul:'obhlidky',record:rec});
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při ukládání: '+e.message); }
@@ -544,9 +544,9 @@ async function saveRecord(){
 async function deleteRecord(){
   if(!editId||!confirm('Opravdu smazat tuto obhlídku?')) return;
   const id=editId; closeModal();
-  showSaving('Mažu záznam...','Komunikuji s Google Sheets');
+  showSaving('Mažu záznam...','Ukládám data');
   try {
-    await apiPost({action:'delete',id:String(id)});
+    await apiPost({action:'delete',modul:'obhlidky',id:String(id)});
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při mazání: '+e.message); }
