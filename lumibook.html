@@ -643,7 +643,7 @@ if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 // ══════════════════════════════════════
 let fixtures = [];        // Current project fixtures
 
-const LB_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzDy6sULzCqDsxZ76fNxn7vNdpT2OoU4XdpbZPWAXBeABaxz1lKk4HK3YKVT5T-RcOmkA/exec';
+const LB_API_URL = 'https://ledshopik-backend-production.up.railway.app/api/lumibook';
 let dbFromSheets = false;
 
 let database = [];        // Saved product database
@@ -662,6 +662,7 @@ console.log('%c LUMIBOOK PRO v2.1 (2026-03-18 22:30) ', 'background:#e8a020;colo
 load();
 render();
 renderDB();
+loadDBFromServer();
 
 // ══════════════════════════════════════
 // PERSISTENCE
@@ -675,23 +676,27 @@ function save() {
 }
 function saveDB() {
   try { localStorage.setItem('lb-database', JSON.stringify(database)); } catch(e) {}
-  // Sync to shared Google Sheets (non-blocking)
-  if(LB_SHEETS_URL && LB_SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbzDy6sULzCqDsxZ76fNxn7vNdpT2OoU4XdpbZPWAXBeABaxz1lKk4HK3YKVT5T-RcOmkA/exec') {
-    fetch(LB_SHEETS_URL, {
-      method: 'POST',
-      body: JSON.stringify({action: 'syncDB', database: database})
-    }).catch(() => {}); // ignore errors silently
-  }
+  // Sync to shared backend (non-blocking)
+  fetch(LB_API_URL + '/sync', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({database: database})
+  }).catch(() => {});
 }
 
-async function loadDBFromSheets() {
-  if(!LB_SHEETS_URL || LB_SHEETS_URL === 'https://script.google.com/macros/s/AKfycbzDy6sULzCqDsxZ76fNxn7vNdpT2OoU4XdpbZPWAXBeABaxz1lKk4HK3YKVT5T-RcOmkA/exec') return;
+async function loadDBFromServer() {
   try {
-    const res = await fetch(LB_SHEETS_URL + '?modul=database');
+    const res = await fetch(LB_API_URL);
     const json = await res.json();
-    if(json.data && json.data.length > 0) {
+    if(json.ok && json.database && Array.isArray(json.database) && json.database.length > 0) {
+      database = json.database;
+      localStorage.setItem('lb-database', JSON.stringify(database));
+      dbFromSheets = true;
+      renderDB();
+    } else if(json.ok && json.data && Array.isArray(json.data) && json.data.length > 0) {
       database = json.data;
       localStorage.setItem('lb-database', JSON.stringify(database));
+      dbFromSheets = true;
       renderDB();
     }
   } catch(e) {} // fallback to localStorage silently
