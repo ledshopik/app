@@ -398,25 +398,25 @@ a{color:var(--accent);text-decoration:none}
 .settings-overlay.open{opacity:1;pointer-events:auto}
 
 /* ── LEDSHOPIK NAV ── */
-#ls-nav{background:#fff;border-bottom:1px solid #e0e0e0;padding:0 24px;display:flex;align-items:stretch;gap:0;flex-wrap:wrap;flex-shrink:0;z-index:200;position:relative}
+#ls-nav{background:#f4f2ed;border-bottom:1px solid #e8e4dc;padding:0 0;display:flex;align-items:stretch;gap:0;flex-wrap:wrap;flex-shrink:0;z-index:200;position:relative;font-family:'Arial Narrow',Arial,sans-serif}
 #ls-nav a{padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;transition:color .15s;white-space:nowrap}
-#ls-nav a.active{color:#60a0e0;border-bottom-color:#60a0e0}
+#ls-nav a.active{color:#e8a020;border-bottom-color:#e8a020}
 #ls-nav a:hover{color:#1a1a1a}
 </style>
 </head>
 <body>
 <div id="ls-nav">
-  <a href="index.html">⌂ Dashboard</a>
-  <a href="instalace.html">Instalace</a>
-  <a href="vyroba.html">Výroba</a>
-  <a href="obhlidky.html">Obhlídky</a>
-  <a href="reklamace.html">Reklamace</a>
-  <a href="konfigurator.html">Konfigurátor</a>
-  <a href="zasobovani.html">Zásobování</a>
+  <a href="index.html" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">⌂ Dashboard</a>
+  <a href="instalace.html" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Instalace</a>
+  <a href="vyroba.html" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Výroba</a>
+  <a href="obhlidky.html" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Obhlídky</a>
+  <a href="reklamace.html" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Reklamace</a>
+  <a href="konfigurator.html" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Konfigurátor</a>
+  <a href="zasobovani.html" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Zásobování</a>
   <a href="lumibook.html" class="active">Lumibook</a>
-  <a href="kalkulator-instalaci.html">Kalkulátor</a>
-  <a href="dochazka.html" style="margin-left:auto;padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#50a060;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:5px;border-bottom:2px solid transparent;background:#f0f8f2;border-radius:6px 6px 0 0;" onmouseover="this.style.color='#3a8048'" onmouseout="this.style.color='#50a060'">🕐 Docházka</a>
-<div style="display:flex;align-items:center;gap:8px;padding:0 12px;margin-left:12px;font-size:12px;color:#888;border-left:1px solid #e0e0e0;"><span id="user-bar-name" style="font-weight:700;color:#333;"></span><a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a></div>
+  <a href="kalkulator-instalaci.html" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">Kalkulátor</a>
+  <a href="dochazka.html" style="margin-left:auto;color:#50a060;background:#f0f8f2;border-radius:6px 6px 0 0;gap:5px;" onmouseover="this.style.color='#3a8048'" onmouseout="this.style.color='#50a060'">🕐 Docházka</a>
+  <div style="display:flex;align-items:center;gap:8px;padding:0 12px;margin-left:12px;font-size:12px;color:#888;border-left:1px solid #e0e0e0;font-family:'Arial Narrow',Arial,sans-serif;"><span id="user-bar-name" style="font-weight:700;color:#333;"></span><a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a></div>
 </div>
 <div id="app">
   <!-- ═══ SIDEBAR ═══ -->
