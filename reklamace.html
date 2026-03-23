@@ -108,26 +108,28 @@ tbody tr[data-stav="Přijato dodavatelem"]     td:first-child { border-left: 3px
 .days-waiting  { font-size: 10px; color: #888; }
 .days-warn     { font-size: 10px; color: #e05050; font-weight: 700; }
 
+.btn-pdf { background: none; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 14px; padding: 2px 6px; transition: all .15s; }
+.btn-pdf:hover { background: #f4f2ed; border-color: #bbb; }
 .empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
 .empty-state .big { font-size: 36px; margin-bottom: 10px; }
 
 /* Modal */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.open { display: flex; }
-.modal { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
-.modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; }
-.modal-title { font-size: 16px; font-weight: 800; letter-spacing: .05em; }
+.modal { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 620px; max-height: 92vh; overflow-y: auto; }
+.modal-header { padding: 14px 20px 10px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 15px; font-weight: 800; letter-spacing: .05em; }
 .modal-close { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; padding: 0 4px; }
 .modal-close:hover { color: #1a1a1a; }
-.modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.form-group { display: flex; flex-direction: column; gap: 5px; }
+.modal-body { padding: 12px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.form-group { display: flex; flex-direction: column; gap: 3px; }
 .form-group.full { grid-column: 1 / -1; }
-.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; }
-.form-group input, .form-group select, .form-group textarea { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
+.form-group label { font-size: 9px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; }
+.form-group input, .form-group select, .form-group textarea { background: #fff; border: 1px solid #ddd; border-radius: 5px; color: #1a1a1a; padding: 6px 10px; font-size: 12px; outline: none; transition: border-color .2s; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #e05050; }
-.form-group textarea { resize: vertical; min-height: 70px; }
+.form-group textarea { resize: vertical; min-height: 50px; }
 .form-group select option { background: #fff; }
-.modal-footer { padding: 16px 24px; border-top: 1px solid #e8e4dc; display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
+.modal-footer { padding: 10px 20px; border-top: 1px solid #e8e4dc; display: flex; gap: 8px; justify-content: flex-end; align-items: center; position: sticky; bottom: 0; background: #fff; z-index: 10; }
 .btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #f0c8c8; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .btn-delete:hover { background: #fce8e8; }
 .btn-cancel { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
@@ -221,6 +223,7 @@ tbody tr[data-stav="Přijato dodavatelem"]     td:first-child { border-left: 3px
         <th onclick="sortBy('datum_nahlaseni')" data-col="datum_nahlaseni"> Nahlášeno <span class="sort-arrow"></span></th>
         <th onclick="sortBy('datum_deadline')"  data-col="datum_deadline">  Deadline  <span class="sort-arrow"></span></th>
         <th onclick="sortBy('stav')"       data-col="stav">       Stav         <span class="sort-arrow"></span></th>
+        <th style="width:40px">PDF</th>
       </tr></thead>
       <tbody id="tbody"></tbody>
     </table>
@@ -294,7 +297,7 @@ tbody tr[data-stav="Přijato dodavatelem"]     td:first-child { border-left: 3px
       <div class="form-group"><label>Technik</label><input type="text" id="f-technik" placeholder="Přiřazený technik"></div>
       <div class="form-group"><label>Datum nahlášení</label><input type="date" id="f-datum-nahlaseni"></div>
       <div class="form-group"><label>Deadline vyřízení</label><input type="date" id="f-datum-deadline"></div>
-      <div class="form-group full"><label>Způsob vyřízení</label><textarea id="f-zpusob" placeholder="Jak byla reklamace vyřízena..."></textarea></div>
+      <div class="form-group full"><label>Způsob vyřízení</label><textarea id="f-reseni" placeholder="Jak byla reklamace vyřízena..."></textarea></div>
       <div class="form-group full"><label>Email zákazníka</label><input type="email" id="f-email" placeholder="email@zakaznik.cz"></div>
       <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px;background:#f8f6f0;border:1px solid #ddd;border-radius:6px;padding:12px 16px;">
         <input type="checkbox" id="f-notifikovat" style="width:18px;height:18px;accent-color:#e05050;cursor:pointer;flex-shrink:0;">
@@ -486,7 +489,7 @@ function getFiltered(){
   const q=(document.getElementById('search').value||'').toLowerCase();
   return data.filter(r=>{
     if(filterVal!=='vse'&&String(r.stav)!==filterVal) return false;
-    if(q&&![String(r.obj||''),String(r.zakaznik||''),String(r.typ||''),String(r.popis||''),String(r.technik||''),String(r.zpusob||'')].join(' ').toLowerCase().includes(q)) return false;
+    if(q&&![String(r.obj||''),String(r.zakaznik||''),String(r.typ||''),String(r.popis||''),String(r.technik||''),String(r.reseni||'')].join(' ').toLowerCase().includes(q)) return false;
     return true;
   }).sort((a,b)=>{
     const va=String(a[sortCol]||''), vb=String(b[sortCol]||'');
@@ -521,6 +524,7 @@ function renderTable(){
       <td class="datum">${fmtDate(r.datum_nahlaseni)}</td>
       <td class="datum ${deadlineClass(r.datum_deadline)}">${fmtDate(r.datum_deadline)}</td>
       <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${String(r.stav||'')||'—'}</span></td>
+      <td style="text-align:center"><button class="btn-pdf" onclick="event.stopPropagation();printProtocolById('${r.id}')" title="Stáhnout protokol">📄</button></td>
     </tr>`).join('');
 }
 
@@ -544,7 +548,7 @@ function openModal(id){
     document.getElementById('f-datum-nahlaseni').value=toInputDate(r.datum_nahlaseni);
     document.getElementById('f-datum-deadline').value=toInputDate(r.datum_deadline);
     document.getElementById('f-stav').value=String(r.stav||'Nová');
-    document.getElementById('f-zpusob').value=String(r.zpusob||'');
+    document.getElementById('f-reseni').value=String(r.reseni||'');
     document.getElementById('f-email').value=String(r.email||'');
     document.getElementById('f-notifikovat').checked=String(r.notifikovat)==='ano';
     // Show linked dodavatel records
@@ -557,13 +561,14 @@ function openModal(id){
       ).join('');
     } else { box.style.display='none'; }
   } else {
-    ['f-obj','f-zakaznik','f-popis','f-technik','f-zpusob','f-email'].forEach(fid=>document.getElementById(fid).value='');
+    ['f-obj','f-zakaznik','f-popis','f-technik','f-reseni','f-email'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('f-notifikovat').checked=false;
     document.getElementById('f-typ').value='Reklamace produktu';
     document.getElementById('f-priorita').value='Střední';
     document.getElementById('f-stav').value='Nová';
     document.getElementById('f-datum-nahlaseni').value=toInputDate(new Date());
-    document.getElementById('f-datum-deadline').value='';
+    const dl=new Date(); dl.setDate(dl.getDate()+30);
+    document.getElementById('f-datum-deadline').value=toInputDate(dl);
     document.getElementById('linked-dod-box').style.display='none';
   }
   document.getElementById('modal-overlay').classList.add('open');
@@ -590,7 +595,7 @@ async function saveRecord(){
     datum_nahlaseni:document.getElementById('f-datum-nahlaseni').value,
     datum_deadline:document.getElementById('f-datum-deadline').value,
     stav:newStav,
-    zpusob:document.getElementById('f-zpusob').value.trim(),
+    reseni:document.getElementById('f-reseni').value.trim(),
     email:document.getElementById('f-email').value.trim(),
     notifikovat:document.getElementById('f-notifikovat').checked?'ano':'ne',
   };
@@ -601,6 +606,36 @@ async function saveRecord(){
     // Auto-create dodavatel record when status changes to "V řešení u dodavatele"
     if(newStav==='V řešení u dodavatele' && prevStav!=='V řešení u dodavatele'){
       await autoCreateDod(rec);
+    }
+    // Email notification to customer
+    if(rec.notifikovat==='ano' && rec.email){
+      try {
+        const emailUrl=SCRIPT_URL.replace('/api/compat','/api/email/send');
+        await fetch(emailUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+          to:rec.email,
+          subject:`Reklamace ${rec.obj||''} – ${isEdit?'aktualizace':'přijetí'} | BE-LIGHT`,
+          html:`<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+            <div style="background:#333;color:#fff;padding:20px 24px;text-align:center;">
+              <h2 style="margin:0;font-size:18px;">REKLAMAČNÍ PROTOKOL</h2>
+              <p style="margin:4px 0 0;font-size:12px;color:#ccc;">BE-LIGHT, s.r.o.</p>
+            </div>
+            <div style="padding:20px 24px;border:1px solid #ddd;border-top:none;">
+              <p>Vážený zákazníku,</p>
+              <p>${isEdit?'Vaše reklamace byla aktualizována':'Vaše reklamace byla přijata'}.</p>
+              <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;">
+                <tr><td style="padding:6px;border-bottom:1px solid #eee;font-weight:700;width:140px;">Číslo obj.</td><td style="padding:6px;border-bottom:1px solid #eee;">${rec.obj||'—'}</td></tr>
+                <tr><td style="padding:6px;border-bottom:1px solid #eee;font-weight:700;">Typ</td><td style="padding:6px;border-bottom:1px solid #eee;">${rec.typ||'—'}</td></tr>
+                <tr><td style="padding:6px;border-bottom:1px solid #eee;font-weight:700;">Stav</td><td style="padding:6px;border-bottom:1px solid #eee;">${newStav}</td></tr>
+                <tr><td style="padding:6px;border-bottom:1px solid #eee;font-weight:700;">Popis</td><td style="padding:6px;border-bottom:1px solid #eee;">${rec.popis||'—'}</td></tr>
+                ${rec.reseni?`<tr><td style="padding:6px;border-bottom:1px solid #eee;font-weight:700;">Vyřízení</td><td style="padding:6px;border-bottom:1px solid #eee;">${rec.reseni}</td></tr>`:''}
+              </table>
+              <p style="font-size:12px;color:#888;">V případě dotazů nás kontaktujte na reklamace@ledshopik.cz nebo +420 792 319 348.</p>
+              <hr style="border:none;border-top:1px solid #eee;margin:16px 0;">
+              <p style="font-size:10px;color:#aaa;">BE-LIGHT, s.r.o. · Nové sady 988/2, 602 00 Brno · www.LEDshopik.cz</p>
+            </div>
+          </div>`
+        })});
+      } catch(emailErr){ console.warn('Email notification failed:',emailErr); }
     }
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
@@ -885,7 +920,7 @@ body{font-family:Arial,sans-serif;color:#111;padding:30px 40px;font-size:13px;li
 <div class="desc-box">${String(r.popis||'—')}</div>
 
 <div class="desc-label">Způsob vyřízení</div>
-<div class="desc-box">${String(r.reseni||r.zpusob||'(dosud nevyplněno)')}</div>
+<div class="desc-box">${String(r.reseni||'(dosud nevyplněno)')}</div>
 
 <div class="desc-label">Poznámka</div>
 <div class="desc-box">${String(r.poznamka||'—')}</div>
@@ -902,6 +937,13 @@ body{font-family:Arial,sans-serif;color:#111;padding:30px 40px;font-size:13px;li
 </body></html>`);
   w.document.close();
   setTimeout(()=>w.print(),300);
+}
+
+function printProtocolById(id){
+  const prevEditId=editId;
+  editId=id;
+  printProtocol();
+  editId=prevEditId;
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────
