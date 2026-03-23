@@ -484,7 +484,8 @@ a{color:var(--accent);text-decoration:none}
         <button class="on" onclick="setView('grid',this)">☷ Karty</button>
         <button onclick="setView('table',this)">☰ Tabulka</button>
       </div>
-      <button class="btn primary sm" onclick="exportPDF()">📄 Export PDF</button>
+      <button class="btn primary sm" onclick="exportPDF()">📄 Tabulka PDF</button>
+      <button class="btn sm" onclick="exportDetailPDF()" style="background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)">📸 Detail PDF</button>
     </div>
 
     <div class="content" id="content">
@@ -566,6 +567,11 @@ a{color:var(--accent);text-decoration:none}
       <div class="fld"><label>Odkaz na eshop</label><input id="f-url" placeholder="https://vas-eshop.cz/produkt/..."></div>
       <div class="fld"><label>Poznámka</label><textarea id="f-note" placeholder="Volitelná poznámka..."></textarea></div>
       <div class="fld"><label>Poznámka do PDF <span style="font-weight:400;color:var(--muted)">(zobrazí se pod produktem v exportu)</span></label><textarea id="f-pdf-note" placeholder="Doplňková informace pro zákazníka..." style="min-height:40px;font-size:11px"></textarea></div>
+      <div class="fld"><label>Další fotky <span style="font-weight:400;color:var(--muted)">(pro detail export)</span></label>
+        <div id="extra-images-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+        <button class="btn sm" onclick="document.getElementById('extra-img-file').click()" style="font-size:11px">+ Přidat fotky</button>
+        <input type="file" id="extra-img-file" accept="image/*" multiple style="display:none">
+      </div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
         <label style="font-size:10.5px;color:var(--text2);display:flex;align-items:center;gap:5px;cursor:pointer">
           <input type="checkbox" id="f-save-db" checked> Uložit do databáze produktů
@@ -1179,6 +1185,8 @@ function openEditModal(idx) {
   document.getElementById('f-note').value = f.note || '';
   document.getElementById('f-pdf-note').value = f.pdfNote || '';
   document.getElementById('f-img-url').value = '';
+  tempExtraImages = f.extraImages ? [...f.extraImages] : [];
+  renderExtraImgPreview();
 
   const zone = document.getElementById('img-zone');
   if (f.image) {
@@ -1196,6 +1204,8 @@ function closeModal() { document.getElementById('modal-bg').classList.remove('op
 
 function clearForm() {
   ['f-name','f-watt','f-lumen','f-dim','f-room','f-url','f-note','f-pdf-note','f-img-url'].forEach(id => document.getElementById(id).value = '');
+  tempExtraImages = [];
+  renderExtraImgPreview();
   document.getElementById('f-type').selectedIndex = 0;
   document.getElementById('f-cct').value = '3000K';
   document.getElementById('f-cri').value = '90';
@@ -1229,6 +1239,33 @@ function bindImgUpload() {
 }
 bindImgUpload();
 
+let tempExtraImages = [];
+function bindExtraImgUpload() {
+  document.getElementById('extra-img-file').addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        tempExtraImages.push(ev.target.result);
+        renderExtraImgPreview();
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  });
+}
+function renderExtraImgPreview() {
+  const container = document.getElementById('extra-images-preview');
+  if (!container) return;
+  container.innerHTML = tempExtraImages.map((img, i) =>
+    `<div style="position:relative;width:60px;height:45px;border-radius:4px;overflow:hidden;border:1px solid #ddd;">
+      <img src="${img}" style="width:100%;height:100%;object-fit:cover;">
+      <button onclick="tempExtraImages.splice(${i},1);renderExtraImgPreview()" style="position:absolute;top:1px;right:1px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:10px;cursor:pointer;line-height:1;">×</button>
+    </div>`
+  ).join('');
+}
+setTimeout(bindExtraImgUpload, 100);
+
 function loadImgFromUrl() {
   const url = document.getElementById('f-img-url').value.trim();
   if (!url) return;
@@ -1256,7 +1293,8 @@ function saveFixture() {
     url: document.getElementById('f-url').value,
     note: document.getElementById('f-note').value,
     pdfNote: document.getElementById('f-pdf-note').value,
-    image: tempImg || (editIdx >= 0 ? fixtures[editIdx].image : null)
+    image: tempImg || (editIdx >= 0 ? fixtures[editIdx].image : null),
+    extraImages: tempExtraImages.length ? [...tempExtraImages] : (editIdx >= 0 ? fixtures[editIdx].extraImages || [] : [])
   };
 
   if (editIdx >= 0) {
@@ -1456,7 +1494,7 @@ function exportPDF() {
   function makeTable(items) {
     return `<table class="t"><thead><tr>
       <th style="width:24px">#</th>
-      ${hasImg?'<th style="width:50px">Fotka</th>':''}
+      ${hasImg?'<th style="width:95px">Fotka</th>':''}
       <th>Tag</th><th>Název</th><th>Typ</th>
       ${hasDim?'<th>Rozměr</th>':''}
       <th>W</th>
@@ -1470,7 +1508,7 @@ function exportPDF() {
       const isSimple = !cc.startsWith('linear');
       return `<tr>
         <td style="color:#999;font-size:9px;text-align:center">${rowNum}</td>
-        ${hasImg?'<td>'+(f.image?`<img src="${f.image}" style="width:44px;height:33px;object-fit:contain;border-radius:3px;border:1px solid #eee">`:'')+'</td>':''}
+        ${hasImg?'<td>'+(f.image?`<img src="${f.image}" style="width:88px;height:66px;object-fit:contain;border-radius:3px;border:1px solid #eee">`:'')+'</td>':''}
         <td><span class="tg">${f.tag}</span></td>
         <td><div style="font-weight:600">${f.name}</div>${f.pdfNote?'<div style="font-size:9px;color:#888;margin-top:2px;line-height:1.3">'+f.pdfNote+'</div>':''}</td>
         <td>${f.type}</td>
@@ -1546,6 +1584,126 @@ ${roomsHtml}
   setTimeout(() => {
     w.print();
     toast('📄 Ulož jako PDF v tiskovém dialogu');
+  }, 800);
+}
+
+function exportDetailPDF() {
+  if (!fixtures.length) { alert('Přidej nejprve svítidla'); return; }
+  const pi = getProjectInfo();
+  const rooms = getRooms();
+
+  function productCard(f, idx) {
+    const cc = cctColor(f.cct);
+    const isSimple = !cc.startsWith('linear');
+    const allImages = [f.image, ...(f.extraImages||[])].filter(Boolean);
+    const gallery = allImages.length > 1
+      ? `<div class="gal">${allImages.map(img=>`<img src="${img}" class="gal-img">`).join('')}</div>`
+      : '';
+    const mainImg = f.image ? `<img src="${f.image}" class="main-img">` : '<div class="main-img no-img">🖼️</div>';
+
+    return `<div class="card">
+      <div class="card-head">
+        <span class="tg">${f.tag}</span>
+        <span class="card-name">${f.name}</span>
+        ${f.room?`<span class="card-room">📍 ${f.room}</span>`:''}
+      </div>
+      <div class="card-body">
+        <div class="card-img">${mainImg}</div>
+        <div class="card-info">
+          <table class="spec">
+            <tr><td class="sl">Typ</td><td>${f.type}</td></tr>
+            ${f.dim?`<tr><td class="sl">Rozměr</td><td>${f.dim}</td></tr>`:''}
+            <tr><td class="sl">Příkon</td><td>${f.watt} W</td></tr>
+            ${f.lumen?`<tr><td class="sl">Světelný tok</td><td>${f.lumen} lm</td></tr>`:''}
+            <tr><td class="sl">Teplota</td><td>${isSimple?`<span class="cc" style="background:${cc}"></span>`:''}${cctLabel(f.cct)}</td></tr>
+            <tr><td class="sl">CRI</td><td>Ra${f.cri}</td></tr>
+            <tr><td class="sl">IP</td><td>${f.ip}</td></tr>
+            <tr><td class="sl">Množství</td><td>${f.qty} ${isLinear(f.type)?'m':'ks'}</td></tr>
+            ${f.price?`<tr><td class="sl">Cena/j</td><td>${f.price.toLocaleString('cs')} Kč</td></tr>
+            <tr class="total"><td class="sl">Celkem</td><td>${Math.round(f.price*f.qty).toLocaleString('cs')} Kč</td></tr>`:''}
+          </table>
+        </div>
+      </div>
+      ${f.note?`<div class="card-note"><strong>Poznámka:</strong> ${f.note}</div>`:''}
+      ${f.pdfNote?`<div class="card-note"><strong>Info:</strong> ${f.pdfNote}</div>`:''}
+      ${gallery}
+    </div>`;
+  }
+
+  let cardsHtml = '';
+  if (rooms.length > 0) {
+    rooms.forEach(r => {
+      const items = fixtures.filter(f => f.room === r);
+      cardsHtml += `<div class="rh">📍 ${r}</div>`;
+      items.forEach((f,i) => { cardsHtml += productCard(f,i); });
+    });
+    const noRoom = fixtures.filter(f => !f.room);
+    if (noRoom.length) {
+      cardsHtml += `<div class="rh">📍 Nezařazeno</div>`;
+      noRoom.forEach((f,i) => { cardsHtml += productCard(f,i); });
+    }
+  } else {
+    fixtures.forEach((f,i) => { cardsHtml += productCard(f,i); });
+  }
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Detail — ${pi.name||'Projekt'}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',Arial,sans-serif;padding:28px 32px;color:#1a1a1a;font-size:12px;background:#fff}
+.hdr{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:2.5px solid #e8a020;padding-bottom:14px;margin-bottom:20px}
+.lg{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#e8a020}
+.ls{font-size:9px;color:#999;margin-top:1px}
+.pj{text-align:right}
+.pn{font-size:14px;font-weight:700}
+.pc{font-size:11px;color:#666;margin-top:1px}
+.pd{font-size:10px;color:#999;margin-top:1px}
+.rh{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#e8a020;margin:24px 0 10px;padding-bottom:5px;border-bottom:1px solid #eee}
+.card{border:1px solid #e8e4dc;border-radius:10px;margin-bottom:20px;overflow:hidden;page-break-inside:avoid}
+.card-head{background:#f8f6f0;padding:10px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e8e4dc}
+.tg{background:#fef3e0;color:#c87800;padding:3px 7px;border-radius:4px;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.card-name{font-size:14px;font-weight:700}
+.card-room{margin-left:auto;font-size:10px;color:#888}
+.card-body{display:flex;gap:20px;padding:16px}
+.card-img{flex:0 0 280px}
+.main-img{width:280px;height:210px;object-fit:contain;border-radius:6px;border:1px solid #eee;display:block}
+.no-img{display:flex;align-items:center;justify-content:center;background:#f8f6f0;font-size:48px;color:#ddd}
+.card-info{flex:1}
+.spec{width:100%;border-collapse:collapse;font-size:12px}
+.spec td{padding:5px 8px;border-bottom:1px solid #f0ece5}
+.sl{font-weight:600;color:#888;width:110px;font-size:11px}
+.total td{font-weight:700!important;border-top:2px solid #e8a020!important;color:#1a8c5e}
+.cc{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.card-note{padding:8px 16px;font-size:11px;color:#555;background:#fdfcfa;border-top:1px solid #f0ece5;line-height:1.5}
+.gal{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;border-top:1px solid #f0ece5;background:#fdfcfa}
+.gal-img{width:140px;height:105px;object-fit:contain;border-radius:6px;border:1px solid #eee}
+.ft{text-align:center;font-size:9px;color:#bbb;margin-top:24px;padding-top:12px;border-top:1px solid #eee}
+@media print{
+  body{padding:16px}
+  @page{margin:10mm}
+  .card{break-inside:avoid}
+}
+</style></head><body>
+<div class="hdr">
+  <div><div class="lg">LUMIBOOK PRO</div><div class="ls">Kniha svítidel by LEDshopik.cz</div></div>
+  <div class="pj">
+    <div class="pn">${pi.name||'Projekt'}</div>
+    ${pi.client?`<div class="pc">Zákazník: ${pi.client}</div>`:''}
+    ${pi.date?`<div class="pd">${new Date(pi.date).toLocaleDateString('cs')}</div>`:''}
+    ${pi.num?`<div class="pd">Č. ${pi.num}</div>`:''}
+    ${pi.author?`<div class="pd">Zpracoval: ${pi.author}</div>`:''}
+  </div>
+</div>
+${cardsHtml}
+<div class="ft">LUMIBOOK PRO by LEDshopik.cz · ${new Date().toLocaleDateString('cs')} · ${pi.name||'Projekt'}</div>
+</body></html>`;
+
+  const w = window.open('','_blank','width=900,height=700');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => {
+    w.print();
+    toast('📸 Detail PDF — ulož v tiskovém dialogu');
   }, 800);
 }
 
