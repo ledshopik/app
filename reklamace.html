@@ -824,50 +824,81 @@ function printProtocol(){
   if(!editId) return;
   const r=data.find(x=>String(x.id)===String(editId));
   if(!r) return;
+  const zadal=localStorage.getItem('ledshopik_user')||'—';
+  const logoUrl=new URL('logo-ledshopik.png',window.location.href).href;
   const w=window.open('','_blank','width=800,height=900');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reklamační protokol – ${String(r.obj||'')}</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;color:#111;padding:40px 50px;font-size:13px;line-height:1.5}
-h1{font-size:20px;text-align:center;margin-bottom:4px;letter-spacing:.05em}
-.subtitle{text-align:center;font-size:11px;color:#666;margin-bottom:30px}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #333;margin-bottom:20px}
-.info-row{display:flex;border-bottom:1px solid #ccc;min-height:32px}
-.info-row:last-child{border-bottom:none}
-.info-label{background:#f0f0f0;font-weight:700;font-size:11px;padding:6px 12px;width:140px;flex-shrink:0;border-right:1px solid #ccc}
-.info-value{padding:6px 12px;flex:1}
-.full-row{grid-column:1/-1}
-.section{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.1em;background:#333;color:#fff;padding:6px 12px;grid-column:1/-1}
-.desc-box{border:1px solid #333;padding:14px;min-height:80px;margin-bottom:20px;white-space:pre-wrap}
-.desc-label{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;color:#333}
-.sign-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:50px}
-.sign-box{border-top:1px solid #333;padding-top:6px;text-align:center;font-size:11px;color:#666}
-.footer{margin-top:40px;font-size:10px;color:#999;text-align:center;border-top:1px solid #ddd;padding-top:10px}
-@media print{body{padding:20px 30px}@page{margin:15mm}}
+body{font-family:Arial,sans-serif;color:#111;padding:30px 40px;font-size:13px;line-height:1.5}
+.header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #333}
+.header-logo img{height:80px}
+.header-right{text-align:right}
+.header-right h1{font-size:22px;letter-spacing:.05em;margin-bottom:6px}
+.header-right .company{font-size:11px;color:#555;line-height:1.6}
+.section-bar{background:#555;color:#fff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.12em;padding:5px 12px;margin:18px 0 0 0}
+.info-table{width:100%;border-collapse:collapse;margin-bottom:0}
+.info-table td{border:1px solid #ccc;padding:6px 12px;font-size:12px;vertical-align:top}
+.info-table .lbl{background:#f0f0f0;font-weight:700;font-size:11px;width:140px;white-space:nowrap}
+.desc-label{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin:18px 0 6px;color:#333}
+.desc-box{border:1px solid #999;padding:12px;min-height:70px;margin-bottom:0;white-space:pre-wrap;font-size:12px}
+.sign-area{margin-top:50px}
+.sign-date{font-size:12px;margin-bottom:30px}
+.sign-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px}
+.sign-line{border-top:1px solid #333;padding-top:6px;text-align:center;font-size:11px;color:#666}
+.footer{margin-top:40px;font-size:9px;color:#999;text-align:center;border-top:1px solid #ddd;padding-top:8px}
+@media print{body{padding:15px 25px}@page{margin:12mm}}
 </style></head><body>
-<h1>REKLAMAČNÍ PROTOKOL</h1>
-<div class="subtitle">LEDshopik s.r.o. · Vyhotoveno: ${new Date().toLocaleDateString('cs-CZ')}</div>
-<div class="info-grid">
-  <div class="section">Údaje reklamace</div>
-  <div class="info-row"><div class="info-label">Číslo obj.</div><div class="info-value"><strong>${String(r.obj||'—')}</strong></div></div>
-  <div class="info-row"><div class="info-label">Datum nahlášení</div><div class="info-value">${fmtDate(r.datum_nahlaseni)}</div></div>
-  <div class="info-row full-row"><div class="info-label">Zákazník</div><div class="info-value"><strong>${String(r.zakaznik||'—')}</strong></div></div>
-  <div class="info-row full-row"><div class="info-label">Email</div><div class="info-value">${String(r.email||'—')}</div></div>
-  <div class="info-row"><div class="info-label">Typ</div><div class="info-value">${String(r.typ||'—')}</div></div>
-  <div class="info-row"><div class="info-label">Priorita</div><div class="info-value">${String(r.priorita||'—')}</div></div>
-  <div class="info-row"><div class="info-label">Stav</div><div class="info-value">${String(r.stav||'—')}</div></div>
-  <div class="info-row"><div class="info-label">Deadline</div><div class="info-value">${fmtDate(r.datum_deadline)}</div></div>
-  <div class="info-row full-row"><div class="info-label">Technik</div><div class="info-value">${String(r.technik||'—')}</div></div>
+
+<div class="header">
+  <div class="header-logo"><img src="${logoUrl}" alt="LEDshopik"></div>
+  <div class="header-right">
+    <h1>REKLAMAČNÍ PROTOKOL</h1>
+    <div class="company">
+      <strong>BE-LIGHT, s.r.o.</strong><br>
+      Nové sady 988/2, 602 00 Brno<br>
+      IČ: 05099749 · DIČ: CZ05099749<br>
+      reklamace@ledshopik.cz · +420 792 319 348<br>
+      www.LEDshopik.cz
+    </div>
+  </div>
 </div>
+
+<div class="section-bar">Evidence reklamace</div>
+<table class="info-table">
+  <tr><td class="lbl">Číslo reklamace</td><td><strong>${String(r.obj||r.id||'—')}</strong></td><td class="lbl">Datum přijetí</td><td>${fmtDate(r.datum_nahlaseni)}</td></tr>
+  <tr><td class="lbl">Zadal</td><td colspan="3">${zadal}</td></tr>
+</table>
+
+<div class="section-bar">Údaje o zákazníkovi</div>
+<table class="info-table">
+  <tr><td class="lbl">Zákazník</td><td colspan="3"><strong>${String(r.zakaznik||'—')}</strong></td></tr>
+  <tr><td class="lbl">Email</td><td colspan="3">${String(r.email||'—')}</td></tr>
+</table>
+
+<div class="section-bar">Reklamované zboží</div>
+<table class="info-table">
+  <tr><td class="lbl">Číslo obj.</td><td><strong>${String(r.obj||'—')}</strong></td><td class="lbl">Typ</td><td>${String(r.typ||'—')}</td></tr>
+</table>
+
 <div class="desc-label">Popis problému</div>
 <div class="desc-box">${String(r.popis||'—')}</div>
+
 <div class="desc-label">Způsob vyřízení</div>
-<div class="desc-box">${String(r.zpusob||'(dosud nevyplněno)')}</div>
-<div class="sign-grid">
-  <div><div class="sign-box">Podpis zákazníka</div></div>
-  <div><div class="sign-box">Podpis LEDshopik</div></div>
+<div class="desc-box">${String(r.reseni||r.zpusob||'(dosud nevyplněno)')}</div>
+
+<div class="desc-label">Poznámka</div>
+<div class="desc-box">${String(r.poznamka||'—')}</div>
+
+<div class="sign-area">
+  <div class="sign-date">Datum: .........................</div>
+  <div class="sign-grid">
+    <div><div class="sign-line">Podpis zákazníka</div></div>
+    <div><div class="sign-line">Za obchod (BE-LIGHT, s.r.o.)</div></div>
+  </div>
 </div>
-<div class="footer">Dokument vygenerován z LEDshopik systému · ${new Date().toLocaleDateString('cs-CZ')} ${new Date().toLocaleTimeString('cs-CZ')}</div>
+
+<div class="footer">BE-LIGHT, s.r.o. · modul Reklamace · Vygenerováno: ${new Date().toLocaleDateString('cs-CZ')} ${new Date().toLocaleTimeString('cs-CZ')}</div>
 </body></html>`);
   w.document.close();
   setTimeout(()=>w.print(),300);
