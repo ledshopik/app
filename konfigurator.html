@@ -342,7 +342,7 @@ function getSections() {
   const sv = sel.sviceni;
   const list = [
     {id:'typ_kruhu',          label:'Typ kruhu',          opts:['RING-25-CR','RING-3050C','RING-50C']},
-    {id:'rozmer',             label:'Průměr kruhu',       opts:['60 cm','90 cm','120 cm','180 cm']},
+    {id:'rozmer',             label:'Průměr kruhu',       opts: sel.typ_kruhu==='RING-50C' ? ['90 cm','120 cm','180 cm'] : ['60 cm','90 cm','120 cm','180 cm']},
     {id:'typ_montaze',        label:'Typ montáže',        opts:['Přisazená','Závěsná']},
     {id:'sviceni',            label:'Způsob svícení',     opts:['Direct','Indirect','Direct + Indirect']},
   ];
@@ -497,6 +497,9 @@ function chooseOpt(secId, opt) {
       delete sel.sviceni;
       delete sel.typ_pasky_indirect;
     }
+  }
+  if (secId === 'typ_kruhu' && opt === 'RING-50C' && sel.rozmer === '60 cm') {
+    delete sel.rozmer;
   }
   if (secId === 'sviceni') {
     if (opt === 'Direct')   delete sel.typ_pasky_indirect;
