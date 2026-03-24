@@ -403,6 +403,7 @@ a{color:var(--accent);text-decoration:none}
 #ls-nav a.active{color:#e8a020;border-bottom-color:#e8a020}
 #ls-nav a:hover{color:#1a1a1a}
 </style>
+<meta name="theme-color" content="#e2b830">
 </head>
 <body>
 <div id="ls-nav">
@@ -719,7 +720,7 @@ async function loadDBFromServer() {
       dbFromSheets = true;
       renderDB();
     }
-  } catch(e) {} // fallback to localStorage silently
+  } catch(e) { console.error('Lumibook DB load error:', e); }
 }
 function load() {
   try {
