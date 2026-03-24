@@ -489,12 +489,12 @@ async function scrapeProduct(url) {
       if (!label || !value) continue;
       // Map label → field
       if (!p.beamAngle && (label.includes('vyzařovací') || label.includes('úhel svícení') || label.includes('úhel'))) p.beamAngle = value.match(/\d+/) ? value.match(/\d+/)[0] + '°' : value;
-      if (!p.divisibility && (label.includes('dělitelnost') || label.includes('dělení') || label.includes('řez') || label.includes('cut'))) p.divisibility = value;
-      if (!p.lifetime && (label.includes('životnost') || label.includes('life'))) p.lifetime = value;
-      if (!p.warranty && (label.includes('záruka') || label.includes('warranty') || label.includes('garanc'))) p.warranty = value;
+      if (!p.divisibility && (label.includes('dělitelnost') || label.includes('dělení') || label.includes('řez') || label.includes('cut'))) { const dv = value.match(/(\d+(?:[.,]\d+)?)\s*(mm|cm)/i); p.divisibility = dv ? (dv[2]==='cm' ? (parseFloat(dv[1])*10)+'mm' : dv[1]+'mm') : value; }
+      if (!p.lifetime && (label.includes('životnost') || label.includes('life'))) { const lv = value.match(/([\d\s]+)\s*(?:h|hod)/i); p.lifetime = lv ? lv[1].trim().replace(/\s/g,' ') + ' h' : value; }
+      if (!p.warranty && (label.includes('záruka') || label.includes('warranty') || label.includes('garanc'))) { const wm = value.match(/(\d+)\s*měs/i); const wr = value.match(/(\d+)\s*(?:rok|let|year)/i); if (wm) { const y = Math.round(parseInt(wm[1])/12); p.warranty = y + (y===1?' rok':y<5?' roky':' let'); } else if (wr) { const y=parseInt(wr[1]); p.warranty = y + (y===1?' rok':y<5?' roky':' let'); } else p.warranty = value; }
       if (!p.dimmable && (label.includes('stmívat') || label.includes('dimm'))) p.dimmable = value;
-      if (!p.operatingTemp && (label.includes('provozní teplot') || label.includes('operating temp'))) p.operatingTemp = value;
-      if (!p.maxLength && (label.includes('max') && label.includes('délk'))) p.maxLength = value;
+      if (!p.operatingTemp && (label.includes('provozní teplot') || label.includes('operating temp'))) p.operatingTemp = value.replace(/~/g,' až ');
+      if (!p.maxLength && (label.includes('max') && (label.includes('délk') || label.includes('zapoj')))) p.maxLength = value;
       if (!p.pcbColor && label.includes('barva') && (label.includes('pcb') || label.includes('desk'))) p.pcbColor = value;
       if (!p.pcbWidth && label.includes('šířka') && (label.includes('pcb') || label.includes('pásk') || label.includes('desk'))) p.pcbWidth = value;
       if (!p.voltage && (label.includes('napětí') || label.includes('napájení') || label.includes('voltage'))) { const vm = value.match(/(\d+)\s*V/); if (vm) p.voltage = vm[1] + ' V'; else p.voltage = value; }
@@ -737,43 +737,43 @@ function generatePDFForProduct(p, withPrice, addQR) {
 
     .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 2px solid #c8a830; padding-bottom: 12px; }
     .header-left { flex: 1; }
-    .header-cat { font-size: 9px; letter-spacing: .2em; color: #c8a830; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
-    .header-name { font-size: 20px; font-weight: 900; color: #1a1a1a; line-height: 1.2; margin-bottom: 3px; }
-    .header-sub { font-size: 11px; color: #666; margin-bottom: 3px; }
-    .header-sku { font-size: 10px; color: #888; }
+    .header-cat { font-size: 9px; letter-spacing: .2em; color: #b8960a; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+    .header-name { font-size: 22px; font-weight: 900; color: #111; line-height: 1.2; margin-bottom: 3px; }
+    .header-sub { font-size: 12px; color: #555; margin-bottom: 3px; font-weight: 600; }
+    .header-sku { font-size: 10px; color: #777; }
     .header-right { text-align: right; flex-shrink: 0; margin-left: 20px; }
-    .stock-badge { display: inline-block; background: #e8f5e9; color: #2e7d32; font-size: 9px; font-weight: 700; padding: 3px 10px; border-radius: 3px; letter-spacing: .08em; margin-bottom: 6px; }
+    .stock-badge { display: inline-block; background: #d4edda; color: #1a6b2a; font-size: 9px; font-weight: 800; padding: 4px 12px; border-radius: 3px; letter-spacing: .08em; margin-bottom: 6px; }
     .header-logo { height: 50px; }
 
-    .specs-bar { display: flex; border: 1px solid #e8e4dc; border-radius: 4px; margin-bottom: 14px; overflow: hidden; }
-    .spec-box { flex: 1; padding: 8px 10px; text-align: center; border-right: 1px solid #e8e4dc; }
+    .specs-bar { display: flex; border: 2px solid #e2b830; border-radius: 6px; margin-bottom: 16px; overflow: hidden; background: #fefcf4; }
+    .spec-box { flex: 1; padding: 10px 12px; text-align: center; border-right: 1px solid #e8dfa0; }
     .spec-box:last-child { border-right: none; }
-    .spec-box .val { font-size: 15px; font-weight: 800; color: #1a1a1a; }
-    .spec-box .lbl { font-size: 7px; color: #888; letter-spacing: .1em; text-transform: uppercase; margin-top: 1px; }
+    .spec-box .val { font-size: 16px; font-weight: 900; color: #111; }
+    .spec-box .lbl { font-size: 7px; color: #8a7a30; letter-spacing: .1em; text-transform: uppercase; margin-top: 2px; font-weight: 600; }
 
     .product-img { text-align: center; margin: 14px 0; }
     .product-img img { max-width: 300px; max-height: 200px; }
 
-    .section-title { font-size: 10px; font-weight: 800; letter-spacing: .15em; color: #c8a830; text-transform: uppercase; margin: 16px 0 8px; border-bottom: 1px solid #e8e4dc; padding-bottom: 4px; }
+    .section-title { font-size: 10px; font-weight: 800; letter-spacing: .15em; color: #9a7a00; text-transform: uppercase; margin: 18px 0 8px; border-bottom: 2px solid #e2b830; padding-bottom: 5px; }
 
-    .tech-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 20px; }
-    .tech-col div { padding: 5px 0; border-bottom: 1px solid #f0ede6; }
-    .tech-label { font-size: 8px; color: #888; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 1px; }
-    .tech-val { font-size: 11px; font-weight: 700; color: #1a1a1a; }
+    .tech-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 20px; border: 1px solid #eee; border-radius: 4px; padding: 6px 12px; background: #fdfcfa; }
+    .tech-col div { padding: 6px 0; border-bottom: 1px solid #f0ede6; }
+    .tech-label { font-size: 8px; color: #777; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px; }
+    .tech-val { font-size: 12px; font-weight: 800; color: #111; }
 
-    .use-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-    .use-tag { background: #f8f6f0; border: 1px solid #e8e4dc; border-radius: 3px; padding: 4px 10px; font-size: 10px; color: #444; font-weight: 600; }
+    .use-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .use-tag { background: #f0f4f8; border: 1px solid #d0d8e0; border-radius: 4px; padding: 5px 12px; font-size: 10px; color: #333; font-weight: 600; }
 
     .install-list { list-style: none; padding: 0; }
-    .install-list li { padding: 3px 0; font-size: 10px; color: #444; }
-    .install-list li::before { content: '\\2713'; color: #3a8048; font-weight: 700; margin-right: 6px; }
+    .install-list li { padding: 4px 0; font-size: 11px; color: #333; }
+    .install-list li::before { content: '\\2713'; color: #2a7a38; font-weight: 900; margin-right: 8px; font-size: 13px; }
 
-    .cert-row { display: flex; gap: 10px; margin: 10px 0; }
-    .cert-badge { background: #f8f6f0; border: 1px solid #e8e4dc; border-radius: 3px; padding: 6px 12px; font-size: 9px; font-weight: 700; color: #444; text-align: center; letter-spacing: .05em; }
+    .cert-row { display: flex; gap: 10px; margin: 12px 0; }
+    .cert-badge { background: #f0f7f0; border: 1px solid #c0d8c0; border-radius: 4px; padding: 8px 14px; font-size: 10px; font-weight: 700; color: #2a6a2a; text-align: center; letter-spacing: .05em; }
 
-    .price-box { background: #fdf8e8; border: 2px solid #c8a830; border-radius: 4px; padding: 12px 16px; margin: 14px 0; display: flex; align-items: center; justify-content: space-between; }
-    .price-label { font-size: 10px; color: #888; letter-spacing: .1em; text-transform: uppercase; }
-    .price-val { font-size: 22px; font-weight: 900; color: #c8a830; }
+    .price-box { background: #fef8e0; border: 2px solid #d4a800; border-radius: 6px; padding: 14px 18px; margin: 16px 0; display: flex; align-items: center; justify-content: space-between; }
+    .price-label { font-size: 11px; color: #7a6a00; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+    .price-val { font-size: 24px; font-weight: 900; color: #b89000; }
 
     .note-box { background: #fffde8; border: 1px solid #e2d080; border-radius: 4px; padding: 10px 14px; margin: 10px 0; font-size: 11px; color: #555; }
     .note-box .note-title { font-size: 9px; font-weight: 700; color: #b89820; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 3px; }
