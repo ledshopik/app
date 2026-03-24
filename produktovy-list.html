@@ -730,59 +730,63 @@ function generatePDFForProduct(p, withPrice, addQR) {
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Produktový list — ' + (p.name||'Produkt') + '</title>');
   w.document.write('<style>');
   w.document.write(`
-    @page { margin: 12mm 14mm; size: A4; }
+    @page { margin: 10mm 12mm; size: A4; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; color: #1a1a1a; font-size: 11px; line-height: 1.4; }
+    body { font-family: Arial, sans-serif; color: #1a1a1a; font-size: 11px; line-height: 1.4; background: #fff; }
     .page { max-width: 780px; margin: 0 auto; padding: 0; }
 
-    .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 2px solid #c8a830; padding-bottom: 12px; }
+    /* Dark header band */
+    .header-band { background: #1a1a1a; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start; }
     .header-left { flex: 1; }
-    .header-cat { font-size: 9px; letter-spacing: .2em; color: #b8960a; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
-    .header-name { font-size: 22px; font-weight: 900; color: #111; line-height: 1.2; margin-bottom: 3px; }
-    .header-sub { font-size: 12px; color: #555; margin-bottom: 3px; font-weight: 600; }
-    .header-sku { font-size: 10px; color: #777; }
+    .header-cat { font-size: 9px; letter-spacing: .25em; color: #e8a020; text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
+    .header-name { font-size: 22px; font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 4px; }
+    .header-sub { font-size: 12px; color: #ccc; margin-bottom: 4px; font-weight: 600; }
+    .header-sku { font-size: 10px; color: #888; }
     .header-right { text-align: right; flex-shrink: 0; margin-left: 20px; }
-    .stock-badge { display: inline-block; background: #d4edda; color: #1a6b2a; font-size: 9px; font-weight: 800; padding: 4px 12px; border-radius: 3px; letter-spacing: .08em; margin-bottom: 6px; }
+    .stock-badge { display: inline-block; background: #2e7d32; color: #fff; font-size: 9px; font-weight: 800; padding: 4px 12px; border-radius: 3px; letter-spacing: .08em; margin-bottom: 8px; }
     .header-logo { height: 50px; }
 
-    .specs-bar { display: flex; border: 2px solid #e2b830; border-radius: 6px; margin-bottom: 16px; overflow: hidden; background: #fefcf4; }
-    .spec-box { flex: 1; padding: 10px 12px; text-align: center; border-right: 1px solid #e8dfa0; }
+    /* Specs bar with golden accent */
+    .specs-bar { display: flex; border-radius: 6px; margin-bottom: 16px; overflow: hidden; background: linear-gradient(135deg, #fef8e0, #fff8e8); border: 2px solid #e8a020; }
+    .spec-box { flex: 1; padding: 12px 10px; text-align: center; border-right: 1px solid rgba(232,160,32,.3); }
     .spec-box:last-child { border-right: none; }
-    .spec-box .val { font-size: 16px; font-weight: 900; color: #111; }
-    .spec-box .lbl { font-size: 7px; color: #8a7a30; letter-spacing: .1em; text-transform: uppercase; margin-top: 2px; font-weight: 600; }
+    .spec-box .val { font-size: 16px; font-weight: 900; color: #1a1a1a; }
+    .spec-box .lbl { font-size: 7px; color: #9a7a10; letter-spacing: .12em; text-transform: uppercase; margin-top: 2px; font-weight: 700; }
 
-    .product-img { text-align: center; margin: 14px 0; }
+    .product-img { text-align: center; margin: 16px 0; padding: 16px; background: #f8f6f0; border-radius: 8px; border: 1px solid #e8e4dc; }
     .product-img img { max-width: 300px; max-height: 200px; }
 
-    .section-title { font-size: 10px; font-weight: 800; letter-spacing: .15em; color: #9a7a00; text-transform: uppercase; margin: 18px 0 8px; border-bottom: 2px solid #e2b830; padding-bottom: 5px; }
+    .section-title { font-size: 10px; font-weight: 800; letter-spacing: .18em; color: #e8a020; text-transform: uppercase; margin: 20px 0 10px; padding-bottom: 5px; border-bottom: 2.5px solid #e8a020; }
 
-    .tech-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 20px; border: 1px solid #eee; border-radius: 4px; padding: 6px 12px; background: #fdfcfa; }
-    .tech-col div { padding: 6px 0; border-bottom: 1px solid #f0ede6; }
-    .tech-label { font-size: 8px; color: #777; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px; }
-    .tech-val { font-size: 12px; font-weight: 800; color: #111; }
+    .tech-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 16px; border: 1px solid #e8e4dc; border-radius: 6px; padding: 8px 14px; background: #fdfcf8; }
+    .tech-col div { padding: 7px 0; border-bottom: 1px solid #f0ede6; }
+    .tech-label { font-size: 8px; color: #888; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px; }
+    .tech-val { font-size: 12px; font-weight: 800; color: #1a1a1a; }
 
     .use-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-    .use-tag { background: #f0f4f8; border: 1px solid #d0d8e0; border-radius: 4px; padding: 5px 12px; font-size: 10px; color: #333; font-weight: 600; }
+    .use-tag { background: #e8f0f8; border: 1px solid #c0d0e0; border-radius: 4px; padding: 5px 12px; font-size: 10px; color: #2a4a6a; font-weight: 600; }
 
+    .install-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px; }
     .install-list { list-style: none; padding: 0; }
-    .install-list li { padding: 4px 0; font-size: 11px; color: #333; }
-    .install-list li::before { content: '\\2713'; color: #2a7a38; font-weight: 900; margin-right: 8px; font-size: 13px; }
+    .install-list li { padding: 4px 0; font-size: 10px; color: #333; }
+    .install-list li::before { content: '\\2713'; color: #2e7d32; font-weight: 900; margin-right: 8px; font-size: 12px; }
 
     .cert-row { display: flex; gap: 10px; margin: 12px 0; }
-    .cert-badge { background: #f0f7f0; border: 1px solid #c0d8c0; border-radius: 4px; padding: 8px 14px; font-size: 10px; font-weight: 700; color: #2a6a2a; text-align: center; letter-spacing: .05em; }
+    .cert-badge { background: #1a1a1a; border-radius: 4px; padding: 8px 14px; font-size: 10px; font-weight: 700; color: #e8a020; text-align: center; letter-spacing: .05em; }
 
-    .price-box { background: #fef8e0; border: 2px solid #d4a800; border-radius: 6px; padding: 14px 18px; margin: 16px 0; display: flex; align-items: center; justify-content: space-between; }
-    .price-label { font-size: 11px; color: #7a6a00; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
-    .price-val { font-size: 24px; font-weight: 900; color: #b89000; }
+    .price-box { background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border-radius: 8px; padding: 16px 20px; margin: 16px 0; display: flex; align-items: center; justify-content: space-between; }
+    .price-label { font-size: 11px; color: #888; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+    .price-val { font-size: 26px; font-weight: 900; color: #e8a020; }
 
-    .note-box { background: #fffde8; border: 1px solid #e2d080; border-radius: 4px; padding: 10px 14px; margin: 10px 0; font-size: 11px; color: #555; }
-    .note-box .note-title { font-size: 9px; font-weight: 700; color: #b89820; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 3px; }
+    .note-box { background: #fef8e0; border-left: 4px solid #e8a020; border-radius: 0 6px 6px 0; padding: 12px 16px; margin: 12px 0; font-size: 11px; color: #444; line-height: 1.5; }
+    .note-box .note-title { font-size: 9px; font-weight: 700; color: #c88a00; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
 
-    .qr-section { text-align: right; margin: 10px 0; }
-    .qr-section img { width: 80px; height: 80px; }
-    .qr-section .qr-label { font-size: 8px; color: #888; margin-top: 2px; }
+    .qr-section { text-align: right; margin: 12px 0; }
+    .qr-section img { width: 80px; height: 80px; border-radius: 4px; }
+    .qr-section .qr-label { font-size: 8px; color: #888; margin-top: 3px; }
 
-    .footer { border-top: 1px solid #e8e4dc; padding-top: 8px; margin-top: 16px; font-size: 8px; color: #aaa; text-align: center; letter-spacing: .05em; }
+    .footer { background: #1a1a1a; border-radius: 6px; padding: 10px 16px; margin-top: 20px; font-size: 8px; color: #888; text-align: center; letter-spacing: .05em; }
+    .footer strong { color: #e8a020; }
 
     @media print {
       body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -791,8 +795,8 @@ function generatePDFForProduct(p, withPrice, addQR) {
   w.document.write('</style></head><body>');
   w.document.write('<div class="page">');
 
-  // Header row
-  w.document.write('<div class="header-row">');
+  // Header band (dark)
+  w.document.write('<div class="header-band">');
   w.document.write('<div class="header-left">');
   w.document.write('<div class="header-cat">PRODUKTOVÝ LIST · ' + (p.category || 'PRODUKT').toUpperCase() + '</div>');
   w.document.write('<div class="header-name">' + (p.name || 'Produkt') + '</div>');
@@ -874,7 +878,7 @@ function generatePDFForProduct(p, withPrice, addQR) {
   }
 
   // Footer
-  w.document.write('<div class="footer">LEDshopik.cz | BE-LIGHT s.r.o., Bohunická 50, 619 00 Brno | www.ledshopik.cz · Produktový list · verze 1.0 · 2026</div>');
+  w.document.write('<div class="footer"><strong>LEDshopik.cz</strong> | BE-LIGHT, s.r.o., Nové sady 988/2, 602 00 Brno | IČ: 05099749 | www.ledshopik.cz · Produktový list · 2026</div>');
 
   w.document.write('</div>'); // .page
   w.document.write('</body></html>');
