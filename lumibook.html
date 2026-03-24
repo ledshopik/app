@@ -705,22 +705,24 @@ function saveDB() {
   }).catch(() => {});
 }
 
-async function loadDBFromServer() {
+async function loadDBFromServer(attempt) {
+  attempt = attempt || 1;
   try {
-    const res = await fetch(LB_API_URL);
+    const res = await fetch(LB_API_URL + '?t=' + Date.now());
+    if(!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
-    if(json.ok && json.database && Array.isArray(json.database) && json.database.length > 0) {
-      database = json.database;
-      localStorage.setItem('lb-database', JSON.stringify(database));
+    var arr = json.database || json.data || [];
+    if(json.ok && Array.isArray(arr) && arr.length > 0) {
+      database = arr;
+      try { localStorage.setItem('lb-database', JSON.stringify(database)); } catch(e){}
       dbFromSheets = true;
       renderDB();
-    } else if(json.ok && json.data && Array.isArray(json.data) && json.data.length > 0) {
-      database = json.data;
-      localStorage.setItem('lb-database', JSON.stringify(database));
-      dbFromSheets = true;
-      renderDB();
+      console.log('Lumibook DB loaded: ' + database.length + ' items');
     }
-  } catch(e) { console.error('Lumibook DB load error:', e); }
+  } catch(e) {
+    console.error('Lumibook DB load error (attempt ' + attempt + '):', e);
+    if(attempt < 3) setTimeout(function(){ loadDBFromServer(attempt + 1); }, 3000);
+  }
 }
 function load() {
   try {
@@ -1894,7 +1896,7 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
       if(!c){localStorage.setItem(VK,d.version);return;}
       if(c!==d.version){
         localStorage.setItem(VK,d.version);
-        window.location.reload(true);
+        window.location.href=window.location.pathname+'?v='+Date.now();
       }
     }).catch(function(){});
   }

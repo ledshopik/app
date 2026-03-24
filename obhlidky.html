@@ -641,7 +641,7 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
       if(!c){localStorage.setItem(VK,d.version);return;}
       if(c!==d.version){
         localStorage.setItem(VK,d.version);
-        window.location.reload(true);
+        window.location.href=window.location.pathname+'?v='+Date.now();
       }
     }).catch(function(){});
   }
