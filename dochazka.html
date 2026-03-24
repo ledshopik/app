@@ -78,6 +78,7 @@ button, input, select, textarea { font-family: inherit; }
 .ev-dovolena  { background: #e0f8e0; color: #40c060; }
 .ev-neschopenka { background: #fce8e8; color: #e05050; }
 .ev-neplacene { background: #fdf4d8; color: #e2b830; }
+.ev-lekar { background: #e8f0ff; color: #6080c0; }
 
 /* Table */
 #table-wrap { padding: 0 32px 32px; overflow-x: auto; }
@@ -97,10 +98,12 @@ td.datum { white-space: nowrap; }
 .t-dovolena   { background: #e0f0e0; color: #40c060; border: 1px solid #c0dcc0; } .t-dovolena .badge-dot   { background: #40c060; }
 .t-neschopenka { background: #fce8e8; color: #e05050; border: 1px solid #f0c8c8; } .t-neschopenka .badge-dot { background: #e05050; }
 .t-neplacene  { background: #fdf4d8; color: #e2b830; border: 1px solid #f0e0a0; } .t-neplacene .badge-dot  { background: #e2b830; }
+.t-lekar      { background: #e8f0ff; color: #6080c0; border: 1px solid #c8d8f0; } .t-lekar .badge-dot      { background: #6080c0; }
 
 tbody tr[data-typ="Dovolená"]        td:first-child { border-left: 3px solid #40c060; }
 tbody tr[data-typ="Neschopenka"]     td:first-child { border-left: 3px solid #e05050; }
 tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e2b830; }
+tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6080c0; }
 
 #empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
 
@@ -174,6 +177,7 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
       <div class="stat"><div class="num" id="stat-total" style="color:#1a1a1a">0</div><div class="lbl">Celkem</div></div>
       <div class="stat"><div class="num" id="stat-dovolena" style="color:#40c060">0</div><div class="lbl">Dovolená</div></div>
       <div class="stat"><div class="num" id="stat-neschopenka" style="color:#e05050">0</div><div class="lbl">Neschopenka</div></div>
+      <div class="stat"><div class="num" id="stat-lekar" style="color:#6080c0">0</div><div class="lbl">Lékař</div></div>
       <div class="stat"><div class="num" id="stat-dnes" style="color:#60a0e0">0</div><div class="lbl">Dnes pryč</div></div>
     </div>
   </div>
@@ -184,6 +188,7 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
   <button class="filter-btn" data-filter="Dovolená"        onclick="setFilter('Dovolená')"><span class="filter-dot" style="background:#40c060"></span>Dovolená</button>
   <button class="filter-btn" data-filter="Neschopenka"     onclick="setFilter('Neschopenka')"><span class="filter-dot" style="background:#e05050"></span>Neschopenka</button>
   <button class="filter-btn" data-filter="Neplacené volno" onclick="setFilter('Neplacené volno')"><span class="filter-dot" style="background:#e2b830"></span>Neplacené volno</button>
+  <button class="filter-btn" data-filter="Lékař" onclick="setFilter('Lékař')"><span class="filter-dot" style="background:#6080c0"></span>Lékař</button>
   <button class="filter-btn" data-filter="aktualni"        onclick="setFilter('aktualni')"><span class="filter-dot" style="background:#60a0e0"></span>Aktuální</button>
   <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderAll()"></div>
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
@@ -226,6 +231,7 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#40c060;"></div>Dovolená</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#e05050;"></div>Neschopenka</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#e2b830;"></div>Neplacené</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#6080c0;"></div>Lékař</div>
     </div>
   </div>
   <div class="cal-grid">
@@ -279,6 +285,7 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
           <option>Dovolená</option>
           <option>Neschopenka</option>
           <option>Neplacené volno</option>
+          <option>Lékař</option>
         </select>
       </div>
       <div class="form-group">
@@ -317,8 +324,8 @@ if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 const SCRIPT_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
 const COLS = ['id','zamestnanec','typ','datum_od','datum_do','dni','poznamka'];
 const MONTHS_CS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
-const TYP_CLASS = { 'Dovolená':'t-dovolena', 'Neschopenka':'t-neschopenka', 'Neplacené volno':'t-neplacene' };
-const TYP_CAL  = { 'Dovolená':'ev-dovolena', 'Neschopenka':'ev-neschopenka', 'Neplacené volno':'ev-neplacene' };
+const TYP_CLASS = { 'Dovolená':'t-dovolena', 'Neschopenka':'t-neschopenka', 'Neplacené volno':'t-neplacene', 'Lékař':'t-lekar' };
+const TYP_CAL  = { 'Dovolená':'ev-dovolena', 'Neschopenka':'ev-neschopenka', 'Neplacené volno':'ev-neplacene', 'Lékař':'ev-lekar' };
 
 let data=[], filterVal='vse', sortCol='datum_od', sortDir=-1, editId=null;
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
@@ -554,6 +561,7 @@ function renderStats(){
   document.getElementById('stat-total').textContent=data.length;
   document.getElementById('stat-dovolena').textContent=data.filter(r=>r.typ==='Dovolená').length;
   document.getElementById('stat-neschopenka').textContent=data.filter(r=>r.typ==='Neschopenka').length;
+  document.getElementById('stat-lekar').textContent=data.filter(r=>r.typ==='Lékař').length;
   document.getElementById('stat-dnes').textContent=data.filter(r=>{
     const od=toInputDate(r.datum_od), doo=toInputDate(r.datum_do);
     return od&&doo&&od<=todayStr&&todayStr<=doo;
