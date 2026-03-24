@@ -417,7 +417,7 @@ a{color:var(--accent);text-decoration:none}
   <a href="lumibook.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#e8a020;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid #e8a020;line-height:1.3;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#e8a020'">LUMIBOOK<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalog</span></a>
   <a href="kalkulator-instalaci.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KALKULÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Ceny montáží</span></a>
   <a href="produktovy-list.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PRODUKTY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalogové listy</span></a>
-  <a href="dochazka.html" style="margin-left:auto;padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#50a060;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:3px;border-bottom:2px solid transparent;background:#f0f8f2;border-radius:6px 6px 0 0;line-height:1.3;" onmouseover="this.style.color='#3a8048'" onmouseout="this.style.color='#50a060'">🕐 DOCHÁZKA</a>
+  <a href="dochazka.html" style="margin-left:auto;padding:10px 20px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#50a060;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center;background:#f0f8f2;border-radius:6px 6px 0 0;line-height:1.3;" onmouseover="this.style.color='#3a8048'" onmouseout="this.style.color='#50a060'">🕐 DOCHÁZKA</a>
 <div style="display:flex;align-items:center;gap:8px;padding:0 12px;margin-left:12px;font-size:12px;color:#888;border-left:1px solid #e0e0e0;font-family:'Arial Narrow',Arial,sans-serif;"><span id="user-bar-name" style="font-weight:700;color:#333;"></span><a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a></div>
 </div>
 <div style="background:#f4f2ed;border-bottom:1px solid #e8e4dc;padding:20px 32px;display:flex;align-items:center;justify-content:space-between;font-family:'Arial Narrow',Arial,sans-serif;">
@@ -1694,7 +1694,9 @@ body{font-family:'DM Sans',Arial,sans-serif;padding:28px 32px;color:#1a1a1a;font
   @page{margin:10mm}
   .card{break-inside:avoid}
 }
-</style></head><body>
+</style>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#ffffff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(x=>x.unregister()))}if('caches' in window){caches.keys().then(n=>n.forEach(k=>caches.delete(k)))}</script>
+</head><body>
 <div class="hdr">
   <div><div class="lg">LUMIBOOK PRO</div><div class="ls">Kniha svítidel by LEDshopik.cz</div></div>
   <div class="pj">
