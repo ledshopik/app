@@ -125,6 +125,68 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 #saving-box { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 24px 36px; text-align: center; }
 #saving-box .saving-title { font-size: 14px; font-weight: 700; color: #e2b830; margin-bottom: 6px; }
 #saving-box .saving-sub   { font-size: 12px; color: #888; }
+/* ── PARTNEŘI SIDEBAR ── */
+#partner-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:250;opacity:0;pointer-events:none;transition:opacity .2s}
+#partner-overlay.open{opacity:1;pointer-events:auto}
+#partner-sidebar{position:fixed;top:0;right:0;bottom:0;width:440px;max-width:95vw;background:#fff;box-shadow:-4px 0 24px rgba(0,0,0,.12);z-index:260;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;overflow:hidden}
+#partner-sidebar.open{transform:translateX(0)}
+.ps-header{padding:16px 20px;border-bottom:1px solid #e8e4dc;display:flex;align-items:center;justify-content:space-between}
+.ps-header h2{font-size:16px;font-weight:800;letter-spacing:.05em;margin:0}
+.ps-close{background:none;border:none;font-size:20px;color:#888;cursor:pointer;padding:0 4px}
+.ps-close:hover{color:#1a1a1a}
+.ps-body{flex:1;overflow-y:auto;padding:16px 20px}
+/* SVG mapa */
+.ps-map{margin-bottom:16px}
+.ps-map svg{width:100%;height:auto}
+.ps-map svg path{fill:#e8e4dc;stroke:#fff;stroke-width:1.5;cursor:pointer;transition:fill .15s}
+.ps-map svg path:hover{fill:#f0dca0}
+.ps-map svg path.region-active{fill:#e2b830}
+.ps-map-legend{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:11px;color:#888}
+.ps-map-label{font-weight:700;color:#1a1a1a}
+.ps-map-reset{background:none;border:1px solid #ddd;border-radius:4px;padding:2px 10px;font-size:10px;color:#888;cursor:pointer}
+.ps-map-reset:hover{color:#1a1a1a;border-color:#bbb}
+/* Filtry a hledání */
+.ps-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ps-obor-btn{background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:700;cursor:pointer;transition:all .15s}
+.ps-obor-btn:hover{border-color:#bbb;color:#444}
+.ps-obor-btn.active{background:#e2b830;color:#fff;border-color:#e2b830}
+.ps-search{width:100%;background:#f8f6f0;border:1px solid #ddd;border-radius:6px;padding:6px 12px;font-size:12px;outline:none;margin-bottom:12px}
+.ps-search:focus{border-color:#e2b830}
+/* Karty partnerů */
+.ps-list{display:flex;flex-direction:column;gap:8px}
+.ps-card{background:#f8f6f0;border:1px solid #e8e4dc;border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.ps-card:hover{border-color:#e2b830}
+.ps-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
+.ps-card-name{font-size:13px;font-weight:700;color:#1a1a1a}
+.ps-card-obor{display:inline-block;background:#e8f0ff;color:#6080c0;border:1px solid #c8d8f0;border-radius:10px;padding:1px 8px;font-size:9px;font-weight:700;letter-spacing:.04em}
+.ps-card-region{font-size:10px;color:#888;margin-bottom:4px}
+.ps-card-contact{font-size:11px;color:#555;margin-bottom:4px}
+.ps-card-contact a{color:#6080c0;text-decoration:none}
+.ps-card-meta{display:flex;align-items:center;gap:12px;font-size:10px;color:#888}
+.ps-stars{color:#e2b830;letter-spacing:1px}
+.ps-card-note{font-size:10px;color:#999;margin-top:4px;font-style:italic}
+.ps-empty{text-align:center;padding:30px 10px;color:#888;font-size:12px}
+.ps-add-btn{width:100%;margin-top:12px;background:#e2b830;color:#fff;border:none;border-radius:6px;padding:8px;font-size:12px;font-weight:700;cursor:pointer}
+.ps-add-btn:hover{background:#f0c840}
+/* Partner modal */
+#partner-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:center;justify-content:center;padding:20px}
+#partner-modal-overlay.open{display:flex}
+#partner-modal{background:#fff;border:1px solid #ddd;border-radius:10px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.pm-header{padding:16px 20px;border-bottom:1px solid #e8e4dc;display:flex;align-items:center;justify-content:space-between}
+.pm-header h3{font-size:15px;font-weight:800;margin:0}
+.pm-body{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pm-group{display:flex;flex-direction:column;gap:4px}
+.pm-group.full{grid-column:1/-1}
+.pm-group label{font-size:9px;font-weight:700;letter-spacing:.12em;color:#888;text-transform:uppercase}
+.pm-group input,.pm-group select,.pm-group textarea{background:#fff;border:1px solid #ddd;border-radius:6px;padding:7px 10px;font-size:12px;outline:none;font-family:inherit}
+.pm-group input:focus,.pm-group select:focus,.pm-group textarea:focus{border-color:#e2b830}
+.pm-group textarea{resize:vertical;min-height:60px}
+.pm-rating{display:flex;gap:2px;cursor:pointer}
+.pm-rating span{font-size:20px;color:#ddd;transition:color .1s}
+.pm-rating span.filled{color:#e2b830}
+.pm-footer{padding:14px 20px;border-top:1px solid #e8e4dc;display:flex;gap:10px;justify-content:flex-end;align-items:center}
+.pm-footer .btn-del{margin-right:auto;background:none;color:#c05050;border:1px solid #f0c8c8;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer}
+.pm-footer .btn-del:hover{background:#fce8e8}
 </style>
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(x=>x.unregister()))}if('caches' in window){caches.keys().then(n=>n.forEach(k=>caches.delete(k)))}</script></head>
 <body><div style="background:#fff;border-bottom:1px solid #e0e0e0;padding:0 24px;display:flex;align-items:stretch;gap:2px;font-family:Arial Narrow,Arial,sans-serif;">
@@ -171,6 +233,7 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
   <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
   <button id="btn-add" onclick="openModal()">+ Přidat instalaci</button>
+  <button id="btn-partners" onclick="togglePartners()" style="background:#fff;color:#666;border:1px solid #ddd;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;letter-spacing:.06em;cursor:pointer;display:flex;align-items:center;gap:6px;">👷 Partneři</button>
 </div>
 
 <div id="table-wrap">
@@ -250,6 +313,103 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
   <div id="saving-box">
     <div class="saving-title" id="saving-title">Ukládám...</div>
     <div class="saving-sub"   id="saving-sub">Ukládám data</div>
+  </div>
+</div>
+
+<!-- ═══ PARTNEŘI SIDEBAR ═══ -->
+<div id="partner-overlay" onclick="togglePartners()"></div>
+<div id="partner-sidebar">
+  <div class="ps-header">
+    <h2>👷 Síť partnerů</h2>
+    <button class="ps-close" onclick="togglePartners()">✕</button>
+  </div>
+  <div class="ps-body">
+    <!-- MAPA ČR -->
+    <div class="ps-map">
+      <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+        <path id="r-KVK" d="M60,195 L95,165 L130,155 L155,170 L145,200 L160,220 L130,240 L95,235 L65,225 Z" data-region="Karlovarský"/>
+        <path id="r-PLK" d="M130,240 L160,220 L145,200 L155,170 L190,160 L220,180 L240,215 L250,255 L230,280 L200,290 L165,275 L140,260 Z" data-region="Plzeňský"/>
+        <path id="r-ULK" d="M155,170 L190,160 L230,140 L280,120 L310,130 L330,155 L300,175 L270,180 L240,175 L220,180 L190,160 Z" data-region="Ústecký"/>
+        <path id="r-LBK" d="M330,155 L310,130 L340,110 L380,105 L410,120 L400,150 L370,165 L345,170 Z" data-region="Liberecký"/>
+        <path id="r-HKK" d="M400,150 L410,120 L450,115 L490,130 L510,155 L490,180 L460,190 L430,185 L400,175 Z" data-region="Královéhradecký"/>
+        <path id="r-PAK" d="M400,175 L430,185 L460,190 L490,180 L480,210 L450,230 L420,235 L390,225 L375,200 Z" data-region="Pardubický"/>
+        <path id="r-STC" d="M220,180 L270,180 L300,175 L330,155 L345,170 L370,165 L400,175 L375,200 L390,225 L370,250 L340,260 L310,250 L280,260 L250,255 L240,215 Z" data-region="Středočeský"/>
+        <path id="r-PHA" d="M305,195 L325,185 L345,195 L340,215 L320,225 L300,215 Z" data-region="Praha"/>
+        <path id="r-JCK" d="M165,275 L200,290 L230,280 L250,255 L280,260 L310,250 L340,260 L350,290 L340,330 L310,355 L270,365 L230,350 L195,330 L170,305 Z" data-region="Jihočeský"/>
+        <path id="r-VYS" d="M340,260 L370,250 L390,225 L420,235 L450,230 L460,255 L450,285 L420,305 L390,310 L360,305 L340,330 L350,290 Z" data-region="Vysočina"/>
+        <path id="r-JMK" d="M450,285 L460,255 L450,230 L480,210 L510,220 L550,235 L580,260 L600,295 L580,330 L550,345 L510,340 L480,325 L450,315 L420,305 Z" data-region="Jihomoravský"/>
+        <path id="r-OLK" d="M510,155 L490,180 L480,210 L510,220 L550,235 L580,220 L610,195 L620,170 L600,155 L570,150 L540,155 Z" data-region="Olomoucký"/>
+        <path id="r-ZLK" d="M580,220 L580,260 L600,295 L630,285 L660,260 L670,230 L650,210 L620,205 L610,195 Z" data-region="Zlínský"/>
+        <path id="r-MSK" d="M620,170 L610,195 L620,205 L650,210 L670,230 L700,215 L730,190 L740,160 L720,140 L690,130 L660,140 L640,155 Z" data-region="Moravskoslezský"/>
+      </svg>
+      <div class="ps-map-legend">
+        <span class="ps-map-label" id="ps-region-label">Celá ČR</span>
+        <button class="ps-map-reset" onclick="filterRegion(null)" style="display:none" id="ps-reset-btn">Zobrazit vše</button>
+      </div>
+    </div>
+
+    <!-- FILTRY -->
+    <div class="ps-filters" id="ps-obor-filters">
+      <button class="ps-obor-btn active" onclick="filterObor('vse')">Vše</button>
+      <button class="ps-obor-btn" onclick="filterObor('Elektro')">⚡ Elektro</button>
+      <button class="ps-obor-btn" onclick="filterObor('SDK')">🧱 SDK</button>
+      <button class="ps-obor-btn" onclick="filterObor('Malíř')">🎨 Malíř</button>
+      <button class="ps-obor-btn" onclick="filterObor('Podlahy')">🪵 Podlahy</button>
+      <button class="ps-obor-btn" onclick="filterObor('Zedník')">🧱 Zedník</button>
+      <button class="ps-obor-btn" onclick="filterObor('Klima')">❄️ Klima</button>
+      <button class="ps-obor-btn" onclick="filterObor('Ostatní')">📦 Ostatní</button>
+    </div>
+    <input type="text" class="ps-search" id="ps-search" placeholder="Hledat partnera..." oninput="renderPartners()">
+
+    <!-- SEZNAM -->
+    <div class="ps-list" id="ps-list"></div>
+
+    <button class="ps-add-btn" onclick="openPartnerModal()">+ Přidat partnera</button>
+  </div>
+</div>
+
+<!-- ═══ PARTNER MODAL ═══ -->
+<div id="partner-modal-overlay" onclick="if(event.target===this)closePartnerModal()">
+  <div id="partner-modal">
+    <div class="pm-header">
+      <h3 id="pm-title">Nový partner</h3>
+      <button class="ps-close" onclick="closePartnerModal()">✕</button>
+    </div>
+    <div class="pm-body">
+      <div class="pm-group full"><label>Název firmy / Jméno</label><input id="pf-firma" placeholder="např. ElektroServis Praha"></div>
+      <div class="pm-group"><label>Kontaktní osoba</label><input id="pf-osoba" placeholder="Jan Novák"></div>
+      <div class="pm-group"><label>IČO</label><input id="pf-ico" placeholder="12345678"></div>
+      <div class="pm-group"><label>Telefon</label><input id="pf-tel" placeholder="+420 ..."></div>
+      <div class="pm-group"><label>Email</label><input id="pf-email" placeholder="email@firma.cz"></div>
+      <div class="pm-group"><label>Kraj</label>
+        <select id="pf-kraj">
+          <option value="">— vyberte —</option>
+          <option>Praha</option><option>Středočeský</option><option>Jihočeský</option>
+          <option>Plzeňský</option><option>Karlovarský</option><option>Ústecký</option>
+          <option>Liberecký</option><option>Královéhradecký</option><option>Pardubický</option>
+          <option>Vysočina</option><option>Jihomoravský</option><option>Olomoucký</option>
+          <option>Zlínský</option><option>Moravskoslezský</option>
+        </select>
+      </div>
+      <div class="pm-group"><label>Obor</label>
+        <select id="pf-obor">
+          <option>Elektro</option><option>SDK</option><option>Malíř</option>
+          <option>Podlahy</option><option>Zedník</option><option>Klima</option><option>Ostatní</option>
+        </select>
+      </div>
+      <div class="pm-group"><label>Cena / hod (Kč)</label><input type="number" id="pf-cena" placeholder="450"></div>
+      <div class="pm-group"><label>Hodnocení</label>
+        <div class="pm-rating" id="pf-rating">
+          <span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span><span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span><span onclick="setRating(5)">★</span>
+        </div>
+      </div>
+      <div class="pm-group full"><label>Poznámky</label><textarea id="pf-pozn" placeholder="Zkušenosti, spolehlivost, speciality..."></textarea></div>
+    </div>
+    <div class="pm-footer">
+      <button class="btn-del" id="pm-delete" onclick="deletePartner()" style="display:none">🗑 Smazat</button>
+      <button class="btn-cancel" onclick="closePartnerModal()">Zrušit</button>
+      <button class="btn-save" onclick="savePartner()">Uložit</button>
+    </div>
   </div>
 </div>
 
@@ -495,6 +655,180 @@ async function deleteRecord(){
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při mazání: '+e.message); }
+}
+
+/* ═══ PARTNEŘI ═══ */
+let partners=[], pFilterRegion=null, pFilterObor='vse', pEditId=null, pRating=3;
+const REGION_IDS={
+  'Karlovarský':'r-KVK','Plzeňský':'r-PLK','Ústecký':'r-ULK','Liberecký':'r-LBK',
+  'Královéhradecký':'r-HKK','Pardubický':'r-PAK','Středočeský':'r-STC','Praha':'r-PHA',
+  'Jihočeský':'r-JCK','Vysočina':'r-VYS','Jihomoravský':'r-JMK','Olomoucký':'r-OLK',
+  'Zlínský':'r-ZLK','Moravskoslezský':'r-MSK'
+};
+
+// Map click handlers
+document.querySelectorAll('.ps-map svg path').forEach(p=>{
+  p.addEventListener('click',()=>filterRegion(p.dataset.region));
+});
+
+function togglePartners(){
+  const sb=document.getElementById('partner-sidebar');
+  const ov=document.getElementById('partner-overlay');
+  const isOpen=sb.classList.contains('open');
+  sb.classList.toggle('open');
+  ov.classList.toggle('open');
+  if(!isOpen&&!partners.length) loadPartners();
+}
+
+async function loadPartners(){
+  try {
+    const res=await fetch(SCRIPT_URL+'?modul=partneri');
+    const json=await res.json();
+    partners=json.data||[];
+    renderPartners();
+  } catch(e){ console.error('Chyba načítání partnerů:',e); }
+}
+
+function filterRegion(region){
+  pFilterRegion=region;
+  document.querySelectorAll('.ps-map svg path').forEach(p=>{
+    p.classList.toggle('region-active',region&&p.dataset.region===region);
+  });
+  document.getElementById('ps-region-label').textContent=region||'Celá ČR';
+  document.getElementById('ps-reset-btn').style.display=region?'inline-block':'none';
+  renderPartners();
+}
+
+function filterObor(obor){
+  pFilterObor=obor;
+  document.querySelectorAll('.ps-obor-btn').forEach(b=>{
+    const bObor=b.textContent.replace(/[⚡🧱🎨🪵❄️📦]\s?/g,'').trim();
+    b.classList.toggle('active', obor==='vse'?bObor==='Vše':bObor===obor);
+  });
+  renderPartners();
+}
+
+function getFilteredPartners(){
+  const q=(document.getElementById('ps-search').value||'').toLowerCase();
+  return partners.filter(p=>{
+    if(pFilterRegion&&p.kraj!==pFilterRegion) return false;
+    if(pFilterObor!=='vse'&&p.obor!==pFilterObor) return false;
+    if(q&&![p.firma,p.osoba,p.obor,p.kraj,p.pozn].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function renderPartners(){
+  const list=getFilteredPartners();
+  const el=document.getElementById('ps-list');
+  if(!list.length){
+    el.innerHTML='<div class="ps-empty">Žádní partneři nenalezeni</div>';
+    // Update region counts on map
+    updateMapCounts();
+    return;
+  }
+  el.innerHTML=list.map(p=>{
+    const stars='★'.repeat(p.hodnoceni||0)+'☆'.repeat(5-(p.hodnoceni||0));
+    return `<div class="ps-card" onclick="openPartnerModal('${p.id}')">
+      <div class="ps-card-top">
+        <div class="ps-card-name">${esc(p.firma||'')}</div>
+        <span class="ps-card-obor">${esc(p.obor||'')}</span>
+      </div>
+      <div class="ps-card-region">📍 ${esc(p.kraj||'—')}${p.osoba?' · '+esc(p.osoba):''}</div>
+      <div class="ps-card-contact">
+        ${p.tel?'📞 <a href="tel:'+esc(p.tel)+'">'+esc(p.tel)+'</a>':''}
+        ${p.email?' · ✉ <a href="mailto:'+esc(p.email)+'">'+esc(p.email)+'</a>':''}
+      </div>
+      <div class="ps-card-meta">
+        <span class="ps-stars">${stars}</span>
+        ${p.cena?'<span>'+p.cena+' Kč/hod</span>':''}
+        ${p.ico?'<span>IČO: '+esc(p.ico)+'</span>':''}
+      </div>
+      ${p.pozn?'<div class="ps-card-note">'+esc(p.pozn)+'</div>':''}
+    </div>`;
+  }).join('');
+  updateMapCounts();
+}
+
+function updateMapCounts(){
+  document.querySelectorAll('.ps-map svg path').forEach(p=>{
+    const region=p.dataset.region;
+    const count=partners.filter(x=>x.kraj===region).length;
+    p.style.fill=count>0?(pFilterRegion===region?'#e2b830':'#d4e8c0'):(pFilterRegion===region?'#e2b830':'');
+  });
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function setRating(n){
+  pRating=n;
+  document.querySelectorAll('#pf-rating span').forEach((s,i)=>s.classList.toggle('filled',i<n));
+}
+
+function openPartnerModal(id){
+  const p=id?partners.find(x=>x.id===String(id)):null;
+  pEditId=p?String(p.id):null;
+  document.getElementById('pm-title').textContent=p?'Upravit partnera':'Nový partner';
+  document.getElementById('pm-delete').style.display=p?'inline-flex':'none';
+  if(p){
+    document.getElementById('pf-firma').value=p.firma||'';
+    document.getElementById('pf-osoba').value=p.osoba||'';
+    document.getElementById('pf-ico').value=p.ico||'';
+    document.getElementById('pf-tel').value=p.tel||'';
+    document.getElementById('pf-email').value=p.email||'';
+    document.getElementById('pf-kraj').value=p.kraj||'';
+    document.getElementById('pf-obor').value=p.obor||'Elektro';
+    document.getElementById('pf-cena').value=p.cena||'';
+    document.getElementById('pf-pozn').value=p.pozn||'';
+    setRating(p.hodnoceni||3);
+  } else {
+    ['pf-firma','pf-osoba','pf-ico','pf-tel','pf-email','pf-cena','pf-pozn'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('pf-kraj').value=pFilterRegion||'';
+    document.getElementById('pf-obor').value='Elektro';
+    setRating(3);
+  }
+  document.getElementById('partner-modal-overlay').classList.add('open');
+}
+
+function closePartnerModal(){
+  document.getElementById('partner-modal-overlay').classList.remove('open');
+  pEditId=null;
+}
+
+async function savePartner(){
+  const isEdit=!!pEditId;
+  const rec={
+    id: pEditId||String(Date.now()),
+    firma: document.getElementById('pf-firma').value.trim(),
+    osoba: document.getElementById('pf-osoba').value.trim(),
+    ico:   document.getElementById('pf-ico').value.trim(),
+    tel:   document.getElementById('pf-tel').value.trim(),
+    email: document.getElementById('pf-email').value.trim(),
+    kraj:  document.getElementById('pf-kraj').value,
+    obor:  document.getElementById('pf-obor').value,
+    cena:  Number(document.getElementById('pf-cena').value)||0,
+    hodnoceni: pRating,
+    pozn:  document.getElementById('pf-pozn').value.trim()
+  };
+  if(!rec.firma){alert('Vyplňte název firmy / jméno');return;}
+  closePartnerModal();
+  showSaving(isEdit?'Ukládám partnera...':'Přidávám partnera...','Ukládám data');
+  try {
+    await apiPost({action:isEdit?'update':'append',modul:'partneri',record:rec});
+    showSaving('Hotovo!','Data uložena');
+    setTimeout(async()=>{hideSaving();await loadPartners();},800);
+  } catch(e){hideSaving();alert('Chyba: '+e.message);}
+}
+
+async function deletePartner(){
+  if(!pEditId||!confirm('Opravdu smazat tohoto partnera?')) return;
+  const id=pEditId; closePartnerModal();
+  showSaving('Mažu partnera...','');
+  try {
+    await apiPost({action:'delete',modul:'partneri',id:String(id)});
+    showSaving('Smazáno!','');
+    setTimeout(async()=>{hideSaving();await loadPartners();},800);
+  } catch(e){hideSaving();alert('Chyba: '+e.message);}
 }
 
 renderCalendar();
