@@ -1479,7 +1479,7 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
 (function(){
   var APP_VER_KEY='ledshopik_app_ver';
   function checkUpdate(){
-    fetch('version.json?t='+Date.now()).then(function(r){return r.json()}).then(function(d){
+    fetch('https://raw.githubusercontent.com/ledshopik/app/main/version.json?t='+Date.now()).then(function(r){return r.json()}).then(function(d){
       var cur=localStorage.getItem(APP_VER_KEY);
       if(!cur){localStorage.setItem(APP_VER_KEY,d.version);return;}
       if(cur!==d.version){
