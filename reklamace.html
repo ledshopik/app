@@ -860,7 +860,7 @@ function printProtocol(){
   const r=data.find(x=>String(x.id)===String(editId));
   if(!r) return;
   const zadal=localStorage.getItem('ledshopik_user')||'—';
-  const logoUrl=new URL('ledshopik_logo_vertical_inverse.png',window.location.href).href;
+  const logoUrl=new URL('ledshopik_logo_vertical_regular.png',window.location.href).href;
   const w=window.open('','_blank','width=800,height=900');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reklamační protokol – ${String(r.obj||'')}</title>
 <style>
