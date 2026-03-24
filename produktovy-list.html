@@ -434,7 +434,7 @@ async function scrapeProduct(url) {
   if (ipMatch) p.ip = 'IP' + ipMatch[1];
 
   // Beam angle
-  const angleMatch = bodyText.match(/vyzařovací\s*úhel[^:]*?(\d+)\s*°/i) || bodyText.match(/(\d+)\s*°\s*(?:vyzař|beam)/i);
+  const angleMatch = bodyText.match(/vyzařovací\s*úhel[^:]*?[:]\s*(\d+)\s*°/i) || bodyText.match(/úhel\s*svícení[^:]*?[:]\s*(\d+)\s*°/i) || bodyText.match(/(\d+)\s*°\s*(?:vyzař|beam)/i) || bodyText.match(/beam\s*angle[^:]*?[:]\s*(\d+)/i) || bodyText.match(/vyzařovací[^:]*?(\d+)\s*°/i);
   if (angleMatch) p.beamAngle = angleMatch[1] + '°';
 
   // Dimmable
@@ -446,7 +446,7 @@ async function scrapeProduct(url) {
   if (tempMatch) p.operatingTemp = tempMatch[1] + ' °C až +' + tempMatch[2] + ' °C';
 
   // Divisibility
-  const divMatch = bodyText.match(/dělitelnost[^:]*?[:]\s*(?:každých?\s*)?(\d+(?:[.,]\d+)?)\s*mm/i) || bodyText.match(/(?:každých?|každý|cut)\s*(\d+(?:[.,]\d+)?)\s*mm/i);
+  const divMatch = bodyText.match(/dělitelnost[^:]*?[:]\s*(?:každých?\s*)?(\d+(?:[.,]\d+)?)\s*mm/i) || bodyText.match(/(?:každých?|každý|cut)\s*(\d+(?:[.,]\d+)?)\s*mm/i) || bodyText.match(/řez[^:]*?[:]\s*(?:každých?\s*)?(\d+(?:[.,]\d+)?)\s*mm/i) || bodyText.match(/dělení[^:]*?[:]\s*(\d+(?:[.,]\d+)?)\s*mm/i) || bodyText.match(/(?:cutting|cut\s*length)[^:]*?[:]\s*(\d+(?:[.,]\d+)?)\s*mm/i);
   if (divMatch) p.divisibility = 'každých ' + divMatch[1] + ' mm';
 
   // Max length
@@ -454,8 +454,8 @@ async function scrapeProduct(url) {
   if (maxLenMatch) p.maxLength = maxLenMatch[1] + ' m';
 
   // Lifetime
-  const lifeMatch = bodyText.match(/životnost[^:]*?[:]\s*([\d\s]+)\s*h/i);
-  if (lifeMatch) p.lifetime = lifeMatch[1].trim() + ' h';
+  const lifeMatch = bodyText.match(/životnost[^:]*?[:]\s*([\d\s]+)\s*h/i) || bodyText.match(/([\d\s]+)\s*h\s*(?:životnost|life)/i) || bodyText.match(/life\s*(?:time|span)[^:]*?[:]\s*([\d\s]+)\s*h/i) || bodyText.match(/([\d]{4,6})\s*(?:hodin|hours|h\b)/i);
+  if (lifeMatch) p.lifetime = lifeMatch[1].replace(/\s/g,'').replace(/(\d)(?=(\d{3})+$)/g, '$1 ') + ' h';
 
   // PCB color
   const pcbColorMatch = bodyText.match(/barva\s*PCB[^:]*?[:]\s*(\w+)/i);
@@ -466,8 +466,31 @@ async function scrapeProduct(url) {
   if (pcbWidthMatch) p.pcbWidth = pcbWidthMatch[1] + ' mm';
 
   // Warranty
-  const warrantyMatch = bodyText.match(/záruka[^:]*?[:]\s*(\d+)\s*(?:rok|let)/i);
-  if (warrantyMatch) p.warranty = warrantyMatch[1] + ' roky';
+  const warrantyMatch = bodyText.match(/záruka[^:]*?[:]\s*(\d+)\s*(?:rok|let|year)/i) || bodyText.match(/(\d+)\s*(?:rok|let|year)\s*(?:záruk|warranty|garanc)/i) || bodyText.match(/warranty[^:]*?[:]\s*(\d+)/i) || bodyText.match(/záruka\s*(\d+)/i);
+  if (warrantyMatch) { const y = parseInt(warrantyMatch[1]); p.warranty = y + (y === 1 ? ' rok' : y < 5 ? ' roky' : ' let'); }
+
+  // Try parsing structured parameter tables (td pairs: label → value)
+  if (doc.body) {
+    const rows = doc.querySelectorAll('tr, .param-row, .spec-row, [class*="param"]');
+    for (const row of rows) {
+      const cells = row.querySelectorAll('td, th, span, div');
+      if (cells.length >= 2) {
+        const label = (cells[0].textContent || '').trim().toLowerCase();
+        const value = (cells[1].textContent || '').trim();
+        if (!value) continue;
+        if (!p.beamAngle && (label.includes('vyzařovací') || label.includes('úhel'))) p.beamAngle = value.replace(/[^\d°]/g,'') || value;
+        if (!p.divisibility && (label.includes('dělitelnost') || label.includes('dělení') || label.includes('řez'))) p.divisibility = value;
+        if (!p.lifetime && (label.includes('životnost') || label.includes('life'))) p.lifetime = value;
+        if (!p.warranty && (label.includes('záruka') || label.includes('warranty'))) p.warranty = value;
+        if (!p.dimmable && label.includes('stmívat')) p.dimmable = value;
+        if (!p.operatingTemp && (label.includes('provozní teplot') || label.includes('operating'))) p.operatingTemp = value;
+        if (!p.maxLength && (label.includes('max') && label.includes('délk'))) p.maxLength = value;
+        if (!p.pcbColor && label.includes('barva') && label.includes('pcb')) p.pcbColor = value;
+        if (!p.pcbWidth && label.includes('šířka') && label.includes('pcb')) p.pcbWidth = value;
+        if (!p.voltage && (label.includes('napětí') || label.includes('voltage'))) p.voltage = value;
+      }
+    }
+  }
 
   // SKU fallback from body
   if (!p.sku) { const skuMatch = bodyText.match(/SKU[:\s]*([A-Z0-9][-A-Z0-9_]+)/i); if (skuMatch) p.sku = skuMatch[1]; }
@@ -816,7 +839,6 @@ function generatePDFForProduct(p, withPrice, addQR) {
   if (warrantyYears) w.document.write('<div class="cert-badge">🛡 Záruka ' + warrantyYears + ' roky</div>');
   w.document.write('<div class="cert-badge">CE certifikát</div>');
   w.document.write('<div class="cert-badge">RoHS</div>');
-  w.document.write('<div class="cert-badge">Energetická třída</div>');
   w.document.write('</div>');
 
   // Price
