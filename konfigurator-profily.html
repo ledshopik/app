@@ -913,23 +913,21 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
 </script>
 <script>
 (function(){
-  var APP_VER_KEY='ledshopik_app_ver';
-  function checkUpdate(){
-    fetch('https://raw.githubusercontent.com/ledshopik/app/main/version.json?t='+Date.now()).then(function(r){return r.json()}).then(function(d){
-      var cur=localStorage.getItem(APP_VER_KEY);
-      if(!cur){localStorage.setItem(APP_VER_KEY,d.version);return;}
-      if(cur!==d.version){
-        if(!document.getElementById('app-update-bar')){
-          var b=document.createElement('div');b.id='app-update-bar';
-          b.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#032d44;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:99999;font-family:Arial,sans-serif;font-size:13px;box-shadow:0 -2px 8px rgba(0,0,0,.2)';
-          b.innerHTML='<span>\ud83d\udd04 Nov\u00e1 verze aplikace je dostupn\u00e1'+(d.note?' \u2013 '+d.note:'')+'</span><button onclick="localStorage.setItem(\''+APP_VER_KEY+'\',\''+d.version+'\');location.reload(true)" style="background:#f5a100;color:#000;border:none;padding:8px 20px;border-radius:4px;font-weight:700;cursor:pointer;font-size:13px">AKTUALIZOVAT</button>';
-          document.body.appendChild(b);
-        }
+  var VK='ledshopik_app_ver';
+  function ck(){
+    fetch('https://raw.githubusercontent.com/ledshopik/app/main/version.json?t='+Date.now())
+    .then(function(r){return r.json()})
+    .then(function(d){
+      var c=localStorage.getItem(VK);
+      if(!c){localStorage.setItem(VK,d.version);return;}
+      if(c!==d.version){
+        localStorage.setItem(VK,d.version);
+        window.location.reload(true);
       }
     }).catch(function(){});
   }
-  checkUpdate();
-  setInterval(checkUpdate,120000);
+  ck();
+  setInterval(ck,30000);
 })();
 </script></body>
 </html>
