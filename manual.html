@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDshopik – Manuál systému</title>
+<meta name="theme-color" content="#e2b830">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Arial Narrow', Arial, sans-serif; background: #f4f2ed; color: #1a1a1a; min-height: 100vh; }
+button, input, select { font-family: inherit; }
+
+/* NAV */
+#nav-bar { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 0 24px; display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; }
+#user-controls { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 6px 32px; display: flex; align-items: center; gap: 14px; }
+
+/* LAYOUT */
+.manual-wrap { display: flex; max-width: 1200px; margin: 0 auto; padding: 20px 32px; gap: 32px; }
+.manual-sidebar { width: 220px; min-width: 220px; position: sticky; top: 20px; align-self: flex-start; }
+.manual-sidebar h3 { font-size: 11px; letter-spacing: .15em; color: #888; text-transform: uppercase; margin-bottom: 12px; }
+.manual-sidebar a { display: block; padding: 6px 12px; font-size: 12px; color: #555; text-decoration: none; border-left: 2px solid transparent; transition: all .15s; border-radius: 0 4px 4px 0; }
+.manual-sidebar a:hover { color: #1a1a1a; background: #f0ede6; }
+.manual-sidebar a.active { color: #e2b830; border-left-color: #e2b830; background: rgba(226,184,48,.06); font-weight: 700; }
+.manual-content { flex: 1; min-width: 0; }
+
+/* HEADER */
+.manual-header { background: #fff; border: 1px solid #e8e4dc; border-radius: 10px; padding: 32px; margin-bottom: 24px; text-align: center; }
+.manual-header .logo { font-size: 28px; font-weight: 900; letter-spacing: .08em; margin-bottom: 4px; }
+.manual-header .logo span { color: #e2b830; }
+.manual-header .sub { font-size: 13px; color: #888; letter-spacing: .1em; }
+.manual-header .desc { font-size: 14px; color: #555; margin-top: 12px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+.print-btn { margin-top: 16px; background: #e2b830; color: #fff; border: none; border-radius: 6px; padding: 8px 24px; font-size: 12px; font-weight: 700; letter-spacing: .06em; cursor: pointer; }
+.print-btn:hover { background: #f0c840; }
+
+/* MODULE SECTIONS */
+.module { background: #fff; border: 1px solid #e8e4dc; border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+.module-head { padding: 16px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; transition: background .15s; }
+.module-head:hover { background: #f8f6f0; }
+.module-icon { font-size: 24px; width: 40px; text-align: center; }
+.module-title { font-size: 16px; font-weight: 800; letter-spacing: .04em; }
+.module-subtitle { font-size: 11px; color: #888; }
+.module-arrow { margin-left: auto; font-size: 14px; color: #bbb; transition: transform .2s; }
+.module.open .module-arrow { transform: rotate(90deg); }
+.module-body { display: none; padding: 0 20px 20px; }
+.module.open .module-body { display: block; }
+
+/* CONTENT ELEMENTS */
+.section-title { font-size: 12px; font-weight: 700; letter-spacing: .12em; color: #e2b830; text-transform: uppercase; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #f0ede6; }
+.section-title:first-child { margin-top: 0; }
+ul { padding-left: 20px; margin: 6px 0 12px; }
+li { font-size: 13px; line-height: 1.7; color: #444; }
+li strong { color: #1a1a1a; }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+.tip { background: #fdf4d8; border: 1px solid #f0e0a0; border-radius: 6px; padding: 10px 14px; margin: 8px 0; font-size: 12px; line-height: 1.6; }
+.tip::before { content: '💡 '; }
+.steps { counter-reset: step; padding-left: 0; list-style: none; }
+.steps li { counter-increment: step; padding-left: 28px; position: relative; margin-bottom: 6px; }
+.steps li::before { content: counter(step); position: absolute; left: 0; top: 1px; width: 20px; height: 20px; background: #e2b830; color: #fff; border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.kbd { display: inline-block; background: #f4f2ed; border: 1px solid #ddd; border-radius: 3px; padding: 1px 6px; font-size: 11px; font-family: monospace; color: #555; }
+
+/* PRINT */
+@media print {
+  #nav-bar, #user-controls, .manual-sidebar, .print-btn, .module-arrow { display: none !important; }
+  .manual-wrap { display: block; padding: 0; }
+  .module { break-inside: avoid; border: none; box-shadow: none; }
+  .module-body { display: block !important; }
+  .module-head { padding: 12px 0; }
+  body { background: #fff; }
+}
+@media (max-width: 768px) {
+  .manual-sidebar { display: none; }
+  .manual-wrap { padding: 12px 16px; }
+}
+</style>
+</head>
+<body>
+
+<div id="nav-bar">
+  <a href="index.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:4px;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">⌂ DASHBOARD<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">Přehled</span></a>
+  <a href="instalace.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">INSTALACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">Montáže</span></a>
+  <a href="vyroba.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">VÝROBA<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">Zakázky</span></a>
+  <a href="obhlidky.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">OBHLÍDKY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">Termíny</span></a>
+  <a href="reklamace.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">REKLAMACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">Servis</span></a>
+  <a href="konfigurator.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KONFIGURÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">RING svítidla</span></a>
+  <a href="konfigurator-profily.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PROFILY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">ALU výroba</span></a>
+  <a href="zasobovani.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">ZÁSOBOVÁNÍ<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">Dodávky</span></a>
+  <a href="lumibook.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">LUMIBOOK<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">Katalog</span></a>
+  <a href="kalkulator-instalaci.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KALKULÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">Ceny montáží</span></a>
+  <a href="produktovy-list.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PRODUKTY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">Katalogové listy</span></a>
+  <a href="manual.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#e2b830;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid #e2b830;line-height:1.3;">📖 MANUÁL<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;text-transform:none;">Nápověda</span></a>
+  <a href="dochazka.html" style="margin-left:auto;padding:10px 20px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#50a060;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center;background:#f0f8f2;border-radius:6px 6px 0 0;line-height:1.3;" onmouseover="this.style.color='#3a8048'" onmouseout="this.style.color='#50a060'">🕐 DOCHÁZKA</a>
+</div>
+<div id="user-controls">
+  <span id="user-bar-name" style="font-weight:700;color:#333;font-size:12px;"></span>
+  <a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a>
+</div>
+
+<div class="manual-wrap">
+  <!-- SIDEBAR NAV -->
+  <nav class="manual-sidebar">
+    <h3>Obsah</h3>
+    <a href="#dashboard" class="active">Dashboard</a>
+    <a href="#instalace">Instalace</a>
+    <a href="#vyroba">Výroba</a>
+    <a href="#obhlidky">Obhlídky</a>
+    <a href="#reklamace">Reklamace</a>
+    <a href="#konfigurator">Konfigurátor RING</a>
+    <a href="#profily">Profily ALU</a>
+    <a href="#zasobovani">Zásobování</a>
+    <a href="#lumibook">Lumibook</a>
+    <a href="#kalkulator">Kalkulátor</a>
+    <a href="#produkty">Produktové listy</a>
+    <a href="#dochazka">Docházka</a>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="manual-content">
+    <!-- HEADER -->
+    <div class="manual-header">
+      <div class="logo">LEDSHOPIK <span>· SYSTÉM</span></div>
+      <div class="sub">MANUÁL & PŘEHLED FUNKCÍ</div>
+      <div class="desc">Provozní systém pro řízení zakázek, výroby, instalací a servisu LED osvětlení. Tento manuál popisuje všechny moduly, jejich funkce a praktické tipy pro každodenní práci.</div>
+      <button class="print-btn" onclick="window.print()">🖨 Stáhnout jako PDF</button>
+    </div>
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="module open" id="dashboard">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">📊</div>
+        <div><div class="module-title">Dashboard</div><div class="module-subtitle">Centrální přehled celého systému</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Přehledové karty</strong> — zobrazují počty záznamů z každého modulu (instalace, výroba, obhlídky, reklamace...)</li>
+          <li><strong>Kalendář</strong> — barevně odlišené události ze všech modulů na jednom místě</li>
+          <li><strong>Úkoly</strong> — rychlý task list s checkboxy pro denní úkoly</li>
+          <li><strong>Zobrazit jako</strong> — přepínání pohledu za konkrétního uživatele (Ondra, David, Michal...)</li>
+        </ul>
+
+        <div class="section-title">Barvy v kalendáři</div>
+        <ul>
+          <li><span class="badge" style="background:#fdf4d8;color:#e2b830;border:1px solid #f0e0a0"><span class="badge-dot" style="background:#e2b830"></span>Instalace</span></li>
+          <li><span class="badge" style="background:#fce0d0;color:#f07030;border:1px solid #f0c0a0"><span class="badge-dot" style="background:#f07030"></span>Výroba</span></li>
+          <li><span class="badge" style="background:#e0f4e8;color:#3ab0a0;border:1px solid #c0e8d8"><span class="badge-dot" style="background:#3ab0a0"></span>Obhlídky</span></li>
+          <li><span class="badge" style="background:#fce8e8;color:#e05050;border:1px solid #f0c8c8"><span class="badge-dot" style="background:#e05050"></span>Reklamace</span></li>
+          <li><span class="badge" style="background:#e0f0e0;color:#40a050;border:1px solid #c0dcc0"><span class="badge-dot" style="background:#40a050"></span>Dovolená</span></li>
+        </ul>
+
+        <div class="tip">Kliknutím na kartu modulu se dostanete přímo do daného modulu. Kliknutím na událost v kalendáři se otevře detail záznamu.</div>
+      </div>
+    </div>
+
+    <!-- ═══ INSTALACE ═══ -->
+    <div class="module" id="instalace">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">🔧</div>
+        <div><div class="module-title">Instalace</div><div class="module-subtitle">Plánování a správa montáží</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Tabulka instalací</strong> — přehled všech montáží s obj. číslem, místem, datem, technikem, stavem</li>
+          <li><strong>Kalendář</strong> — vizuální zobrazení instalací po dnech, vícedenní zakázky se zobrazují jako pruhy</li>
+          <li><strong>Partneři</strong> — databáze externích firem a řemeslníků s interaktivní mapou ČR</li>
+        </ul>
+
+        <div class="section-title">Stavy</div>
+        <ul>
+          <li><span class="badge" style="background:#fdf4d8;color:#e2b830;border:1px solid #f0e0a0"><span class="badge-dot" style="background:#e2b830"></span>Čeká na potvrzení</span></li>
+          <li><span class="badge" style="background:#e8f0ff;color:#6080c0;border:1px solid #c8d8f0"><span class="badge-dot" style="background:#6080c0"></span>Naplánováno</span></li>
+          <li><span class="badge" style="background:#e0f4e8;color:#50c080;border:1px solid #c0e8d0"><span class="badge-dot" style="background:#50c080"></span>Probíhá</span></li>
+          <li><span class="badge" style="background:#e0f0e0;color:#40a050;border:1px solid #c0dcc0"><span class="badge-dot" style="background:#40a050"></span>Hotovo</span></li>
+          <li><span class="badge" style="background:#fce8e8;color:#c05050;border:1px solid #f0c8c8"><span class="badge-dot" style="background:#c05050"></span>Zrušeno</span></li>
+        </ul>
+
+        <div class="section-title">Jak přidat instalaci</div>
+        <ol class="steps">
+          <li>Klikněte na <strong>+ Přidat instalaci</strong></li>
+          <li>Vyplňte obj. číslo, místo, obsah, datum a technika</li>
+          <li>Vyberte stav a klikněte <strong>Uložit</strong></li>
+        </ol>
+
+        <div class="section-title">Partneři — databáze řemeslníků</div>
+        <ul>
+          <li>Klikněte na tlačítko <strong>👷 Partneři</strong> v toolbaru</li>
+          <li>Otevře se sidebar s <strong>interaktivní mapou ČR</strong> — klikněte na kraj pro filtrování</li>
+          <li>Filtrujte podle oboru: Elektro, SDK, Malíř, Podlahy, Zedník, Klima</li>
+          <li>U každého partnera: hodnocení hvězdičkami, cena/hod, kontakt, poznámky</li>
+        </ul>
+
+        <div class="tip">Kliknutím na hlavičku sloupce v tabulce seřadíte záznamy. Kliknutím znovu změníte směr řazení (↑/↓).</div>
+      </div>
+    </div>
+
+    <!-- ═══ VÝROBA ═══ -->
+    <div class="module" id="vyroba">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">⚙️</div>
+        <div><div class="module-title">Výroba & Zakázky</div><div class="module-subtitle">Řízení výrobních zakázek</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Tabulka zakázek</strong> — obj. číslo, zákazník, typ výroby, náročnost, deadline, technik, stav</li>
+          <li><strong>Priorita</strong> — Normální nebo Urgentní (zvýrazněno červeně)</li>
+          <li><strong>Odpočet do deadline</strong> — barevné zobrazení zbývajících dnů (červená = po termínu)</li>
+          <li><strong>Náročnost</strong> — Jednoduchá / Střední / Složitá (barevně odlišené)</li>
+          <li><strong>Telegram notifikace</strong> — automatické upozornění na změny stavu</li>
+        </ul>
+
+        <div class="section-title">Stavy</div>
+        <ul>
+          <li><span class="badge" style="background:#e8f0ff;color:#6080c0;border:1px solid #c8d8f0"><span class="badge-dot" style="background:#6080c0"></span>Čeká na výrobu</span></li>
+          <li><span class="badge" style="background:#fdf4d8;color:#e2b830;border:1px solid #f0e0a0"><span class="badge-dot" style="background:#e2b830"></span>Ve výrobě</span></li>
+          <li><span class="badge" style="background:#e0f0e0;color:#40a050;border:1px solid #c0dcc0"><span class="badge-dot" style="background:#40a050"></span>Hotovo</span></li>
+          <li><span class="badge" style="background:#e0f4f4;color:#2a9090;border:1px solid #b0e0e0"><span class="badge-dot" style="background:#2a9090"></span>Vydáno zákazníkovi</span></li>
+        </ul>
+
+        <div class="section-title">Nastavení (⚙)</div>
+        <ul>
+          <li><strong>Telegram Chat ID</strong> — zadejte ID pro příjem notifikací o změnách stavů zakázek</li>
+        </ul>
+
+        <div class="tip">Urgentní zakázky se zobrazují v červeném pruhu nahoře. Číslo ve sloupci "Zbývá" se zbarví červeně, když je termín překročen.</div>
+      </div>
+    </div>
+
+    <!-- ═══ OBHLÍDKY ═══ -->
+    <div class="module" id="obhlidky">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">🔍</div>
+        <div><div class="module-title">Obhlídky & Průzkumy</div><div class="module-subtitle">Evidence terénních obhlídek</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Tabulka obhlídek</strong> — objekt, zákazník, datum, vzdálenost, stav, verdikt</li>
+          <li><strong>Kalkulace vzdálenosti</strong> — automatický výpočet km podle PSČ</li>
+          <li><strong>Verdikty</strong> — Pokračovat, Nabídka, Instalace, Nezájem, Čeká</li>
+        </ul>
+
+        <div class="section-title">Stavy</div>
+        <ul>
+          <li><span class="badge" style="background:#e8f0ff;color:#6080c0;border:1px solid #c8d8f0"><span class="badge-dot" style="background:#6080c0"></span>Nová</span></li>
+          <li><span class="badge" style="background:#e0f4f4;color:#3ab0a0;border:1px solid #b0e0e0"><span class="badge-dot" style="background:#3ab0a0"></span>Potvrzena</span></li>
+          <li><span class="badge" style="background:#e0f0e0;color:#40a050;border:1px solid #c0dcc0"><span class="badge-dot" style="background:#40a050"></span>Proběhla</span></li>
+          <li><span class="badge" style="background:#fdf4d8;color:#e2b830;border:1px solid #f0e0a0"><span class="badge-dot" style="background:#e2b830"></span>Čeká na rozhodnutí</span></li>
+          <li><span class="badge" style="background:#fce8e8;color:#c05050;border:1px solid #f0c8c8"><span class="badge-dot" style="background:#c05050"></span>Zrušena</span></li>
+        </ul>
+
+        <div class="section-title">Nastavení sazeb (⚙)</div>
+        <ul>
+          <li><strong>Sazba za km</strong> — Kč za kilometr pro výpočet cestovních nákladů</li>
+          <li><strong>Sazba cestovní čas</strong> — hodinová sazba za čas strávený cestou</li>
+        </ul>
+
+        <div class="tip">Vzdálenost se počítá automaticky podle PSČ. Badge s km se zobrazí u každé obhlídky.</div>
+      </div>
+    </div>
+
+    <!-- ═══ REKLAMACE ═══ -->
+    <div class="module" id="reklamace">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">⚠️</div>
+        <div><div class="module-title">Reklamace & Servis</div><div class="module-subtitle">Správa reklamací zákazníků i dodavatelů</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Dvě záložky</strong> — Zákazníci (reklamace od zákazníků) a Dodavatelé (reklamace směrem k dodavatelům)</li>
+          <li><strong>Priority</strong> — Vysoká, Střední, Nízká</li>
+          <li><strong>Termíny</strong> — sledování deadline s upozorněním na blížící se/překročené termíny</li>
+          <li><strong>Propojené záznamy</strong> — odkaz na související instalaci</li>
+          <li><strong>Počítadlo dnů</strong> — kolik dnů čeká reklamace na vyřízení</li>
+        </ul>
+
+        <div class="section-title">Stavy — záložka Zákazníci</div>
+        <ul>
+          <li><span class="badge" style="background:#f0e8ff;color:#9060d0;border:1px solid #d8c8f0"><span class="badge-dot" style="background:#9060d0"></span>Nová</span></li>
+          <li><span class="badge" style="background:#fdf4d8;color:#e2b830;border:1px solid #f0e0a0"><span class="badge-dot" style="background:#e2b830"></span>V řešení</span></li>
+          <li><span class="badge" style="background:#e8f0ff;color:#6080c0;border:1px solid #c8d8f0"><span class="badge-dot" style="background:#6080c0"></span>V řešení u dodavatele</span></li>
+          <li><span class="badge" style="background:#e0f0e0;color:#40a050;border:1px solid #c0dcc0"><span class="badge-dot" style="background:#40a050"></span>Vyřízené</span></li>
+          <li><span class="badge" style="background:#fce8e8;color:#c05050;border:1px solid #f0c8c8"><span class="badge-dot" style="background:#c05050"></span>Zamítnuto</span></li>
+        </ul>
+
+        <div class="tip">Červený alert bar nahoře upozorňuje na urgentní a překročené reklamace. Číslo u "Dnů čekání" se zbarví červeně po překročení limitu.</div>
+      </div>
+    </div>
+
+    <!-- ═══ KONFIGURÁTOR ═══ -->
+    <div class="module" id="konfigurator">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">💡</div>
+        <div><div class="module-title">Konfigurátor RING</div><div class="module-subtitle">Ceník a konfigurace RING svítidel</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Kroková konfigurace</strong> — vybírejte parametry krok za krokem (velikost, barva, typ LED...)</li>
+          <li><strong>Živý náhled</strong> — SVG vizualizace svítidla se mění podle výběru</li>
+          <li><strong>Kalkulace ceny</strong> — cena se počítá v reálném čase podle zvoleného oboru</li>
+          <li><strong>Správa cen</strong> — záložka pro editaci cen jednotlivých komponent</li>
+        </ul>
+
+        <div class="section-title">Jak konfigurovat</div>
+        <ol class="steps">
+          <li>Vyberte parametr v prvním kroku</li>
+          <li>Pokračujte dalšími kroky — nedostupné kombinace jsou šedé</li>
+          <li>Progress bar ukazuje kolik kroků zbývá</li>
+          <li>Po dokončení se aktivuje tlačítko <strong>Kopírovat konfiguraci</strong></li>
+        </ol>
+
+        <div class="section-title">Správa cen</div>
+        <ul>
+          <li>Přepněte na záložku <strong>SPRÁVA CEN</strong></li>
+          <li>Editujte ceny v Kč u jednotlivých komponent</li>
+          <li>Klikněte <strong>Uložit</strong> pro potvrzení nebo <strong>Zahodit</strong> pro návrat</li>
+        </ul>
+
+        <div class="tip">Žlutý rámeček s vykřičníkem upozorňuje na nedostupné kombinace. Ceny se zobrazují přímo u každé volby.</div>
+      </div>
+    </div>
+
+    <!-- ═══ PROFILY ═══ -->
+    <div class="module" id="profily">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">📐</div>
+        <div><div class="module-title">Profily ALU</div><div class="module-subtitle">Ceník a konfigurace hliníkových profilů</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Kroková konfigurace</strong> — výběr typu profilu, příslušenství, délky</li>
+          <li><strong>Vlastní délka</strong> — zadání přesné délky profilu v mm</li>
+          <li><strong>Náhled profilu</strong> — vizualizace vybraného profilu</li>
+          <li><strong>Správa cen</strong> — záložka pro editaci ceníku</li>
+        </ul>
+
+        <div class="tip">Cena se automaticky přepočítává podle zadané délky profilu. Profily mají minimální a maximální délku.</div>
+      </div>
+    </div>
+
+    <!-- ═══ ZÁSOBOVÁNÍ ═══ -->
+    <div class="module" id="zasobovani">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">📦</div>
+        <div><div class="module-title">Zásobování & Dodavatelé</div><div class="module-subtitle">Správa zásilek a dodavatelských vztahů</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Tři záložky</strong> — Zásilky, Dodavatelé, Evidence</li>
+          <li><strong>Odpočet doručení</strong> — barevný countdown (zelená = OK, oranžová = blíží se, červená = po termínu)</li>
+          <li><strong>Hromadné operace</strong> — zaškrtněte více zásilek a změňte stav nebo přidejte poznámku hromadně</li>
+          <li><strong>Import</strong> — drag & drop nahrání Excel/XLSX souboru</li>
+          <li><strong>Odkazy na faktury</strong> — přímé propojení s fakturami</li>
+        </ul>
+
+        <div class="section-title">Stavy zásilek</div>
+        <ul>
+          <li><span class="badge" style="background:#e8f0ff;color:#6080c0;border:1px solid #c8d8f0"><span class="badge-dot" style="background:#6080c0"></span>Objednáno</span></li>
+          <li><span class="badge" style="background:#fdf4d8;color:#e2b830;border:1px solid #f0e0a0"><span class="badge-dot" style="background:#e2b830"></span>Potvrzeno</span></li>
+          <li><span class="badge" style="background:#e0f4f4;color:#3ab0a0;border:1px solid #b0e0e0"><span class="badge-dot" style="background:#3ab0a0"></span>Odesláno</span></li>
+          <li><span class="badge" style="background:#fce0d0;color:#e08040;border:1px solid #f0c8a0"><span class="badge-dot" style="background:#e08040"></span>Celnice</span></li>
+          <li><span class="badge" style="background:#e0f0e0;color:#40a050;border:1px solid #c0dcc0"><span class="badge-dot" style="background:#40a050"></span>Doručeno</span></li>
+          <li><span class="badge" style="background:#fce8e8;color:#c05050;border:1px solid #f0c8c8"><span class="badge-dot" style="background:#c05050"></span>Zrušeno</span></li>
+        </ul>
+
+        <div class="tip">Pro hromadnou změnu stavu zaškrtněte checkboxy vlevo u zásilek — objeví se lišta s hromadnými akcemi. Excel import podporuje formát XLSX.</div>
+      </div>
+    </div>
+
+    <!-- ═══ LUMIBOOK ═══ -->
+    <div class="module" id="lumibook">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">📋</div>
+        <div><div class="module-title">Lumibook PRO</div><div class="module-subtitle">Kniha svítidel — katalog a projekty</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Projekt</strong> — nahoře vlevo: název projektu, zákazník, datum, číslo projektu, zpracoval</li>
+          <li><strong>Import z eshopu</strong> — vložte URL produktu z ledshopik.cz a klikněte Načíst</li>
+          <li><strong>Databáze produktů</strong> — sdílený katalog svítidel s parametry (výkon, lumen, CCT, CRI, IP)</li>
+          <li><strong>Místnosti</strong> — organizace svítidel do místností (+ místnost pro vytvoření nové)</li>
+          <li><strong>Karty svítidel</strong> — vizuální zobrazení s obrázkem, parametry, cenou</li>
+          <li><strong>PDF export</strong> — export knihy svítidel do PDF</li>
+        </ul>
+
+        <div class="section-title">Jak přidat svítidlo</div>
+        <ol class="steps">
+          <li>V sekci <strong>Import z eshopu</strong> vložte URL produktu z ledshopik.cz</li>
+          <li>Klikněte <strong>⚡ Načíst</strong> — data se stáhnou automaticky</li>
+          <li>Nebo klikněte <strong>+ Nové svítidlo</strong> pro ruční zadání</li>
+          <li>Přiřaďte svítidlo do místnosti a nastavte počet kusů</li>
+        </ol>
+
+        <div class="section-title">Klávesové zkratky</div>
+        <ul>
+          <li><span class="kbd">Ctrl</span> + <span class="kbd">N</span> — Nové svítidlo</li>
+          <li><span class="kbd">Ctrl</span> + <span class="kbd">P</span> — Export PDF</li>
+          <li><span class="kbd">Esc</span> — Zavřít modální okno</li>
+        </ul>
+
+        <div class="tip">Databáze produktů je sdílená — produkty importované na jednom zařízení jsou dostupné na všech. Přepínání mezi zobrazením Karty/Seznam je vpravo nahoře.</div>
+      </div>
+    </div>
+
+    <!-- ═══ KALKULÁTOR ═══ -->
+    <div class="module" id="kalkulator">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">🧮</div>
+        <div><div class="module-title">Kalkulátor instalací</div><div class="module-subtitle">Výpočet cen montáží a cestovného</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Kalkulace vzdálenosti</strong> — zadejte PSČ odkud a kam, systém spočítá km</li>
+          <li><strong>Položky instalace</strong> — přidávejte řádky s typem montáže, metry, cenou/m</li>
+          <li><strong>Doplňkové práce</strong> — zapněte checkbox u přídavných prací (SDK, elektro...)</li>
+          <li><strong>Celková kalkulace</strong> — automatický součet: práce + cestovné + doplňky</li>
+          <li><strong>Historie</strong> — uložené kalkulace pro pozdější referenci</li>
+        </ul>
+
+        <div class="section-title">Nastavení sazeb (⚙)</div>
+        <ul>
+          <li><strong>Sazba za km</strong> — cestovní náklady</li>
+          <li><strong>Hodinová sazba cestovní čas</strong></li>
+          <li><strong>Hodinová sazba montážník</strong></li>
+          <li><strong>Tabulka sazeb</strong> — ceny podle typu montáže, pásků, přípravy</li>
+          <li><strong>Doplňkové práce</strong> — sazby za SDK, elektro atd.</li>
+        </ul>
+
+        <div class="tip">Sazby se ukládají a platí pro všechny budoucí kalkulace. Historii kalkulací najdete pod hlavním formulářem.</div>
+      </div>
+    </div>
+
+    <!-- ═══ PRODUKTY ═══ -->
+    <div class="module" id="produkty">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">📄</div>
+        <div><div class="module-title">Produktové listy</div><div class="module-subtitle">Generátor katalogových listů</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Generátor</strong> — vložte URL produktu, systém stáhne data a vygeneruje list</li>
+          <li><strong>Batch generování</strong> — vložte více URL najednou pro hromadné zpracování</li>
+          <li><strong>Editace</strong> — upravte specifikace před generováním</li>
+          <li><strong>Všechny listy</strong> — záložka s historií vygenerovaných listů</li>
+        </ul>
+
+        <div class="section-title">Jak vygenerovat list</div>
+        <ol class="steps">
+          <li>Vložte URL produktu z eshopu</li>
+          <li>Klikněte <strong>Import</strong> — data se načtou automaticky</li>
+          <li>Zkontrolujte a upravte specifikace</li>
+          <li>Klikněte <strong>Generovat</strong> pro vytvoření listu</li>
+        </ol>
+
+        <div class="tip">Pro hromadné generování použijte batch režim — vložte více URL oddělených novým řádkem.</div>
+      </div>
+    </div>
+
+    <!-- ═══ DOCHÁZKA ═══ -->
+    <div class="module" id="dochazka">
+      <div class="module-head" onclick="toggle(this)">
+        <div class="module-icon">📅</div>
+        <div><div class="module-title">Docházka & Absence</div><div class="module-subtitle">Evidence dovolených, nemocí a absencí</div></div>
+        <div class="module-arrow">▶</div>
+      </div>
+      <div class="module-body">
+        <div class="section-title">Hlavní funkce</div>
+        <ul>
+          <li><strong>Kalendář</strong> — měsíční přehled absencí celého týmu s barevným rozlišením</li>
+          <li><strong>Tabulka</strong> — seznam všech absencí s filtrováním a řazením</li>
+          <li><strong>Automatický počet dnů</strong> — systém spočítá pracovní dny mezi daty</li>
+          <li><strong>Export</strong> — stáhněte data jako CSV nebo PDF</li>
+          <li><strong>Svátky</strong> — české státní svátky jsou automaticky zvýrazněny</li>
+        </ul>
+
+        <div class="section-title">Typy absencí</div>
+        <ul>
+          <li><span class="badge" style="background:#e0f0e0;color:#40c060;border:1px solid #c0dcc0"><span class="badge-dot" style="background:#40c060"></span>Dovolená</span> — řádná dovolená</li>
+          <li><span class="badge" style="background:#fce8e8;color:#e05050;border:1px solid #f0c8c8"><span class="badge-dot" style="background:#e05050"></span>Neschopenka</span> — pracovní neschopnost</li>
+          <li><span class="badge" style="background:#fdf4d8;color:#e2b830;border:1px solid #f0e0a0"><span class="badge-dot" style="background:#e2b830"></span>Neplacené volno</span></li>
+          <li><span class="badge" style="background:#e8f0ff;color:#6080c0;border:1px solid #c8d8f0"><span class="badge-dot" style="background:#6080c0"></span>Lékař</span> — návštěva lékaře</li>
+        </ul>
+
+        <div class="section-title">Jak zadat absenci</div>
+        <ol class="steps">
+          <li>Klikněte <strong>+ Přidat absenci</strong></li>
+          <li>Vyberte zaměstnance a typ absence</li>
+          <li>Zadejte datum od–do — dny se spočítají automaticky</li>
+          <li>Klikněte <strong>Uložit</strong></li>
+        </ol>
+
+        <div class="section-title">Export dat</div>
+        <ul>
+          <li><strong>↓ CSV</strong> — export do tabulky (Excel, Google Sheets)</li>
+          <li><strong>↓ PDF</strong> — export pro tisk</li>
+          <li>Filtrujte podle roku pomocí dropdownu <strong>Období</strong></li>
+        </ul>
+
+        <div class="tip">Svátky jsou automaticky zvýrazněny červeně v kalendáři. Víkendy se nepočítají do pracovních dnů. Kalendář zobrazuje absence celého týmu najednou.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
+document.getElementById('user-bar-name').textContent=localStorage.getItem('ledshopik_user')||'';
+function logout(){localStorage.removeItem('ledshopik_user');window.location.href='login.html';}
+
+function toggle(el) {
+  el.parentElement.classList.toggle('open');
+}
+
+// Sidebar active tracking
+document.querySelectorAll('.manual-sidebar a').forEach(a => {
+  a.addEventListener('click', function(e) {
+    document.querySelectorAll('.manual-sidebar a').forEach(x => x.classList.remove('active'));
+    this.classList.add('active');
+    // Open the target module
+    const id = this.getAttribute('href').substring(1);
+    const mod = document.getElementById(id);
+    if (mod && !mod.classList.contains('open')) mod.classList.add('open');
+  });
+});
+
+// Scroll spy
+window.addEventListener('scroll', function() {
+  const modules = document.querySelectorAll('.module');
+  let current = '';
+  modules.forEach(m => {
+    if (m.getBoundingClientRect().top < 150) current = m.id;
+  });
+  document.querySelectorAll('.manual-sidebar a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+</script>
+<script>
+(function(){
+  var VK='ledshopik_app_ver';
+  function ck(){
+    fetch('https://raw.githubusercontent.com/ledshopik/app/main/version.json?t='+Date.now())
+    .then(function(r){return r.json()})
+    .then(function(d){
+      var c=localStorage.getItem(VK);
+      if(!c){localStorage.setItem(VK,d.version);return;}
+      if(c!==d.version){
+        localStorage.setItem(VK,d.version);
+        window.location.href=window.location.pathname+'?v='+Date.now();
+      }
+    }).catch(function(){});
+  }
+  ck();
+  setInterval(ck,30000);
+})();
+</script>
+</body>
+</html>
