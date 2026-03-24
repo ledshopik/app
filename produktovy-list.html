@@ -469,26 +469,40 @@ async function scrapeProduct(url) {
   const warrantyMatch = bodyText.match(/záruka[^:]*?[:]\s*(\d+)\s*(?:rok|let|year)/i) || bodyText.match(/(\d+)\s*(?:rok|let|year)\s*(?:záruk|warranty|garanc)/i) || bodyText.match(/warranty[^:]*?[:]\s*(\d+)/i) || bodyText.match(/záruka\s*(\d+)/i);
   if (warrantyMatch) { const y = parseInt(warrantyMatch[1]); p.warranty = y + (y === 1 ? ' rok' : y < 5 ? ' roky' : ' let'); }
 
-  // Try parsing structured parameter tables (td pairs: label → value)
+  // Try parsing structured parameter tables (th+td pairs in <table class="parametry"> and similar)
   if (doc.body) {
-    const rows = doc.querySelectorAll('tr, .param-row, .spec-row, [class*="param"]');
+    const rows = doc.querySelectorAll('table.parametry tr, table.params tr, table.specifications tr, tr, .param-row, .spec-row');
     for (const row of rows) {
-      const cells = row.querySelectorAll('td, th, span, div');
-      if (cells.length >= 2) {
-        const label = (cells[0].textContent || '').trim().toLowerCase();
-        const value = (cells[1].textContent || '').trim();
-        if (!value) continue;
-        if (!p.beamAngle && (label.includes('vyzařovací') || label.includes('úhel'))) p.beamAngle = value.replace(/[^\d°]/g,'') || value;
-        if (!p.divisibility && (label.includes('dělitelnost') || label.includes('dělení') || label.includes('řez'))) p.divisibility = value;
-        if (!p.lifetime && (label.includes('životnost') || label.includes('life'))) p.lifetime = value;
-        if (!p.warranty && (label.includes('záruka') || label.includes('warranty'))) p.warranty = value;
-        if (!p.dimmable && label.includes('stmívat')) p.dimmable = value;
-        if (!p.operatingTemp && (label.includes('provozní teplot') || label.includes('operating'))) p.operatingTemp = value;
-        if (!p.maxLength && (label.includes('max') && label.includes('délk'))) p.maxLength = value;
-        if (!p.pcbColor && label.includes('barva') && label.includes('pcb')) p.pcbColor = value;
-        if (!p.pcbWidth && label.includes('šířka') && label.includes('pcb')) p.pcbWidth = value;
-        if (!p.voltage && (label.includes('napětí') || label.includes('voltage'))) p.voltage = value;
+      // Try th+td first (eshop pattern), then td+td
+      const th = row.querySelector('th');
+      const td = row.querySelector('td');
+      let label, value;
+      if (th && td) {
+        label = (th.textContent || '').trim().toLowerCase().replace(/[:：]/g,'');
+        value = (td.textContent || '').trim();
+      } else {
+        const cells = row.querySelectorAll('td, span, div');
+        if (cells.length < 2) continue;
+        label = (cells[0].textContent || '').trim().toLowerCase().replace(/[:：]/g,'');
+        value = (cells[1].textContent || '').trim();
       }
+      if (!label || !value) continue;
+      // Map label → field
+      if (!p.beamAngle && (label.includes('vyzařovací') || label.includes('úhel svícení') || label.includes('úhel'))) p.beamAngle = value.match(/\d+/) ? value.match(/\d+/)[0] + '°' : value;
+      if (!p.divisibility && (label.includes('dělitelnost') || label.includes('dělení') || label.includes('řez') || label.includes('cut'))) p.divisibility = value;
+      if (!p.lifetime && (label.includes('životnost') || label.includes('life'))) p.lifetime = value;
+      if (!p.warranty && (label.includes('záruka') || label.includes('warranty') || label.includes('garanc'))) p.warranty = value;
+      if (!p.dimmable && (label.includes('stmívat') || label.includes('dimm'))) p.dimmable = value;
+      if (!p.operatingTemp && (label.includes('provozní teplot') || label.includes('operating temp'))) p.operatingTemp = value;
+      if (!p.maxLength && (label.includes('max') && label.includes('délk'))) p.maxLength = value;
+      if (!p.pcbColor && label.includes('barva') && (label.includes('pcb') || label.includes('desk'))) p.pcbColor = value;
+      if (!p.pcbWidth && label.includes('šířka') && (label.includes('pcb') || label.includes('pásk') || label.includes('desk'))) p.pcbWidth = value;
+      if (!p.voltage && (label.includes('napětí') || label.includes('napájení') || label.includes('voltage'))) { const vm = value.match(/(\d+)\s*V/); if (vm) p.voltage = vm[1] + ' V'; else p.voltage = value; }
+      if (!p.watt && (label.includes('příkon') || label.includes('výkon') || label.includes('watt'))) { const wm = value.match(/(\d+(?:[.,]\d+)?)/); if (wm) p.watt = parseFloat(wm[1].replace(',','.')); }
+      if (!p.lumen && (label.includes('světelný tok') || label.includes('svítivost') || label.includes('lumen'))) { const lm = value.match(/(\d+(?:[.,]\d+)?)/); if (lm) p.lumen = parseFloat(lm[1].replace(',','.')); }
+      if (!p.cri && (label.includes('cri') || label.includes('podání barev') || label.includes('ra '))) { const cm = value.match(/(\d+)/); if (cm) p.cri = cm[1]; }
+      if (!p.ip && (label.includes('ip') && label.includes('krytí') || label === 'ip krytí' || label === 'krytí')) { const im = value.match(/IP\s*(\d+)/i); if (im) p.ip = 'IP' + im[1]; }
+      if (!p.cct && (label.includes('teplota světla') || label.includes('cct') || label.includes('barva světla'))) p.cct = value;
     }
   }
 
