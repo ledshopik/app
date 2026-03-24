@@ -116,12 +116,12 @@ tbody tr[data-stav="Přijato dodavatelem"]     td:first-child { border-left: 3px
 /* Modal */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.open { display: flex; }
-.modal { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 620px; max-height: 92vh; overflow-y: auto; }
+.modal { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 620px; max-height: 92vh; overflow: hidden; display: flex; flex-direction: column; }
 .modal-header { padding: 14px 20px 10px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; }
 .modal-title { font-size: 15px; font-weight: 800; letter-spacing: .05em; }
 .modal-close { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; padding: 0 4px; }
 .modal-close:hover { color: #1a1a1a; }
-.modal-body { padding: 12px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.modal-body { padding: 12px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; overflow-y: auto; flex: 1; }
 .form-group { display: flex; flex-direction: column; gap: 3px; }
 .form-group.full { grid-column: 1 / -1; }
 .form-group label { font-size: 9px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; }
