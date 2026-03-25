@@ -213,7 +213,7 @@ button, input, select, textarea { font-family: inherit; }
     <button class="btn-nast-cancel" onclick="toggleHistorie()">Zavřít</button>
   </div>
   <div style="overflow-x:auto;">
-    <table><thead><tr><th>Datum</th><th>Zákazník</th><th>PSČ</th><th>Km</th><th>Položky</th><th>Celkem (od–do)</th><th>Poznámka</th></tr></thead>
+    <table><thead><tr><th>Datum</th><th>Zákazník</th><th>PSČ</th><th>Km</th><th>Položky</th><th>Celkem (od–do)</th><th>Poznámka</th><th style="width:90px;">Akce</th></tr></thead>
     <tbody id="historie-tbody"></tbody></table>
   </div>
   <div id="historie-empty" style="text-align:center;padding:30px;color:#888;display:none;">Žádné uložené kalkulace</div>
@@ -299,6 +299,7 @@ const HOME_PSC = '61900';
 // Data
 let dataSazby=[], dataDoplnky=[], dataKalkulace=[], config={};
 let polozkyCounter=0;
+let editKalkulaceId=null; // ID editované kalkulace
 
 // Defaults
 const DEF_CONFIG = { sazba_km:15, sazba_cestovni:300, sazba_hodina:1000, home_psc:'61900' };
@@ -661,7 +662,8 @@ function renderHistorie(){
     const doo=Number(String(k.celkem_do||'0').replace(',','.'))||0;
     let polCount='—';
     try { polCount=JSON.parse(String(k.polozky_json||'[]')).length; } catch(e){}
-    return `<tr>
+    const isActive=editKalkulaceId===k.id;
+    return `<tr style="${isActive?'background:#faf3e0;':''}">
       <td style="white-space:nowrap;">${String(k.datum||'—')}</td>
       <td style="font-weight:700;">${String(k.zakaznik||'—')}</td>
       <td>${String(k.psc||'—')}</td>
@@ -669,6 +671,10 @@ function renderHistorie(){
       <td>${polCount}</td>
       <td style="font-weight:700;color:var(--accent);">${od?od.toLocaleString('cs-CZ'):''} – ${doo?doo.toLocaleString('cs-CZ'):''} Kč</td>
       <td style="font-size:11px;color:#888;">${String(k.poznamka||'')}</td>
+      <td style="white-space:nowrap;">
+        <button onclick="loadKalkulace('${k.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:10px;font-weight:700;cursor:pointer;margin-right:4px" title="Načíst do editoru">✏️</button>
+        <button onclick="deleteKalkulace('${k.id}')" style="background:#c04040;color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:10px;font-weight:700;cursor:pointer" title="Smazat">🗑</button>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -683,8 +689,9 @@ async function saveKalkulace(){
   const celkem=doprava+praceTotal+doplnky;
   if(celkem<=0){ alert('Kalkulace je prázdná — přidej položky nebo dopravu.'); return; }
 
+  const isEdit=!!editKalkulaceId;
   const rec={
-    id:String(Date.now()),
+    id: isEdit ? editKalkulaceId : String(Date.now()),
     datum:new Date().toLocaleDateString('cs-CZ'),
     zakaznik:document.getElementById('c-zakaznik').value.trim(),
     psc:document.getElementById('c-psc').value.trim(),
@@ -699,16 +706,83 @@ async function saveKalkulace(){
   };
 
   if(!SCRIPT_URL){ alert('Apps Script URL není nastavena!'); return; }
-  showSaving('Ukládám kalkulaci...','');
+  showSaving(isEdit?'Aktualizuji kalkulaci...':'Ukládám kalkulaci...','');
   try {
-    await apiPost({action:'append',modul:'kalkulace',record:rec});
-    dataKalkulace.push(rec);
-    showSaving('Hotovo!','Kalkulace uložena');
-    setTimeout(()=>hideSaving(),800);
+    await apiPost({action: isEdit?'update':'append', modul:'kalkulace', record:rec});
+    if(isEdit){
+      const idx=dataKalkulace.findIndex(k=>k.id===editKalkulaceId);
+      if(idx>=0) dataKalkulace[idx]=rec;
+    } else {
+      dataKalkulace.push(rec);
+    }
+    editKalkulaceId=null;
+    updateSaveBtn();
+    showSaving('Hotovo!', isEdit?'Kalkulace aktualizována':'Kalkulace uložena');
+    setTimeout(()=>{hideSaving();renderHistorie();},800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
 }
 
+function loadKalkulace(id){
+  const k=dataKalkulace.find(x=>x.id===id);
+  if(!k) return;
+  editKalkulaceId=id;
+  // Fill basic fields
+  document.getElementById('c-zakaznik').value=k.zakaznik||'';
+  document.getElementById('c-poznamka').value=k.poznamka||'';
+  document.getElementById('c-psc').value=k.psc||'';
+  document.getElementById('c-km').value=k.km||'';
+  document.getElementById('c-min').value='';
+  // Restore polozky
+  document.getElementById('polozky-list').innerHTML='';
+  polozkyCounter=0;
+  try{
+    const pol=JSON.parse(String(k.polozky_json||'[]'));
+    if(pol.length){
+      pol.forEach(p=>{
+        addPolozka();
+        const idx=polozkyCounter-1;
+        const row=document.querySelector(`[data-polozka="${idx}"]`);
+        if(!row) return;
+        const selects=row.querySelectorAll('select');
+        const inputs=row.querySelectorAll('input[type="number"]');
+        if(selects[0]) selects[0].value=p.typ||'';
+        if(selects[1]) selects[1].value=p.mont||'';
+        if(selects[2]) selects[2].value=p.pasek||'';
+        if(selects[3]) selects[3].value=p.prip||'';
+        if(inputs[0]) inputs[0].value=p.metry||'';
+        if(inputs[1]) inputs[1].value=p.tech||'';
+      });
+    } else addPolozka();
+  }catch(e){ addPolozka(); }
+  recalc();
+  updateSaveBtn();
+  renderHistorie();
+  // Scroll to top and close historie
+  toggleHistorie();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function deleteKalkulace(id){
+  if(!confirm('Opravdu smazat tuto kalkulaci?')) return;
+  showSaving('Mažu kalkulaci...','');
+  try{
+    await apiPost({action:'delete',modul:'kalkulace',id:String(id)});
+    dataKalkulace=dataKalkulace.filter(k=>k.id!==id);
+    if(editKalkulaceId===id){ editKalkulaceId=null; updateSaveBtn(); }
+    showSaving('Smazáno!','');
+    setTimeout(()=>{hideSaving();renderHistorie();},800);
+  }catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+function updateSaveBtn(){
+  const btn=document.querySelector('.btn-save-calc');
+  if(!btn) return;
+  btn.textContent=editKalkulaceId?'💾 Aktualizovat kalkulaci':'💾 Uložit kalkulaci';
+}
+
 function resetCalc(){
+  editKalkulaceId=null;
+  updateSaveBtn();
   document.getElementById('c-zakaznik').value='';
   document.getElementById('c-poznamka').value='';
   document.getElementById('c-psc').value='';
