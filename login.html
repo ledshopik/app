@@ -27,7 +27,9 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
   <div id="users-container" class="loading">Načítám uživatele...</div>
 </div>
 <script>
-const API_URL = 'https://ledshopik-backend-production.up.railway.app';
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
 const COLORS = ['#4080c0','#40a050','#c8a830','#e06030','#8060c0','#c04080','#30a0a0','#6080d0','#a06030','#50b070','#d05050','#7070b0'];
 
 // Already logged in?
@@ -38,14 +40,14 @@ if (localStorage.getItem('ledshopik_user')) {
 async function loadUsers() {
   const container = document.getElementById('users-container');
   try {
-    const res = await fetch(API_URL + '/api/auth/users');
-    const json = await res.json();
-    if (!json.ok || !json.data.length) {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/uzivatele?select=*', {headers: SB_HEADERS});
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) {
       container.innerHTML = '<div class="error">Žádní uživatelé</div>';
       return;
     }
     container.className = 'users-grid';
-    container.innerHTML = json.data.map((u, i) => `
+    container.innerHTML = data.map((u, i) => `
       <div class="user-btn" onclick="login('${u.jmeno}')">
         <div class="avatar" style="background:${COLORS[i % COLORS.length]}">${u.jmeno.charAt(0)}</div>
         ${u.jmeno}

@@ -365,7 +365,9 @@
 // ── Auth ──────────────────────────────────────────────────────────────────────
 if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 
-const API_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 const CURRENT_USER = localStorage.getItem('ledshopik_user') || '';
 document.getElementById('user-bar-name').textContent = CURRENT_USER;
 
@@ -932,12 +934,12 @@ function formatPrice(n) {
 // ── History (API) ─────────────────────────────────────────────────────────────
 async function loadHistory() {
   try {
-    const res = await fetch(API_URL + '?modul=produktove_listy', {
-      headers: {'X-User': CURRENT_USER}
+    const res = await fetch(SUPABASE_URL + '/rest/v1/produktove_listy?select=*&uzivatel=eq.' + encodeURIComponent(CURRENT_USER), {
+      headers: SB_HEADERS
     });
     const data = await res.json();
-    if (data.ok) {
-      history = (data.data || []).filter(s => s.uzivatel === CURRENT_USER);
+    if (Array.isArray(data)) {
+      history = data;
       renderHistory();
     }
   } catch(e) {
@@ -996,17 +998,17 @@ async function saveToHistory() {
   };
 
   try {
-    const res = await fetch(API_URL, {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/produktove_listy', {
       method: 'POST',
-      headers: {'Content-Type':'application/json','X-User': CURRENT_USER},
-      body: JSON.stringify({action:'append', modul:'produktove_listy', record})
+      headers: {...SB_HEADERS, 'Prefer':'return=minimal'},
+      body: JSON.stringify(record)
     });
-    const data = await res.json();
-    if (data.ok) {
+    if (res.ok) {
       await loadHistory();
       alert('Uloženo do historie.');
     } else {
-      alert('Chyba: ' + (data.error || 'Neznámá chyba'));
+      const err = await res.json().catch(()=>({}));
+      alert('Chyba: ' + (err.message || 'Neznámá chyba'));
     }
   } catch(e) {
     alert('Chyba připojení k serveru');
@@ -1016,13 +1018,11 @@ async function saveToHistory() {
 async function deleteFromHistory(id) {
   if (!confirm('Opravdu smazat tento záznam?')) return;
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','X-User': CURRENT_USER},
-      body: JSON.stringify({action:'delete', modul:'produktove_listy', id})
+    const res = await fetch(SUPABASE_URL + '/rest/v1/produktove_listy?id=eq.' + encodeURIComponent(id), {
+      method: 'DELETE',
+      headers: SB_HEADERS
     });
-    const data = await res.json();
-    if (data.ok) await loadHistory();
+    if (res.ok) await loadHistory();
   } catch(e) {
     alert('Chyba při mazání');
   }

@@ -300,14 +300,16 @@ button, input, select, textarea { font-family: inherit; }
 <div id="saving-overlay">
   <div id="saving-box">
     <div class="saving-title" id="saving-title">Ukládám...</div>
-    <div class="saving-sub" id="saving-sub">Komunikuji s Google Sheets</div>
+    <div class="saving-sub" id="saving-sub">Ukládám data</div>
   </div>
 </div>
 
 <script>
 if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 // ── Config ───────────────────────────────────────────────────────────────────
-const SCRIPT_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 const HOME_PSC = '61900';
 
 // Data
@@ -332,36 +334,44 @@ function getConf(k){ return Number(config[k])||DEF_CONFIG[k]||0; }
 function getHomePSC(){ return String(config.home_psc||localStorage.getItem('home_psc')||HOME_PSC); }
 
 // ── API ──────────────────────────────────────────────────────────────────────
-async function apiPost(payload){
-  if(!SCRIPT_URL){ alert('Apps Script URL není nastavena! Otevři kód a doplň SCRIPT_URL.'); throw new Error('No SCRIPT_URL'); }
-  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload),redirect:'follow',headers:{'Content-Type':'text/plain'}});
-  const text=await res.text();
-  let json;
-  try { json=JSON.parse(text); } catch(e) {
-    const m=text.match(/\{[\s\S]*\}/);
-    if(m) try { json=JSON.parse(m[0]); } catch(e2){}
-    if(!json) throw new Error('Neplatná odpověď serveru');
+async function sbInsert(table,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table,{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbUpdate(table,id,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?id=eq.'+id,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbDelete(table,id){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?id=eq.'+id,{method:'DELETE',headers:SB_HEADERS});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbReplaceAll(table,records){
+  // Delete all existing rows, then insert new ones
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?id=not.is.null',{method:'DELETE',headers:SB_HEADERS});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+  if(records.length){
+    const res2=await fetch(SUPABASE_URL+'/rest/v1/'+table,{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(records)});
+    if(!res2.ok){ const t=await res2.text(); throw new Error(t); }
   }
-  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
-  return json;
 }
 
 async function loadAllData(){
-  if(!SCRIPT_URL){ syncStatus('error','Nastav SCRIPT_URL v kódu'); renderDoplnkyCalc(); addPolozka(); return; }
   syncStatus('loading','Načítám...');
   try {
+    const sbGet=async(table)=>{const r=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?select=*',{headers:SB_HEADERS});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
     const [rSaz, rDop, rKal, rCfg] = await Promise.all([
-      fetch(SCRIPT_URL+'?modul=sazby').then(r=>r.json()).catch(()=>({data:[]})),
-      fetch(SCRIPT_URL+'?modul=doplnky').then(r=>r.json()).catch(()=>({data:[]})),
-      fetch(SCRIPT_URL+'?modul=kalkulace').then(r=>r.json()).catch(()=>({data:[]})),
-      fetch(SCRIPT_URL+'?modul=config').then(r=>r.json()).catch(()=>({data:[]})),
+      sbGet('sazby').catch(()=>[]),
+      sbGet('doplnky').catch(()=>[]),
+      sbGet('kalkulace').catch(()=>[]),
+      sbGet('config').catch(()=>[]),
     ]);
-    dataSazby=rSaz.data||[];
-    dataDoplnky=rDop.data||[];
-    dataKalkulace=rKal.data||[];
+    dataSazby=rSaz;
+    dataDoplnky=rDop;
+    dataKalkulace=rKal;
     // Config: key-value pairs
     config={};
-    (rCfg.data||[]).forEach(r=>{ if(r.klic) config[String(r.klic).trim()]=String(r.hodnota||'').trim(); });
+    rCfg.forEach(r=>{ if(r.klic) config[String(r.klic).trim()]=String(r.hodnota||'').trim(); });
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
   } catch(e){ syncStatus('error','Chyba: '+e.message); }
   renderDoplnkyCalc();
@@ -611,7 +621,6 @@ function removeDoplnekRow(i){
 }
 
 async function saveAllSazby(){
-  if(!SCRIPT_URL){ alert('Apps Script URL není nastavena!'); return; }
   showSaving('Ukládám nastavení...','');
   try {
     // Read values from inputs
@@ -645,9 +654,9 @@ async function saveAllSazby(){
       });
     });
     // Save all in batch
-    await apiPost({action:'replaceAll',modul:'config',records:newConfig});
-    await apiPost({action:'replaceAll',modul:'sazby',records:newSazby});
-    await apiPost({action:'replaceAll',modul:'doplnky',records:newDoplnky});
+    await sbReplaceAll('config',newConfig);
+    await sbReplaceAll('sazby',newSazby);
+    await sbReplaceAll('doplnky',newDoplnky);
     // Also save PSC to localStorage
     localStorage.setItem('home_psc',document.getElementById('n-psc').value.trim());
     showSaving('Hotovo!','Nastavení uloženo');
@@ -719,10 +728,9 @@ async function saveKalkulace(){
     poznamka:document.getElementById('c-poznamka').value.trim(),
   };
 
-  if(!SCRIPT_URL){ alert('Apps Script URL není nastavena!'); return; }
   showSaving(isEdit?'Aktualizuji kalkulaci...':'Ukládám kalkulaci...','');
   try {
-    await apiPost({action: isEdit?'update':'append', modul:'kalkulace', record:rec});
+    if(isEdit) await sbUpdate('kalkulace',rec.id,rec); else await sbInsert('kalkulace',rec);
     if(isEdit){
       const idx=dataKalkulace.findIndex(k=>k.id===editKalkulaceId);
       if(idx>=0) dataKalkulace[idx]=rec;
@@ -780,7 +788,7 @@ async function deleteKalkulace(id){
   if(!confirm('Opravdu smazat tuto kalkulaci?')) return;
   showSaving('Mažu kalkulaci...','');
   try{
-    await apiPost({action:'delete',modul:'kalkulace',id:String(id)});
+    await sbDelete('kalkulace',id);
     dataKalkulace=dataKalkulace.filter(k=>k.id!==id);
     if(editKalkulaceId===id){ editKalkulaceId=null; updateSaveBtn(); }
     showSaving('Smazáno!','');

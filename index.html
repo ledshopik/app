@@ -329,7 +329,7 @@ button, input, select { font-family: inherit; }
   
 </div>
 <style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
-<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://ledshopik-backend-production.up.railway.app/api/compat?modul=dochazka').then(r=>r.json()).then(j=>{const d=j.data||[];const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
+<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'}}).then(r=>r.json()).then(j=>{const d=Array.isArray(j)?j:(j.data||[]);const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
 <div id="user-controls">
   <span id="user-bar-name" style="font-weight:700;color:#333;font-size:12px;"></span>
   <a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a>
@@ -597,10 +597,10 @@ button, input, select { font-family: inherit; }
 <script>
 if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 // ── Konfigurace ────────────────────────────────────────────────────────────────
-const SCRIPT_INSTALACE = 'https://ledshopik-backend-production.up.railway.app/api/compat';
-const SCRIPT_VYROBA    = 'https://ledshopik-backend-production.up.railway.app/api/compat';
-const SCRIPT_ZASOBOVANI = 'https://ledshopik-backend-production.up.railway.app/api/compat';
-const SCRIPT_REKLAMACE = 'https://ledshopik-backend-production.up.railway.app/api/compat';
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+
 
 const MONTHS_CS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const today = new Date();
@@ -632,27 +632,33 @@ function syncStatus(state,text){
   document.getElementById('sync-text').textContent=text;
 }
 
+async function sbFetch(table){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?select=*',{headers:SB_HEADERS});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  return res.json();
+}
+
 async function loadAll(){
   syncStatus('loading','Načítám...');
   try {
     const [rInst, rObh, rRek, rRekDod, rDoch, rVyr, rZas, rUkoly] = await Promise.all([
-      fetch(SCRIPT_INSTALACE+'?modul=instalace').then(r=>r.json()),
-      fetch(SCRIPT_INSTALACE+'?modul=obhlidky').then(r=>r.json()),
-      fetch(SCRIPT_REKLAMACE+'?modul=reklamace').then(r=>r.json()),
-      fetch(SCRIPT_REKLAMACE+'?modul=reklamace_dodavatel').then(r=>r.json()).catch(()=>({data:[]})),
-      fetch(SCRIPT_INSTALACE+'?modul=dochazka').then(r=>r.json()),
-      fetch(SCRIPT_VYROBA+'?modul=vyroba').then(r=>r.json()),
-      fetch(SCRIPT_ZASOBOVANI+'?modul=zasilky').then(r=>r.json()),
-      fetch(SCRIPT_INSTALACE+'?modul=ukoly').then(r=>r.json()).catch(()=>({data:[]})),
+      sbFetch('instalace'),
+      sbFetch('obhlidky'),
+      sbFetch('reklamace'),
+      sbFetch('reklamace_dodavatel').catch(()=>[]),
+      sbFetch('dochazka'),
+      sbFetch('vyroba'),
+      sbFetch('zasilky'),
+      sbFetch('ukoly').catch(()=>[]),
     ]);
-    dataInst = rInst.data||[];
-    dataObh  = rObh.data||[];
-    dataRek  = rRek.data||[];
-    dataRekDod = rRekDod.data||[];
-    dataDoch = rDoch.data||[];
-    dataVyr  = rVyr.data||[];
-    dataZas  = rZas.data||[];
-    dataUkoly = rUkoly.data||[];
+    dataInst = rInst;
+    dataObh  = rObh;
+    dataRek  = rRek;
+    dataRekDod = rRekDod;
+    dataDoch = rDoch;
+    dataVyr  = rVyr;
+    dataZas  = rZas;
+    dataUkoly = rUkoly;
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderAll();
   } catch(e){
@@ -886,11 +892,18 @@ function renderAlerts(){
   }).join('');
 }
 
-// ── apiPost ───────────────────────────────────────────────────────────────────
-async function apiPost(payload){
-  const res=await fetch(SCRIPT_INSTALACE,{method:'POST',body:JSON.stringify(payload)});
-  const json=await res.json();
-  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+// ── Supabase CRUD ─────────────────────────────────────────────────────────────
+async function sbInsert(table,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table,{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbUpdate(table,id,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?id=eq.'+id,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbDelete(table,id){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?id=eq.'+id,{method:'DELETE',headers:SB_HEADERS});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
 }
 
 // ── Tasks 2.0 ─────────────────────────────────────────────────────────────────
@@ -962,7 +975,7 @@ async function toggleTaskDone(id){
   if(!t) return;
   t.stav = t.stav==='hotovo'?'aktivni':'hotovo';
   renderTasks();
-  try { await apiPost({action:'update',modul:'ukoly',record:{id:t.id,stav:t.stav}}); } catch(e){}
+  try { await sbUpdate('ukoly',t.id,{stav:t.stav}); } catch(e){}
 }
 
 async function quickAddTask(){
@@ -985,7 +998,7 @@ async function quickAddTask(){
   dataUkoly.push(rec);
   renderTasks();
   inp.value = '';
-  try { await apiPost({action:'append',modul:'ukoly',record:rec}); } catch(e){ alert('Chyba: '+e.message); }
+  try { await sbInsert('ukoly',rec); } catch(e){ alert('Chyba: '+e.message); }
 }
 
 async function deleteTaskById(id){
@@ -993,7 +1006,7 @@ async function deleteTaskById(id){
   dataUkoly = dataUkoly.filter(t=>t.id!==id);
   renderTasks();
   closeTaskModal();
-  try { await apiPost({action:'delete',modul:'ukoly',id:id}); } catch(e){}
+  try { await sbDelete('ukoly',id); } catch(e){}
 }
 
 async function saveTask(){
@@ -1027,7 +1040,7 @@ async function saveTask(){
   closeTaskModal();
 
   try {
-    await apiPost({action: isEdit?'update':'append', modul:'ukoly', record:rec});
+    if(isEdit) await sbUpdate('ukoly',rec.id,rec); else await sbInsert('ukoly',rec);
   } catch(e){ alert('Chyba: '+e.message); }
 }
 

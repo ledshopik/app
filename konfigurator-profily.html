@@ -393,7 +393,9 @@
 <script>
 if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 const PRICES_KEY = 'alu_profil_ceny';
-const API_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 const CURRENT_USER = localStorage.getItem('ledshopik_user') || '';
 let sestavy = [];
 
@@ -721,12 +723,12 @@ function copyConfig() {
 // ── Sestavy (API) ──────────────────────────────────────────────────────────
 async function loadSestavy() {
   try {
-    const res = await fetch(API_URL + '?modul=sestavy_profily', {
-      headers: {'X-User': CURRENT_USER}
+    const res = await fetch(SUPABASE_URL + '/rest/v1/sestavy_profily?select=*&uzivatel=eq.' + encodeURIComponent(CURRENT_USER), {
+      headers: SB_HEADERS
     });
     const data = await res.json();
-    if (data.ok) {
-      sestavy = (data.data || []).filter(s => s.uzivatel === CURRENT_USER);
+    if (Array.isArray(data)) {
+      sestavy = data;
       renderSestavy();
     }
   } catch(e) {
@@ -799,13 +801,12 @@ async function addToList() {
   };
 
   try {
-    const res = await fetch(API_URL, {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/sestavy_profily', {
       method: 'POST',
-      headers: {'Content-Type':'application/json','X-User': CURRENT_USER},
-      body: JSON.stringify({action:'append', modul:'sestavy_profily', record})
+      headers: {...SB_HEADERS, 'Prefer':'return=minimal'},
+      body: JSON.stringify(record)
     });
-    const data = await res.json();
-    if (data.ok) {
+    if (res.ok) {
       sel = {};
       customLengthVal = '';
       document.getElementById('qty-input').value = '1';
@@ -813,7 +814,8 @@ async function addToList() {
       renderKonfigurator();
       await loadSestavy();
     } else {
-      alert('Chyba: ' + (data.error || 'Neznámá chyba'));
+      const err = await res.json().catch(()=>({}));
+      alert('Chyba: ' + (err.message || 'Neznámá chyba'));
     }
   } catch(e) {
     alert('Chyba připojení k serveru');
@@ -822,13 +824,11 @@ async function addToList() {
 
 async function deleteSestava(id) {
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','X-User': CURRENT_USER},
-      body: JSON.stringify({action:'delete', modul:'sestavy_profily', id})
+    const res = await fetch(SUPABASE_URL + '/rest/v1/sestavy_profily?id=eq.' + encodeURIComponent(id), {
+      method: 'DELETE',
+      headers: SB_HEADERS
     });
-    const data = await res.json();
-    if (data.ok) await loadSestavy();
+    if (res.ok) await loadSestavy();
   } catch(e) {
     alert('Chyba při mazání');
   }

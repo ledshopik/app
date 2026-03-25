@@ -455,7 +455,7 @@ a{color:var(--accent);text-decoration:none}
   
 </div>
 <style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
-<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://ledshopik-backend-production.up.railway.app/api/compat?modul=dochazka').then(r=>r.json()).then(j=>{const d=j.data||[];const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
+<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'}}).then(r=>r.json()).then(j=>{const d=Array.isArray(j)?j:(j.data||[]);const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
 <div id="user-controls" style="background:#fff;border-bottom:1px solid #e0e0e0;padding:6px 32px;display:flex;align-items:center;gap:14px;">
   <span id="user-bar-name" style="font-weight:700;color:#333;font-size:12px;"></span>
   <a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a>
@@ -691,7 +691,10 @@ if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 // ══════════════════════════════════════
 let fixtures = [];        // Current project fixtures
 
-const LB_API_URL = 'https://ledshopik-backend-production.up.railway.app/api/lumibook';
+const LB_SB_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const LB_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const LB_SB_HEADERS = {'apikey':LB_SB_KEY,'Authorization':'Bearer '+LB_SB_KEY,'Content-Type':'application/json'};
+const LB_PROXY_URL = 'https://ledshopik-backend-production.up.railway.app/api'; // kept for HTTP proxy only
 let dbFromSheets = false;
 
 let database = [];        // Saved product database
@@ -745,33 +748,34 @@ function syncProjectToServer(){
     rooms_json: JSON.stringify(customRooms),
     tag_n: String(tagN)
   };
-  fetch(LB_API_URL+'/projects/save',{
+  fetch(LB_SB_URL+'/rest/v1/lumibook_projects',{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({project})
-  }).then(r=>r.json()).then(j=>{
-    if(j.ok) console.log('Projekt uložen na server');
+    headers:{...LB_SB_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},
+    body:JSON.stringify(project)
+  }).then(r=>{
+    if(r.ok) console.log('Projekt uložen na server');
   }).catch(e=>console.error('Sync error:',e));
 }
 
 function saveDB() {
   try { localStorage.setItem('lb-database', JSON.stringify(database)); } catch(e) {}
-  // Sync to shared backend (non-blocking)
-  fetch(LB_API_URL + '/sync', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({database: database})
-  }).catch(() => {});
+  // Sync to Supabase (non-blocking) — upsert each item
+  database.forEach(item => {
+    fetch(LB_SB_URL + '/rest/v1/lumibook_database', {
+      method: 'POST',
+      headers: {...LB_SB_HEADERS, 'Prefer':'resolution=merge-duplicates,return=minimal'},
+      body: JSON.stringify(item)
+    }).catch(() => {});
+  });
 }
 
 async function loadDBFromServer(attempt) {
   attempt = attempt || 1;
   try {
-    const res = await fetch(LB_API_URL + '?t=' + Date.now());
+    const res = await fetch(LB_SB_URL + '/rest/v1/lumibook_database?select=*', {headers: LB_SB_HEADERS});
     if(!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    var arr = json.database || json.data || [];
-    if(json.ok && Array.isArray(arr) && arr.length > 0) {
+    const arr = await res.json();
+    if(Array.isArray(arr) && arr.length > 0) {
       database = arr;
       try { localStorage.setItem('lb-database', JSON.stringify(database)); } catch(e){}
       dbFromSheets = true;
@@ -820,10 +824,10 @@ function load() {
 async function loadProjectFromServer(){
   if(!currentProjectId) return;
   try{
-    const res=await fetch(LB_API_URL+'/projects/'+currentProjectId+'?t='+Date.now());
-    const json=await res.json();
-    if(json.ok && json.data && json.data.id){
-      const p=json.data;
+    const res=await fetch(LB_SB_URL+'/rest/v1/lumibook_projects?id=eq.'+encodeURIComponent(currentProjectId)+'&select=*',{headers:LB_SB_HEADERS});
+    const arr=await res.json();
+    if(Array.isArray(arr) && arr.length>0){
+      const p=arr[0];
       if(p.nazev) document.getElementById('p-name').value=p.nazev;
       if(p.zakaznik) document.getElementById('p-client').value=p.zakaznik;
       if(p.datum) document.getElementById('p-date').value=p.datum;
@@ -847,9 +851,9 @@ async function loadProjectFromServer(){
 
 async function loadProjectList(){
   try{
-    const res=await fetch(LB_API_URL+'/projects?t='+Date.now());
-    const json=await res.json();
-    return json.ok?json.data:[];
+    const res=await fetch(LB_SB_URL+'/rest/v1/lumibook_projects?select=*&order=datum.desc',{headers:LB_SB_HEADERS});
+    const arr=await res.json();
+    return Array.isArray(arr)?arr:[];
   }catch(e){ return []; }
 }
 
@@ -1005,7 +1009,7 @@ async function importFromEshop() {
     // ── STEP 1: Fetch page HTML via own backend proxy ──
     let html = '';
     try {
-      const r = await fetch(LB_API_URL.replace('/lumibook','') + '/proxy?url=' + encodeURIComponent(url), {signal: AbortSignal.timeout(15000)});
+      const r = await fetch(LB_PROXY_URL + '/proxy?url=' + encodeURIComponent(url), {signal: AbortSignal.timeout(15000)});
       if (r.ok) html = await r.text();
     } catch(e) {}
     // Fallback: public CORS proxies

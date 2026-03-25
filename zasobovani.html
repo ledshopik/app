@@ -184,7 +184,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
 </head>
 <body>
 <style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
-<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://ledshopik-backend-production.up.railway.app/api/compat?modul=dochazka').then(r=>r.json()).then(j=>{const d=j.data||[];const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
+<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'}}).then(r=>r.json()).then(j=>{const d=Array.isArray(j)?j:(j.data||[]);const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
 <div id="header">
   <div style="display:flex;align-items:center;gap:16px;">
     <div class="header-accent"></div>
@@ -565,7 +565,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
 <div id="saving-overlay">
   <div id="saving-box">
     <div class="saving-title" id="saving-title">Ukládám...</div>
-    <div class="saving-sub" id="saving-sub">Komunikuji s Google Sheets</div>
+    <div class="saving-sub" id="saving-sub">Ukládám data</div>
   </div>
 </div>
 
@@ -581,7 +581,10 @@ if ('caches' in window) {
   caches.keys().then(names => names.forEach(n => caches.delete(n)));
 }
 
-const SCRIPT_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+const BACKEND_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
 const COLS_ZAS = ['id','cislo_obj','dodavatel','zeme','zpusob_dopravy','obsah','pocet_ks','hodnota','mena','datum_objednani','termin_zakaznik','termin_dodavatel','ocekavane_doruceni','tracking','vazba_zakazka','stav','faktura','poznamka'];
 const COLS_DOD = ['id','nazev','zeme','kontakt','email','web','doprava_vychozi','poznamka'];
 
@@ -625,13 +628,13 @@ async function loadData(){
   syncStatus('loading','Načítám data...');
   try {
     const [rZas, rDod, rEvi] = await Promise.all([
-      fetch(SCRIPT_URL+'?modul=zasilky').then(r=>r.json()),
-      fetch(SCRIPT_URL+'?modul=dodavatele').then(r=>r.json()),
-      fetch(SCRIPT_URL+'?modul=evidence').then(r=>r.json()).catch(()=>({data:[]}))
+      fetch(SUPABASE_URL+'/rest/v1/zasilky?select=*',{headers:SB_HEADERS}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}),
+      fetch(SUPABASE_URL+'/rest/v1/dodavatele?select=*',{headers:SB_HEADERS}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}),
+      fetch(SUPABASE_URL+'/rest/v1/evidence?select=*',{headers:SB_HEADERS}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).catch(()=>[])
     ]);
-    dataZas = rZas.data||[];
-    dataDod  = rDod.data||[];
-    dataEvi  = rEvi.data||[];
+    dataZas = rZas;
+    dataDod  = rDod;
+    dataEvi  = rEvi;
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderTable();
     renderDodavatele();
@@ -640,17 +643,17 @@ async function loadData(){
   } catch(e){ syncStatus('error','Chyba: '+e.message); }
 }
 
-async function apiPost(payload){
-  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload),redirect:'follow',headers:{'Content-Type':'text/plain'}});
-  const text=await res.text();
-  let json;
-  try { json=JSON.parse(text); } catch(e) {
-    const m=text.match(/\{[\s\S]*\}/);
-    if(m) try { json=JSON.parse(m[0]); } catch(e2){}
-    if(!json) throw new Error('Neplatná odpověď serveru');
-  }
-  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
-  return json;
+async function sbInsert(table,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table,{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbUpdate(table,id,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?id=eq.'+id,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbDelete(table,id){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?id=eq.'+id,{method:'DELETE',headers:SB_HEADERS});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
 }
 
 function switchTab(tab){
@@ -869,9 +872,9 @@ async function saveRecord(){
   const stavChanged = oldRec && oldRec.stav !== rec.stav && rec.stav === 'Doručeno';
 
   closeModal();
-  showSaving(isEdit?'Ukládám změny...':'Přidávám zásilku...','Komunikuji s Google Sheets');
+  showSaving(isEdit?'Ukládám změny...':'Přidávám zásilku...','Ukládám data');
   try {
-    await apiPost({action:isEdit?'update':'append', modul:'zasilky', record:rec});
+    if(isEdit) await sbUpdate('zasilky',rec.id,rec); else await sbInsert('zasilky',rec);
     // Auto-vytvořit záznam v evidenci když zásilka přejde na "Doručeno"
     if (stavChanged) {
       showSaving('Přidávám do evidence zásilek...','');
@@ -900,7 +903,7 @@ async function deleteRecord(){
   const id=editId; closeModal();
   showSaving('Mažu...','');
   try {
-    await apiPost({action:'delete', modul:'zasilky', id:String(id)});
+    await sbDelete('zasilky',id);
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
@@ -921,7 +924,7 @@ async function saveDodavatel(){
   closeModalDod();
   showSaving(isEdit?'Ukládám dodavatele...':'Přidávám dodavatele...','');
   try {
-    await apiPost({action:isEdit?'update':'append', modul:'dodavatele', record:rec});
+    if(isEdit) await sbUpdate('dodavatele',rec.id,rec); else await sbInsert('dodavatele',rec);
     showSaving('Hotovo!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
@@ -932,7 +935,7 @@ async function deleteDodavatel(){
   const id=editDodId; closeModalDod();
   showSaving('Mažu...','');
   try {
-    await apiPost({action:'delete', modul:'dodavatele', id:String(id)});
+    await sbDelete('dodavatele',id);
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
@@ -1149,7 +1152,7 @@ async function applyBulkTracking() {
       const rec = dataZas.find(r => String(r.id) === id);
       if(rec) {
         rec.tracking = tracking;
-        await apiPost({action:'update', modul:'zasilky', record: rec});
+        await sbUpdate('zasilky',rec.id,rec);
       }
     }
     showSaving('Hotovo!','');
@@ -1167,7 +1170,7 @@ async function applyBulkFaktura() {
       const rec = dataZas.find(r => String(r.id) === id);
       if(rec) {
         rec.faktura = fakturaValue;
-        await apiPost({action:'update', modul:'zasilky', record: rec});
+        await sbUpdate('zasilky',rec.id,rec);
       }
     }
     showSaving('Hotovo!','');
@@ -1185,7 +1188,7 @@ async function applyBulkStav() {
       if(rec) {
         const wasNotDoruceno = rec.stav !== 'Doručeno';
         rec.stav = stav;
-        await apiPost({action:'update', modul:'zasilky', record: rec});
+        await sbUpdate('zasilky',rec.id,rec);
         // Auto-evidence při přechodu na "Doručeno"
         if (stav === 'Doručeno' && wasNotDoruceno) {
           await autoCreateEvidence(rec);
@@ -1237,7 +1240,7 @@ function handleFileUpload(file, filenameId, warningId, onLoaded) {
   reader.onload = async function(e) {
     const base64 = e.target.result; // full data URL with prefix
     try {
-      const res = await fetch(SCRIPT_URL, {
+      const res = await fetch(BACKEND_URL, {
         method: 'POST',
         body: JSON.stringify({ action: 'uploadFile', filename: file.name, mimeType: file.type, data: base64 }),
         headers: { 'Content-Type': 'application/json' }
@@ -1430,9 +1433,9 @@ async function saveEvidence() {
     poznamka: document.getElementById('fe-poznamka').value.trim(),
   };
   closeModalEvi();
-  showSaving(isEdit ? 'Ukládám změny...' : 'Přidávám zásilku...', 'Komunikuji s Google Sheets');
+  showSaving(isEdit ? 'Ukládám změny...' : 'Přidávám zásilku...', 'Ukládám data');
   try {
-    await apiPost({ action: isEdit ? 'update' : 'append', modul: 'evidence', record: rec });
+    if(isEdit) await sbUpdate('evidence',rec.id,rec); else await sbInsert('evidence',rec);
     showSaving('Hotovo!', 'Data uložena');
     setTimeout(async () => { hideSaving(); await loadData(); }, 800);
   } catch (e) { hideSaving(); alert('Chyba: ' + e.message); }
@@ -1444,7 +1447,7 @@ async function deleteEvidence() {
   closeModalEvi();
   showSaving('Mažu...', '');
   try {
-    await apiPost({ action: 'delete', modul: 'evidence', id: String(id) });
+    await sbDelete('evidence',id);
     showSaving('Smazáno!', '');
     setTimeout(async () => { hideSaving(); await loadData(); }, 800);
   } catch (e) { hideSaving(); alert('Chyba: ' + e.message); }
@@ -1465,7 +1468,7 @@ async function autoCreateEvidence(zasilkaRec) {
         vazby.push(zasId);
         existing.vazby = vazby.join('|');
         existing.hodnota = String((parseFloat(existing.hodnota)||0) + (parseFloat(zasilkaRec.hodnota)||0));
-        await apiPost({ action: 'update', modul: 'evidence', record: existing });
+        await sbUpdate('evidence',existing.id,existing);
       }
       return;
     }
@@ -1488,7 +1491,7 @@ async function autoCreateEvidence(zasilkaRec) {
     vazby: zasId,
     poznamka: 'Auto z obj. ' + String(zasilkaRec.cislo_obj || ''),
   };
-  await apiPost({ action: 'append', modul: 'evidence', record: eviRec });
+  await sbInsert('evidence',eviRec);
   // Přidej do lokálního pole aby další zásilky ve stejné smyčce mohly sloučit
   dataEvi.push(eviRec);
 }
