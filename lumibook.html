@@ -1322,6 +1322,8 @@ function openAddModal() {
   document.getElementById('modal-bg').classList.add('open');
 }
 
+let tempExtraImages = [];
+
 function openEditModal(idx) {
   editIdx = idx;
   const f = fixtures[idx];
@@ -1396,7 +1398,6 @@ function bindImgUpload() {
 }
 bindImgUpload();
 
-let tempExtraImages = [];
 function bindExtraImgUpload() {
   document.getElementById('extra-img-file').addEventListener('change', function(e) {
     const files = Array.from(e.target.files);
