@@ -977,14 +977,21 @@ async function importFromEshop() {
   status.innerHTML = '<span class="spin">⟳</span> Stahuji stránku...';
 
   try {
-    // ── STEP 1: Fetch page HTML via CORS proxy ──
+    // ── STEP 1: Fetch page HTML via own backend proxy ──
     let html = '';
-    const proxies = ['https://corsproxy.io/?url=','https://api.allorigins.win/raw?url=','https://api.codetabs.com/v1/proxy?quest='];
-    for (const proxy of proxies) {
-      try {
-        const r = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(10000)});
-        if (r.ok) { html = await r.text(); break; }
-      } catch(e) { continue; }
+    try {
+      const r = await fetch(LB_API_URL.replace('/lumibook','') + '/proxy?url=' + encodeURIComponent(url), {signal: AbortSignal.timeout(15000)});
+      if (r.ok) html = await r.text();
+    } catch(e) {}
+    // Fallback: public CORS proxies
+    if (!html) {
+      const proxies = ['https://corsproxy.io/?url=','https://api.allorigins.win/raw?url='];
+      for (const proxy of proxies) {
+        try {
+          const r = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(10000)});
+          if (r.ok) { html = await r.text(); break; }
+        } catch(e) { continue; }
+      }
     }
     if (!html) throw new Error('Nepodařilo se stáhnout stránku — zkus to znovu');
 

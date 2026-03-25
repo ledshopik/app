@@ -363,12 +363,19 @@ function switchTab(tab) {
 // ── Scraping ──────────────────────────────────────────────────────────────────
 async function scrapeProduct(url) {
   let html = '';
-  const proxies = ['https://corsproxy.io/?url=','https://api.allorigins.win/raw?url=','https://api.codetabs.com/v1/proxy?quest='];
-  for (const proxy of proxies) {
-    try {
-      const r = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(10000)});
-      if (r.ok) { html = await r.text(); break; }
-    } catch(e) { continue; }
+  const API_BASE = 'https://ledshopik-backend-production.up.railway.app/api';
+  try {
+    const r = await fetch(API_BASE + '/proxy?url=' + encodeURIComponent(url), {signal: AbortSignal.timeout(15000)});
+    if (r.ok) html = await r.text();
+  } catch(e) {}
+  if (!html) {
+    const proxies = ['https://corsproxy.io/?url=','https://api.allorigins.win/raw?url='];
+    for (const proxy of proxies) {
+      try {
+        const r = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(10000)});
+        if (r.ok) { html = await r.text(); break; }
+      } catch(e) { continue; }
+    }
   }
   if (!html) throw new Error('Nepodařilo se stáhnout stránku');
 
