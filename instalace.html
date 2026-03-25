@@ -355,14 +355,14 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 
     <!-- FILTRY -->
     <div class="ps-filters" id="ps-obor-filters">
-      <button class="ps-obor-btn active" onclick="filterObor('vse')">Vše</button>
-      <button class="ps-obor-btn" onclick="filterObor('Elektro')">⚡ Elektro</button>
-      <button class="ps-obor-btn" onclick="filterObor('SDK')">🧱 SDK</button>
-      <button class="ps-obor-btn" onclick="filterObor('Malíř')">🎨 Malíř</button>
-      <button class="ps-obor-btn" onclick="filterObor('Podlahy')">🪵 Podlahy</button>
-      <button class="ps-obor-btn" onclick="filterObor('Zedník')">🧱 Zedník</button>
-      <button class="ps-obor-btn" onclick="filterObor('Klima')">❄️ Klima</button>
-      <button class="ps-obor-btn" onclick="filterObor('Ostatní')">📦 Ostatní</button>
+      <button class="ps-obor-btn active" data-obor="vse" onclick="filterObor('vse')">Vše</button>
+      <button class="ps-obor-btn" data-obor="Elektro" onclick="filterObor('Elektro')">⚡ Elektro</button>
+      <button class="ps-obor-btn" data-obor="SDK" onclick="filterObor('SDK')">🧱 SDK</button>
+      <button class="ps-obor-btn" data-obor="Malíř" onclick="filterObor('Malíř')">🎨 Malíř</button>
+      <button class="ps-obor-btn" data-obor="Podlahy" onclick="filterObor('Podlahy')">🪵 Podlahy</button>
+      <button class="ps-obor-btn" data-obor="Zedník" onclick="filterObor('Zedník')">🧱 Zedník</button>
+      <button class="ps-obor-btn" data-obor="Klima" onclick="filterObor('Klima')">❄️ Klima</button>
+      <button class="ps-obor-btn" data-obor="Ostatní" onclick="filterObor('Ostatní')">📦 Ostatní</button>
     </div>
     <input type="text" class="ps-search" id="ps-search" placeholder="Hledat partnera..." oninput="renderPartners()">
 
@@ -381,11 +381,12 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
       <button class="ps-close" onclick="closePartnerModal()">✕</button>
     </div>
     <div class="pm-body">
-      <div class="pm-group full"><label>Název firmy / Jméno</label><input id="pf-firma" placeholder="např. ElektroServis Praha"></div>
+      <div class="pm-group" style="position:relative"><label>IČO</label><input id="pf-ico" placeholder="12345678" maxlength="8" style="padding-right:80px"><button type="button" onclick="lookupARES()" id="btn-ares" style="position:absolute;right:4px;top:24px;background:#032d44;color:#fff;border:none;border-radius:3px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.05em">NAČÍST</button><div id="ares-status" style="font-size:10px;color:#888;margin-top:2px;min-height:14px"></div></div>
+      <div class="pm-group"><label>Název firmy / Jméno</label><input id="pf-firma" placeholder="např. ElektroServis Praha"></div>
       <div class="pm-group"><label>Kontaktní osoba</label><input id="pf-osoba" placeholder="Jan Novák"></div>
-      <div class="pm-group"><label>IČO</label><input id="pf-ico" placeholder="12345678"></div>
-      <div class="pm-group"><label>Telefon</label><input id="pf-tel" placeholder="+420 ..."></div>
-      <div class="pm-group"><label>Email</label><input id="pf-email" placeholder="email@firma.cz"></div>
+      <div class="pm-group full"><label>Ulice a č.p.</label><input id="pf-ulice" placeholder="Nové sady 988/2"></div>
+      <div class="pm-group"><label>Město</label><input id="pf-mesto" placeholder="Brno"></div>
+      <div class="pm-group"><label>PSČ</label><input id="pf-psc" placeholder="602 00" maxlength="6"></div>
       <div class="pm-group"><label>Kraj</label>
         <select id="pf-kraj">
           <option value="">— vyberte —</option>
@@ -396,6 +397,8 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
           <option>Zlínský</option><option>Moravskoslezský</option>
         </select>
       </div>
+      <div class="pm-group"><label>Telefon</label><input id="pf-tel" placeholder="+420 ..."></div>
+      <div class="pm-group"><label>Email</label><input id="pf-email" placeholder="email@firma.cz"></div>
       <div class="pm-group"><label>Obor</label>
         <select id="pf-obor">
           <option>Elektro</option><option>SDK</option><option>Malíř</option>
@@ -682,7 +685,7 @@ function togglePartners(){
   const isOpen=sb.classList.contains('open');
   sb.classList.toggle('open');
   ov.classList.toggle('open');
-  if(!isOpen&&!partners.length) loadPartners();
+  if(!isOpen) loadPartners();
 }
 
 async function loadPartners(){
@@ -707,8 +710,8 @@ function filterRegion(region){
 function filterObor(obor){
   pFilterObor=obor;
   document.querySelectorAll('.ps-obor-btn').forEach(b=>{
-    const bObor=b.textContent.replace(/[⚡🧱🎨🪵❄️📦]\s?/g,'').trim();
-    b.classList.toggle('active', obor==='vse'?bObor==='Vše':bObor===obor);
+    const bObor=b.dataset.obor||'vse';
+    b.classList.toggle('active', obor===bObor);
   });
   renderPartners();
 }
@@ -718,7 +721,7 @@ function getFilteredPartners(){
   return partners.filter(p=>{
     if(pFilterRegion&&p.kraj!==pFilterRegion) return false;
     if(pFilterObor!=='vse'&&p.obor!==pFilterObor) return false;
-    if(q&&![p.firma,p.osoba,p.obor,p.kraj,p.pozn].join(' ').toLowerCase().includes(q)) return false;
+    if(q&&![p.firma,p.osoba,p.obor,p.kraj,p.mesto,p.ulice,p.ico,p.pozn].join(' ').toLowerCase().includes(q)) return false;
     return true;
   });
 }
@@ -739,7 +742,7 @@ function renderPartners(){
         <div class="ps-card-name">${esc(p.firma||'')}</div>
         <span class="ps-card-obor">${esc(p.obor||'')}</span>
       </div>
-      <div class="ps-card-region">📍 ${esc(p.kraj||'—')}${p.osoba?' · '+esc(p.osoba):''}</div>
+      <div class="ps-card-region">📍 ${p.ulice?esc(p.ulice)+', ':''}${p.mesto?esc(p.mesto)+', ':''}${esc(p.kraj||'—')}${p.psc?' '+esc(p.psc):''}${p.osoba?' · '+esc(p.osoba):''}</div>
       <div class="ps-card-contact">
         ${p.tel?'📞 <a href="tel:'+esc(p.tel)+'">'+esc(p.tel)+'</a>':''}
         ${p.email?' · ✉ <a href="mailto:'+esc(p.email)+'">'+esc(p.email)+'</a>':''}
@@ -770,15 +773,56 @@ function setRating(n){
   document.querySelectorAll('#pf-rating span').forEach((s,i)=>s.classList.toggle('filled',i<n));
 }
 
+// ARES lookup
+const ARES_KRAJ_MAP={'CZ010':'Praha','CZ020':'Středočeský','CZ031':'Jihočeský','CZ032':'Plzeňský','CZ041':'Karlovarský','CZ042':'Ústecký','CZ051':'Liberecký','CZ052':'Královéhradecký','CZ053':'Pardubický','CZ063':'Vysočina','CZ064':'Jihomoravský','CZ071':'Olomoucký','CZ072':'Zlínský','CZ080':'Moravskoslezský'};
+
+async function lookupARES(){
+  const ico=document.getElementById('pf-ico').value.trim();
+  const st=document.getElementById('ares-status');
+  if(!ico||ico.length!==8||!/^\d{8}$/.test(ico)){st.textContent='⚠ IČO musí mít 8 číslic';st.style.color='#c04040';return;}
+  st.textContent='⏳ Načítám z ARES...';st.style.color='#888';
+  document.getElementById('btn-ares').disabled=true;
+  try{
+    const r=await fetch('https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/'+ico);
+    if(!r.ok) throw new Error('Subjekt nenalezen');
+    const d=await r.json();
+    // Fill fields
+    if(d.obchodniJmeno) document.getElementById('pf-firma').value=d.obchodniJmeno;
+    const addr=d.sidlo||{};
+    if(addr.textovaAdresa){
+      const parts=addr.textovaAdresa.split(',').map(s=>s.trim());
+      if(parts.length>=2){
+        document.getElementById('pf-ulice').value=parts.slice(0,-1).join(', ');
+        const cityPsc=parts[parts.length-1];
+        const pscMatch=cityPsc.match(/(\d{3}\s?\d{2})\s+(.*)/);
+        if(pscMatch){document.getElementById('pf-psc').value=pscMatch[1];document.getElementById('pf-mesto').value=pscMatch[2];}
+        else document.getElementById('pf-mesto').value=cityPsc;
+      } else document.getElementById('pf-ulice').value=addr.textovaAdresa;
+    }
+    if(addr.kodKraje){
+      const krajCode='CZ0'+addr.kodKraje;
+      const krajName=Object.entries(ARES_KRAJ_MAP).find(([k])=>krajCode.startsWith(k.slice(0,4)));
+      if(krajName) document.getElementById('pf-kraj').value=krajName[1];
+    }
+    st.textContent='✓ Načteno z ARES';st.style.color='#40a050';
+  }catch(e){
+    st.textContent='✗ '+e.message;st.style.color='#c04040';
+  }finally{document.getElementById('btn-ares').disabled=false;}
+}
+
 function openPartnerModal(id){
   const p=id?partners.find(x=>x.id===String(id)):null;
   pEditId=p?String(p.id):null;
   document.getElementById('pm-title').textContent=p?'Upravit partnera':'Nový partner';
   document.getElementById('pm-delete').style.display=p?'inline-flex':'none';
+  document.getElementById('ares-status').textContent='';
   if(p){
     document.getElementById('pf-firma').value=p.firma||'';
     document.getElementById('pf-osoba').value=p.osoba||'';
     document.getElementById('pf-ico').value=p.ico||'';
+    document.getElementById('pf-ulice').value=p.ulice||'';
+    document.getElementById('pf-mesto').value=p.mesto||'';
+    document.getElementById('pf-psc').value=p.psc||'';
     document.getElementById('pf-tel').value=p.tel||'';
     document.getElementById('pf-email').value=p.email||'';
     document.getElementById('pf-kraj').value=p.kraj||'';
@@ -787,7 +831,7 @@ function openPartnerModal(id){
     document.getElementById('pf-pozn').value=p.pozn||'';
     setRating(p.hodnoceni||3);
   } else {
-    ['pf-firma','pf-osoba','pf-ico','pf-tel','pf-email','pf-cena','pf-pozn'].forEach(id=>document.getElementById(id).value='');
+    ['pf-firma','pf-osoba','pf-ico','pf-ulice','pf-mesto','pf-psc','pf-tel','pf-email','pf-cena','pf-pozn'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('pf-kraj').value=pFilterRegion||'';
     document.getElementById('pf-obor').value='Elektro';
     setRating(3);
@@ -807,6 +851,9 @@ async function savePartner(){
     firma: document.getElementById('pf-firma').value.trim(),
     osoba: document.getElementById('pf-osoba').value.trim(),
     ico:   document.getElementById('pf-ico').value.trim(),
+    ulice: document.getElementById('pf-ulice').value.trim(),
+    mesto: document.getElementById('pf-mesto').value.trim(),
+    psc:   document.getElementById('pf-psc').value.trim(),
     tel:   document.getElementById('pf-tel').value.trim(),
     email: document.getElementById('pf-email').value.trim(),
     kraj:  document.getElementById('pf-kraj').value,
