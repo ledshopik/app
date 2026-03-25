@@ -334,8 +334,10 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
 
 <script>
 if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
-const SCRIPT_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
-const COLS = ['id','obj','zakaznik','typ','narocnost','priorita','datum_zalozeni','deadline','technik','zadal','stav','tel_technik','tel_zadal','chat_id_hotovo','poznamka'];
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+const TABLE = 'vyroba';
 
 const STATUS_CLASS = {
   'Čeká na výrobu':                's-ceka',
@@ -374,27 +376,25 @@ function syncStatus(state,text){ document.getElementById('sync-dot').className=s
 async function loadData(){
   syncStatus('loading','Načítám data...');
   try {
-    const res=await fetch(SCRIPT_URL+'?modul=vyroba');
-    const json=await res.json();
-    data=json.data||[];
+    const res=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?select=*',{headers:SB_HEADERS});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    data=await res.json();
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderTable();
   } catch(e){ syncStatus('error','Chyba: '+e.message); }
 }
 
-async function apiPost(payload){
-  console.log('apiPost called',JSON.stringify(payload));
-  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({...payload,modul:'vyroba'}),redirect:'follow',headers:{'Content-Type':'text/plain'}});
-  const text=await res.text();
-  console.log('apiPost response status:',res.status,'body:',text.substring(0,500));
-  let json;
-  try { json=JSON.parse(text); } catch(e) {
-    const m=text.match(/\{[\s\S]*\}/);
-    if(m) try { json=JSON.parse(m[0]); } catch(e2){}
-    if(!json) throw new Error('Neplatná odpověď serveru: '+text.substring(0,200));
-  }
-  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
-  return json;
+async function sbInsert(rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE,{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbUpdate(id,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?id=eq.'+id,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbDelete(id){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?id=eq.'+id,{method:'DELETE',headers:SB_HEADERS});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
 }
 
 function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderTable(); }
@@ -544,7 +544,7 @@ async function saveRecord(){
   closeModal();
   showSaving(isEdit?'Ukládám změny...':'Přidávám zakázku...','Ukládám data');
   try {
-    await apiPost({action:isEdit?'update':'append',modul:'vyroba',record:rec});
+    if(isEdit) await sbUpdate(currentId,rec); else await sbInsert(rec);
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
@@ -555,7 +555,7 @@ async function deleteRecord(){
   const id=editId; closeModal();
   showSaving('Mažu...','');
   try {
-    await apiPost({action:'delete',modul:'vyroba',id:String(id)});
+    await sbDelete(String(id));
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
