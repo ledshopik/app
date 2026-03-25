@@ -73,7 +73,7 @@ button, input, select { font-family: inherit; }
 #btn-refresh-all { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
 #btn-refresh-all:hover { color: #1a1a1a; }
 
-#main { max-width: 1100px; margin: 0 auto; padding: 24px 32px; }
+#main { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
 
 /* Module cards */
 .modules-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-bottom: 2px; }
@@ -105,14 +105,17 @@ button, input, select { font-family: inherit; }
 .mod-stat-row .val { font-size: 13px; font-weight: 700; }
 .mod-footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid #ddd; font-size: 10px; letter-spacing: .1em; }
 
+/* Dashboard main 3-col */
+.dashboard-main { display: grid; grid-template-columns: 280px 1fr 300px; gap: 2px; }
+.dash-left, .dash-right { display: flex; flex-direction: column; gap: 2px; }
+
 /* Bottom panels */
-.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
 .panel { background: #fff; padding: 20px; }
 .panel-title { font-size: 9px; letter-spacing: .2em; color: #888; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .panel-title-line { height: 2px; width: 16px; border-radius: 1px; }
 
 /* Calendar */
-.cal-wrap { margin-bottom: 2px; margin-top: 6px; }
+.cal-wrap { }
 .cal-header-row { background: #fff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
 .cal-header-row .cal-title { font-size: 9px; letter-spacing: .2em; color: #888; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
 .cal-nav { display: flex; align-items: center; gap: 8px; }
@@ -165,11 +168,27 @@ button, input, select { font-family: inherit; }
 .task-text { font-size: 12px; flex: 1; }
 .task-tag { font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
 
+/* Task 2.0 styles */
+.task-filter-btn { background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:4px;padding:2px 8px;font-size:9px;font-weight:700;cursor:pointer; }
+.task-filter-btn.active { background:#6080c0;color:#fff;border-color:#6080c0; }
+.task-type-tag { font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700;letter-spacing:.05em; }
+.task-type-rychly { background:#e0f4e0;color:#2a6a2a; }
+.task-type-ticket { background:#ece0f8;color:#6a3a9a; }
+.task-type-upominka { background:#fef0d8;color:#8a6a10; }
+.task-priority-vysoka { border-left:3px solid #e05050; }
+.task-assigned { border-left:3px solid #6080c0; }
+.task-overdue { color:#c04040; }
+
+/* Form groups */
+.fg { display:flex;flex-direction:column;gap:4px; }
+.fg label { font-size:10px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase; }
+.fg input, .fg select, .fg textarea { background:#fff;border:1px solid #ddd;border-radius:4px;color:#1a1a1a;padding:6px 10px;font-size:12px;outline:none;font-family:inherit; }
+
 @media (max-width: 768px) {
   #main { padding: 16px; }
   .modules-grid { grid-template-columns: repeat(2,1fr); }
   .tools-row { grid-template-columns: 1fr; }
-  .bottom-grid { grid-template-columns: 1fr; }
+  .dashboard-main { grid-template-columns: 1fr; }
   #header { padding: 14px 16px; }
   #user-bar { padding: 8px 16px; }
 }
@@ -334,57 +353,20 @@ button, input, select { font-family: inherit; }
     </a>
   </div>
 
-  <!-- Calendar -->
-  <div class="cal-wrap">
-    <div class="cal-header-row">
-      <div class="cal-title">
-        <div style="width:16px;height:2px;background:#e2b830;border-radius:1px;"></div>
-        Kalendář
-      </div>
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fdf4d8;"></div>Instalace</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f4e8;"></div>Obhlídka</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f8e0;"></div>Dovolená</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fff0e0;"></div>Výroba</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#f8f4e0;"></div>Zásobování</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fce8e8;"></div>Neschopenka</div>
+  <!-- Dashboard 3-column layout -->
+  <div class="dashboard-main">
+    <!-- Left: Schedule + Alerts -->
+    <div class="dash-left">
+      <div class="panel">
+        <div class="panel-title">
+          <div class="panel-title-line" style="background:#e2b830;"></div>
+          Dnešní program
         </div>
-        <div class="cal-nav">
-          <button onclick="calNav(-1)">&#8592;</button>
-          <div class="cal-month" id="cal-month-label"></div>
-          <button onclick="calNav(1)">&#8594;</button>
-          <button id="btn-cal-today" onclick="calToday()">Dnes</button>
+        <div id="schedule-list">
+          <div style="font-size:12px;color:#888;">Načítám...</div>
         </div>
       </div>
-    </div>
-    <div class="cal-grid-wrap">
-      <div class="cal-weekdays">
-        <div class="cal-wd">Po</div><div class="cal-wd">Út</div><div class="cal-wd">St</div>
-        <div class="cal-wd">Čt</div><div class="cal-wd">Pá</div>
-        <div class="cal-wd" style="color:#c05050;">So</div>
-        <div class="cal-wd" style="color:#c05050;">Ne</div>
-      </div>
-      <div class="cal-days" id="cal-days"></div>
-    </div>
-  </div>
-
-  <!-- Bottom row -->
-  <div class="bottom-grid">
-    <!-- Schedule -->
-    <div class="panel">
-      <div class="panel-title">
-        <div class="panel-title-line" style="background:#e2b830;"></div>
-        Dnešní program
-      </div>
-      <div id="schedule-list">
-        <div style="font-size:12px;color:#888;">Načítám...</div>
-      </div>
-    </div>
-
-    <!-- Alerts + Tasks -->
-    <div style="display:flex;flex-direction:column;gap:2px;">
-      <div class="panel" style="flex:1;">
+      <div class="panel">
         <div class="panel-title">
           <div class="panel-title-line" style="background:#e05050;"></div>
           Upozornění
@@ -393,15 +375,113 @@ button, input, select { font-family: inherit; }
           <div style="font-size:12px;color:#888;">Načítám...</div>
         </div>
       </div>
+    </div>
+
+    <!-- Center: Calendar -->
+    <div class="dash-center">
+      <div class="cal-wrap">
+        <div class="cal-header-row">
+          <div class="cal-title">
+            <div style="width:16px;height:2px;background:#e2b830;border-radius:1px;"></div>
+            Kalendář
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fdf4d8;"></div>Instalace</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f4e8;"></div>Obhlídka</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f8e0;"></div>Dovolená</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fff0e0;"></div>Výroba</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#f8f4e0;"></div>Zásobování</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fce8e8;"></div>Neschopenka</div>
+            </div>
+            <div class="cal-nav">
+              <button onclick="calNav(-1)">&#8592;</button>
+              <div class="cal-month" id="cal-month-label"></div>
+              <button onclick="calNav(1)">&#8594;</button>
+              <button id="btn-cal-today" onclick="calToday()">Dnes</button>
+            </div>
+          </div>
+        </div>
+        <div class="cal-grid-wrap">
+          <div class="cal-weekdays">
+            <div class="cal-wd">Po</div><div class="cal-wd">Út</div><div class="cal-wd">St</div>
+            <div class="cal-wd">Čt</div><div class="cal-wd">Pá</div>
+            <div class="cal-wd" style="color:#c05050;">So</div>
+            <div class="cal-wd" style="color:#c05050;">Ne</div>
+          </div>
+          <div class="cal-days" id="cal-days"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Tasks 2.0 -->
+    <div class="dash-right">
       <div class="panel" style="flex:1;">
         <div class="panel-title">
           <div class="panel-title-line" style="background:#6080c0;"></div>
-          Úkoly
+          Moje úkoly
+          <div style="margin-left:auto;display:flex;gap:4px;">
+            <button class="task-filter-btn active" data-f="aktivni" onclick="filterTasks('aktivni')">Aktivní</button>
+            <button class="task-filter-btn" data-f="hotovo" onclick="filterTasks('hotovo')">Hotové</button>
+            <button class="task-filter-btn" data-f="vse" onclick="filterTasks('vse')">Vše</button>
+          </div>
         </div>
         <div id="tasks-list"></div>
-        <div style="margin-top:10px;">
-          <input type="text" id="new-task-input" placeholder="Přidat úkol..." style="background:#fff;border:1px solid #ddd;border-radius:4px;color:#1a1a1a;padding:6px 10px;font-size:12px;width:100%;outline:none;">
+        <div style="margin-top:10px;display:flex;gap:6px;">
+          <input type="text" id="new-task-input" placeholder="Nový úkol..." style="background:#fff;border:1px solid #ddd;border-radius:4px;color:#1a1a1a;padding:6px 10px;font-size:12px;flex:1;outline:none;">
+          <button onclick="openTaskModal()" style="background:#6080c0;color:#fff;border:none;border-radius:4px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;" title="Podrobný úkol">+</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Modal -->
+  <div id="task-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeTaskModal()">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:10px;width:100%;max-width:480px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;">
+      <div style="padding:16px 20px;border-bottom:1px solid #e8e4dc;display:flex;align-items:center;justify-content:space-between;">
+        <div id="tm-title" style="font-size:15px;font-weight:800;">Nový úkol</div>
+        <button onclick="closeTaskModal()" style="background:none;border:none;color:#888;font-size:18px;cursor:pointer;">✕</button>
+      </div>
+      <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow-y:auto;flex:1;">
+        <input type="hidden" id="tm-id">
+        <div style="grid-column:1/-1;" class="fg"><label>Text úkolu</label><input id="tm-text" placeholder="Co je potřeba udělat..."></div>
+        <div class="fg"><label>Typ</label>
+          <select id="tm-typ">
+            <option value="rychly">Rychlý úkol</option>
+            <option value="ticket">Ticket (dlouhodobý)</option>
+            <option value="upominka">Upomínka</option>
+          </select>
+        </div>
+        <div class="fg"><label>Priorita</label>
+          <select id="tm-priorita">
+            <option value="nizka">Nízká</option>
+            <option value="normalni" selected>Normální</option>
+            <option value="vysoka">Vysoká ⚠</option>
+          </select>
+        </div>
+        <div class="fg"><label>Přiřazeno komu</label>
+          <select id="tm-prirazeno">
+            <option value="Ondra">Ondra</option><option value="David">David</option><option value="Michal">Michal</option>
+            <option value="Erik">Erik</option><option value="Lukáš">Lukáš</option><option value="Mário">Mário</option>
+            <option value="Tom">Tom</option><option value="Kuba">Kuba</option><option value="Petr">Petr</option>
+            <option value="Miriam">Miriam</option><option value="Filip">Filip</option><option value="Eve">Eve</option>
+          </select>
+        </div>
+        <div class="fg"><label>Stav</label>
+          <select id="tm-stav">
+            <option value="aktivni">Aktivní</option>
+            <option value="hotovo">Hotovo</option>
+            <option value="zruseno">Zrušeno</option>
+          </select>
+        </div>
+        <div class="fg"><label>Termín</label><input type="date" id="tm-termin"></div>
+        <div class="fg"><label>Upomínka</label><input type="datetime-local" id="tm-upominka"></div>
+        <div style="grid-column:1/-1;" class="fg"><label>Poznámka</label><input id="tm-poznamka" placeholder="Volitelná poznámka..."></div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid #e8e4dc;display:flex;gap:10px;justify-content:flex-end;align-items:center;">
+        <button id="tm-delete-btn" onclick="deleteTaskById(document.getElementById('tm-id').value)" style="display:none;margin-right:auto;background:none;color:#c05050;border:1px solid #f0c8c8;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;">🗑 Smazat</button>
+        <button onclick="closeTaskModal()" style="background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;">Zrušit</button>
+        <button onclick="saveTask()" style="background:#6080c0;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:12px;font-weight:700;cursor:pointer;">Uložit</button>
       </div>
     </div>
   </div>
@@ -419,7 +499,7 @@ const MONTHS_CS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červe
 const today = new Date();
 let calYear = today.getFullYear(), calMonth = today.getMonth();
 let dataInst=[], dataObh=[], dataRek=[], dataRekDod=[], dataDoch=[], dataVyr=[], dataZas=[], currentUser='vse';
-let tasks = JSON.parse(localStorage.getItem('dashboard_tasks')||'[]');
+let dataUkoly = [];
 
 // ── Header datum ──────────────────────────────────────────────────────────────
 function initHeader(){
@@ -448,7 +528,7 @@ function syncStatus(state,text){
 async function loadAll(){
   syncStatus('loading','Načítám...');
   try {
-    const [rInst, rObh, rRek, rRekDod, rDoch, rVyr, rZas] = await Promise.all([
+    const [rInst, rObh, rRek, rRekDod, rDoch, rVyr, rZas, rUkoly] = await Promise.all([
       fetch(SCRIPT_INSTALACE+'?modul=instalace').then(r=>r.json()),
       fetch(SCRIPT_INSTALACE+'?modul=obhlidky').then(r=>r.json()),
       fetch(SCRIPT_REKLAMACE+'?modul=reklamace').then(r=>r.json()),
@@ -456,6 +536,7 @@ async function loadAll(){
       fetch(SCRIPT_INSTALACE+'?modul=dochazka').then(r=>r.json()),
       fetch(SCRIPT_VYROBA+'?modul=vyroba').then(r=>r.json()),
       fetch(SCRIPT_ZASOBOVANI+'?modul=zasilky').then(r=>r.json()),
+      fetch(SCRIPT_INSTALACE+'?modul=ukoly').then(r=>r.json()).catch(()=>({data:[]})),
     ]);
     dataInst = rInst.data||[];
     dataObh  = rObh.data||[];
@@ -464,6 +545,7 @@ async function loadAll(){
     dataDoch = rDoch.data||[];
     dataVyr  = rVyr.data||[];
     dataZas  = rZas.data||[];
+    dataUkoly = rUkoly.data||[];
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderAll();
   } catch(e){
@@ -686,30 +768,176 @@ function renderAlerts(){
     </div>`).join('');
 }
 
-// ── Tasks ─────────────────────────────────────────────────────────────────────
-function saveTasks(){ localStorage.setItem('dashboard_tasks',JSON.stringify(tasks)); }
+// ── apiPost ───────────────────────────────────────────────────────────────────
+async function apiPost(payload){
+  const res=await fetch(SCRIPT_INSTALACE,{method:'POST',body:JSON.stringify(payload)});
+  const json=await res.json();
+  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+}
+
+// ── Tasks 2.0 ─────────────────────────────────────────────────────────────────
+let taskFilter = 'aktivni';
+
+function filterTasks(f){
+  taskFilter = f;
+  document.querySelectorAll('.task-filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.f===f));
+  renderTasks();
+}
 
 function renderTasks(){
   const el=document.getElementById('tasks-list');
-  if(!tasks.length){ el.innerHTML='<div style="font-size:12px;color:#888;padding:4px 0;">Žádné úkoly</div>'; return; }
-  el.innerHTML=tasks.map((t,i)=>`
-    <div class="task-item${t.done?' done':''}" onclick="toggleTask(${i})">
-      <div class="task-cb">${t.done?'✓':''}</div>
-      <div class="task-text">${t.text}</div>
-      <div onclick="event.stopPropagation();deleteTask(${i})" style="font-size:11px;color:#888;cursor:pointer;padding:2px 6px;">✕</div>
-    </div>`).join('');
+  const user = currentUser==='vse' ? (localStorage.getItem('ledshopik_user')||'') : currentUser;
+
+  let filtered = dataUkoly.filter(t => {
+    if(t.prirazeno_komu !== user && t.uzivatel !== user) return false;
+    if(taskFilter==='aktivni') return t.stav==='aktivni';
+    if(taskFilter==='hotovo') return t.stav==='hotovo';
+    return true;
+  });
+
+  // Sort: overdue first, then by priority, then by date
+  const priOrder = {vysoka:0, normalni:1, nizka:2};
+  filtered.sort((a,b) => {
+    if(a.stav!==b.stav) return a.stav==='aktivni'?-1:1;
+    return (priOrder[a.priorita]||1) - (priOrder[b.priorita]||1);
+  });
+
+  if(!filtered.length){
+    el.innerHTML='<div style="font-size:12px;color:#888;padding:8px 0;">Žádné úkoly</div>';
+    return;
+  }
+
+  el.innerHTML = filtered.map(t => {
+    const isDone = t.stav==='hotovo';
+    const isAssigned = t.prirazeno_komu === user && t.uzivatel !== user;
+    const isPriHigh = t.priorita==='vysoka';
+    const typeCls = 'task-type-'+t.typ;
+    const typeLabels = {rychly:'Úkol',ticket:'Ticket',upominka:'Upomínka'};
+
+    // Termin
+    let terminHtml = '';
+    if(t.termin && !isDone){
+      const d = new Date(t.termin+'T00:00:00');
+      const diff = Math.round((d - new Date(new Date().toDateString()))/(1000*60*60*24));
+      if(diff<0) terminHtml = '<span class="task-overdue">⚠ po termínu</span>';
+      else if(diff===0) terminHtml = '<span style="color:#e08030;font-size:10px;font-weight:700;">DNES!</span>';
+      else if(diff<=3) terminHtml = '<span style="color:#e08030;font-size:10px;">za '+diff+' dn'+(diff===1?'í':'í')+'</span>';
+      else terminHtml = '<span style="color:#888;font-size:10px;">'+t.termin.split('-').reverse().join('.')+'</span>';
+    }
+
+    return '<div class="task-item'+(isDone?' done':'')+(isPriHigh?' task-priority-vysoka':'')+(isAssigned?' task-assigned':'')+'" onclick="openTaskModal(\''+t.id+'\')">'
+      +'<div class="task-cb" onclick="event.stopPropagation();toggleTaskDone(\''+t.id+'\')">'+(isDone?'✓':'')+'</div>'
+      +'<div style="flex:1;min-width:0;">'
+        +'<div class="task-text">'+(t.text||'')+'</div>'
+        +'<div style="display:flex;gap:4px;align-items:center;margin-top:2px;flex-wrap:wrap;">'
+          +'<span class="task-type-tag '+typeCls+'">'+typeLabels[t.typ||'rychly']+'</span>'
+          +(isAssigned?'<span style="font-size:9px;color:#6080c0;">od '+t.uzivatel+'</span>':'')
+          +terminHtml
+        +'</div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
 }
 
-function toggleTask(i){ tasks[i].done=!tasks[i].done; saveTasks(); renderTasks(); }
-function deleteTask(i){ tasks.splice(i,1); saveTasks(); renderTasks(); }
+async function toggleTaskDone(id){
+  const t = dataUkoly.find(x=>x.id===id);
+  if(!t) return;
+  t.stav = t.stav==='hotovo'?'aktivni':'hotovo';
+  renderTasks();
+  try { await apiPost({action:'update',modul:'ukoly',record:{id:t.id,stav:t.stav}}); } catch(e){}
+}
+
+async function quickAddTask(){
+  const inp = document.getElementById('new-task-input');
+  const text = inp.value.trim();
+  if(!text) return;
+  const user = localStorage.getItem('ledshopik_user')||'';
+  const rec = {
+    id: String(Date.now()),
+    uzivatel: user,
+    prirazeno_komu: user,
+    text: text,
+    typ: 'rychly',
+    priorita: 'normalni',
+    termin: '',
+    upominka: '',
+    stav: 'aktivni',
+    poznamka: ''
+  };
+  dataUkoly.push(rec);
+  renderTasks();
+  inp.value = '';
+  try { await apiPost({action:'append',modul:'ukoly',record:rec}); } catch(e){ alert('Chyba: '+e.message); }
+}
+
+async function deleteTaskById(id){
+  if(!confirm('Smazat úkol?')) return;
+  dataUkoly = dataUkoly.filter(t=>t.id!==id);
+  renderTasks();
+  closeTaskModal();
+  try { await apiPost({action:'delete',modul:'ukoly',id:id}); } catch(e){}
+}
+
+async function saveTask(){
+  const id = document.getElementById('tm-id').value;
+  const isEdit = !!id && dataUkoly.some(t=>t.id===id);
+  const user = localStorage.getItem('ledshopik_user')||'';
+
+  const rec = {
+    id: isEdit ? id : String(Date.now()),
+    uzivatel: isEdit ? (dataUkoly.find(t=>t.id===id)||{}).uzivatel || user : user,
+    prirazeno_komu: document.getElementById('tm-prirazeno').value || user,
+    text: document.getElementById('tm-text').value.trim(),
+    typ: document.getElementById('tm-typ').value,
+    priorita: document.getElementById('tm-priorita').value,
+    termin: document.getElementById('tm-termin').value || '',
+    upominka: document.getElementById('tm-upominka').value || '',
+    stav: document.getElementById('tm-stav').value,
+    poznamka: document.getElementById('tm-poznamka').value.trim()
+  };
+
+  if(!rec.text){ alert('Vyplň text úkolu'); return; }
+
+  if(isEdit){
+    const idx = dataUkoly.findIndex(t=>t.id===id);
+    if(idx>=0) dataUkoly[idx] = rec;
+  } else {
+    dataUkoly.push(rec);
+  }
+
+  renderTasks();
+  closeTaskModal();
+
+  try {
+    await apiPost({action: isEdit?'update':'append', modul:'ukoly', record:rec});
+  } catch(e){ alert('Chyba: '+e.message); }
+}
+
+function openTaskModal(id){
+  const t = id ? dataUkoly.find(x=>x.id===id) : null;
+  const user = localStorage.getItem('ledshopik_user')||'';
+  document.getElementById('tm-title').textContent = t ? 'Upravit úkol' : 'Nový úkol';
+  document.getElementById('tm-delete-btn').style.display = t ? 'inline-flex' : 'none';
+  document.getElementById('tm-id').value = t ? t.id : '';
+  document.getElementById('tm-text').value = t ? t.text : '';
+  document.getElementById('tm-typ').value = t ? t.typ : 'rychly';
+  document.getElementById('tm-priorita').value = t ? t.priorita : 'normalni';
+  document.getElementById('tm-prirazeno').value = t ? t.prirazeno_komu : user;
+  document.getElementById('tm-stav').value = t ? t.stav : 'aktivni';
+  document.getElementById('tm-termin').value = t ? t.termin : '';
+  document.getElementById('tm-upominka').value = t ? t.upominka : '';
+  document.getElementById('tm-poznamka').value = t ? t.poznamka : '';
+  document.getElementById('task-modal-overlay').style.display = 'flex';
+}
+
+function closeTaskModal(){
+  document.getElementById('task-modal-overlay').style.display = 'none';
+}
 
 document.addEventListener('DOMContentLoaded',()=>{
   const inp=document.getElementById('new-task-input');
   inp.addEventListener('keydown',e=>{
-    if(e.key==='Enter'&&inp.value.trim()){
-      tasks.push({text:inp.value.trim(),done:false});
-      saveTasks(); renderTasks(); inp.value='';
-    }
+    if(e.key==='Enter') quickAddTask();
   });
   const savedUser=localStorage.getItem('dashboard_user')||'vse';
   document.getElementById('user-select').value=savedUser;
