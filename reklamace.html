@@ -129,6 +129,11 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
   <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#c8a830'" onmouseout="this.style.color='#555'">Zásobování</a>
   <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#555'">Lumibook</a></div>
 
+<div id="team-bar" style="background:#fff;border-bottom:1px solid #e8e4dc;padding:6px 32px;display:flex;align-items:center;justify-content:center;gap:4px;">
+</div>
+<style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
+<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];const _SBK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':_SBK,'Authorization':'Bearer '+_SBK}}).then(r=>r.json()).then(d=>{const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})()</script>
+
 <div id="header">
   <div class="header-left">
     <div class="eyebrow">LEDshopik · Zákaznický servis</div>
@@ -232,13 +237,16 @@ tbody tr[data-stav="Zamítnuto"]               td:first-child { border-left: 3px
 <div id="saving-overlay">
   <div id="saving-box">
     <div class="saving-title" id="saving-title">Ukládám...</div>
-    <div class="saving-sub"   id="saving-sub">Komunikuji s Google Sheets</div>
+    <div class="saving-sub"   id="saving-sub">Ukládám data</div>
   </div>
 </div>
 
 <script>
 // ── Konfigurace ──────────────────────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1CrDyJardzxDfKV0Bog2DznHIOPmOAL8tI6TgnWDKiWPTdH-kanpx0ZTeJi17WnDhOA/exec';
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+const TABLE = 'reklamace';
 
 const COLS = ['id','obj','zakaznik','typ','popis','priorita','technik','datum_nahlaseni','datum_deadline','stav','zpusob'];
 
@@ -286,18 +294,25 @@ function syncStatus(state,text){ document.getElementById('sync-dot').className=s
 async function loadData(){
   syncStatus('loading','Načítám data...');
   try {
-    const res=await fetch(SCRIPT_URL);
-    const json=await res.json();
-    data=json.data||[];
+    const res=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?select=*',{headers:SB_HEADERS});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    data=await res.json();
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderTable();
   } catch(e){ syncStatus('error','Chyba: '+e.message); }
 }
 
-async function apiPost(payload){
-  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});
-  const json=await res.json();
-  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+async function sbInsert(rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE,{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbUpdate(id,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?id=eq.'+id,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbDelete(id){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?id=eq.'+id,{method:'DELETE',headers:SB_HEADERS});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
 }
 
 // ── Filter & sort ─────────────────────────────────────────────────────────────
@@ -409,9 +424,9 @@ async function saveRecord(){
     notifikovat:      document.getElementById('f-notifikovat').checked ? 'ano' : 'ne',
   };
   closeModal();
-  showSaving(isEdit?'Ukládám změny...':'Přidávám reklamaci...','Komunikuji s Google Sheets');
+  showSaving(isEdit?'Ukládám změny...':'Přidávám reklamaci...','Ukládám data');
   try {
-    await apiPost({action:isEdit?'update':'append',record:rec});
+    if(isEdit) await sbUpdate(editId,rec); else await sbInsert(rec);
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při ukládání: '+e.message); }
@@ -420,9 +435,9 @@ async function saveRecord(){
 async function deleteRecord(){
   if(!editId||!confirm('Opravdu smazat tuto reklamaci?')) return;
   const id=editId; closeModal();
-  showSaving('Mažu záznam...','Komunikuji s Google Sheets');
+  showSaving('Mažu záznam...','Ukládám data');
   try {
-    await apiPost({action:'delete',id:String(id)});
+    await sbDelete(id);
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při mazání: '+e.message); }
@@ -430,6 +445,27 @@ async function deleteRecord(){
 
 loadData();
 setInterval(loadData,120000);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+  const sb = supabase.createClient(
+    'https://fqxtlmppfyzsyaxbhbzh.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'
+  );
+  sb.channel('realtime-reklamace')
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'reklamace'}, () => {
+      console.log('Realtime: reklamace changed, reloading...');
+      if(typeof loadData === 'function') loadData();
+    })
+    .subscribe();
+  sb.channel('realtime-reklamace_dodavatel')
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'reklamace_dodavatel'}, () => {
+      console.log('Realtime: reklamace_dodavatel changed, reloading...');
+      if(typeof loadData === 'function') loadData();
+    })
+    .subscribe();
+})();
 </script>
 </body>
 </html>
