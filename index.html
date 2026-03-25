@@ -181,9 +181,9 @@ button, input, select { font-family: inherit; }
 }
 .task-item:hover { transform: translateX(2px); filter: brightness(.97); }
 .task-item:last-child { margin-bottom: 0; }
-.task-item.typ-rychly { background: #edf8ed; border-left-color: #40a050; }
-.task-item.typ-ticket { background: #f0ecf8; border-left-color: #7050b0; }
-.task-item.typ-upominka { background: #fef6e8; border-left-color: #e2b830; }
+.task-item.typ-rychly { background: #fafaf6; }
+.task-item.typ-ticket { background: #fafaf6; }
+.task-item.typ-upominka { background: #fafaf6; }
 .task-cb {
   width: 20px; height: 20px; border: 2px solid #ccc; border-radius: 50%;
   flex-shrink: 0; display: flex; align-items: center; justify-content: center;
@@ -213,6 +213,8 @@ button, input, select { font-family: inherit; }
 .task-type-upominka { background:#fef0d8;color:#8a6a10; }
 .task-priority-dot { display: none; }
 .task-item.pri-vysoka { border-left-color: #e05050 !important; }
+.task-item.pri-normalni { border-left-color: #e2b830 !important; }
+.task-item.pri-nizka { border-left-color: #6080c0 !important; }
 .task-overdue { color:#c04040; font-weight:700; }
 .task-due-badge {
   font-size: 9px; color: #888; background: #f0ece4; padding: 1px 6px;
@@ -455,9 +457,6 @@ button, input, select { font-family: inherit; }
     </a>
   </div>
 
-  <!-- Weekly overview -->
-  <div id="week-grid-wrap" class="week-grid-wrap" style="display:none;"></div>
-
   <!-- Dashboard 3-column layout -->
   <div class="dashboard-main">
     <!-- Left: Schedule + Alerts -->
@@ -668,7 +667,7 @@ function renderAll(){
   renderAlerts();
   renderTasks();
   renderTeamBar();
-  renderWeeklyOverview();
+  //renderWeeklyOverview();
   renderTimeline();
 }
 
