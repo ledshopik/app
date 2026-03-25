@@ -902,7 +902,10 @@ async function importFromEshop() {
           if (ld['@type'] === 'Product') {
             p.name = ld.name || '';
             p.note = ld.description || '';
-            p.image = ld.image || '';
+            var ldImg = ld.image || '';
+            if (Array.isArray(ldImg)) ldImg = ldImg[0] || '';
+            if (typeof ldImg === 'object' && ldImg.url) ldImg = ldImg.url;
+            p.image = ldImg;
             if (ld.offers) p.price = parseFloat(ld.offers.price) || 0;
             if (ld.sku) p.note = (p.note ? p.note + ' | ' : '') + 'SKU: ' + ld.sku;
             foundProduct = true;
@@ -926,9 +929,13 @@ async function importFromEshop() {
       const metaDesc = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
       if (metaDesc) p.note = metaDesc[1];
     }
-    // Fallback image: eshop-specific patterns
+    // Fallback image: eshop-specific patterns (Shoptet maxi first, then any fotky)
     if (!p.image) {
-      const imgPat = html.match(/["'](https?:\/\/[^"']*\/fotky\/[^"']*\.(?:jpg|png|webp)[^"']*)["']/i);
+      const maxiMatch = html.match(/["'](https?:\/\/[^"']*\/fotky\/maxi\/[^"']*\.(?:jpg|png|webp))[^"']*["']/i);
+      if (maxiMatch) p.image = maxiMatch[1];
+    }
+    if (!p.image) {
+      const imgPat = html.match(/["'](https?:\/\/[^"']*\/fotky\/[^"']*\.(?:jpg|png|webp))[^"']*["']/i);
       if (imgPat) p.image = imgPat[1];
     }
     // Fix relative image URLs
@@ -948,10 +955,10 @@ async function importFromEshop() {
     const lmMatch = bodyText.match(/(\d+(?:[.,]\d+)?)\s*lm\s*(?:\/\s*m|na\s*metr)/i) || bodyText.match(/(\d+(?:[.,]\d+)?)\s*lm/i);
     if (lmMatch) p.lumen = parseFloat(lmMatch[1].replace(',','.'));
 
-    // CCT
-    const cctMatch = bodyText.match(/(\d{4,5})\s*K/g);
-    if (cctMatch) p.cct = cctMatch.map(m => m.trim()).join(', ');
-    if (!p.cct) { const cctRange = bodyText.match(/(\d{4})\s*-\s*(\d{4,5})\s*K/); if (cctRange) p.cct = cctRange[1] + '-' + cctRange[2] + 'K'; }
+    // CCT — deduplicate
+    const cctRange = bodyText.match(/(\d{4})\s*[-–]\s*(\d{4,5})\s*K/);
+    if (cctRange) { p.cct = cctRange[1] + '-' + cctRange[2] + 'K'; }
+    else { const cctAll = bodyText.match(/(\d{4,5})\s*K/g); if (cctAll) { const unique = [...new Set(cctAll.map(m => m.trim()))]; p.cct = unique.join(', '); } }
 
     // CRI
     const criMatch = bodyText.match(/CRI[:\s>]*(\d+)/i) || bodyText.match(/Ra[:\s>]*(\d+)/i);
