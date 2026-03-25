@@ -176,11 +176,14 @@ button, input, select { font-family: inherit; }
 /* Tasks */
 .task-item {
   display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-  margin-bottom: 6px; background: #fafaf6; border-radius: 8px;
+  margin-bottom: 6px; border-radius: 0 8px 8px 0; border-left: 3px solid #ccc;
   cursor: pointer; transition: all .15s; position: relative;
 }
-.task-item:hover { background: #f4f2ed; transform: translateX(2px); }
+.task-item:hover { transform: translateX(2px); filter: brightness(.97); }
 .task-item:last-child { margin-bottom: 0; }
+.task-item.typ-rychly { background: #edf8ed; border-left-color: #40a050; }
+.task-item.typ-ticket { background: #f0ecf8; border-left-color: #7050b0; }
+.task-item.typ-upominka { background: #fef6e8; border-left-color: #e2b830; }
 .task-cb {
   width: 20px; height: 20px; border: 2px solid #ccc; border-radius: 50%;
   flex-shrink: 0; display: flex; align-items: center; justify-content: center;
@@ -208,14 +211,8 @@ button, input, select { font-family: inherit; }
 .task-type-rychly { background:#e0f4e0;color:#2a6a2a; }
 .task-type-ticket { background:#ece0f8;color:#6a3a9a; }
 .task-type-upominka { background:#fef0d8;color:#8a6a10; }
-.task-priority-dot {
-  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-}
-.task-priority-dot.pri-vysoka { background: #e05050; }
-.task-priority-dot.pri-normalni { background: #e2b830; }
-.task-priority-dot.pri-nizka { background: #ccc; }
-.task-item.task-priority-vysoka { border-left: none; }
-.task-assigned { border-left: none; }
+.task-priority-dot { display: none; }
+.task-item.pri-vysoka { border-left-color: #e05050 !important; }
 .task-overdue { color:#c04040; font-weight:700; }
 .task-due-badge {
   font-size: 9px; color: #888; background: #f0ece4; padding: 1px 6px;
@@ -947,8 +944,7 @@ function renderTasks(){
       else terminHtml = '<span class="task-due-badge">'+t.termin.split('-').reverse().join('.')+'</span>';
     }
 
-    return '<div class="task-item'+(isDone?' done':'')+'" onclick="openTaskModal(\''+t.id+'\')">'
-      +'<div class="task-priority-dot pri-'+pri+'"></div>'
+    return '<div class="task-item'+(isDone?' done':'')+' typ-'+(t.typ||'rychly')+' pri-'+pri+'" onclick="openTaskModal(\''+t.id+'\')">'
       +'<div class="task-cb" onclick="event.stopPropagation();toggleTaskDone(\''+t.id+'\')">'+(isDone?'✓':'')+'</div>'
       +'<div style="flex:1;min-width:0;">'
         +'<div class="task-text">'+(t.text||'')+'</div>'
