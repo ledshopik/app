@@ -995,14 +995,25 @@ async function loadWeather(){
   try {
     const cacheKey = 'ledshopik_weather';
     const cacheTimeKey = 'ledshopik_weather_time';
+    const cacheCityKey = 'ledshopik_weather_city';
     const cached = localStorage.getItem(cacheKey);
     const cachedTime = Number(localStorage.getItem(cacheTimeKey)||0);
     let data;
     if(cached && (Date.now()-cachedTime < 30*60*1000)){
       data = JSON.parse(cached);
     } else {
-      const res = await fetch('https://wttr.in/Ostrava?format=j1');
+      // Získej polohu z GPS, fallback na Ostrava
+      let city = 'Ostrava';
+      try {
+        const pos = await new Promise((ok,fail)=>navigator.geolocation.getCurrentPosition(ok,fail,{timeout:5000,maximumAge:3600000}));
+        city = pos.coords.latitude.toFixed(4)+','+pos.coords.longitude.toFixed(4);
+      } catch(e){}
+      const res = await fetch('https://wttr.in/'+city+'?format=j1');
       data = await res.json();
+      // Ulož název města z odpovědi
+      if(data.nearest_area && data.nearest_area[0]){
+        data._cityName = data.nearest_area[0].areaName[0].value;
+      }
       localStorage.setItem(cacheKey, JSON.stringify(data));
       localStorage.setItem(cacheTimeKey, String(Date.now()));
     }
@@ -1032,7 +1043,8 @@ function renderWeather(data){
     });
   }
 
-  el.innerHTML = '<div class="weather-now"><span class="w-icon">'+emoji+'</span><div><div class="w-temp">'+temp+'°C</div><div class="w-desc">'+desc+'</div></div></div>'
+  const cityName = data._cityName || (data.nearest_area && data.nearest_area[0] ? data.nearest_area[0].areaName[0].value : '');
+  el.innerHTML = '<div class="weather-now"><span class="w-icon">'+emoji+'</span><div><div class="w-temp">'+temp+'°C</div><div class="w-desc">'+desc+(cityName?' · '+cityName:'')+'</div></div></div>'
     + '<div class="weather-forecast">'+forecastHtml+'</div>';
 }
 
