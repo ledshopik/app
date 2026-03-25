@@ -690,6 +690,8 @@ if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 // STATE
 // ══════════════════════════════════════
 let fixtures = [];        // Current project fixtures
+let _saveTimer = null;
+let tempExtraImages = [];
 
 const LB_SB_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
 const LB_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
@@ -719,7 +721,6 @@ loadDBFromServer();
 // ══════════════════════════════════════
 // PERSISTENCE (server-first, localStorage as cache)
 // ══════════════════════════════════════
-let _saveTimer=null;
 function save() {
   // Local cache
   try {
@@ -1323,8 +1324,6 @@ function openAddModal() {
   document.getElementById('modal-bg').classList.add('open');
   console.log('modal-bg classes:', document.getElementById('modal-bg').className);
 }
-
-let tempExtraImages = [];
 
 function openEditModal(idx) {
   editIdx = idx;
