@@ -287,6 +287,26 @@ tbody tr[data-stav="Čeká na rozhodnutí"] td:first-child { border-left: 3px so
   </div>
 </div>
 
+<div id="table-wrap">
+  <table>
+    <thead><tr>
+      <th onclick="sortBy('obj')"         data-col="obj">        OBJ. Č.       <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('zakaznik')"    data-col="zakaznik">   Zákazník      <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('misto')"       data-col="misto">      Místo         <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('predmet')"     data-col="predmet">    Předmět       <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('datum')"       data-col="datum">      Datum         <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('technik')"     data-col="technik">    Technik       <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('vzdalenost')"  data-col="vzdalenost"> Vzdálenost    <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('stav')"        data-col="stav">       Stav          <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('vysledek')"    data-col="vysledek">   Výsledek      <span class="sort-arrow"></span></th>
+      <th data-col="cena_obhlidky"> Cena obhlídky <span class="sort-arrow"></span></th>
+      <th>Poznámka</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div id="empty-state"><div class="big">📋</div><p>Žádné obhlídky</p></div>
+</div>
+
 <div id="calendar-section">
   <div id="cal-header">
     <div class="cal-title">KALENDÁŘ OBHLÍDEK</div>
@@ -310,26 +330,6 @@ tbody tr[data-stav="Čeká na rozhodnutí"] td:first-child { border-left: 3px so
     </div>
     <div class="cal-days" id="cal-days"></div>
   </div>
-</div>
-
-<div id="table-wrap">
-  <table>
-    <thead><tr>
-      <th onclick="sortBy('obj')"         data-col="obj">        OBJ. Č.       <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('zakaznik')"    data-col="zakaznik">   Zákazník      <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('misto')"       data-col="misto">      Místo         <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('predmet')"     data-col="predmet">    Předmět       <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('datum')"       data-col="datum">      Datum         <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('technik')"     data-col="technik">    Technik       <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('vzdalenost')"  data-col="vzdalenost"> Vzdálenost    <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('stav')"        data-col="stav">       Stav          <span class="sort-arrow"></span></th>
-      <th onclick="sortBy('vysledek')"    data-col="vysledek">   Výsledek      <span class="sort-arrow"></span></th>
-      <th data-col="cena_obhlidky"> Cena obhlídky <span class="sort-arrow"></span></th>
-      <th>Poznámka</th>
-    </tr></thead>
-    <tbody id="tbody"></tbody>
-  </table>
-  <div id="empty-state"><div class="big">📋</div><p>Žádné obhlídky</p></div>
 </div>
 
 <div id="modal-overlay" onclick="overlayClick(event)">
