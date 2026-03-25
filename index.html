@@ -243,11 +243,11 @@ button, input, select { font-family: inherit; }
       <div class="header-eyebrow">LEDshopik · Systém</div>
       <div class="header-title">DASHBOARD</div>
     </div>
+    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;transition:all .15s;flex-shrink:0;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
   </div>
   <div id="team-bar" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;"></div>
   <div style="display:flex;align-items:center;gap:16px;">
     <div id="weather-widget" class="weather-widget"></div>
-    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;transition:all .15s;flex-shrink:0;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
     <div class="header-date">
       <div class="day" id="hdr-day">—</div>
       <div class="month" id="hdr-month">—</div>
@@ -1004,13 +1004,8 @@ async function loadWeather(){
     if(cached && (Date.now()-cachedTime < 30*60*1000)){
       data = JSON.parse(cached);
     } else {
-      // Získej polohu z GPS, fallback na Ostrava
-      let city = 'Ostrava';
-      try {
-        const pos = await new Promise((ok,fail)=>navigator.geolocation.getCurrentPosition(ok,fail,{timeout:5000,maximumAge:3600000}));
-        city = pos.coords.latitude.toFixed(4)+','+pos.coords.longitude.toFixed(4);
-      } catch(e){}
-      const res = await fetch('https://wttr.in/'+city+'?format=j1');
+      // Automatická detekce polohy přes IP (wttr.in to dělá sám bez parametru města)
+      const res = await fetch('https://wttr.in/?format=j1');
       data = await res.json();
       // Ulož název města z odpovědi
       if(data.nearest_area && data.nearest_area[0]){
