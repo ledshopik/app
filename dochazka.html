@@ -123,6 +123,9 @@ tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6
 .form-group input:focus, .form-group select:focus { border-color: #60a0e0; }
 .form-group select option { background: #fff; }
 .days-info { font-size: 12px; color: #60a0e0; font-weight: 700; margin-top: 4px; }
+.rozsah-btn { background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s; }
+.rozsah-btn:hover { border-color:#bbb;color:#444; }
+.rozsah-btn.active { background:#60a0e0;color:#fff;border-color:#60a0e0; }
 #modal-footer { padding: 16px 24px; border-top: 1px solid #e8e4dc; display: flex; gap: 10px; justify-content: flex-end; }
 #btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #f0c8c8; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .btn-cancel { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
@@ -148,19 +151,19 @@ tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6
 <body>
 
 <div id="nav">
-  <a href="index.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:4px;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">⌂ DASHBOARD<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Přehled</span></a>
-  <a href="instalace.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">INSTALACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Montáže</span></a>
-  <a href="vyroba.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">VÝROBA<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Zakázky</span></a>
-  <a href="obhlidky.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">OBHLÍDKY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Termíny</span></a>
-  <a href="reklamace.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">REKLAMACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Servis</span></a>
-  <a href="konfigurator.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KONFIGURÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">RING svítidla</span></a>
-  <a href="konfigurator-profily.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PROFILY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">ALU výroba</span></a>
-  <a href="zasobovani.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">ZÁSOBOVÁNÍ<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Dodávky</span></a>
-  <a href="lumibook.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">LUMIBOOK<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalog</span></a>
-  <a href="kalkulator-instalaci.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KALKULÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Ceny montáží</span></a>
-  <a href="produktovy-list.html" style="padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PRODUKTY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalogové listy</span></a>
+  <a href="index.html" style="padding:8px 14px;border-top:3px solid #60a0e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:4px;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">⌂ DASHBOARD<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Přehled</span></a>
+  <a href="instalace.html" style="padding:8px 14px;border-top:3px solid #e2b830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">INSTALACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Montáže</span></a>
+  <a href="vyroba.html" style="padding:8px 14px;border-top:3px solid #f07030;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">VÝROBA<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Zakázky</span></a>
+  <a href="obhlidky.html" style="padding:8px 14px;border-top:3px solid #3ab0a0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">OBHLÍDKY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Termíny</span></a>
+  <a href="reklamace.html" style="padding:8px 14px;border-top:3px solid #e05050;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">REKLAMACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Servis</span></a>
+  <a href="konfigurator.html" style="padding:8px 14px;border-top:3px solid #a070e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KONFIGURÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">RING svítidla</span></a>
+  <a href="konfigurator-profily.html" style="padding:8px 14px;border-top:3px solid #40a0a0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PROFILY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">ALU výroba</span></a>
+  <a href="zasobovani.html" style="padding:8px 14px;border-top:3px solid #c8a830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">ZÁSOBOVÁNÍ<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Dodávky</span></a>
+  <a href="lumibook.html" style="padding:8px 14px;border-top:3px solid #e8a020;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">LUMIBOOK<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalog</span></a>
+  <a href="kalkulator-instalaci.html" style="padding:8px 14px;border-top:3px solid #b08820;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KALKULÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Ceny montáží</span></a>
+  <a href="produktovy-list.html" style="padding:8px 14px;border-top:3px solid #e05050;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PRODUKTY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalogové listy</span></a>
   <a href="dochazka.html" style="margin-left:auto;padding:10px 20px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#3a8048;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center;background:#f0f8f2;border-radius:6px 6px 0 0;line-height:1.3;border-bottom:2px solid #50a060;">🕐 DOCHÁZKA</a>
-  <a href="manual.html" style="padding:8px 12px;font-size:14px;font-weight:700;color:#bbb;text-decoration:none;display:flex;align-items:center;justify-content:center;border:1px solid #e0e0e0;border-radius:50%;width:28px;height:28px;margin-left:8px;align-self:center;" onmouseover="this.style.color='#e2b830';this.style.borderColor='#e2b830'" onmouseout="this.style.color='#bbb';this.style.borderColor='#e0e0e0'" title="Nápověda">?</a>
+  
 </div>
 <div id="user-controls" style="background:#fff;border-bottom:1px solid #e0e0e0;padding:6px 32px;display:flex;align-items:center;gap:14px;">
   <span id="user-bar-name" style="font-weight:700;color:#333;font-size:12px;"></span>
@@ -181,7 +184,7 @@ tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6
       <div class="stat"><div class="num" id="stat-lekar" style="color:#6080c0">0</div><div class="lbl">Lékař</div></div>
       <div class="stat"><div class="num" id="stat-dnes" style="color:#60a0e0">0</div><div class="lbl">Dnes pryč</div></div>
     </div>
-    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#888;font-size:11px;font-weight:700;letter-spacing:.06em;transition:all .15s;white-space:nowrap;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#888'">📖 MANUÁL</a>
+    
   </div>
 </div>
 
@@ -297,6 +300,20 @@ tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6
       <div class="form-group">
         <label>Datum do</label>
         <input type="date" id="f-datum-do" oninput="calcDays()">
+      </div>
+      <div class="form-group full">
+        <label>Časový rozsah</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="f-rozsah-btns">
+          <button type="button" class="rozsah-btn active" data-val="cely" onclick="setRozsah('cely')">Celý den</button>
+          <button type="button" class="rozsah-btn" data-val="dopoledne" onclick="setRozsah('dopoledne')">Dopoledne (do 12:00)</button>
+          <button type="button" class="rozsah-btn" data-val="odpoledne" onclick="setRozsah('odpoledne')">Odpoledne (od 12:00)</button>
+          <button type="button" class="rozsah-btn" data-val="vlastni" onclick="setRozsah('vlastni')">Vlastní</button>
+        </div>
+        <div id="f-cas-vlastni" style="display:none;margin-top:8px;display:none;gap:10px;align-items:center;">
+          <input type="time" id="f-cas-od" value="08:00" style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+          <span style="color:#888;">—</span>
+          <input type="time" id="f-cas-do" value="16:00" style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+        </div>
       </div>
       <div class="form-group full">
         <div class="days-info" id="days-info"></div>
@@ -622,6 +639,21 @@ function renderTable(){
     </tr>`).join('');
 }
 
+let currentRozsah='cely';
+function setRozsah(val){
+  currentRozsah=val;
+  document.querySelectorAll('.rozsah-btn').forEach(b=>b.classList.toggle('active',b.dataset.val===val));
+  const vlastni=document.getElementById('f-cas-vlastni');
+  vlastni.style.display=val==='vlastni'?'flex':'none';
+  calcDays();
+}
+function getRozsahText(){
+  if(currentRozsah==='cely') return '';
+  if(currentRozsah==='dopoledne') return ' (do 12:00)';
+  if(currentRozsah==='odpoledne') return ' (od 12:00)';
+  return ' ('+document.getElementById('f-cas-od').value+' – '+document.getElementById('f-cas-do').value+')';
+}
+
 function calcDays(){
   const od=document.getElementById('f-datum-od').value;
   const doo=document.getElementById('f-datum-do').value;
@@ -629,7 +661,9 @@ function calcDays(){
   if(n>0){
     const a=new Date(od+'T00:00:00'), b=new Date(doo+'T00:00:00');
     const total=Math.round((b-a)/(1000*60*60*24))+1;
-    document.getElementById('days-info').textContent=`${n} pracovních dní` + (total!==n ? ` (${total} kalendářních)` : '');
+    const half=currentRozsah==='dopoledne'||currentRozsah==='odpoledne';
+    const dniText=half&&n===1?'0.5 dne':n+' pracovních dní';
+    document.getElementById('days-info').textContent=dniText + (total!==n&&!half ? ` (${total} kalendářních)` : '') + getRozsahText();
   } else {
     document.getElementById('days-info').textContent='';
   }
@@ -641,6 +675,7 @@ function openModal(id){
   document.getElementById('modal-title').textContent=r?'Upravit absenci':'Přidat absenci';
   document.getElementById('btn-delete').style.display=r?'inline-flex':'none';
   document.getElementById('days-info').textContent='';
+  setRozsah('cely');
   if(r){
     document.getElementById('f-zamestnanec').value=r.zamestnanec||'';
     document.getElementById('f-typ').value=r.typ||'Dovolená';
@@ -667,14 +702,20 @@ async function saveRecord(){
   const currentId=editId?String(editId):String(Date.now());
   const od=document.getElementById('f-datum-od').value;
   const doo=document.getElementById('f-datum-do').value;
+  const half=currentRozsah==='dopoledne'||currentRozsah==='odpoledne';
+  const dniNum=countDays(od,doo);
+  const dniVal=half&&dniNum===1?'0.5':String(dniNum);
+  const rozsahNote=getRozsahText();
+  const userNote=document.getElementById('f-poznamka').value.trim();
+  const poznamka=rozsahNote?(userNote?rozsahNote.trim()+' · '+userNote:rozsahNote.trim()):userNote;
   const rec={
     id:          currentId,
     zamestnanec: document.getElementById('f-zamestnanec').value,
     typ:         document.getElementById('f-typ').value,
     datum_od:    od,
     datum_do:    doo,
-    dni:         String(countDays(od,doo)),
-    poznamka:    document.getElementById('f-poznamka').value.trim(),
+    dni:         dniVal,
+    poznamka:    poznamka,
   };
   if(!rec.zamestnanec){ alert('Vyberte zaměstnance'); return; }
   closeModal();
