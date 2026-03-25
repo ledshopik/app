@@ -1019,7 +1019,7 @@ async function importFromEshop() {
     } catch(e) {}
     // Fallback: public CORS proxies
     if (!html) {
-      const proxies = ['https://corsproxy.io/?url=','https://api.allorigins.win/raw?url='];
+      const proxies = ['https://api.codetabs.com/v1/proxy/?quest=','https://corsproxy.io/?url=','https://api.allorigins.win/raw?url='];
       for (const proxy of proxies) {
         try {
           const r = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(10000)});
@@ -1315,11 +1315,13 @@ function addToDB(item) {
 // MODAL
 // ══════════════════════════════════════
 function openAddModal() {
+  console.log('openAddModal called');
   editIdx = -1;
   document.getElementById('m-title').textContent = 'Přidat svítidlo';
   document.getElementById('m-save').textContent = 'Přidat';
   clearForm();
   document.getElementById('modal-bg').classList.add('open');
+  console.log('modal-bg classes:', document.getElementById('modal-bg').className);
 }
 
 let tempExtraImages = [];
