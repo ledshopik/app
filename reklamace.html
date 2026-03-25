@@ -977,8 +977,6 @@ body{font-family:Arial,sans-serif;color:#111;padding:30px 40px;font-size:13px;li
 </div>
 
 <div class="footer">BE-LIGHT, s.r.o. · modul Reklamace · Vygenerováno: ${new Date().toLocaleDateString('cs-CZ')} ${new Date().toLocaleTimeString('cs-CZ')}</div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-reklamace').on('postgres_changes',{event:'*',schema:'public',table:'reklamace'},function(){console.log('RT:reklamace');if(typeof loadData==='function')loadData();}).subscribe();})();</script>
 </body></html>`);
   w.document.close();
   setTimeout(()=>w.print(),300);
