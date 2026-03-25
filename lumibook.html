@@ -676,6 +676,7 @@ let tagN = 1;
 let activeRoom = '__all__';
 let customRooms = [];  // Manually created rooms
 let tempImg = null;
+let currentProjectId = null; // ID projektu na serveru
 
 // ══════════════════════════════════════
 // INIT
@@ -688,15 +689,46 @@ renderDB();
 loadDBFromServer();
 
 // ══════════════════════════════════════
-// PERSISTENCE
+// PERSISTENCE (server-first, localStorage as cache)
 // ══════════════════════════════════════
+let _saveTimer=null;
 function save() {
+  // Local cache
   try {
     localStorage.setItem('lb-fixtures', JSON.stringify(fixtures));
     localStorage.setItem('lb-tagN', tagN);
     localStorage.setItem('lb-project', JSON.stringify(getProjectInfo()));
   } catch(e) {}
+  // Debounced server sync
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(syncProjectToServer, 1500);
 }
+
+function syncProjectToServer(){
+  if(!currentProjectId) return;
+  const pi=getProjectInfo();
+  const project={
+    id: currentProjectId,
+    uzivatel: localStorage.getItem('ledshopik_user')||'',
+    nazev: pi.name||'',
+    zakaznik: pi.client||'',
+    datum: pi.date||'',
+    cislo: pi.num||'',
+    autor: pi.author||'',
+    poznamka: pi.note||'',
+    fixtures_json: JSON.stringify(fixtures),
+    rooms_json: JSON.stringify(customRooms),
+    tag_n: String(tagN)
+  };
+  fetch(LB_API_URL+'/projects/save',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({project})
+  }).then(r=>r.json()).then(j=>{
+    if(j.ok) console.log('Projekt uložen na server');
+  }).catch(e=>console.error('Sync error:',e));
+}
+
 function saveDB() {
   try { localStorage.setItem('lb-database', JSON.stringify(database)); } catch(e) {}
   // Sync to shared backend (non-blocking)
@@ -726,7 +758,9 @@ async function loadDBFromServer(attempt) {
     if(attempt < 3) setTimeout(function(){ loadDBFromServer(attempt + 1); }, 3000);
   }
 }
+
 function load() {
+  // Local cache first (fast)
   try {
     const f = localStorage.getItem('lb-fixtures');
     if (f) { fixtures = JSON.parse(f); tagN = fixtures.length + 1; }
@@ -736,7 +770,6 @@ function load() {
     if (d) database = JSON.parse(d);
     const cr = localStorage.getItem('lb-rooms');
     if (cr) customRooms = JSON.parse(cr);
-    // Load custom param choices
     loadParamChoices();
     const p = localStorage.getItem('lb-project');
     if (p) {
@@ -749,6 +782,70 @@ function load() {
       if(pi.note) document.getElementById('p-note').value = pi.note;
     }
   } catch(e) {}
+  // Auto-create or resume project ID
+  currentProjectId = localStorage.getItem('lb-current-project-id');
+  if(!currentProjectId){
+    currentProjectId = String(Date.now());
+    localStorage.setItem('lb-current-project-id', currentProjectId);
+  }
+  // Load project from server (overrides local if exists)
+  loadProjectFromServer();
+}
+
+async function loadProjectFromServer(){
+  if(!currentProjectId) return;
+  try{
+    const res=await fetch(LB_API_URL+'/projects/'+currentProjectId+'?t='+Date.now());
+    const json=await res.json();
+    if(json.ok && json.data && json.data.id){
+      const p=json.data;
+      if(p.nazev) document.getElementById('p-name').value=p.nazev;
+      if(p.zakaznik) document.getElementById('p-client').value=p.zakaznik;
+      if(p.datum) document.getElementById('p-date').value=p.datum;
+      if(p.cislo) document.getElementById('p-num').value=p.cislo;
+      if(p.autor) document.getElementById('p-author').value=p.autor;
+      if(p.poznamka) document.getElementById('p-note').value=p.poznamka;
+      try{
+        const fx=JSON.parse(p.fixtures_json||'[]');
+        if(fx.length){ fixtures=fx; tagN=Math.max(tagN,...fx.map(f=>f.tag||0))+1; }
+      }catch(e){}
+      try{
+        const rm=JSON.parse(p.rooms_json||'[]');
+        if(rm.length) customRooms=rm;
+      }catch(e){}
+      if(p.tag_n) tagN=Math.max(tagN,parseInt(p.tag_n));
+      render(); renderRoomTabs(); updateStats();
+      console.log('Projekt načten ze serveru: '+p.nazev);
+    }
+  }catch(e){ console.log('Server projekt nenalezen, použit lokální cache'); }
+}
+
+async function loadProjectList(){
+  try{
+    const res=await fetch(LB_API_URL+'/projects?t='+Date.now());
+    const json=await res.json();
+    return json.ok?json.data:[];
+  }catch(e){ return []; }
+}
+
+async function switchProject(id){
+  currentProjectId=id;
+  localStorage.setItem('lb-current-project-id',id);
+  await loadProjectFromServer();
+  render(); renderDB(); renderRoomTabs(); updateStats();
+}
+
+async function newProject(){
+  // Save current first
+  syncProjectToServer();
+  // Create new
+  currentProjectId=String(Date.now());
+  localStorage.setItem('lb-current-project-id',currentProjectId);
+  fixtures=[];tagN=1;customRooms=[];
+  ['p-name','p-client','p-num','p-author','p-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('p-date').valueAsDate=new Date();
+  render(); renderRoomTabs(); updateStats();
+  save();
 }
 function getProjectInfo() {
   return {
