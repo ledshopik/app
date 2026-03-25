@@ -308,7 +308,7 @@ a{color:var(--accent);text-decoration:none}
 .modal-bg.open{opacity:1;pointer-events:auto}
 .modal{
   background:var(--panel);border:1px solid var(--border2);border-radius:var(--rx);
-  width:560px;max-width:94vw;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;
+  width:560px;max-width:94vw;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;
   transform:translateY(16px) scale(.98);transition:transform .25s
 }
 .modal-bg.open .modal{transform:translateY(0) scale(1)}
@@ -760,17 +760,18 @@ function syncProjectToServer(){
 
 function saveDB() {
   try { localStorage.setItem('lb-database', JSON.stringify(database)); } catch(e) {}
-  // Sync to Supabase — delete all then insert all as JSON rows
-  fetch(LB_SB_URL+'/rest/v1/lumibook_database?id=neq.___never___',{method:'DELETE',headers:LB_SB_HEADERS}).then(()=>{
-    if(!database.length) return;
-    const rows = database.map((item,i) => ({id: item.id || String(Date.now())+'-'+i, data_json: JSON.stringify(item)}));
-    fetch(LB_SB_URL+'/rest/v1/lumibook_database',{
-      method:'POST',
-      headers:{...LB_SB_HEADERS,'Prefer':'return=minimal'},
-      body:JSON.stringify(rows)
-    }).then(r=>{ if(r.ok) console.log('Lumibook DB uložena: '+rows.length+' items'); })
-    .catch(e=>console.error('DB save error:',e));
-  }).catch(()=>{});
+  // Sync to Supabase — upsert each item (safe, no delete)
+  if(!database.length) return;
+  const rows = database.map((item,i) => {
+    if(!item.id) item.id = String(Date.now())+'-'+i;
+    return {id: item.id, data_json: JSON.stringify(item)};
+  });
+  fetch(LB_SB_URL+'/rest/v1/lumibook_database',{
+    method:'POST',
+    headers:{...LB_SB_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},
+    body:JSON.stringify(rows)
+  }).then(r=>{ if(r.ok) console.log('Lumibook DB uložena: '+rows.length+' items'); })
+  .catch(e=>console.error('DB save error:',e));
 }
 
 async function loadDBFromServer(attempt) {
@@ -781,7 +782,7 @@ async function loadDBFromServer(attempt) {
     const arr = await res.json();
     if(Array.isArray(arr) && arr.length > 0) {
       database = arr.map(row => {
-        try { return JSON.parse(row.data_json); } catch(e) { return row; }
+        try { const parsed = JSON.parse(row.data_json); if(!parsed.id) parsed.id = row.id; return parsed; } catch(e) { return row; }
       });
       try { localStorage.setItem('lb-database', JSON.stringify(database)); } catch(e){}
       dbFromSheets = true;
