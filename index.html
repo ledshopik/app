@@ -184,6 +184,46 @@ button, input, select { font-family: inherit; }
 .fg label { font-size:10px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase; }
 .fg input, .fg select, .fg textarea { background:#fff;border:1px solid #ddd;border-radius:4px;color:#1a1a1a;padding:6px 10px;font-size:12px;outline:none;font-family:inherit; }
 
+/* Team bar */
+.team-bar { background:#fff; border-bottom:1px solid #e0e0e0; padding:8px 32px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.team-bar-title { font-size:9px; letter-spacing:.2em; color:#888; text-transform:uppercase; font-weight:700; margin-right:4px; }
+.team-avatar { position:relative; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; cursor:default; flex-shrink:0; }
+.team-avatar .team-dot { position:absolute; bottom:-1px; right:-1px; width:12px; height:12px; border-radius:50%; border:2px solid #fff; }
+.team-avatar-tooltip { display:none; position:absolute; bottom:110%; left:50%; transform:translateX(-50%); background:#333; color:#fff; font-size:10px; padding:3px 8px; border-radius:4px; white-space:nowrap; z-index:50; }
+.team-avatar:hover .team-avatar-tooltip { display:block; }
+
+/* Weather widget */
+.weather-widget { display:flex; align-items:center; gap:10px; margin-left:12px; }
+.weather-now { display:flex; align-items:center; gap:6px; }
+.weather-now .w-icon { font-size:22px; line-height:1; }
+.weather-now .w-temp { font-size:20px; font-weight:900; color:#1a1a1a; line-height:1; }
+.weather-now .w-desc { font-size:9px; color:#888; letter-spacing:.05em; }
+.weather-forecast { display:flex; gap:8px; margin-left:6px; }
+.weather-fc-day { text-align:center; }
+.weather-fc-day .fc-name { font-size:8px; color:#888; text-transform:uppercase; letter-spacing:.05em; }
+.weather-fc-day .fc-icon { font-size:14px; line-height:1.2; }
+.weather-fc-day .fc-temp { font-size:10px; font-weight:700; color:#1a1a1a; }
+
+/* Weekly overview */
+.week-grid-wrap { background:#fff; padding:16px 20px; margin-bottom:2px; }
+.week-grid-title { font-size:9px; letter-spacing:.2em; color:#888; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.week-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.week-col { min-height:60px; padding:6px; border-radius:4px; background:#fafaf6; position:relative; }
+.week-col.wk-weekend { background:#f4f0ea; }
+.week-col.wk-today { outline:2px solid #e2b830; }
+.week-col .wk-day-name { font-size:9px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:4px; }
+.week-col.wk-today .wk-day-name { color:#e2b830; }
+.week-col .wk-badge { font-size:9px; font-weight:700; padding:2px 5px; border-radius:3px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
+
+/* Timeline / Activity */
+.timeline-panel { background:#fff; padding:20px; }
+.tl-item { display:flex; align-items:flex-start; gap:10px; padding:7px 0; border-bottom:1px solid #f0ece4; }
+.tl-item:last-child { border-bottom:none; }
+.tl-icon { font-size:16px; flex-shrink:0; width:28px; text-align:center; }
+.tl-border { width:3px; border-radius:2px; flex-shrink:0; align-self:stretch; }
+.tl-text { font-size:12px; color:#333; flex:1; }
+.tl-time { font-size:10px; color:#999; white-space:nowrap; flex-shrink:0; }
+
 @media (max-width: 768px) {
   #main { padding: 16px; }
   .modules-grid { grid-template-columns: repeat(2,1fr); }
@@ -205,9 +245,12 @@ button, input, select { font-family: inherit; }
     </div>
     <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;transition:all .15s;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
   </div>
-  <div class="header-date">
-    <div class="day" id="hdr-day">—</div>
-    <div class="month" id="hdr-month">—</div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div id="weather-widget" class="weather-widget"></div>
+    <div class="header-date">
+      <div class="day" id="hdr-day">—</div>
+      <div class="month" id="hdr-month">—</div>
+    </div>
   </div>
 </div>
 
@@ -226,6 +269,7 @@ button, input, select { font-family: inherit; }
   <a href="dochazka.html" style="margin-left:auto;padding:10px 20px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#50a060;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center;background:#f0f8f2;border-radius:6px 6px 0 0;line-height:1.3;" onmouseover="this.style.color='#3a8048'" onmouseout="this.style.color='#50a060'">🕐 DOCHÁZKA</a>
   
 </div>
+<div id="team-bar" class="team-bar" style="display:none;"></div>
 <div id="user-controls">
   <span id="user-bar-name" style="font-weight:700;color:#333;font-size:12px;"></span>
   <a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a>
@@ -353,6 +397,9 @@ button, input, select { font-family: inherit; }
     </a>
   </div>
 
+  <!-- Weekly overview -->
+  <div id="week-grid-wrap" class="week-grid-wrap" style="display:none;"></div>
+
   <!-- Dashboard 3-column layout -->
   <div class="dashboard-main">
     <!-- Left: Schedule + Alerts -->
@@ -434,6 +481,9 @@ button, input, select { font-family: inherit; }
       </div>
     </div>
   </div>
+
+  <!-- Timeline / Activity -->
+  <div id="timeline-panel" class="timeline-panel" style="margin-top:2px;display:none;"></div>
 
   <!-- Task Modal -->
   <div id="task-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeTaskModal()">
@@ -559,6 +609,9 @@ function renderAll(){
   renderSchedule();
   renderAlerts();
   renderTasks();
+  renderTeamBar();
+  renderWeeklyOverview();
+  renderTimeline();
 }
 
 // ── Module cards ──────────────────────────────────────────────────────────────
@@ -934,6 +987,246 @@ function closeTaskModal(){
   document.getElementById('task-modal-overlay').style.display = 'none';
 }
 
+// ── Weather widget ────────────────────────────────────────────────────────────
+const WEATHER_CODE_EMOJI = {113:'☀️',116:'⛅',119:'☁️',122:'☁️',143:'🌫️',176:'🌦️',200:'⛈️',227:'🌨️',230:'❄️',248:'🌫️',260:'🌫️',263:'🌦️',266:'🌧️',293:'🌧️',296:'🌧️',299:'🌧️',302:'🌧️',305:'🌧️',308:'🌧️',311:'🌧️',314:'🌧️',317:'🌨️',320:'🌨️',323:'🌨️',326:'🌨️',329:'❄️',332:'❄️',335:'❄️',338:'❄️',350:'🌧️',353:'🌦️',356:'🌧️',359:'🌧️',362:'🌨️',365:'🌨️',368:'🌨️',371:'❄️',374:'🌨️',377:'🌨️',386:'⛈️',389:'⛈️',392:'⛈️',395:'❄️'};
+const DAY_NAMES_CS = ['Ne','Po','Út','St','Čt','Pá','So'];
+
+async function loadWeather(){
+  try {
+    const cacheKey = 'ledshopik_weather';
+    const cacheTimeKey = 'ledshopik_weather_time';
+    const cached = localStorage.getItem(cacheKey);
+    const cachedTime = Number(localStorage.getItem(cacheTimeKey)||0);
+    let data;
+    if(cached && (Date.now()-cachedTime < 30*60*1000)){
+      data = JSON.parse(cached);
+    } else {
+      const res = await fetch('https://wttr.in/Ostrava?format=j1');
+      data = await res.json();
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      localStorage.setItem(cacheTimeKey, String(Date.now()));
+    }
+    renderWeather(data);
+  } catch(e){ /* fail silently */ }
+}
+
+function renderWeather(data){
+  const el = document.getElementById('weather-widget');
+  if(!data || !data.current_condition || !data.current_condition[0]) return;
+  const cur = data.current_condition[0];
+  const code = Number(cur.weatherCode);
+  const emoji = WEATHER_CODE_EMOJI[code] || '🌤️';
+  const temp = cur.temp_C;
+  const descArr = cur.lang_cs || cur.weatherDesc;
+  const desc = descArr && descArr[0] ? (descArr[0].value || '') : '';
+
+  let forecastHtml = '';
+  if(data.weather){
+    data.weather.slice(0,3).forEach((day,i)=>{
+      const dt = new Date(day.date+'T00:00:00');
+      const dayName = i===0 ? 'Dnes' : DAY_NAMES_CS[dt.getDay()];
+      const fCode = Number(day.hourly && day.hourly[4] ? day.hourly[4].weatherCode : 0);
+      const fEmoji = WEATHER_CODE_EMOJI[fCode] || '🌤️';
+      const maxT = day.maxtempC;
+      forecastHtml += '<div class="weather-fc-day"><div class="fc-name">'+dayName+'</div><div class="fc-icon">'+fEmoji+'</div><div class="fc-temp">'+maxT+'°</div></div>';
+    });
+  }
+
+  el.innerHTML = '<div class="weather-now"><span class="w-icon">'+emoji+'</span><div><div class="w-temp">'+temp+'°C</div><div class="w-desc">'+desc+'</div></div></div>'
+    + '<div class="weather-forecast">'+forecastHtml+'</div>';
+}
+
+// ── Team bar ─────────────────────────────────────────────────────────────────
+function renderTeamBar(){
+  const el = document.getElementById('team-bar');
+  // Collect all team member names from the user select
+  const allMembers = ['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];
+  const todayStr = dateStr(today);
+
+  // Parse absence: who is on leave today
+  const absenceMap = {}; // name -> {type, emoji, color}
+  const TYPE_MAP = {
+    'Dovolená':    {emoji:'🔵', color:'#4090d0', bg:'#3070b0'},
+    'Neschopenka': {emoji:'🔴', color:'#e05050', bg:'#c03030'},
+    'Neplacené volno': {emoji:'🟠', color:'#e08030', bg:'#c06020'},
+    'Lékař':       {emoji:'🟣', color:'#a060d0', bg:'#8040b0'}
+  };
+
+  dataDoch.forEach(r=>{
+    if(!r.datum_od || !r.datum_do || !r.zamestnanec) return;
+    const from = toInputDate(r.datum_od);
+    const to = toInputDate(r.datum_do);
+    if(!from || !to) return;
+    if(todayStr >= from && todayStr <= to){
+      const name = r.zamestnanec.trim();
+      const typeInfo = TYPE_MAP[r.typ] || {emoji:'🟠', color:'#e08030', bg:'#c06020'};
+      absenceMap[name] = {type: r.typ, ...typeInfo};
+    }
+  });
+
+  const COLORS = ['#4090d0','#e2b830','#3ab0a0','#f07030','#a070e0','#e05050','#40a050','#c8a830','#6080c0','#e050a0','#50c080','#b08820'];
+
+  let html = '<span class="team-bar-title">Tým dnes</span>';
+  allMembers.forEach((name,i)=>{
+    const initials = name.substring(0,2).toUpperCase();
+    const absence = absenceMap[name];
+    const dotColor = absence ? absence.color : '#40a050';
+    const tooltip = absence ? (name+' — '+absence.type) : (name+' — v práci');
+    const bgColor = COLORS[i % COLORS.length];
+    html += '<div class="team-avatar" style="background:'+bgColor+';" title="'+tooltip+'">'
+      + initials
+      + '<div class="team-dot" style="background:'+dotColor+';"></div>'
+      + '<div class="team-avatar-tooltip">'+tooltip+'</div>'
+      + '</div>';
+  });
+
+  el.innerHTML = html;
+  el.style.display = 'flex';
+}
+
+// ── Weekly overview ──────────────────────────────────────────────────────────
+function renderWeeklyOverview(){
+  const el = document.getElementById('week-grid-wrap');
+  const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const dow = todayDate.getDay(); // 0=Sun
+  const mondayOffset = dow === 0 ? -6 : 1 - dow;
+  const monday = new Date(todayDate);
+  monday.setDate(todayDate.getDate() + mondayOffset);
+
+  const days = [];
+  const DAY_SHORT = ['Po','Út','St','Čt','Pá','So','Ne'];
+  for(let i=0;i<7;i++){
+    const d = new Date(monday);
+    d.setDate(monday.getDate()+i);
+    days.push({date:d, str:dateStr(d), name:DAY_SHORT[i], isWeekend:i>=5, isToday:dateStr(d)===dateStr(todayDate)});
+  }
+
+  // Collect events for this week
+  const weekEvents = {}; // dateStr -> [{label, color, bg}]
+  days.forEach(d => weekEvents[d.str] = []);
+
+  // Installations this week
+  filterByUser(dataInst,'technik').forEach(r=>{
+    const d = toInputDate(r.datum_montaze) || toInputDate(r.datum);
+    if(!d) return;
+    // Check if multi-day
+    const start = new Date(d+'T00:00:00');
+    const len = Math.max(1, Number(r.delka)||1);
+    for(let i=0;i<len;i++){
+      const day = new Date(start);
+      day.setDate(start.getDate()+i);
+      const ds = dateStr(day);
+      if(weekEvents[ds]) weekEvents[ds].push({label:(r.misto||r.obj||'INS'), color:'#a08020', bg:'#fdf4d8'});
+    }
+  });
+
+  // Production deadlines
+  dataVyr.filter(r=>r.deadline && r.stav!=='Vydáno zákazníkovi').forEach(r=>{
+    const d = toInputDate(r.deadline);
+    if(d && weekEvents[d]) weekEvents[d].push({label:(r.obj||'VYR')+' DL', color:'#c05020', bg:'#fff0e0'});
+  });
+
+  // Inspections
+  filterByUser(dataObh,'technik').forEach(r=>{
+    const d = toInputDate(r.datum_obhlidky) || toInputDate(r.datum);
+    if(d && weekEvents[d]) weekEvents[d].push({label:(r.misto||r.zakaznik||'OBH'), color:'#208070', bg:'#e0f4e8'});
+  });
+
+  let html = '<div class="week-grid-title"><div class="panel-title-line" style="background:#e2b830;"></div>Týdenní přehled</div>';
+  html += '<div class="week-grid">';
+  days.forEach(d=>{
+    const cls = 'week-col'+(d.isWeekend?' wk-weekend':'')+(d.isToday?' wk-today':'');
+    let evHtml = '';
+    weekEvents[d.str].slice(0,4).forEach(ev=>{
+      evHtml += '<span class="wk-badge" style="background:'+ev.bg+';color:'+ev.color+';">'+ev.label+'</span>';
+    });
+    if(weekEvents[d.str].length>4) evHtml += '<span style="font-size:8px;color:#888;">+'+( weekEvents[d.str].length-4)+'</span>';
+    html += '<div class="'+cls+'"><div class="wk-day-name">'+d.name+' '+d.date.getDate()+'.</div>'+evHtml+'</div>';
+  });
+  html += '</div>';
+
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
+// ── Timeline / Activity ──────────────────────────────────────────────────────
+function renderTimeline(){
+  const el = document.getElementById('timeline-panel');
+  const activities = [];
+
+  // Installations
+  dataInst.forEach(r=>{
+    const d = toInputDate(r.datum) || toInputDate(r.zalozeno);
+    if(!d) return;
+    activities.push({date:d, icon:'🔧', color:'#e2b830', text:'Nová instalace: '+(r.zakaznik||r.misto||r.obj||'—'), module:'inst'});
+  });
+
+  // Production
+  dataVyr.forEach(r=>{
+    const d = toInputDate(r.zalozeno) || toInputDate(r.deadline);
+    if(!d) return;
+    const stavText = r.stav ? ' — '+r.stav.toLowerCase() : '';
+    activities.push({date:d, icon:'🏭', color:'#f07030', text:'Výroba #'+(r.obj||r.id)+stavText, module:'vyr'});
+  });
+
+  // Reklamace
+  dataRek.forEach(r=>{
+    const d = toInputDate(r.zalozeno) || toInputDate(r.datum);
+    if(!d) return;
+    const stavText = r.stav ? ' — '+r.stav.toLowerCase() : '';
+    activities.push({date:d, icon:'⚠️', color:'#e05050', text:'Reklamace '+(r.zakaznik||r.obj||'—')+stavText, module:'rek'});
+  });
+
+  // Inspections
+  dataObh.forEach(r=>{
+    const d = toInputDate(r.datum) || toInputDate(r.zalozeno);
+    if(!d) return;
+    activities.push({date:d, icon:'👁', color:'#3ab0a0', text:'Obhlídka: '+(r.zakaznik||r.misto||'—'), module:'obh'});
+  });
+
+  // Zásobování
+  dataZas.forEach(r=>{
+    const d = toInputDate(r.datum) || toInputDate(r.zalozeno);
+    if(!d) return;
+    activities.push({date:d, icon:'📦', color:'#c8a830', text:'Zásilka: '+(r.dodavatel||r.cislo_obj||'—')+' — '+(r.stav||''), module:'zas'});
+  });
+
+  // Sort by date descending
+  activities.sort((a,b) => b.date.localeCompare(a.date));
+
+  // Take last ~10
+  const top = activities.slice(0,10);
+
+  if(!top.length){
+    el.style.display = 'none';
+    return;
+  }
+
+  // Relative time
+  function relTime(ds){
+    const diff = Math.round((today - new Date(ds+'T12:00:00'))/(1000*60*60*24));
+    if(diff<=0) return 'dnes';
+    if(diff===1) return 'včera';
+    if(diff<7) return 'před '+diff+' dny';
+    if(diff<14) return 'před týdnem';
+    if(diff<30) return 'před '+Math.floor(diff/7)+' týdny';
+    return ds.split('-').reverse().join('.');
+  }
+
+  let html = '<div class="panel-title"><div class="panel-title-line" style="background:#e2b830;"></div>Poslední aktivita</div>';
+  top.forEach(a=>{
+    html += '<div class="tl-item">'
+      + '<div class="tl-icon">'+a.icon+'</div>'
+      + '<div class="tl-border" style="background:'+a.color+';"></div>'
+      + '<div class="tl-text">'+a.text+'</div>'
+      + '<div class="tl-time">'+relTime(a.date)+'</div>'
+      + '</div>';
+  });
+
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
 document.addEventListener('DOMContentLoaded',()=>{
   const inp=document.getElementById('new-task-input');
   inp.addEventListener('keydown',e=>{
@@ -947,6 +1240,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 initHeader();
 renderTasks();
 loadAll();
+loadWeather();
 // Auto-refresh every 30s (only when page visible and no modal open)
 setInterval(()=>{
   if(document.hidden) return;
