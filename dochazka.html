@@ -90,6 +90,8 @@ button, input, select, textarea { font-family: inherit; }
 .ev-neschopenka { background: #fce8e8; color: #e05050; }
 .ev-neplacene { background: #fdf4d8; color: #e2b830; }
 .ev-lekar { background: #e8f0ff; color: #6080c0; }
+.ev-homeoffice { background: #e0e8f8; color: #6080c0; }
+.ev-jednani { background: #ece0f8; color: #8060c0; }
 
 /* Table */
 #table-wrap { padding: 0 32px 32px; overflow-x: auto; }
@@ -110,11 +112,15 @@ td.datum { white-space: nowrap; }
 .t-neschopenka { background: #fce8e8; color: #e05050; border: 1px solid #f0c8c8; } .t-neschopenka .badge-dot { background: #e05050; }
 .t-neplacene  { background: #fdf4d8; color: #e2b830; border: 1px solid #f0e0a0; } .t-neplacene .badge-dot  { background: #e2b830; }
 .t-lekar      { background: #e8f0ff; color: #6080c0; border: 1px solid #c8d8f0; } .t-lekar .badge-dot      { background: #6080c0; }
+.t-homeoffice { background: #e0e8f8; color: #6080c0; border: 1px solid #c0d0e8; } .t-homeoffice .badge-dot { background: #6080c0; }
+.t-jednani    { background: #ece0f8; color: #8060c0; border: 1px solid #d0c0e8; } .t-jednani .badge-dot    { background: #8060c0; }
 
 tbody tr[data-typ="Dovolená"]        td:first-child { border-left: 3px solid #40c060; }
 tbody tr[data-typ="Neschopenka"]     td:first-child { border-left: 3px solid #e05050; }
 tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e2b830; }
 tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6080c0; }
+tbody tr[data-typ="Home office"]    td:first-child { border-left: 3px solid #6080c0; }
+tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left: 3px solid #8060c0; }
 
 #empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
 
@@ -126,7 +132,7 @@ tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6
 #modal-title { font-size: 16px; font-weight: 800; }
 #modal-close { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; }
 #modal-close:hover { color: #1a1a1a; }
-#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; overflow-y: auto; flex: 1; }
+#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; overflow-y: auto; flex: 1; min-height: 0; }
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group.full { grid-column: 1 / -1; }
 .form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; }
@@ -160,6 +166,9 @@ tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6
 </style>
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script></head>
 <body>
+<div id="team-bar" style="background:#fff;border-bottom:1px solid #e8e4dc;padding:6px 32px;display:flex;align-items:center;justify-content:center;gap:4px;"></div>
+<style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
+<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://ledshopik-backend-production.up.railway.app/api/compat?modul=dochazka').then(r=>r.json()).then(j=>{const d=j.data||[];const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
 <div id="header">
   <div style="display:flex;align-items:center;gap:16px;">
     <div class="header-accent"></div>
@@ -195,12 +204,26 @@ tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6
   <a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a>
 </div>
 
+<div style="padding:10px 32px;display:flex;align-items:center;gap:16px;background:#fff;border-bottom:1px solid #e8e4dc;">
+  <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">—</span></div>
+  <div class="stats">
+    <div class="stat"><div class="num" id="stat-total">0</div><div class="lbl">Celkem</div></div>
+    <div class="stat"><div class="num" id="stat-dovolena" style="color:#40c060;">0</div><div class="lbl">Dovolená</div></div>
+    <div class="stat"><div class="num" id="stat-neschopenka" style="color:#e05050;">0</div><div class="lbl">Neschopenka</div></div>
+    <div class="stat"><div class="num" id="stat-lekar" style="color:#6080c0;">0</div><div class="lbl">Lékař</div></div>
+    <div class="stat"><div class="num" id="stat-homeoffice" style="color:#6080c0;">0</div><div class="lbl">Home office</div></div>
+    <div class="stat"><div class="num" id="stat-jednani" style="color:#8060c0;">0</div><div class="lbl">Jednání</div></div>
+    <div class="stat"><div class="num" id="stat-dnes" style="color:#60a0e0;">0</div><div class="lbl">Dnes</div></div>
+  </div>
+</div>
 <div id="toolbar">
   <button class="filter-btn active" data-filter="vse" onclick="setFilter('vse')">Vše</button>
   <button class="filter-btn" data-filter="Dovolená"        onclick="setFilter('Dovolená')"><span class="filter-dot" style="background:#40c060"></span>Dovolená</button>
   <button class="filter-btn" data-filter="Neschopenka"     onclick="setFilter('Neschopenka')"><span class="filter-dot" style="background:#e05050"></span>Neschopenka</button>
   <button class="filter-btn" data-filter="Neplacené volno" onclick="setFilter('Neplacené volno')"><span class="filter-dot" style="background:#e2b830"></span>Neplacené volno</button>
   <button class="filter-btn" data-filter="Lékař" onclick="setFilter('Lékař')"><span class="filter-dot" style="background:#6080c0"></span>Lékař</button>
+  <button class="filter-btn" data-filter="Home office" onclick="setFilter('Home office')"><span class="filter-dot" style="background:#6080c0"></span>Home office</button>
+  <button class="filter-btn" data-filter="Pracovní jednání mimo firmu" onclick="setFilter('Pracovní jednání mimo firmu')"><span class="filter-dot" style="background:#8060c0"></span>Jednání</button>
   <button class="filter-btn" data-filter="aktualni"        onclick="setFilter('aktualni')"><span class="filter-dot" style="background:#60a0e0"></span>Aktuální</button>
   <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderAll()"></div>
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
@@ -244,6 +267,8 @@ tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#e05050;"></div>Neschopenka</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#e2b830;"></div>Neplacené</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#6080c0;"></div>Lékař</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#6080c0;"></div>Home office</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#8060c0;"></div>Jednání</div>
     </div>
   </div>
   <div class="cal-grid">
@@ -298,6 +323,8 @@ tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6
           <option>Neschopenka</option>
           <option>Neplacené volno</option>
           <option>Lékař</option>
+          <option>Home office</option>
+          <option>Pracovní jednání mimo firmu</option>
         </select>
       </div>
       <div class="form-group">
@@ -350,8 +377,8 @@ if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 const SCRIPT_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
 const COLS = ['id','zamestnanec','typ','datum_od','datum_do','dni','poznamka'];
 const MONTHS_CS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
-const TYP_CLASS = { 'Dovolená':'t-dovolena', 'Neschopenka':'t-neschopenka', 'Neplacené volno':'t-neplacene', 'Lékař':'t-lekar' };
-const TYP_CAL  = { 'Dovolená':'ev-dovolena', 'Neschopenka':'ev-neschopenka', 'Neplacené volno':'ev-neplacene', 'Lékař':'ev-lekar' };
+const TYP_CLASS = { 'Dovolená':'t-dovolena', 'Neschopenka':'t-neschopenka', 'Neplacené volno':'t-neplacene', 'Lékař':'t-lekar', 'Home office':'t-homeoffice', 'Pracovní jednání mimo firmu':'t-jednani' };
+const TYP_CAL  = { 'Dovolená':'ev-dovolena', 'Neschopenka':'ev-neschopenka', 'Neplacené volno':'ev-neplacene', 'Lékař':'ev-lekar', 'Home office':'ev-homeoffice', 'Pracovní jednání mimo firmu':'ev-jednani' };
 
 let data=[], filterVal='vse', sortCol='datum_od', sortDir=-1, editId=null;
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
@@ -588,6 +615,8 @@ function renderStats(){
   document.getElementById('stat-dovolena').textContent=data.filter(r=>r.typ==='Dovolená').length;
   document.getElementById('stat-neschopenka').textContent=data.filter(r=>r.typ==='Neschopenka').length;
   document.getElementById('stat-lekar').textContent=data.filter(r=>r.typ==='Lékař').length;
+  document.getElementById('stat-homeoffice').textContent=data.filter(r=>r.typ==='Home office').length;
+  document.getElementById('stat-jednani').textContent=data.filter(r=>r.typ==='Pracovní jednání mimo firmu').length;
   document.getElementById('stat-dnes').textContent=data.filter(r=>{
     const od=toInputDate(r.datum_od), doo=toInputDate(r.datum_do);
     return od&&doo&&od<=todayStr&&todayStr<=doo;

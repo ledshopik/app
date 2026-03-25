@@ -116,7 +116,7 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 #modal-title { font-size: 16px; font-weight: 800; letter-spacing: .05em; }
 #modal-close { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; padding: 0 4px; }
 #modal-close:hover { color: #1a1a1a; }
-#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; overflow-y: auto; flex: 1; }
+#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; overflow-y: auto; flex: 1; min-height: 0; }
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group.full { grid-column: 1 / -1; }
 .form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; }
@@ -201,6 +201,9 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 </style>
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script></head>
 <body>
+<div id="team-bar" style="background:#fff;border-bottom:1px solid #e8e4dc;padding:6px 32px;display:flex;align-items:center;justify-content:center;gap:4px;"></div>
+<style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
+<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://ledshopik-backend-production.up.railway.app/api/compat?modul=dochazka').then(r=>r.json()).then(j=>{const d=j.data||[];const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
 <div id="header">
   <div style="display:flex;align-items:center;gap:16px;">
     <div class="header-accent"></div>
@@ -453,9 +456,18 @@ async function loadData(){
 }
 
 async function apiPost(payload){
-  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});
-  const json=await res.json();
+  console.log('apiPost called',JSON.stringify(payload));
+  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload),redirect:'follow',headers:{'Content-Type':'text/plain'}});
+  const text=await res.text();
+  console.log('apiPost response status:',res.status,'body:',text.substring(0,500));
+  let json;
+  try { json=JSON.parse(text); } catch(e) {
+    const m=text.match(/\{[\s\S]*\}/);
+    if(m) try { json=JSON.parse(m[0]); } catch(e2){}
+    if(!json) throw new Error('Neplatná odpověď serveru: '+text.substring(0,200));
+  }
   if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+  return json;
 }
 
 function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderTable(); }
@@ -638,6 +650,7 @@ function showSaving(t,s){ document.getElementById('saving-title').textContent=t;
 function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
 
 async function saveRecord(){
+  console.log('saveRecord called, editId=',editId);
   const isEdit = !!editId;
   const currentId = editId ? String(editId) : String(Date.now());
   const rec={
