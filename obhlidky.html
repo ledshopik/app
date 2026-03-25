@@ -134,7 +134,7 @@ tbody tr[data-stav="Čeká na rozhodnutí"] td:first-child { border-left: 3px so
 #saving-box .saving-sub   { font-size: 12px; color: #888; }
 
 /* Calendar */
-#calendar-section { margin: 0 32px 40px; background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; display: none; }
+#calendar-section { margin: 0 32px 40px; background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
 #cal-header { padding: 16px 24px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 #cal-header .cal-title { font-size: 15px; font-weight: 800; letter-spacing: .06em; }
 #cal-nav { display: flex; align-items: center; gap: 10px; }
@@ -242,10 +242,6 @@ tbody tr[data-stav="Čeká na rozhodnutí"] td:first-child { border-left: 3px so
   <button class="filter-btn" data-filter="Proběhla"                 onclick="setFilter('Proběhla')"><span class="filter-dot" style="background:#40a050"></span>Proběhla</button>
   <button class="filter-btn" data-filter="Čeká na rozhodnutí"       onclick="setFilter('Čeká na rozhodnutí')"><span class="filter-dot" style="background:#e2b830"></span>Čeká</button>
   <button class="filter-btn" data-filter="Zrušena"                  onclick="setFilter('Zrušena')"><span class="filter-dot" style="background:#c05050"></span>Zrušena</button>
-  <div class="view-toggle">
-    <button id="view-table" class="active" onclick="setView('table')">Tabulka</button>
-    <button id="view-cal" onclick="setView('calendar')">Kalendář</button>
-  </div>
   <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
   <button id="btn-add" onclick="openModal()">+ Nová obhlídka</button>
@@ -590,7 +586,7 @@ function renderTable(){
       <td style="white-space:nowrap;font-weight:600;color:#3ab0a0;">${calcRowCost(r)}</td>
       <td style="font-size:11px;color:#999;max-width:160px;">${r.poznamka||''}</td>
     </tr>`).join('');
-  if(currentView==='calendar') renderCalendar();
+  renderCalendar();
 }
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
