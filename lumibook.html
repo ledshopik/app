@@ -1736,6 +1736,8 @@ body{font-family:'DM Sans',Arial,sans-serif;padding:32px 36px;color:#1a1a1a;font
 ${pi.note?`<div class="nt">${pi.note}</div>`:''}
 ${roomsHtml}
 <div class="ft">LUMIBOOK PRO by LEDshopik.cz · ${new Date().toLocaleDateString('cs')} · ${pi.name||'Projekt'}</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-lumibook_database').on('postgres_changes',{event:'*',schema:'public',table:'lumibook_database'},function(){console.log('RT:lumibook_database');if(typeof loadDBFromServer==='function')loadDBFromServer();}).subscribe();sb.channel('rt-lumibook_projects').on('postgres_changes',{event:'*',schema:'public',table:'lumibook_projects'},function(){console.log('RT:lumibook_projects');if(typeof loadProjectFromServer==='function')loadProjectFromServer();}).subscribe();})();</script>
 </body></html>`;
 
   const w = window.open('','_blank','width=900,height=700');
@@ -1857,6 +1859,8 @@ body{font-family:'DM Sans',Arial,sans-serif;padding:28px 32px;color:#1a1a1a;font
 </div>
 ${cardsHtml}
 <div class="ft">LUMIBOOK PRO by LEDshopik.cz · ${new Date().toLocaleDateString('cs')} · ${pi.name||'Projekt'}</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-lumibook_database').on('postgres_changes',{event:'*',schema:'public',table:'lumibook_database'},function(){console.log('RT:lumibook_database');if(typeof loadDBFromServer==='function')loadDBFromServer();}).subscribe();sb.channel('rt-lumibook_projects').on('postgres_changes',{event:'*',schema:'public',table:'lumibook_projects'},function(){console.log('RT:lumibook_projects');if(typeof loadProjectFromServer==='function')loadProjectFromServer();}).subscribe();})();</script>
 </body></html>`;
 
   const w = window.open('','_blank','width=900,height=700');
@@ -2047,5 +2051,7 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
 })();
 
 (function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
-</script></body>
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-lumibook_database').on('postgres_changes',{event:'*',schema:'public',table:'lumibook_database'},function(){console.log('RT:lumibook_database');if(typeof loadDBFromServer==='function')loadDBFromServer();}).subscribe();sb.channel('rt-lumibook_projects').on('postgres_changes',{event:'*',schema:'public',table:'lumibook_projects'},function(){console.log('RT:lumibook_projects');if(typeof loadProjectFromServer==='function')loadProjectFromServer();}).subscribe();})();</script>
+</body>
 </html>

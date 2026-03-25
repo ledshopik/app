@@ -1353,5 +1353,7 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
   ck();
   setInterval(ck,30000);
 })();
-</script></body>
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-all').on('postgres_changes',{event:'*',schema:'public'},function(){console.log('RT update');if(typeof loadAll==='function')loadAll();}).subscribe();})();</script>
+</body>
 </html>
