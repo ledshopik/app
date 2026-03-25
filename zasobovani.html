@@ -168,7 +168,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
 .file-upload-or { text-align: center; font-size: 10px; color: #aaa; margin: 6px 0; text-transform: uppercase; letter-spacing: .1em; }
 .file-upload-warning { color: #e05050; font-size: 11px; font-weight: 700; margin-top: 4px; display: none; }
 </style>
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(x=>x.unregister()))}if('caches' in window){caches.keys().then(n=>n.forEach(k=>caches.delete(k)))}</script>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
