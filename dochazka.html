@@ -14,10 +14,21 @@ button, input, select, textarea { font-family: inherit; }
 #nav a.active { color: #60a0e0; border-bottom-color: #60a0e0; }
 #nav a:hover { color: #1a1a1a; }
 
-#header { background: #f4f2ed; border-bottom: 1px solid #e8e4dc; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
-.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
-.header-left .title { font-size: 22px; font-weight: 900; letter-spacing: .06em; }
-.header-left .title span { color: #60a0e0; }
+/* App Header */
+#header {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-accent { width: 4px; height: 48px; background: #e2b830; border-radius: 2px; flex-shrink: 0; }
+.header-title-wrap { margin-left: 14px; }
+.header-eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; color: #1a1a1a; }
+.header-date { text-align: right; }
+.header-date .day { font-size: 24px; font-weight: 900; color: #e2b830; letter-spacing: .02em; line-height: 1; }
+.header-date .month { font-size: 10px; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
 
 .stats { display: flex; gap: 6px; flex-wrap: wrap; }
 .stat { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
@@ -171,20 +182,16 @@ tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6
 </div>
 
 <div id="header">
-  <div class="header-left">
-    <div class="eyebrow">LEDshopik · Tým</div>
-    <div class="title">DOCHÁZKA <span>&</span> ABSENCE</div>
-  </div>
-  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-    <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
-    <div class="stats">
-      <div class="stat"><div class="num" id="stat-total" style="color:#1a1a1a">0</div><div class="lbl">Celkem</div></div>
-      <div class="stat"><div class="num" id="stat-dovolena" style="color:#40c060">0</div><div class="lbl">Dovolená</div></div>
-      <div class="stat"><div class="num" id="stat-neschopenka" style="color:#e05050">0</div><div class="lbl">Neschopenka</div></div>
-      <div class="stat"><div class="num" id="stat-lekar" style="color:#6080c0">0</div><div class="lbl">Lékař</div></div>
-      <div class="stat"><div class="num" id="stat-dnes" style="color:#60a0e0">0</div><div class="lbl">Dnes pryč</div></div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="header-accent"></div>
+    <div class="header-title-wrap">
+      <div class="header-eyebrow">LEDshopik &middot; Systém</div>
+      <div class="header-title">DOCHÁZKA</div>
     </div>
-    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#888;font-size:11px;font-weight:700;letter-spacing:.06em;transition:all .15s;white-space:nowrap;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#888'">📖 MANUÁL</a>
+  </div>
+  <div class="header-date">
+    <div class="day" id="hdr-day">&mdash;</div>
+    <div class="month" id="hdr-month">&mdash;</div>
   </div>
 </div>
 
@@ -767,5 +774,7 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
   ck();
   setInterval(ck,30000);
 })();
+
+(function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
 </script></body>
 </html>

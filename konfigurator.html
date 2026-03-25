@@ -15,25 +15,21 @@
   button { font-family: inherit; cursor: pointer; }
   input  { font-family: inherit; }
 
-  /* Header */
-  #header {
-    background: #fff;
-    padding: 0 28px;
-    display: flex;
-    align-items: stretch;
-    justify-content: space-between;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  #header-left { padding: 16px 0; }
-  #header-left .subtitle { font-size: 10px; letter-spacing: .25em; color: #777; text-transform: uppercase; margin-bottom: 4px; }
-  #header-left .title    { font-size: 18px; font-weight: 900; color: #1a1a1a; letter-spacing: .03em; line-height: 1.2; max-width: 500px; }
-  #header-tabs { display: flex; align-items: stretch; }
-  #header-tabs button {
-    background: transparent; color: #666; border: none;
-    padding: 0 24px; font-size: 12px; font-weight: 700;
-    letter-spacing: .15em; transition: all .2s;
-  }
-  #header-tabs button.active { background: #60a0e0; color: #fff; }
+/* App Header */
+#header {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-accent { width: 4px; height: 48px; background: #e2b830; border-radius: 2px; flex-shrink: 0; }
+.header-title-wrap { margin-left: 14px; }
+.header-eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; color: #1a1a1a; }
+.header-date { text-align: right; }
+.header-date .day { font-size: 24px; font-weight: 900; color: #e2b830; letter-spacing: .02em; line-height: 1; }
+.header-date .month { font-size: 10px; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
 
   /* Layout */
   #konfigurator-layout {
@@ -46,9 +42,7 @@
   }
 
   @media (max-width: 700px) {
-    #header { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 10px; }
-    #header-left .title { font-size: 15px; }
-    #header-tabs button { padding: 0 14px; font-size: 11px; }
+
     #konfigurator-layout { grid-template-columns: 1fr; padding: 12px 10px; gap: 16px; }
     #right-panel { position: static; }
     #ring-preview svg { width: 180px; height: 180px; }
@@ -248,15 +242,17 @@
 </div>
 
 <div id="header">
-  <div id="header-left">
-    <div class="subtitle">LEDshopik · Zakázková výroba</div>
-    <div class="title">KONFIGURÁTOR CENY VÝROBY SVÍTIDEL RING</div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="header-accent"></div>
+    <div class="header-title-wrap">
+      <div class="header-eyebrow">LEDshopik &middot; Systém</div>
+      <div class="header-title">KONFIGURÁTOR</div>
+    </div>
   </div>
-  <div id="header-tabs">
-    <button id="tab-konfigurator" class="active" onclick="switchTab('konfigurator')">KONFIGURÁTOR</button>
-    <button id="tab-cenik" onclick="switchTab('cenik')">SPRÁVA CEN</button>
+  <div class="header-date">
+    <div class="day" id="hdr-day">&mdash;</div>
+    <div class="month" id="hdr-month">&mdash;</div>
   </div>
-  <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#888;font-size:11px;font-weight:700;letter-spacing:.06em;transition:all .15s;white-space:nowrap;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#888'">📖 MANUÁL</a>
 </div>
 
 <div id="tab-content-konfigurator">
@@ -634,5 +630,7 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
   ck();
   setInterval(ck,30000);
 })();
+
+(function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
 </script></body>
 </html>

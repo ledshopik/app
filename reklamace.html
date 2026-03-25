@@ -9,10 +9,21 @@
 body { font-family: 'Arial Narrow', Arial, sans-serif; background: #f4f2ed; color: #1a1a1a; min-height: 100vh; }
 button, input, select, textarea { font-family: inherit; }
 
-#header { background: #f4f2ed; border-bottom: 1px solid #e8e4dc; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
-.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
-.header-left .title { font-size: 22px; font-weight: 900; letter-spacing: .06em; color: #1a1a1a; line-height: 1; }
-.header-left .title span { color: #e05050; }
+/* App Header */
+#header {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-accent { width: 4px; height: 48px; background: #e2b830; border-radius: 2px; flex-shrink: 0; }
+.header-title-wrap { margin-left: 14px; }
+.header-eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; color: #1a1a1a; }
+.header-date { text-align: right; }
+.header-date .day { font-size: 24px; font-weight: 900; color: #e2b830; letter-spacing: .02em; line-height: 1; }
+.header-date .month { font-size: 10px; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
 
 .stats { display: flex; gap: 6px; flex-wrap: wrap; }
 .stat { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
@@ -182,26 +193,16 @@ tbody tr[data-stav="Přijato dodavatelem"]     td:first-child { border-left: 3px
 </div>
 
 <div id="header">
-  <div class="header-left">
-    <div class="eyebrow">LEDshopik · Zákaznický servis</div>
-    <div class="title">REKLAMACE <span>&</span> SERVIS</div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="header-accent"></div>
+    <div class="header-title-wrap">
+      <div class="header-eyebrow">LEDshopik &middot; Systém</div>
+      <div class="header-title">REKLAMACE</div>
+    </div>
   </div>
-  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-    <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
-    <div class="stats" id="stats-zak">
-      <div class="stat"><div class="num" id="stat-total" style="color:#1a1a1a">0</div><div class="lbl">Celkem</div></div>
-      <div class="stat"><div class="num" id="stat-nova"  style="color:#e050e0">0</div><div class="lbl">Nové</div></div>
-      <div class="stat"><div class="num" id="stat-reseni" style="color:#e2b830">0</div><div class="lbl">V řešení</div></div>
-      <div class="stat"><div class="num" id="stat-dodavatel" style="color:#6080c0">0</div><div class="lbl">Dodavatel</div></div>
-      <div class="stat"><div class="num" id="stat-vyrizeno" style="color:#40a050">0</div><div class="lbl">Vyřízeno</div></div>
-    </div>
-    <div class="stats" id="stats-dod" style="display:none;">
-      <div class="stat"><div class="num" id="sd-total" style="color:#1a1a1a">0</div><div class="lbl">Celkem</div></div>
-      <div class="stat"><div class="num" id="sd-odeslano" style="color:#6080c0">0</div><div class="lbl">Odesláno</div></div>
-      <div class="stat"><div class="num" id="sd-ceka" style="color:#e2b830">0</div><div class="lbl">Čeká</div></div>
-      <div class="stat"><div class="num" id="sd-vyrizeno" style="color:#40a050">0</div><div class="lbl">Vyřízeno</div></div>
-    </div>
-    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#888;font-size:11px;font-weight:700;letter-spacing:.06em;transition:all .15s;white-space:nowrap;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#888'">📖 MANUÁL</a>
+  <div class="header-date">
+    <div class="day" id="hdr-day">&mdash;</div>
+    <div class="month" id="hdr-month">&mdash;</div>
   </div>
 </div>
 
@@ -990,5 +991,7 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
   ck();
   setInterval(ck,30000);
 })();
+
+(function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
 </script></body>
 </html>
