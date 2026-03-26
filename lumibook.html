@@ -746,11 +746,11 @@ loadDBFromServer();
 // PERSISTENCE (server-first, localStorage as cache)
 // ══════════════════════════════════════
 function save() {
-  // Local cache
+  // Local cache — per user
   try {
-    localStorage.setItem('lb-fixtures', JSON.stringify(fixtures));
-    localStorage.setItem('lb-tagN', tagN);
-    localStorage.setItem('lb-project', JSON.stringify(getProjectInfo()));
+    localStorage.setItem(lbKey('lb-fixtures'), JSON.stringify(fixtures));
+    localStorage.setItem(lbKey('lb-tagN'), tagN);
+    localStorage.setItem(lbKey('lb-project'), JSON.stringify(getProjectInfo()));
   } catch(e) {}
   // Debounced server sync
   clearTimeout(_saveTimer);
@@ -796,19 +796,20 @@ async function loadDBFromServer(attempt) {
   }
 }
 
+function lbKey(k){ return k+'-'+(localStorage.getItem('ledshopik_user')||'anon'); }
 function load() {
-  // Local cache first (fast)
+  // Local cache first (fast) — per user
   try {
-    const f = localStorage.getItem('lb-fixtures');
+    const f = localStorage.getItem(lbKey('lb-fixtures'));
     if (f) { fixtures = JSON.parse(f); tagN = fixtures.length + 1; }
-    const t = localStorage.getItem('lb-tagN');
+    const t = localStorage.getItem(lbKey('lb-tagN'));
     if (t) tagN = Math.max(tagN, parseInt(t));
     const d = localStorage.getItem('lb-database');
     if (d) database = JSON.parse(d);
-    const cr = localStorage.getItem('lb-rooms');
+    const cr = localStorage.getItem(lbKey('lb-rooms'));
     if (cr) customRooms = JSON.parse(cr);
     loadParamChoices();
-    const p = localStorage.getItem('lb-project');
+    const p = localStorage.getItem(lbKey('lb-project'));
     if (p) {
       const pi = JSON.parse(p);
       if(pi.name) document.getElementById('p-name').value = pi.name;
@@ -965,7 +966,7 @@ function deleteRoom(r) {
   if (!confirm(msg)) return;
   // Remove from custom rooms
   customRooms = customRooms.filter(cr => cr !== r);
-  try { localStorage.setItem('lb-rooms', JSON.stringify(customRooms)); } catch(e){}
+  try { localStorage.setItem(lbKey('lb-rooms'), JSON.stringify(customRooms)); } catch(e){}
   // Unassign fixtures from this room
   fixtures.forEach(f => { if (f.room === r) f.room = ''; });
   if (activeRoom === r) activeRoom = '__all__';
@@ -979,7 +980,7 @@ function addRoom() {
   // Save to custom rooms
   if (!customRooms.includes(trimmed)) {
     customRooms.push(trimmed);
-    try { localStorage.setItem('lb-rooms', JSON.stringify(customRooms)); } catch(e){}
+    try { localStorage.setItem(lbKey('lb-rooms'), JSON.stringify(customRooms)); } catch(e){}
   }
   // Offer to assign unassigned fixtures
   const unassigned = fixtures.filter(f => !f.room);
