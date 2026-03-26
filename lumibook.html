@@ -719,13 +719,14 @@ loadDBFromServer();
 (async function(){
   var user = localStorage.getItem('ledshopik_user');
   if(!user) return;
+  var pidKey='lb-project-id-'+user;
   try {
     var res = await fetch(LB_SB_URL+'/rest/v1/lumibook_projects?uzivatel=eq.'+encodeURIComponent(user)+'&order=id.desc&limit=1&select=*',{headers:LB_SB_HEADERS});
     if(!res.ok) return;
     var arr = await res.json();
     if(arr.length > 0) {
       var p = arr[0];
-      localStorage.setItem('lb-current-project-id', p.id);
+      localStorage.setItem(pidKey, p.id);
       if(p.fixtures_json) { try { fixtures = JSON.parse(p.fixtures_json); } catch(e){} }
       if(p.rooms_json) { try { customRooms = JSON.parse(p.rooms_json); } catch(e){} }
       if(p.tag_n) tagN = parseInt(p.tag_n) || tagN;
@@ -758,8 +759,10 @@ function save() {
 
 function syncProjectToServer() {
   var pi=getProjectInfo();
-  var pid=localStorage.getItem('lb-current-project-id');
-  if(!pid){pid=String(Date.now());localStorage.setItem('lb-current-project-id',pid);}
+  var user=localStorage.getItem('ledshopik_user')||'anon';
+  var pidKey='lb-project-id-'+user;
+  var pid=localStorage.getItem(pidKey);
+  if(!pid){pid=user+'-'+String(Date.now());localStorage.setItem(pidKey,pid);}
   fetch(LB_SB_URL+'/rest/v1/lumibook_projects',{
     method:'POST',headers:Object.assign({},LB_SB_HEADERS,{'Prefer':'resolution=merge-duplicates,return=minimal'}),
     body:JSON.stringify({id:pid,uzivatel:localStorage.getItem('ledshopik_user')||'',nazev:pi.name||'',zakaznik:pi.client||'',datum:pi.date||'',cislo:pi.num||'',autor:pi.author||'',poznamka:pi.note||'',fixtures_json:JSON.stringify(fixtures),rooms_json:JSON.stringify(customRooms),tag_n:String(tagN)})
