@@ -135,10 +135,51 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
 #saving-box .saving-title { font-size: 14px; font-weight: 700; color: #f07030; margin-bottom: 6px; }
 #saving-box .saving-sub { font-size: 12px; color: #888; }
 
+/* Calendar */
+#calendar-section { display: none; margin: 0 32px 40px; background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
+#cal-header { padding: 16px 24px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+#cal-header .cal-title { font-size: 15px; font-weight: 800; letter-spacing: .06em; }
+#cal-nav { display: flex; align-items: center; gap: 10px; }
+#cal-nav button { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
+#cal-nav button:hover { color: #1a1a1a; }
+#cal-month-label { font-size: 14px; font-weight: 700; min-width: 140px; text-align: center; letter-spacing: .05em; }
+#btn-today { background: #f07030; color: #fff; border: none; border-radius: 6px; padding: 5px 14px; font-size: 11px; font-weight: 700; cursor: pointer; }
+#cal-legend { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #888; }
+.leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+#cal-grid { padding: 16px 24px 20px; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
+.cal-weekday { text-align: center; font-size: 9px; letter-spacing: .1em; color: #888; padding: 4px 0; text-transform: uppercase; }
+.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-day { min-height: 90px; background: #fff; padding: 6px 8px; position: relative; overflow: hidden; cursor: default; border-bottom:1px solid #ece8e0; border-right:1px solid #ece8e0; }
+.cal-day.other-month { opacity: .3; }
+.cal-day.today { outline: 1px solid #f07030; }
+.cal-day.today .day-num { color: #f07030; font-weight: 900; }
+.day-num { font-size: 10px; font-weight: 600; color: #888; margin-bottom: 3px; }
+.cal-day.has-event .day-num { color: #444; }
+.cal-event { font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 2px; margin-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
+.cal-event:hover { opacity: .8; }
+.ev-ceka-vyr  { background: #c8d8f0; color: #4090e0; }
+.ev-vyroba    { background: #fde0c8; color: #f07030; }
+.ev-hotovo    { background: #d0e8d0; color: #40a050; }
+.ev-vydano    { background: #e0e0e0; color: #999; }
+.ev-urgent    { background: #f0c8c8; color: #e04040; }
+.cal-day.holiday { background: #fff0f0; }
+.cal-day.weekend.holiday { background: #f8f0f0; }
+.cal-day.holiday .day-num { color: #c05050; font-weight: 900; }
+.holiday-name { font-size: 7px; color: #c05050; line-height: 1.1; margin-bottom: 2px; }
+.day-busy-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #f07030, #ff8040); opacity: .6; }
+/* View toggle tabs */
+.view-toggle { display: flex; gap: 4px; margin-left: 8px; }
+.view-toggle button { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .06em; cursor: pointer; transition: all .15s; }
+.view-toggle button:hover { border-color: #bbb; color: #444; }
+.view-toggle button.active { background: #f07030; color: #fff; border-color: #f07030; }
+
 @media (max-width: 720px) {
   #header { padding: 12px 16px; }
   #toolbar { padding: 10px 12px; }
   #table-wrap { padding: 0 12px 24px; }
+  #calendar-section { margin: 0 12px 20px; }
   #modal-body { grid-template-columns: 1fr; }
   .form-group.full { grid-column: 1; }
 }
@@ -221,6 +262,10 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
   <button id="btn-add" onclick="openModal()">+ Nová výroba</button>
   <button onclick="toggleNastaveni()" style="background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">⚙ Nastavení</button>
+  <div class="view-toggle">
+    <button id="view-table" class="active" onclick="setView('table')">📋 Tabulka</button>
+    <button id="view-cal" onclick="setView('calendar')">📅 Kalendář</button>
+  </div>
 </div>
 
 <div id="nastaveni-panel" style="display:none;background:#f8f6f0;border-bottom:1px solid #ddd;padding:16px 32px;">
@@ -264,6 +309,32 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
     <tbody id="tbody"></tbody>
   </table>
   <div id="empty-state"><div style="font-size:36px;margin-bottom:10px;">🔧</div><p>Žádné zakázky</p></div>
+</div>
+
+<div id="calendar-section">
+  <div id="cal-header">
+    <div class="cal-title">KALENDÁŘ VÝROBY</div>
+    <div id="cal-nav">
+      <button onclick="calNav(-1)">&#8592;</button>
+      <div id="cal-month-label"></div>
+      <button onclick="calNav(1)">&#8594;</button>
+      <button id="btn-today" onclick="calToday()">Dnes</button>
+    </div>
+    <div id="cal-legend">
+      <div class="leg"><div class="leg-dot" style="background:#c8d8f0;border:1px solid #4090e0"></div>Čeká</div>
+      <div class="leg"><div class="leg-dot" style="background:#fde0c8;border:1px solid #f07030"></div>Ve výrobě</div>
+      <div class="leg"><div class="leg-dot" style="background:#d0e8d0;border:1px solid #40a050"></div>Hotovo</div>
+      <div class="leg"><div class="leg-dot" style="background:#e0e0e0;border:1px solid #999"></div>Vydáno</div>
+      <div class="leg"><div class="leg-dot" style="background:#f0c8c8;border:1px solid #e04040"></div>Urgentní</div>
+    </div>
+  </div>
+  <div id="cal-grid">
+    <div class="cal-weekdays">
+      <div class="cal-weekday">Po</div><div class="cal-weekday">Út</div><div class="cal-weekday">St</div>
+      <div class="cal-weekday">Čt</div><div class="cal-weekday">Pá</div><div class="cal-weekday">So</div><div class="cal-weekday">Ne</div>
+    </div>
+    <div class="cal-days" id="cal-days"></div>
+  </div>
 </div>
 
 <!-- Modal -->
@@ -362,6 +433,10 @@ const NAROCNOST_CLASS = { 'Jednoduchá':'narocnost-1', 'Střední':'narocnost-2'
 
 let data=[], filterVal='aktivni', sortCol='deadline', sortDir=1, editId=null;
 const today=new Date();
+let currentView='table';
+let calYear=today.getFullYear(), calMonth=today.getMonth();
+const MONTHS_CS=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
+const EV_CLASS_VYR={'Čeká na výrobu':'ev-ceka-vyr','Ve výrobě':'ev-vyroba','Hotovo':'ev-hotovo','Vydáno zákazníkovi':'ev-vydano'};
 
 function toInputDate(d){
   if(!d||d==='') return '';
@@ -613,6 +688,107 @@ function onZadalChange(){
   const jmeno=document.getElementById('f-zadal').value;
   const tel=getTel(jmeno);
   if(tel) document.getElementById('f-tel-zadal').value=tel;
+}
+
+// ── View toggle ──────────────────────────────────────────────────────────────
+function setView(v){
+  currentView=v;
+  document.getElementById('view-table').classList.toggle('active',v==='table');
+  document.getElementById('view-cal').classList.toggle('active',v==='calendar');
+  document.getElementById('table-wrap').style.display=v==='table'?'':'none';
+  document.getElementById('calendar-section').style.display=v==='calendar'?'block':'none';
+  if(v==='calendar') renderCalendar();
+}
+
+// ── Calendar helpers ─────────────────────────────────────────────────────────
+function calNav(dir){ calMonth+=dir; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function calToday(){ calYear=today.getFullYear(); calMonth=today.getMonth(); renderCalendar(); }
+
+function easterDate(year) {
+  var a=year%19, b=Math.floor(year/100), c=year%100;
+  var d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25);
+  var g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30;
+  var i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7;
+  var m=Math.floor((a+11*h+22*l)/451);
+  var month=Math.floor((h+l-7*m+114)/31), day=((h+l-7*m+114)%31)+1;
+  return new Date(year, month-1, day);
+}
+function getCzechHolidays(year) {
+  var holidays = new Set();
+  var add = function(m,d){ holidays.add(year+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0')); };
+  add(1,1);add(5,1);add(5,8);add(7,5);add(7,6);add(9,28);add(10,28);add(11,17);add(12,24);add(12,25);add(12,26);
+  var easter = easterDate(year);
+  var gf = new Date(easter); gf.setDate(easter.getDate()-2);
+  var em = new Date(easter); em.setDate(easter.getDate()+1);
+  holidays.add(dateStr(gf)); holidays.add(dateStr(em));
+  return holidays;
+}
+var holidayCache = {};
+function isHoliday(ds) {
+  var year = Number(ds.split('-')[0]);
+  if (!holidayCache[year]) holidayCache[year] = getCzechHolidays(year);
+  return holidayCache[year].has(ds);
+}
+var HOLIDAY_NAMES = {
+  '01-01':'Nový rok','05-01':'Svátek práce','05-08':'Den vítězství',
+  '07-05':'Cyril a Metoděj','07-06':'Jan Hus','09-28':'Den české státnosti',
+  '10-28':'Vznik Československa','11-17':'Den boje za svobodu',
+  '12-24':'Štědrý den','12-25':'1. svátek vánoční','12-26':'2. svátek vánoční'
+};
+function getHolidayName(ds) {
+  var md = ds.substring(5);
+  if (HOLIDAY_NAMES[md]) return HOLIDAY_NAMES[md];
+  var year = Number(ds.split('-')[0]);
+  var easter = easterDate(year);
+  var gf = new Date(easter); gf.setDate(easter.getDate()-2);
+  var em = new Date(easter); em.setDate(easter.getDate()+1);
+  if (ds === dateStr(gf)) return 'Velký pátek';
+  if (ds === dateStr(em)) return 'Velikonoční pondělí';
+  return '';
+}
+
+function getCalEvents(){
+  return data.filter(function(r){ return r.deadline && r.deadline!==''; }).map(function(r){
+    var d=toInputDate(r.deadline);
+    if(!d) return null;
+    var evClass = r.priorita==='Urgentní' ? 'ev-urgent' : (EV_CLASS_VYR[r.stav]||'');
+    return {id:r.id, obj:r.obj||'', zakaznik:r.zakaznik||'', stav:r.stav||'', priorita:r.priorita||'', date:d, evClass:evClass};
+  }).filter(Boolean);
+}
+
+function renderCalendar(){
+  document.getElementById('cal-month-label').textContent=MONTHS_CS[calMonth]+' '+calYear;
+  var events=getCalEvents();
+  var firstDay=new Date(calYear,calMonth,1);
+  var startDow=firstDay.getDay(); startDow=startDow===0?6:startDow-1;
+  var dim=new Date(calYear,calMonth+1,0).getDate();
+  var dip=new Date(calYear,calMonth,0).getDate();
+  var total=Math.ceil((startDow+dim)/7)*7;
+  var html='';
+  for(var i=0;i<total;i++){
+    var dn,mo=0;
+    if(i<startDow){dn=dip-startDow+i+1;mo=-1;}
+    else if(i>=startDow+dim){dn=i-startDow-dim+1;mo=1;}
+    else{dn=i-startDow+1;}
+    var cd=new Date(calYear,calMonth+mo,dn);
+    var isT=dateStr(cd)===dateStr(today),isSat=cd.getDay()===6,isSun=cd.getDay()===0,other=mo!==0;
+    var cdStr=dateStr(cd);
+    var hol=isHoliday(cdStr);
+    var holName=hol?getHolidayName(cdStr):'';
+    var evs=events.filter(function(ev){ return ev.date===cdStr; });
+    var evHtml=evs.slice(0,3).map(function(ev){
+      var label=(ev.obj?ev.obj+' ':'')+(ev.zakaznik||'?');
+      return '<div class="cal-event '+ev.evClass+'" onclick="event.stopPropagation();openModal(\''+ev.id+'\')" title="'+label+' ('+ev.stav+')">'+label+'</div>';
+    }).join('');
+    if(evs.length>3) evHtml+='<div style="font-size:9px;color:#888;padding:1px 4px;">+'+String(evs.length-3)+' další</div>';
+    html+='<div class="cal-day'+(other?' other-month':'')+(isT?' today':'')+(evs.length?' has-event':'')+(hol?' holiday':'')+'" '+((isSat||isSun)&&!hol?'style="background:#f8f6f0;"':'')+'>';
+    if(holName) html+='<div class="holiday-name">'+holName+'</div>';
+    html+='<div class="day-num" style="'+((isSat||isSun)||hol?'color:#c05050;':'')+'">'+dn+'</div>';
+    html+=evHtml;
+    if(evs.length&&!other) html+='<div class="day-busy-bar"></div>';
+    html+='</div>';
+  }
+  document.getElementById('cal-days').innerHTML=html;
 }
 
 loadData();
