@@ -1036,8 +1036,10 @@ async function deleteFromHistory(id) {
 
 async function reloadFromHistory(url) {
   if (!url) return;
-  document.getElementById('single-url').value = url;
+  // Strip fragment (#) from URL - causes proxy issues
+  url = url.split('#')[0];
   switchTab('single');
+  document.getElementById('single-url').value = url;
   await loadSingle();
 }
 
