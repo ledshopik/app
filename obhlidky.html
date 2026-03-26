@@ -363,7 +363,7 @@ tbody tr[data-stav="Čeká na rozhodnutí"] td:first-child { border-left: 3px so
       <div class="form-group"><label>Čas jízdy (min)</label><input type="number" id="f-cas-jizdy" placeholder="min" min="0" step="1" oninput="calcCosts()"></div>
       <div class="form-group full"><label>Předmět obhlídky</label><input type="text" id="f-predmet" placeholder="Co se bude řešit..."></div>
       <div class="form-group"><label>Datum obhlídky</label><input type="date" id="f-datum"></div>
-      <div class="form-group"><label>Technik</label><input type="text" id="f-technik" placeholder="Kdo pojede"></div>
+      <div class="form-group"><label>Technik</label><input type="text" id="f-technik" placeholder="Kdo pojede" list="dl-zamestnanci"><datalist id="dl-zamestnanci"><option value="Ondra"><option value="David"><option value="Michal"><option value="Erik"><option value="Lukáš"><option value="Mário"><option value="Tom"><option value="Kuba"><option value="Petr"><option value="Miriam"><option value="Filip"><option value="Eve"></datalist></div>
       <div class="form-group"><label>Email zákazníka</label><input type="email" id="f-email" placeholder="email@zakaznik.cz"></div>
       <div class="form-group"><label>Odhadovaná cena zakázky</label><input type="number" id="f-cena-odhad" placeholder="Kč" min="0" step="100"></div>
       <div class="form-group"><label>Výsledek obhlídky</label>

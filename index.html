@@ -1080,15 +1080,18 @@ async function loadWeather(){
     if(cached && (Date.now()-cachedTime < 30*60*1000)){
       data = JSON.parse(cached);
     } else {
-      // Použij navigator.geolocation, fallback na Ostravu
-      let location = 'Ostrava';
+      // Geolokace → IP lokace → fallback Ostrava
+      let location = '';
       try {
         const pos = await new Promise((resolve, reject) => {
           if (!navigator.geolocation) return reject('no geolocation');
           navigator.geolocation.getCurrentPosition(resolve, reject, {timeout: 5000, maximumAge: 600000});
         });
         location = pos.coords.latitude.toFixed(4) + ',' + pos.coords.longitude.toFixed(4);
-      } catch(geoErr) { /* fallback na Ostravu */ }
+      } catch(geoErr) {
+        try { const ipRes = await fetch('https://ipapi.co/city/'); location = await ipRes.text(); } catch(e2) {}
+      }
+      if (!location || location.length < 2) location = 'Ostrava';
       const res = await fetch('https://wttr.in/' + encodeURIComponent(location) + '?format=j1');
       data = await res.json();
       if(data.nearest_area && data.nearest_area[0]){
