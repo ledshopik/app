@@ -415,7 +415,7 @@ const DEFAULT_PRICES = {
   typ_pasky:       {'jednobarva':100,'CCT':200,'RGB':300,'RGBW':400,'RGBCCT':500},
   pocet_rad:       {'1':0,'2':200,'3':400,'4':600},
   vestavny_zdroj:  {'Ano':300,'Ne':0},
-  montaz:          {'Přisazená':100,'Závěsná':200,'Závěsná s napájením':350},
+  montaz:          {'Vlastní':0,'Přisazená':100,'Závěsná':200,'Závěsná s napájením':350},
 };
 
 function loadPrices() {
@@ -443,7 +443,7 @@ function getSections() {
     {id:'typ_pasky',       label:'Typ pásky',          opts:['jednobarva','CCT','RGB','RGBW','RGBCCT']},
     {id:'pocet_rad',       label:'Počet řad pásky',    opts:['1','2','3','4']},
     {id:'vestavny_zdroj',  label:'Vestavný zdroj',     opts:['Ano','Ne']},
-    {id:'montaz',          label:'Montáž',             opts:['Přisazená','Závěsná','Závěsná s napájením']},
+    {id:'montaz',          label:'Montáž',             opts:['Vlastní','Přisazená','Závěsná','Závěsná s napájením']},
   ];
 }
 
