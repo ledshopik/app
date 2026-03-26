@@ -1058,7 +1058,8 @@ async function importFromEshop() {
       if (zetaImg) p.image = zetaImg[1].replace(/shrink_\d+_\d+/, 'shrink_500_500');
     }
     if (p.image && !p.image.startsWith('http')) {
-      try { p.image = new URL(p.image, url).href; } catch(e) { p.image = 'https://www.ledshopik.cz/' + p.image.replace(/^\//, ''); }
+      var baseUrl = url.match(/^(https?:\/\/[^\/]+)/);
+      p.image = (baseUrl ? baseUrl[1] : 'https://www.ledshopik.cz') + '/' + p.image.replace(/^\//, '');
     }
 
     // ── STEP 3: Extract params from name (pipe-separated) + body text ──
