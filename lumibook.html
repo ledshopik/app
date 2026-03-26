@@ -1452,6 +1452,7 @@ function saveFixture() {
 // RENDER
 // ══════════════════════════════════════
 function render() {
+  console.log('render() called, fixtures:', fixtures.length, 'view:', view);
   save();
   updateStats();
   renderRoomTabs();
@@ -1466,8 +1467,11 @@ function render() {
     return;
   }
 
-  if (view === 'grid') renderGrid(filtered);
-  else renderTable(filtered);
+  console.log('render: filtered', filtered.length, 'view', view, 'area', area ? 'exists' : 'MISSING');
+  try {
+    if (view === 'grid') renderGrid(filtered);
+    else renderTable(filtered);
+  } catch(e) { console.error('RENDER ERROR:', e); area.innerHTML = '<div style="color:red;padding:20px">Chyba renderování: '+e.message+'</div>'; }
 }
 
 function renderGrid(items) {
