@@ -8,6 +8,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Arial Narrow', Arial, sans-serif; background: #f4f2ed; color: #1a1a1a; min-height: 100vh; }
 button, input, select, textarea { font-family: inherit; }
+option, datalist option { color: #333; background: #fff; }
 
 :root { --accent: #b08820; --accent-bg: #faf3e0; --accent-border: #e0cc90; }
 
@@ -153,7 +154,7 @@ button, input, select, textarea { font-family: inherit; }
   </div>
 </div>
 <div style="background:#fff;border-bottom:1px solid #e0e0e0;padding:0 24px;display:flex;align-items:stretch;gap:2px;font-family:Arial Narrow,Arial,sans-serif;flex-wrap:wrap;">
-  <a href="index.html" style="padding:8px 14px;border-top:3px solid #60a0e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:4px;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">⌂ DASHBOARD<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Přehled</span></a>
+  <a href="index.html" style="padding:8px 14px;border-top:3px solid #60a0e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:4px;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">⌂ WORKSPACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Přehled</span></a>
   <a href="instalace.html" style="padding:8px 14px;border-top:3px solid #e2b830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">INSTALACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Montáže</span></a>
   <a href="vyroba.html" style="padding:8px 14px;border-top:3px solid #f07030;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">VÝROBA<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Zakázky</span></a>
   <a href="obhlidky.html" style="padding:8px 14px;border-top:3px solid #3ab0a0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">OBHLÍDKY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Termíny</span></a>
@@ -173,7 +174,9 @@ button, input, select, textarea { font-family: inherit; }
 </div>
 
 <div id="toolbar">
-  <button class="tb-btn" id="btn-nast" onclick="toggleNastaveni()">⚙ Nastavení sazeb</button>
+  <button class="tb-btn active" id="tab-kalk" onclick="switchKalkTab('kalk')">📋 Kalkulátor</button>
+  <button class="tb-btn" id="tab-sazby" onclick="switchKalkTab('sazby')">💰 Nastavení sazeb</button>
+  <div style="width:1px;height:20px;background:#ddd;margin:0 6px;"></div>
   <button class="tb-btn" onclick="loadAllData()">↻ Obnovit</button>
   <button class="tb-btn" id="btn-hist" onclick="toggleHistorie()">📋 Historie</button>
   <div style="flex:1;"></div>
@@ -186,7 +189,6 @@ button, input, select, textarea { font-family: inherit; }
     <h3>⚙ NASTAVENÍ SAZEB</h3>
     <div style="display:flex;gap:10px;">
       <button class="btn-nast" onclick="saveAllSazby()">💾 Uložit vše</button>
-      <button class="btn-nast-cancel" onclick="toggleNastaveni()">Zavřít</button>
     </div>
   </div>
   <div class="nast-body">
@@ -559,14 +561,26 @@ function recalc(){
   }
 }
 
-// ── Nastavení ────────────────────────────────────────────────────────────────
-function toggleNastaveni(){
-  const el=document.getElementById('nastaveni');
-  const show=el.style.display==='none';
-  el.style.display=show?'block':'none';
-  document.getElementById('btn-nast').classList.toggle('active',show);
-  if(show) fillNastaveni();
+// ── Tab switching ────────────────────────────────────────────────────────────
+function switchKalkTab(tab){
+  const mainEl=document.getElementById('main');
+  const nastEl=document.getElementById('nastaveni');
+  const tabKalk=document.getElementById('tab-kalk');
+  const tabSazby=document.getElementById('tab-sazby');
+  if(tab==='sazby'){
+    mainEl.style.display='none';
+    nastEl.style.display='block';
+    tabKalk.classList.remove('active');
+    tabSazby.classList.add('active');
+    fillNastaveni();
+  } else {
+    mainEl.style.display='';
+    nastEl.style.display='none';
+    tabKalk.classList.add('active');
+    tabSazby.classList.remove('active');
+  }
 }
+function toggleNastaveni(){ switchKalkTab(document.getElementById('nastaveni').style.display==='none'?'sazby':'kalk'); }
 
 function fillNastaveni(){
   document.getElementById('n-km').value=getConf('sazba_km');
