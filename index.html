@@ -1050,7 +1050,8 @@ function openTaskModal(id){
   document.getElementById('tm-title').textContent = t ? 'Upravit úkol' : 'Nový úkol';
   document.getElementById('tm-delete-btn').style.display = t ? 'inline-flex' : 'none';
   document.getElementById('tm-id').value = t ? t.id : '';
-  document.getElementById('tm-text').value = t ? t.text : '';
+  const quickInput = document.getElementById('new-task-input');
+  document.getElementById('tm-text').value = t ? t.text : (quickInput ? quickInput.value.trim() : '');
   document.getElementById('tm-typ').value = t ? t.typ : 'rychly';
   document.getElementById('tm-priorita').value = t ? t.priorita : 'normalni';
   document.getElementById('tm-prirazeno').value = t ? t.prirazeno_komu : user;
