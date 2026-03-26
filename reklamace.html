@@ -183,6 +183,105 @@ tbody tr[data-stav="Přijato dodavatelem"]     td:first-child { border-left: 3px
 .weather-fc-day .fc-name { font-size:8px; color:#888; text-transform:uppercase; letter-spacing:.05em; }
 .weather-fc-day .fc-icon { font-size:14px; line-height:1.2; }
 .weather-fc-day .fc-temp { font-size:10px; font-weight:700; color:#1a1a1a; }
+/* ===== RESPONSIVE: iPad (max-width 768px) ===== */
+@media (max-width: 768px) {
+  #nav-bar, #nav, #ls-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+  }
+  #nav-bar a, #nav a, #ls-nav a {
+    font-size: 11px !important;
+    padding: 6px 10px !important;
+    min-width: auto !important;
+  }
+  #header {
+    padding: 8px 12px !important;
+    gap: 8px !important;
+  }
+  #team-bar {
+    display: none !important;
+  }
+  .weather-widget, #weather-widget {
+    display: none !important;
+  }
+  #user-controls {
+    padding: 4px 12px !important;
+    font-size: 11px !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  #toolbar {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    padding: 8px 12px !important;
+  }
+  .filter-btn {
+    font-size: 10px !important;
+    padding: 4px 10px !important;
+  }
+  #search-wrap {
+    width: 100% !important;
+    order: 99;
+  }
+  .stats, #stats-bar, [class*="stats"] {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .stat {
+    min-width: 60px !important;
+    padding: 6px 10px !important;
+  }
+  #table-wrap, .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table {
+    min-width: 600px;
+  }
+  tbody td {
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+  }
+  thead th {
+    padding: 6px 8px !important;
+    font-size: 9px !important;
+  }
+  #calendar-section {
+    margin: 0 8px 20px !important;
+  }
+  .cal-day {
+    min-height: 60px !important;
+    font-size: 10px !important;
+  }
+  .cal-ev {
+    font-size: 8px !important;
+    padding: 1px 3px !important;
+  }
+  .modal, [id*="modal"]:not([id*="overlay"]) {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 10px auto !important;
+  }
+  .modal-body, #modal-body {
+    max-height: 60vh !important;
+  }
+}
+
+/* ===== RESPONSIVE: iPhone (max-width 480px) ===== */
+@media (max-width: 480px) {
+  #header a[href="manual.html"] {
+    display: none !important;
+  }
+  .modal, [id*="modal"]:not([id*="overlay"]) {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    min-height: 100vh;
+  }
+}
+
 </style>
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script></head>
 <body>
@@ -207,7 +306,7 @@ tbody tr[data-stav="Přijato dodavatelem"]     td:first-child { border-left: 3px
   </div>
 </div>
 
-<div style="background:#fff;border-bottom:1px solid #e0e0e0;padding:0 24px;display:flex;align-items:stretch;gap:2px;font-family:Arial Narrow,Arial,sans-serif;">
+<div id="nav-bar" style="background:#fff;border-bottom:1px solid #e0e0e0;padding:0 24px;display:flex;align-items:stretch;gap:2px;font-family:Arial Narrow,Arial,sans-serif;">
   <a href="index.html" style="padding:8px 14px;border-top:3px solid #60a0e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:4px;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">⌂ DASHBOARD<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Přehled</span></a>
   <a href="instalace.html" style="padding:8px 14px;border-top:3px solid #e2b830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">INSTALACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Montáže</span></a>
   <a href="vyroba.html" style="padding:8px 14px;border-top:3px solid #f07030;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">VÝROBA<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Zakázky</span></a>
