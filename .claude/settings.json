@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/LEDshopik/app/.claude/auto-version.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
