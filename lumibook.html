@@ -671,37 +671,25 @@ function save() {
     localStorage.setItem('lb-tagN', tagN);
     localStorage.setItem('lb-project', JSON.stringify(getProjectInfo()));
   } catch(e) {}
-  // Debounced server sync
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(syncProjectToServer, 1500);
 }
 function syncProjectToServer(){
   var pi = getProjectInfo();
-  var currentProjectId = localStorage.getItem('lb-current-project-id');
-  if(!currentProjectId){ currentProjectId = String(Date.now()); localStorage.setItem('lb-current-project-id', currentProjectId); }
-  var project = {
-    id: currentProjectId, uzivatel: localStorage.getItem('ledshopik_user')||'',
-    nazev: pi.name||'', zakaznik: pi.client||'', datum: pi.date||'',
-    cislo: pi.num||'', autor: pi.author||'', poznamka: pi.note||'',
-    fixtures_json: JSON.stringify(fixtures), rooms_json: JSON.stringify(customRooms), tag_n: String(tagN)
-  };
+  var pid = localStorage.getItem('lb-current-project-id');
+  if(!pid){ pid = String(Date.now()); localStorage.setItem('lb-current-project-id', pid); }
   fetch(LB_SB_URL+'/rest/v1/lumibook_projects',{
     method:'POST', headers:{...LB_SB_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},
-    body:JSON.stringify(project)
-  }).catch(function(e){ console.error('Sync error:',e); });
+    body:JSON.stringify({id:pid,uzivatel:localStorage.getItem('ledshopik_user')||'',nazev:pi.name||'',zakaznik:pi.client||'',datum:pi.date||'',cislo:pi.num||'',autor:pi.author||'',poznamka:pi.note||'',fixtures_json:JSON.stringify(fixtures),rooms_json:JSON.stringify(customRooms),tag_n:String(tagN)})
+  }).catch(function(e){console.error('Sync error:',e)});
 }
 function saveDB() {
   try { localStorage.setItem('lb-database', JSON.stringify(database)); } catch(e) {}
   if(!database.length) return;
-  var rows = database.map(function(item,i){
-    if(!item.id) item.id = String(Date.now())+'-'+i;
-    return {id: item.id, data_json: JSON.stringify(item)};
-  });
-  fetch(LB_SB_URL+'/rest/v1/lumibook_database',{
-    method:'POST', headers:{...LB_SB_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},
-    body:JSON.stringify(rows)
-  }).catch(function(e){ console.error('DB save error:',e); });
+  var rows = database.map(function(item,i){ if(!item.id) item.id=String(Date.now())+'-'+i; return {id:item.id,data_json:JSON.stringify(item)}; });
+  fetch(LB_SB_URL+'/rest/v1/lumibook_database',{method:'POST',headers:{...LB_SB_HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows)}).catch(function(e){console.error('DB save:',e)});
 }
+
 async function loadDBFromServer() {
   try {
     var res = await fetch(LB_SB_URL+'/rest/v1/lumibook_database?select=*',{headers:LB_SB_HEADERS});
@@ -710,10 +698,9 @@ async function loadDBFromServer() {
     if(Array.isArray(arr) && arr.length > 0) {
       database = arr.map(function(row){ try { var p=JSON.parse(row.data_json); if(!p.id) p.id=row.id; return p; } catch(e){ return row; } });
       try { localStorage.setItem('lb-database', JSON.stringify(database)); } catch(e){}
-      dbFromSheets = true;
-      renderDB();
+      dbFromSheets = true; renderDB();
     }
-  } catch(e) { console.error('DB load error:', e); }
+  } catch(e) { console.error('DB load:', e); }
 }
 function load() {
   try {
@@ -738,6 +725,8 @@ function load() {
       if(pi.note) document.getElementById('p-note').value = pi.note;
     }
   } catch(e) {}
+  // Auto-create project ID
+  if(!localStorage.getItem('lb-current-project-id')) localStorage.setItem('lb-current-project-id', String(Date.now()));
 }
 function getProjectInfo() {
   return {
@@ -902,10 +891,7 @@ async function importFromEshop() {
           if (ld['@type'] === 'Product') {
             p.name = ld.name || '';
             p.note = ld.description || '';
-            var ldImg = ld.image || '';
-            if (Array.isArray(ldImg)) ldImg = ldImg[0] || '';
-            if (typeof ldImg === 'object' && ldImg.url) ldImg = ldImg.url;
-            p.image = ldImg;
+            var ldImg = ld.image || ''; if(Array.isArray(ldImg)) ldImg=ldImg[0]||''; if(typeof ldImg==='object'&&ldImg.url) ldImg=ldImg.url; p.image = ldImg;
             if (ld.offers) p.price = parseFloat(ld.offers.price) || 0;
             if (ld.sku) p.note = (p.note ? p.note + ' | ' : '') + 'SKU: ' + ld.sku;
             foundProduct = true;
@@ -929,13 +915,9 @@ async function importFromEshop() {
       const metaDesc = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
       if (metaDesc) p.note = metaDesc[1];
     }
-    // Fallback image: eshop-specific patterns (Shoptet maxi first, then any fotky)
+    // Fallback image: eshop-specific patterns
     if (!p.image) {
-      const maxiMatch = html.match(/["'](https?:\/\/[^"']*\/fotky\/maxi\/[^"']*\.(?:jpg|png|webp))[^"']*["']/i);
-      if (maxiMatch) p.image = maxiMatch[1];
-    }
-    if (!p.image) {
-      const imgPat = html.match(/["'](https?:\/\/[^"']*\/fotky\/[^"']*\.(?:jpg|png|webp))[^"']*["']/i);
+      const imgPat = html.match(/["'](https?:\/\/[^"']*\/fotky\/[^"']*\.(?:jpg|png|webp)[^"']*)["']/i);
       if (imgPat) p.image = imgPat[1];
     }
     // Fix relative image URLs
@@ -957,8 +939,8 @@ async function importFromEshop() {
 
     // CCT — deduplicate
     const cctRange = bodyText.match(/(\d{4})\s*[-–]\s*(\d{4,5})\s*K/);
-    if (cctRange) { p.cct = cctRange[1] + '-' + cctRange[2] + 'K'; }
-    else { const cctAll = bodyText.match(/(\d{4,5})\s*K/g); if (cctAll) { const unique = [...new Set(cctAll.map(m => m.trim()))]; p.cct = unique.join(', '); } }
+    if (cctRange) { p.cct = cctRange[1]+'-'+cctRange[2]+'K'; }
+    else { const cctAll = bodyText.match(/(\d{4,5})\s*K/g); if (cctAll) { const unique=[...new Set(cctAll.map(m=>m.trim()))]; p.cct=unique.join(', '); } }
 
     // CRI
     const criMatch = bodyText.match(/CRI[:\s>]*(\d+)/i) || bodyText.match(/Ra[:\s>]*(\d+)/i);
@@ -1653,11 +1635,12 @@ document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.key === 'n') { e.preventDefault(); openAddModal(); }
   if (e.ctrlKey && e.key === 'p') { e.preventDefault(); exportPDF(); }
 });
+
 if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 document.getElementById('user-bar-name').textContent=localStorage.getItem('ledshopik_user')||'';
 function logout(){localStorage.removeItem('ledshopik_user');window.location.href='login.html';}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-lumibook_database').on('postgres_changes',{event:'*',schema:'public',table:'lumibook_database'},function(){console.log('RT:lumibook_database');if(typeof loadDBFromServer==='function')loadDBFromServer();}).subscribe();sb.channel('rt-lumibook_projects').on('postgres_changes',{event:'*',schema:'public',table:'lumibook_projects'},function(){console.log('RT:lumibook_projects');}).subscribe();})();</script>
+<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-lb-db').on('postgres_changes',{event:'*',schema:'public',table:'lumibook_database'},function(){if(typeof loadDBFromServer==='function')loadDBFromServer();}).subscribe();})();</script>
 </body>
 </html>
