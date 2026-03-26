@@ -915,18 +915,19 @@ async function importFromEshop() {
       const metaDesc = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
       if (metaDesc) p.note = metaDesc[1];
     }
-    // Fallback image: eshop-specific patterns (full URLs)
+    // Fallback image: LEDshopik zeta/fotky paths (thumbnail → 500x500)
+    if (!p.image) {
+      var allZeta = html.match(/["']((?:https?:\/\/[^"']*)?zeta\/temp\/fotky\/cache\/[^"']*\.(?:jpg|jpeg|png|webp))["']/gi);
+      if (allZeta) {
+        var best = allZeta[0].replace(/^["']|["']$/g,'').replace(/shrink_\d+_\d+/, 'shrink_500_500');
+        if (!best.startsWith('http')) { try { best = new URL(best, url).href; } catch(e) { best = 'https://www.ledshopik.cz/' + best; } }
+        p.image = best;
+      }
+    }
+    // Fallback: any eshop product image
     if (!p.image) {
       const imgPat = html.match(/["'](https?:\/\/[^"']*\/fotky\/[^"']*\.(?:jpg|jpeg|png|webp)[^"']*)["']/i);
       if (imgPat) p.image = imgPat[1];
-    }
-    // Fallback: relative zeta/temp/fotky paths (LEDshopik eshop)
-    if (!p.image) {
-      const zetaImg = html.match(/["'](zeta\/temp\/fotky\/[^"']*\.(?:jpg|jpeg|png|webp))[^"']*/i);
-      if (zetaImg) {
-        var imgPath = zetaImg[1].replace(/shrink_\d+_\d+/, 'shrink_500_500');
-        try { p.image = new URL(imgPath, url).href; } catch(e) { p.image = 'https://www.ledshopik.cz/' + imgPath; }
-      }
     }
     // Fix relative image URLs
     if (p.image && !p.image.startsWith('http')) {
@@ -945,10 +946,10 @@ async function importFromEshop() {
     const lmMatch = bodyText.match(/(\d+(?:[.,]\d+)?)\s*lm\s*(?:\/\s*m|na\s*metr)/i) || bodyText.match(/(\d+(?:[.,]\d+)?)\s*lm/i);
     if (lmMatch) p.lumen = parseFloat(lmMatch[1].replace(',','.'));
 
-    // CCT — deduplicate
+    // CCT — deduplicate and limit to unique values
     const cctRange = bodyText.match(/(\d{4})\s*[-–]\s*(\d{4,5})\s*K/);
     if (cctRange) { p.cct = cctRange[1]+'-'+cctRange[2]+'K'; }
-    else { const cctAll = bodyText.match(/(\d{4,5})\s*K/g); if (cctAll) { const unique=[...new Set(cctAll.map(m=>m.trim()))]; p.cct=unique.join(', '); } }
+    else { const cctAll = bodyText.match(/(\d{4,5})\s*K/g); if (cctAll) { const seen=new Set(); const unique=[]; cctAll.forEach(function(m){ var v=m.trim().replace(/\s+/g,''); if(!seen.has(v)){seen.add(v);unique.push(v);}}); p.cct=unique.slice(0,4).join(', '); } }
 
     // CRI
     const criMatch = bodyText.match(/CRI[:\s>]*(\d+)/i) || bodyText.match(/Ra[:\s>]*(\d+)/i);
