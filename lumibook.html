@@ -1110,7 +1110,7 @@ async function importFromEshop() {
     // Truncate note to 2 sentences
     if (p.note && p.note.length > 150) p.note = p.note.split(/[.!]/).slice(0,2).join('. ').trim();
 
-    console.log('Parsed (no AI):', p);
+    console.log('Parsed (no AI):', JSON.stringify(p));
 
     // ── Detect product category from name ──
     const nl = (p.name || url).toLowerCase();
@@ -1124,7 +1124,8 @@ async function importFromEshop() {
     const isWall = (nl.includes('svítidlo') || nl.includes('svitidlo')) && (nl.includes('nástěn') || nl.includes('nasten') || nl.includes('wall'));
     const isOutdoor = (nl.includes('svítidlo') || nl.includes('svitidlo')) && (nl.includes('venkov') || nl.includes('outdoor') || nl.includes('ip65') || nl.includes('ip66') || nl.includes('ip67'));
     const isFixture = (nl.includes('svítidlo') || nl.includes('svitidlo')) && !isRail;
-    const isStrip = nl.includes('pásek') || nl.includes('pasek') || nl.includes('strip');
+    const dlType = (p.type || '').toLowerCase();
+    const isStrip = nl.includes('pásek') || nl.includes('pasek') || nl.includes('strip') || nl.includes('neon') || dlType.includes('pás');
     const isMagnetic = nl.includes('magnet') && (nl.includes('svítidlo') || nl.includes('svitidlo') || nl.includes('spot') || nl.includes('linear'));
     console.log('Category detect:', {name: nl, isProfile, isPSU, isDimmer, isRail, isFixture, isMagnetic});
 
