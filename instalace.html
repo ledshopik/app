@@ -485,7 +485,7 @@ async function sbDelete(table,id){
   if(!res.ok){ const t=await res.text(); throw new Error(t); }
 }
 
-function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderTable(); }
+function setFilter(f){ filterVal=(filterVal===f && f!=='vse')?'vse':f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===filterVal)); renderTable(); }
 function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTable(); }
 
 function getFiltered(){
