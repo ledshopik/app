@@ -390,7 +390,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
       </div>
       <div class="form-group"><label>Datum objednání</label><input type="date" id="f-datum-obj"></div>
       <div class="form-group"><label>Termín zákazník</label><input type="date" id="f-termin-zak"></div>
-      <div class="form-group"><label>Termín dodavatel</label><input type="date" id="f-termin-dod"></div>
+      <div class="form-group"><label>Termín dokončení výroby</label><input type="date" id="f-termin-dod"></div>
       <div class="form-group"><label>Očekávané doručení</label><input type="date" id="f-doruceni"></div>
       <div class="form-group"><label>Tracking číslo</label><input type="text" id="f-tracking" placeholder="např. 1Z999AA1..."></div>
       <div class="form-group"><label>Vazba na zakázku</label><input type="text" id="f-vazba" placeholder="OBJ. Č. zákazníka"></div>
@@ -1023,7 +1023,7 @@ function exportXLSX(){
     'Doprava': r.zpusob_dopravy||'',
     'Objednáno': r.datum_objednani||'',
     'Termín zákazník': r.termin_zakaznik||'',
-    'Termín dodavatel': r.termin_dodavatel||'',
+    'Termín dokončení výroby': r.termin_dodavatel||'',
     'Očekávané doručení': r.ocekavane_doruceni||'',
     'Tracking': r.tracking||'',
     'Vazba': r.vazba_zakazka||'',
