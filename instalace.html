@@ -6,143 +6,250 @@
 <title>LEDshopik – Instalace</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Arial Narrow', 'Arial', sans-serif; background: #0f1117; color: #e8e4dc; min-height: 100vh; }
+body { font-family: 'Arial Narrow', 'Arial', sans-serif; background: #f4f2ed; color: #1a1a1a; min-height: 100vh; }
 button, input, select, textarea { font-family: inherit; }
-#header { background: #0f1117; border-bottom: 1px solid #1e2230; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
-.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #4a5060; text-transform: uppercase; margin-bottom: 4px; }
-.header-left .title   { font-size: 22px; font-weight: 900; letter-spacing: .06em; color: #e8e4dc; line-height: 1; }
-.header-left .title span { color: #e2b830; }
+option, datalist option { color: #333; background: #fff; }
+/* App Header */
+#header {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-accent { width: 4px; height: 48px; background: #e2b830; border-radius: 2px; flex-shrink: 0; }
+.header-title-wrap { margin-left: 14px; }
+.header-eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; color: #1a1a1a; }
+.header-date { text-align: right; }
+.header-date .day { font-size: 24px; font-weight: 900; color: #e2b830; letter-spacing: .02em; line-height: 1; }
+.header-date .month { font-size: 10px; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
 .stats { display: flex; gap: 6px; flex-wrap: wrap; }
-.stat { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+.stat { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
 .stat .num { font-size: 18px; font-weight: 800; line-height: 1; }
-.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; margin-top: 2px; }
-#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4a5060; }
-#sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #4a5060; flex-shrink: 0; }
+.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #888; text-transform: uppercase; margin-top: 2px; }
+#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; }
+#sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; flex-shrink: 0; }
 #sync-dot.ok      { background: #40a050; }
 #sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
 #sync-dot.error   { background: #c05050; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #1e2230; background: #0f1117; }
-.filter-btn { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
-.filter-btn:hover { border-color: #3a3d4a; color: #c0c8d0; }
-.filter-btn.active { background: #e2b830; color: #0f1117; border-color: #e2b830; }
+#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #e8e4dc; background: #f4f2ed; }
+.filter-btn { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+.filter-btn:hover { border-color: #bbb; color: #444; }
+.filter-btn.active { background: #e2b830; color: #fff; border-color: #e2b830; }
 .filter-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 #search-wrap { margin-left: auto; position: relative; }
-#search-wrap input { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; transition: border-color .2s; }
+#search-wrap input { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; transition: border-color .2s; }
 #search-wrap input:focus { border-color: #e2b830; }
-#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #4a5060; }
-#btn-add { background: #e2b830; color: #0f1117; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
+#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #888; }
+#btn-add { background: #e2b830; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
 #btn-add:hover { background: #f0c840; }
-#btn-refresh { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
-#btn-refresh:hover { color: #e8e4dc; }
+#btn-refresh { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+#btn-refresh:hover { color: #1a1a1a; }
 #table-wrap { padding: 0 32px; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 980px; }
-thead th { background: #1a1d26; color: #4a5060; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2d3a; white-space: nowrap; cursor: pointer; user-select: none; transition: color .15s; }
+thead th { background: #fff; color: #888; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #ddd; white-space: nowrap; cursor: pointer; user-select: none; transition: color .15s; }
 thead th:hover { color: #e2b830; }
 thead th.sorted { color: #e2b830; }
 thead th .sort-arrow { margin-left: 4px; font-size: 9px; }
-tbody tr { border-bottom: 1px solid #1a1d26; transition: background .12s; cursor: pointer; }
-tbody tr:hover { background: #161820; }
-tbody td { padding: 13px 14px; font-size: 12px; vertical-align: top; color: #c0c8d0; }
-td.obj { font-weight: 700; color: #e8e4dc; font-size: 13px; white-space: nowrap; }
-td.misto { color: #e8e4dc; font-weight: 600; }
+tbody tr { border-bottom: 1px solid #f4f2ed; transition: background .12s; cursor: pointer; }
+tbody tr:hover { background: #f8f6f0; }
+tbody td { padding: 13px 14px; font-size: 12px; vertical-align: top; color: #444; }
+td.obj { font-weight: 700; color: #1a1a1a; font-size: 13px; white-space: nowrap; }
+td.misto { color: #1a1a1a; font-weight: 600; }
 td.datum { white-space: nowrap; }
-td.poznamky { color: #8890a0; font-size: 11px; max-width: 200px; }
+td.poznamky { color: #999; font-size: 11px; max-width: 200px; }
 td.delka { white-space: nowrap; text-align: center; }
-.delka-badge { display: inline-block; background: #1a2235; color: #6080c0; border: 1px solid #2a3555; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+.delka-badge { display: inline-block; background: #e8f0ff; color: #6080c0; border: 1px solid #c8d8f0; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
 .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: .06em; white-space: nowrap; }
 .badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.s-planovano { background: #1a2235; color: #6080c0; border: 1px solid #2a3555; } .s-planovano .badge-dot { background: #6080c0; }
-.s-probiha   { background: #1a2820; color: #50c080; border: 1px solid #255030; } .s-probiha   .badge-dot { background: #50c080; }
-.s-hotovo    { background: #1a2a1a; color: #40a050; border: 1px solid #204530; } .s-hotovo    .badge-dot { background: #40a050; }
-.s-zruseno   { background: #2a1a1a; color: #c05050; border: 1px solid #552020; } .s-zruseno   .badge-dot { background: #c05050; }
-.s-ceka      { background: #2a2010; color: #e2b830; border: 1px solid #554020; } .s-ceka      .badge-dot { background: #e2b830; }
+.s-planovano { background: #e8f0ff; color: #6080c0; border: 1px solid #c8d8f0; } .s-planovano .badge-dot { background: #6080c0; }
+.s-probiha   { background: #e0f4e8; color: #50c080; border: 1px solid #c0e8d0; } .s-probiha   .badge-dot { background: #50c080; }
+.s-hotovo    { background: #e0f0e0; color: #40a050; border: 1px solid #c0dcc0; } .s-hotovo    .badge-dot { background: #40a050; }
+.s-zruseno   { background: #fce8e8; color: #c05050; border: 1px solid #f0c8c8; } .s-zruseno   .badge-dot { background: #c05050; }
+.s-ceka      { background: #fdf4d8; color: #e2b830; border: 1px solid #f0e0a0; } .s-ceka      .badge-dot { background: #e2b830; }
 tbody tr[data-status="Naplánováno"]       td:first-child { border-left: 3px solid #6080c0; }
 tbody tr[data-status="Probíhá"]           td:first-child { border-left: 3px solid #50c080; }
 tbody tr[data-status="Hotovo"]            td:first-child { border-left: 3px solid #40a050; }
 tbody tr[data-status="Zrušeno"]           td:first-child { border-left: 3px solid #c05050; }
 tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px solid #e2b830; }
-#empty-state { text-align: center; padding: 60px 20px; color: #4a5060; display: none; }
+#empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
 #empty-state .big { font-size: 36px; margin-bottom: 10px; }
-#calendar-section { margin: 32px 32px 40px; background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; overflow: hidden; }
-#cal-header { padding: 16px 24px; border-bottom: 1px solid #1e2230; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+#calendar-section { margin: 32px 32px 40px; background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
+#cal-header { padding: 16px 24px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 #cal-header .cal-title { font-size: 15px; font-weight: 800; letter-spacing: .06em; }
 #cal-nav { display: flex; align-items: center; gap: 10px; }
-#cal-nav button { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
-#cal-nav button:hover { color: #e8e4dc; }
+#cal-nav button { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
+#cal-nav button:hover { color: #1a1a1a; }
 #cal-month-label { font-size: 14px; font-weight: 700; min-width: 140px; text-align: center; letter-spacing: .05em; }
-#btn-today { background: #e2b830; color: #0f1117; border: none; border-radius: 6px; padding: 5px 14px; font-size: 11px; font-weight: 700; cursor: pointer; }
+#btn-today { background: #e2b830; color: #fff; border: none; border-radius: 6px; padding: 5px 14px; font-size: 11px; font-weight: 700; cursor: pointer; }
 #cal-legend { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-.leg { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #4a5060; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #888; }
 .leg-dot { width: 10px; height: 10px; border-radius: 2px; }
 #cal-grid { padding: 16px 24px 20px; }
-.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 6px; }
-.cal-weekday { text-align: center; font-size: 10px; font-weight: 700; letter-spacing: .1em; color: #4a5060; padding: 4px 0; text-transform: uppercase; }
-.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-.cal-day { min-height: 72px; background: #1a1d26; border-radius: 6px; padding: 6px 7px; position: relative; overflow: hidden; border: 1px solid transparent; transition: border-color .15s; }
-.cal-day:hover { border-color: #3a3d4a; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
+.cal-weekday { text-align: center; font-size: 9px; letter-spacing: .1em; color: #888; padding: 4px 0; text-transform: uppercase; }
+.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-day { min-height: 90px; background: #fff; padding: 6px 8px; position: relative; overflow: hidden; cursor: default; border-bottom:1px solid #ece8e0; border-right:1px solid #ece8e0; }
 .cal-day.other-month { opacity: .3; }
-.cal-day.today { border-color: #e2b830 !important; }
-.cal-day.today .day-num { color: #e2b830; font-weight: 800; }
-.day-num { font-size: 11px; font-weight: 600; color: #4a5060; margin-bottom: 4px; }
-.cal-day.has-event .day-num { color: #c0c8d0; }
-.cal-event { font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; margin-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; line-height: 1.4; }
+.cal-day.today { outline: 1px solid #e2b830; }
+.cal-day.today .day-num { color: #e2b830; font-weight: 900; }
+.day-num { font-size: 10px; font-weight: 600; color: #888; margin-bottom: 3px; }
+.cal-day.has-event .day-num { color: #444; }
+.cal-event { font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 2px; margin-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
 .cal-event:hover { opacity: .8; }
-.ev-planovano { background: #2a3555; color: #6080c0; }
-.ev-probiha   { background: #255030; color: #50c080; }
-.ev-hotovo    { background: #204530; color: #40a050; }
-.ev-zruseno   { background: #552020; color: #c05050; opacity: .6; }
-.ev-ceka      { background: #554020; color: #e2b830; }
+.ev-planovano { background: #c8d8f0; color: #6080c0; }
+.ev-probiha   { background: #c0e8d0; color: #50c080; }
+.ev-hotovo    { background: #c0dcc0; color: #40a050; }
+.ev-zruseno   { background: #f0c8c8; color: #c05050; opacity: .6; }
+.cal-day.holiday { background: #fff0f0; }
+.cal-day.weekend.holiday { background: #f8f0f0; }
+.cal-day.holiday .day-num { color: #c05050; font-weight: 900; }
+.holiday-name { font-size: 7px; color: #c05050; line-height: 1.1; margin-bottom: 2px; }
+.ev-ceka      { background: #f0e0a0; color: #e2b830; }
 .ev-cont      { border-left: 2px solid currentColor; }
 .day-busy-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #e2b830, #50c080); opacity: .6; }
-#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 #modal-overlay.open { display: flex; }
-#modal { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
-#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #1e2230; display: flex; align-items: center; justify-content: space-between; }
+#modal { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 560px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
+#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; }
 #modal-title { font-size: 16px; font-weight: 800; letter-spacing: .05em; }
-#modal-close { background: none; border: none; color: #4a5060; font-size: 20px; cursor: pointer; padding: 0 4px; }
-#modal-close:hover { color: #e8e4dc; }
-#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+#modal-close { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; padding: 0 4px; }
+#modal-close:hover { color: #1a1a1a; }
+#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; overflow-y: auto; flex: 1; min-height: 0; }
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group.full { grid-column: 1 / -1; }
-.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; }
-.form-group input, .form-group select, .form-group textarea { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
+.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; }
+.form-group input, .form-group select, .form-group textarea { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #e2b830; }
 .form-group textarea { resize: vertical; min-height: 70px; }
-.form-group select option { background: #1a1d26; }
-#modal-footer { padding: 16px 24px; border-top: 1px solid #1e2230; display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
-#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #552020; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
-#btn-delete:hover { background: #2a1a1a; }
-.btn-cancel { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
-.btn-cancel:hover { color: #e8e4dc; }
-.btn-save { background: #e2b830; color: #0f1117; border: none; border-radius: 6px; padding: 8px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.form-group select option { background: #fff; }
+#modal-footer { padding: 16px 24px; border-top: 1px solid #e8e4dc; display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
+#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #f0c8c8; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
+#btn-delete:hover { background: #fce8e8; }
+.btn-cancel { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-cancel:hover { color: #1a1a1a; }
+.btn-save { background: #e2b830; color: #fff; border: none; border-radius: 6px; padding: 8px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .btn-save:hover { background: #f0c840; }
-#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; align-items: center; justify-content: center; }
+#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 300; align-items: center; justify-content: center; }
 #saving-overlay.open { display: flex; }
-#saving-box { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; padding: 24px 36px; text-align: center; }
+#saving-box { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 24px 36px; text-align: center; }
 #saving-box .saving-title { font-size: 14px; font-weight: 700; color: #e2b830; margin-bottom: 6px; }
-#saving-box .saving-sub   { font-size: 12px; color: #4a5060; }
+#saving-box .saving-sub   { font-size: 12px; color: #888; }
+/* ── PARTNEŘI SIDEBAR ── */
+#partner-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:250;opacity:0;pointer-events:none;transition:opacity .2s}
+#partner-overlay.open{opacity:1;pointer-events:auto}
+#partner-sidebar{position:fixed;top:0;right:0;bottom:0;width:440px;max-width:95vw;background:#fff;box-shadow:-4px 0 24px rgba(0,0,0,.12);z-index:260;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;overflow:hidden}
+#partner-sidebar.open{transform:translateX(0)}
+.ps-header{padding:16px 20px;border-bottom:1px solid #e8e4dc;display:flex;align-items:center;justify-content:space-between}
+.ps-header h2{font-size:16px;font-weight:800;letter-spacing:.05em;margin:0}
+.ps-close{background:none;border:none;font-size:20px;color:#888;cursor:pointer;padding:0 4px}
+.ps-close:hover{color:#1a1a1a}
+.ps-body{flex:1;overflow-y:auto;padding:16px 20px}
+/* SVG mapa */
+.ps-map{margin-bottom:16px}
+.ps-map svg{width:100%;height:auto}
+.ps-map svg path{fill:#e8e4dc;stroke:#fff;stroke-width:1.5;cursor:pointer;transition:fill .15s}
+.ps-map svg path:hover{fill:#f0dca0}
+.ps-map svg path.region-active{fill:#e2b830}
+.ps-map-legend{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:11px;color:#888}
+.ps-map-label{font-weight:700;color:#1a1a1a}
+.ps-map-reset{background:none;border:1px solid #ddd;border-radius:4px;padding:2px 10px;font-size:10px;color:#888;cursor:pointer}
+.ps-map-reset:hover{color:#1a1a1a;border-color:#bbb}
+/* Filtry a hledání */
+.ps-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ps-obor-btn{background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:700;cursor:pointer;transition:all .15s}
+.ps-obor-btn:hover{border-color:#bbb;color:#444}
+.ps-obor-btn.active{background:#e2b830;color:#fff;border-color:#e2b830}
+.ps-search{width:100%;background:#f8f6f0;border:1px solid #ddd;border-radius:6px;padding:6px 12px;font-size:12px;outline:none;margin-bottom:12px}
+.ps-search:focus{border-color:#e2b830}
+/* Karty partnerů */
+.ps-list{display:flex;flex-direction:column;gap:8px}
+.ps-card{background:#f8f6f0;border:1px solid #e8e4dc;border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.ps-card:hover{border-color:#e2b830}
+.ps-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
+.ps-card-name{font-size:13px;font-weight:700;color:#1a1a1a}
+.ps-card-obor{display:inline-block;background:#e8f0ff;color:#6080c0;border:1px solid #c8d8f0;border-radius:10px;padding:1px 8px;font-size:9px;font-weight:700;letter-spacing:.04em}
+.ps-card-region{font-size:10px;color:#888;margin-bottom:4px}
+.ps-card-contact{font-size:11px;color:#555;margin-bottom:4px}
+.ps-card-contact a{color:#6080c0;text-decoration:none}
+.ps-card-meta{display:flex;align-items:center;gap:12px;font-size:10px;color:#888}
+.ps-stars{color:#e2b830;letter-spacing:1px}
+.ps-card-note{font-size:10px;color:#999;margin-top:4px;font-style:italic}
+.ps-empty{text-align:center;padding:30px 10px;color:#888;font-size:12px}
+.ps-add-btn{width:100%;margin-top:12px;background:#e2b830;color:#fff;border:none;border-radius:6px;padding:8px;font-size:12px;font-weight:700;cursor:pointer}
+.ps-add-btn:hover{background:#f0c840}
+/* Partner modal */
+#partner-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:center;justify-content:center;padding:20px}
+#partner-modal-overlay.open{display:flex}
+#partner-modal{background:#fff;border:1px solid #ddd;border-radius:10px;width:100%;max-width:480px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+.pm-header{padding:16px 20px;border-bottom:1px solid #e8e4dc;display:flex;align-items:center;justify-content:space-between}
+.pm-header h3{font-size:15px;font-weight:800;margin:0}
+.pm-body{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow-y:auto;flex:1}
+.pm-group{display:flex;flex-direction:column;gap:4px}
+.pm-group.full{grid-column:1/-1}
+.pm-group label{font-size:9px;font-weight:700;letter-spacing:.12em;color:#888;text-transform:uppercase}
+.pm-group input,.pm-group select,.pm-group textarea{background:#fff;border:1px solid #ddd;border-radius:6px;padding:7px 10px;font-size:12px;outline:none;font-family:inherit}
+.pm-group input:focus,.pm-group select:focus,.pm-group textarea:focus{border-color:#e2b830}
+.pm-group textarea{resize:vertical;min-height:60px}
+.pm-rating{display:flex;gap:2px;cursor:pointer}
+.pm-rating span{font-size:20px;color:#ddd;transition:color .1s}
+.pm-rating span.filled{color:#e2b830}
+.pm-footer{padding:14px 20px;border-top:1px solid #e8e4dc;display:flex;gap:10px;justify-content:flex-end;align-items:center}
+.pm-footer .btn-del{margin-right:auto;background:none;color:#c05050;border:1px solid #f0c8c8;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer}
+.pm-footer .btn-del:hover{background:#fce8e8}
 </style>
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/app/sw.js")}</script></head>
-<body><div style="background:#0a0c12;border-bottom:1px solid #1e2230;padding:0 24px;display:flex;align-items:stretch;gap:2px;font-family:Arial Narrow,Arial,sans-serif;"><a href="index.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:6px;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8e4dc'" onmouseout="this.style.color='#555'">⌂ Dashboard</a><a href="instalace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e2b830'" onmouseout="this.style.color='#555'">Instalace</a>
-  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#f07030'" onmouseout="this.style.color='#555'">Výroba</a><a href="obhlidky.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#3ab0a0'" onmouseout="this.style.color='#555'">Obhlídky</a><a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e05050'" onmouseout="this.style.color='#555'">Reklamace</a><a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#a070e0'" onmouseout="this.style.color='#555'">Konfigurátor</a><a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#555'">Docházka</a>
-  <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#c8a830'" onmouseout="this.style.color='#555'">Zásobování</a>
-  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#555'">Lumibook</a></div>
-
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script></head>
+<body>
+<style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
+<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'}}).then(r=>r.json()).then(j=>{const d=Array.isArray(j)?j:(j.data||[]);const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
 <div id="header">
-  <div class="header-left">
-    <div class="eyebrow">LEDshopik · Servis &amp; montáž</div>
-    <div class="title">INSTALACE <span>—</span> PLÁN &amp; PŘEHLED</div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="header-accent"></div>
+    <div class="header-title-wrap">
+      <div class="header-eyebrow">LEDshopik &middot; Systém</div>
+      <div class="header-title">INSTALACE</div>
+    </div>
+    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;transition:all .15s;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
   </div>
-  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-    <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
+  <div id="team-bar" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;"></div>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div id="weather-mini" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888;"></div>
+    <div class="header-date">
+      <div class="day" id="hdr-day">&mdash;</div>
+      <div class="month" id="hdr-month">&mdash;</div>
+    </div>
+  </div>
+</div>
+
+<div style="background:#fff;border-bottom:1px solid #e0e0e0;padding:0 24px;display:flex;align-items:stretch;gap:2px;font-family:Arial Narrow,Arial,sans-serif;">
+  <a href="index.html" style="padding:8px 14px;border-top:3px solid #60a0e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:4px;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">⌂ DASHBOARD<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Přehled</span></a>
+  <a href="instalace.html" style="padding:8px 14px;border-top:3px solid #e2b830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#60a0e0;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid #60a0e0;line-height:1.3;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#60a0e0'">INSTALACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Montáže</span></a>
+  <a href="vyroba.html" style="padding:8px 14px;border-top:3px solid #f07030;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">VÝROBA<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Zakázky</span></a>
+  <a href="obhlidky.html" style="padding:8px 14px;border-top:3px solid #3ab0a0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">OBHLÍDKY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Termíny</span></a>
+  <a href="reklamace.html" style="padding:8px 14px;border-top:3px solid #e05050;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">REKLAMACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Servis</span></a>
+  <a href="konfigurator.html" style="padding:8px 14px;border-top:3px solid #a070e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KONFIGURÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">RING svítidla</span></a>
+  <a href="konfigurator-profily.html" style="padding:8px 14px;border-top:3px solid #40a0a0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PROFILY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">ALU výroba</span></a>
+  <a href="zasobovani.html" style="padding:8px 14px;border-top:3px solid #c8a830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">ZÁSOBOVÁNÍ<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Dodávky</span></a>
+  <a href="lumibook.html" style="padding:8px 14px;border-top:3px solid #e8a020;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">LUMIBOOK<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalog</span></a>
+  <a href="kalkulator-instalaci.html" style="padding:8px 14px;border-top:3px solid #b08820;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KALKULÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Ceny montáží</span></a>
+  <a href="produktovy-list.html" style="padding:8px 14px;border-top:3px solid #e05050;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PRODUKTY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalogové listy</span></a>
+  <a href="dochazka.html" style="margin-left:auto;padding:10px 20px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#50a060;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center;background:#f0f8f2;border-radius:6px 6px 0 0;line-height:1.3;" onmouseover="this.style.color='#3a8048'" onmouseout="this.style.color='#50a060'">🕐 DOCHÁZKA</a>
+  
+</div>
+<div id="user-controls" style="background:#fff;border-bottom:1px solid #e0e0e0;padding:6px 32px;display:flex;align-items:center;gap:14px;">
+  <span id="user-bar-name" style="font-weight:700;color:#333;font-size:12px;"></span>
+  <a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:16px;">
+    <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Pripojovani...</span></div>
     <div class="stats">
-      <div class="stat"><div class="num" id="stat-total" style="color:#e8e4dc">0</div><div class="lbl">Celkem</div></div>
-      <div class="stat"><div class="num" id="stat-ceka"  style="color:#e2b830">0</div><div class="lbl">Čeká</div></div>
-      <div class="stat"><div class="num" id="stat-plan"  style="color:#6080c0">0</div><div class="lbl">Plán.</div></div>
-      <div class="stat"><div class="num" id="stat-prob"  style="color:#50c080">0</div><div class="lbl">Probíhá</div></div>
-      <div class="stat"><div class="num" id="stat-hot"   style="color:#40a050">0</div><div class="lbl">Hotovo</div></div>
-      <div class="stat"><div class="num" id="stat-zrus"  style="color:#c05050">0</div><div class="lbl">Zrušeno</div></div>
+      <div class="stat"><div class="num" id="stat-total">0</div><div class="lbl">Celkem</div></div>
+      <div class="stat"><div class="num" id="stat-ceka" style="color:#e2b830;">0</div><div class="lbl">Ceka</div></div>
+      <div class="stat"><div class="num" id="stat-plan" style="color:#6080c0;">0</div><div class="lbl">Naplanovano</div></div>
+      <div class="stat"><div class="num" id="stat-prob" style="color:#50c080;">0</div><div class="lbl">Probiha</div></div>
+      <div class="stat"><div class="num" id="stat-hot" style="color:#40a050;">0</div><div class="lbl">Hotovo</div></div>
+      <div class="stat"><div class="num" id="stat-zrus" style="color:#c05050;">0</div><div class="lbl">Zruseno</div></div>
     </div>
   </div>
 </div>
@@ -157,6 +264,7 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
   <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
   <button id="btn-add" onclick="openModal()">+ Přidat instalaci</button>
+  <button id="btn-partners" onclick="togglePartners()" style="background:#fff;color:#666;border:1px solid #ddd;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;letter-spacing:.06em;cursor:pointer;display:flex;align-items:center;gap:6px;">👷 Partneři</button>
 </div>
 
 <div id="table-wrap">
@@ -187,11 +295,11 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
       <button id="btn-today" onclick="calToday()">Dnes</button>
     </div>
     <div id="cal-legend">
-      <div class="leg"><div class="leg-dot" style="background:#2a3555;border:1px solid #6080c0"></div>Naplánováno</div>
-      <div class="leg"><div class="leg-dot" style="background:#255030;border:1px solid #50c080"></div>Probíhá</div>
-      <div class="leg"><div class="leg-dot" style="background:#204530;border:1px solid #40a050"></div>Hotovo</div>
-      <div class="leg"><div class="leg-dot" style="background:#554020;border:1px solid #e2b830"></div>Čeká</div>
-      <div class="leg"><div class="leg-dot" style="background:#552020;border:1px solid #c05050"></div>Zrušeno</div>
+      <div class="leg"><div class="leg-dot" style="background:#c8d8f0;border:1px solid #6080c0"></div>Naplánováno</div>
+      <div class="leg"><div class="leg-dot" style="background:#c0e8d0;border:1px solid #50c080"></div>Probíhá</div>
+      <div class="leg"><div class="leg-dot" style="background:#c0dcc0;border:1px solid #40a050"></div>Hotovo</div>
+      <div class="leg"><div class="leg-dot" style="background:#f0e0a0;border:1px solid #e2b830"></div>Čeká</div>
+      <div class="leg"><div class="leg-dot" style="background:#f0c8c8;border:1px solid #c05050"></div>Zrušeno</div>
     </div>
   </div>
   <div id="cal-grid">
@@ -220,7 +328,7 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
       <div class="form-group full"><label>Obsah instalace</label><input type="text" id="f-obsah" placeholder="např. LED neony R25 PRO – 50m"></div>
       <div class="form-group"><label>Plánované datum</label><input type="date" id="f-datum"></div>
       <div class="form-group"><label>Délka instalace (dny)</label><input type="number" id="f-delka" min="1" max="365" placeholder="např. 3"></div>
-      <div class="form-group"><label>Technik / montážník</label><input type="text" id="f-technik" placeholder="Jméno technika"></div>
+      <div class="form-group"><label>Technik / montážník</label><input type="text" id="f-technik" placeholder="Jméno technika" list="dl-zamestnanci"><datalist id="dl-zamestnanci"><option value="Ondra"><option value="David"><option value="Michal"><option value="Erik"><option value="Lukáš"><option value="Mário"><option value="Tom"><option value="Kuba"><option value="Petr"><option value="Miriam"><option value="Filip"><option value="Eve"></datalist></div>
       <div class="form-group"><label>Kontakt na zákazníka</label><input type="text" id="f-kontakt" placeholder="Jméno, tel., e-mail..."></div>
       <div class="form-group full"><label>Poznámky</label><textarea id="f-poznamky" placeholder="Další informace..."></textarea></div>
     </div>
@@ -235,12 +343,115 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 <div id="saving-overlay">
   <div id="saving-box">
     <div class="saving-title" id="saving-title">Ukládám...</div>
-    <div class="saving-sub"   id="saving-sub">Komunikuji s Google Sheets</div>
+    <div class="saving-sub"   id="saving-sub">Ukládám data</div>
+  </div>
+</div>
+
+<!-- ═══ PARTNEŘI SIDEBAR ═══ -->
+<div id="partner-overlay" onclick="togglePartners()"></div>
+<div id="partner-sidebar">
+  <div class="ps-header">
+    <h2>👷 Síť partnerů</h2>
+    <button class="ps-close" onclick="togglePartners()">✕</button>
+  </div>
+  <div class="ps-body">
+    <!-- MAPA ČR -->
+    <div class="ps-map">
+      <svg viewBox="-2 25 200 110" xmlns="http://www.w3.org/2000/svg">
+        <path id="r-PHA" d="M63.985,65.103l1.666-0.833l0.635,0.357c0,0,0.993,0.191,1.111,0.08c0.118-0.112-0.278-1.032-0.278-1.032l0.714-0.437l0.992,0.198l1.111-0.595l0.595-0.793l1.31,0.04l0.317,0.555l0.753,0.238l0.238,0.357l0.873-0.198l-0.238,0.873l1.15,0.277l0.516,0.833h0.754l0.714,0.912l-0.119,0.714l-1.151,0.119l-0.793,0.556l0.556,0.476l0.119,1.229l-0.833,0.754l-0.953-0.635l-1.229-0.159l-0.595,0.595l-1.111,0.278l-0.634,0.913l-0.873,0.039l-0.833,0.397l-0.238,0.635l-1.071,0.238l-0.794-0.873l0.397-1.27l-1.111-0.556l0.317-0.714l-0.913-0.595l-0.714-1.031l0.555-0.833L63.985,65.103z" data-region="Praha"/>
+        <path id="r-STC" d="M99.213,71.173l-1.626-0.793l-0.04-1.111l-1.309-0.437l-1.349-0.793l0.198-1.111l0.813-1.173l0.494-1.614l-1.929-1.031l0.941-1.659l-0.493-1.076l0.27-1.345l-0.314-1.435l-0.717-0.717l-1.3,0.852l-2.107-0.27v-1.255l-1.144-1.144L88.1,54.77l-0.314-1.121l1.143-1.144l-0.695-1.905l0.404-1.121l-0.672-1.076l0.582-0.897l-1.211-0.538v-0.897l-1.692-0.863l-0.773-0.773h-1.322l-1.009-1.009l-0.987,1.704l-1.569,1.749l-0.538-0.538l-1.345,0.224v1.121l-1.883,1.524l-2.242,0.538l-0.538-1.614l-2.601,0.134l-0.538,0.718l0.224,1.704h-1.121l-0.359,1.076h-1.166l0.403,2.018l-0.852,0.852l-1.928-0.179l-1.031,1.031H60.57l-1.883-0.852l-1.524,0.807v1.076l-1.233,1.233h-1.412l-0.482,0.482l0.034,0.93l-1.345-0.807l-1.479,1.479l-2.063-0.044l-1.972,1.21l-1.749,0.089l-1.345,1.256l-0.269,1.569l-1.479,0.628l-0.807,1.3l0.546,0.687l-0.655,0.833l0.833,0.774l0.952-0.595l1.607,0.119l0.178,1.011l0.953,0.536l1.071,0.536l1.071-0.417l1.25,1.606l1.19-0.238l0.06,0.953l1.19,0.238l1.012,0.654l-0.119,1.547l0.297,0.893l-1.131,1.13l0.536,1.429l-0.595,1.012l0.536,1.071l-1.131,1.367h-1.309l-1.25,0.894l0.953,1.012l-0.417,1.19l0.833,1.071l0.773,0.595l-0.297,1.072l-0.06,1.428l0.773,1.309l3.273,0.119l1.071,0.536l1.666-0.834l0.655-1.13h1.13l0.893,0.951l3.213-0.356l0.714-0.894h1.428l0.953,1.191l1.011,0.059l1.488-0.893l1.547,0.715l1.071-0.179l1.904,0.476l1.726,0.715l0.833-0.953l1.547-0.832l-0.357-1.846l1.25-0.893l1.844,1.547l1.012-0.118l0.536,1.31l0.773,1.13l0.655-0.655l0.06-1.248l1.309-1.31l1.964,0.298l1.547-0.061l1.071,0.179l0.536-0.952l0.893,0.418l1.13-0.774l-0.059-1.249l-1.845-0.894l0.06-1.369l0.893-0.832l0.178-0.952l0.714-0.418l0.952,0.238l0.773-0.714h1.369l0.476-1.012l1.369,0.06l-0.119-1.428l0.952-0.773l1.428-0.119l-0.477-1.944l0.873-0.873L99.213,71.173zM76.799,66.65l-1.151,0.119l-0.793,0.556l0.556,0.476l0.119,1.229l-0.833,0.754l-0.953-0.635l-1.229-0.159l-0.595,0.595l-1.111,0.278l-0.634,0.913l-0.873,0.039l-0.833,0.397l-0.238,0.635l-1.071,0.238l-0.794-0.873l0.397-1.27l-1.111-0.556l0.317-0.714l-0.913-0.595l-0.714-1.031l0.555-0.833l-0.912-1.111l1.666-0.833l0.635,0.357l1.111,0.08l-0.278-1.032l0.714-0.437l0.992,0.198l1.111-0.595l0.595-0.793l1.31,0.04l0.317,0.555l0.753,0.238l0.238,0.357l0.873-0.198l-0.238,0.873l1.15,0.277l0.516,0.833h0.754l0.714,0.912L76.799,66.65z" data-region="Středočeský"/>
+        <path id="r-KVK" d="M19.546,72.884l-1.693-0.069v-1.229l-1.229-0.582l0.064-1.423l-3.622-2.458l-2.263-1.164l-0.97-1.746l-0.97-1.099l0.453-2.005l-1.487-2.263l-1.067-1.067l0.744-1.455l-0.646-1.617h2.069l0.518,0.518v1.422h1.1l0.614,0.614l-0.356,1.002l0.646,0.647v1.617l0.971,0.97l0.452-2.328c0,0-0.323-0.776,0-1.1s1.293-1.293,1.293-1.293l0.582-1.94l2.522-1.358v-0.905l0.809-0.809l1.843-0.291l2.328-0.388l0.776,0.776l1.293-1.617l2.394-0.647l2.521,1.875l1.153,1.153h2.384l1.166,0.44c0,0-0.061,1.003,0,1.121c0.062,0.118,2.556-0.269,2.556-0.269l1.121,1.121l-1.099,1.099l0.605,1.143l-0.403,1.48l0.987,0.986L37.3,60.599l1.121,1.524L37.3,63.244l1.659,1.659l-0.807,1.973l-1.345,0.359v2.017l-1.793-1.345l-1.883-0.224l-3.586,2.331v1.345l-0.919,0.919l-1.502-0.74l-0.762,0.359l-1.479-0.896l-1.793,0.762l-1.277,1.278l-1.188-1.054L19.546,72.884z" data-region="Karlovarský"/>
+        <path id="r-ULK" d="M29.234,51.474l2.264-1.229l-0.064-1.747l0.776-0.776l2.328-0.388l1.94,0.259l0.776-1.423v-1.035l0.646-1.164h0.776l0.387,1.164l0.97-0.323V43.39l0.615-0.615l0.356-0.938h0.905l0.388,1.229l1.035,0.647l2.005-1.423l0.129-2.393l0.938-0.938l1.067,0.55l1.294-1.164l0.84,0.841l1.552-0.841l1.746-0.194l0.388,0.906h0.711l1.164-1.164v-1.811l1.487-0.259l1.035-1.035l1.358,0.841l2.069-1.099l0.841-0.841l1.746,0.129l0.841-1.681h1.164l0.453,0.517l2.328-0.841l0.259-1.617l-1.94-0.646v-1.229l-1.94-0.388l0.711-1.294l0.646-1.681l1.94,0.905l0.453,0.453h1.164l1.811-0.647l1.164,1.164l1.164,1.1l0.064,1.423l-0.97,1.617l2.199-0.388l-0.388,2.263v1.035l-1.523,0.532l-0.225,1.749l-1.524-0.583l-1.704-0.224l0.359,1.435l-1.144,1.144v0.919l-0.998,0.998c0,0-0.969,1.353-0.953,1.603s0.807,1.3,0.807,1.3v1.21l1.704,2.824l1.21,1.479l-0.538,0.718l0.224,1.704h-1.121l-0.359,1.076h-1.166l0.403,2.018l-0.852,0.852l-1.928-0.179l-1.031,1.031H60.57l-1.883-0.852l-1.524,0.807v1.076l-1.233,1.233h-1.412l-0.482,0.482l0.034,0.93l-1.345-0.807l-1.479,1.479l-2.063-0.044l-1.972,1.21l-1.749,0.089l-1.345,1.256l-0.269,1.569l-1.479,0.628l-0.807,1.3l-1.614-0.941h-0.987L37.3,63.244l1.121-1.121L37.3,60.599l0.404-0.852l-0.987-0.986l0.403-1.48l-0.605-1.143l1.099-1.099l-1.121-1.121l-2.556,0.269v-1.121l-1.166-0.44h-2.384L29.234,51.474z" data-region="Ústecký"/>
+        <path id="r-PLK" d="M38.959,64.903l-0.807,1.973l-1.345,0.359v2.017l-1.793-1.345l-1.883-0.224l-3.586,2.331v1.345l-0.919,0.919l-1.502-0.74l-0.762,0.359l-1.479-0.896l-1.793,0.762l-1.277,1.278l-1.188-1.054l-1.076,0.897l-1.693-0.069l-1.875,2.846l-0.114,1.701l-1.956,1.791l1.487,1.682l1.811,1.229l-0.129,1.875l1.229,1.424l-0.065,1.745l1.94,1.358l-0.194,2.134l0.323,1.487l1.552,0.841l1.358,1.423l1.035,1.746l1.875,0.517l0.647-0.452l1.681,0.324l2.134,1.552l0.259,1.745l1.875,1.876v0.905l1.746,1.358l0.323,1.357l1.164,0.842h1.617l1.552,1.552l1.422,2.068l0.194,2.265l2.651,1.745l0.911-1.517l0.018-0.899l0.399-1.422l1.25-0.535l0.297-0.834l-0.595-0.951l0.298-2.321l1.071,0.356l0.357-0.654l1.428-0.535l0.595-1.429l-0.714-1.428l1.13-0.596l-0.893-1.011l0.714-0.654v-0.893l0.833-0.655l1.071-1.666l-0.833-1.369l0.179-1.844v-1.072l-0.357-1.309l0.655-0.952l-0.773-1.309l0.06-1.428l0.297-1.072l-0.773-0.595l-0.833-1.071l0.417-1.19l-0.953-1.012l1.25-0.894h1.309l1.131-1.367l-0.536-1.071l0.595-1.012l-0.536-1.429l1.131-1.13l-0.297-0.893l0.119-1.547l-1.012-0.654l-1.19-0.238l-0.06-0.953l-1.19,0.238c0,0-1.204-1.596-1.25-1.606c-0.046-0.011-1.071,0.417-1.071,0.417l-1.071-0.536l-0.953-0.536l-0.178-1.011l-1.607-0.119l-0.952,0.595l-0.833-0.774l0.655-0.833l-0.546-0.687l-1.614-0.941H38.959z" data-region="Plzeňský"/>
+        <path id="r-LBK" d="M98.496,36.6l1.439,1.626l-0.449,1.883l0.763,1.838l-0.358,0.986l0.896,0.896l-0.718,1.435l1.346,1.345v0.852l-2.286,0.493l-1.077-1.076l-1.39,0.896v1.21l-1.166,0.673l-0.762-1.166l-2.601-0.897l-1.704,1.121l-1.883-1.211l-1.211-0.538v-0.897l-1.692-0.863l-0.773-0.773h-1.322l-1.009-1.009l-0.987,1.704l-1.569,1.749l-0.538-0.538l-1.345,0.224v1.121l-1.883,1.524l-2.242,0.538l-0.538-1.614l-2.601,0.134l-1.21-1.479l-1.704-2.824v-1.21l-0.807-1.3l0.953-1.603l0.998-0.998v-0.919l1.144-1.144l-0.359-1.435l1.704,0.224l1.524,0.583l0.225-1.749l1.523-0.532l4.01,1.229l1.293-1.875l2.393-0.129c0,0,1.574,0.292,1.682,0.194c0.107-0.099,0.388-2.264,0.388-2.264l0.517-2.07l-1.1-1.099l1.035-1.035h1.746l0.906,0.841l1.422-0.776l0.776,1.358l1.164-0.518l1.294,1.552l-0.583,1.293l0.647,2.004l1.131,1.132l1.067,1.067l0.129,1.875l0.42,0.42l1.456-1.326L98.496,36.6z" data-region="Liberecký"/>
+        <path id="r-HKK" d="M98.496,36.6l1.94,0.129l2.134,0.97l0.646,0.647l1.487,0.258l1.617-0.905l0.646,1.423l0.906,2.005h1.164l1.682-0.647l1.034,1.94l-0.13,1.229l1.617-1.164l1.1-1.099l1.939,1.358l0.972,0.064l0.322-1.422h2.651l3.299,3.233l-1.1,0.97l-0.259,1.875l-2.069,0.776l-2.975,2.328l0.258,1.294l1.683,1.939l1.422-0.711l0.809,0.808v1.002l0.921,0.921l1.182-0.146l1.357,2.393l1.875,1.487l0.324,2.393l0.673,1.381l-1.999-0.895h-0.94v1.3l-2.376,0.673l-1.257,1.255l-0.402,1.704h-2.241l-1.57,0.448l-1.008-1.009l-1.727-1.009l-0.986-0.986h-1.076v-1.57l-0.807-0.807l-1.838-0.045l-1.525,0.762l-0.784,0.785c0,0-0.749-0.262-0.829-0.292s0-1.345,0-1.345h-1.166l-1.211,1.659h-2.287l-1.255-0.718l-2.364,2.048L95.9,65.755l0.494-1.614l-1.929-1.031l0.941-1.659l-0.493-1.076l0.27-1.345l-0.314-1.435l-0.717-0.717l-1.3,0.852l-2.107-0.27v-1.255l-1.144-1.144L88.1,54.77l-0.314-1.121l1.143-1.144l-0.695-1.905l0.404-1.121l-0.672-1.076l0.582-0.897l1.883,1.211l1.704-1.121l2.601,0.897l0.762,1.166l1.166-0.673v-1.21l1.39-0.896l1.077,1.076c0,0,2.262-0.468,2.286-0.493c0.022-0.026,0-0.852,0-0.852l-1.346-1.345l0.718-1.435l-0.896-0.896l0.358-0.986l-0.763-1.838l0.449-1.883L98.496,36.6z" data-region="Královéhradecký"/>
+        <path id="r-PAK" d="M135.293,60.139l-0.414,1.949l-1.111,2.143l-0.357,2.062l0.595,0.992l-2.379,1.944v1.349l0.595,1.389l0.237,1.746l0.575,0.575l-1.329,0.893l0.992,1.943l1.071,2.104v1.07l1.349,0.595v1.786l-1.229,1.229v1.349l-0.754,1.071l-1.468-1.468h-4.404l-0.872,1.428h-2.937l-0.773,0.773l-1.726-1.726l-1.388-0.039l-1.707-2.022l-3.331-0.755l-0.596-1.388l-1.588,0.039v-0.873l-1.625,1.032v1.349l-1.826-0.635l-0.912-0.477v-1.189l-1.229-0.635l-0.952-0.198l-0.991-1.032l-1.667-1.07l-2.301,0.039l-2.143-1.666l-0.477-1.944l0.873-0.873l0.119-1.825l-1.626-0.793l-0.04-1.111l-1.309-0.437l-1.349-0.793l0.198-1.111l0.813-1.173l2.074-0.463l2.364-2.048l1.255,0.718c0,0,2.174,0.078,2.287,0c0.113-0.079,1.211-1.659,1.211-1.659h1.166v1.345l0.829,0.292l0.784-0.785l1.525-0.762l1.838,0.045l0.807,0.807v1.57h1.076l0.986,0.986l1.727,1.009l1.008,1.009l1.57-0.448h2.241l0.402-1.704l1.257-1.255l2.376-0.673v-1.3h0.94l1.999,0.895l2.948,1.658l1.681-1.681l0.874-0.874l-0.032-1.52L135.293,60.139z" data-region="Pardubický"/>
+        <path id="r-VYS" d="M122.679,87.061l-1.726-1.726l-1.388-0.039l-1.707-2.022l-3.331-0.755l-0.596-1.388l-1.588,0.039v-0.873l-1.625,1.032c0,0,0.055,1.304,0,1.349c-0.055,0.044-1.826-0.635-1.826-0.635l-0.912-0.477v-1.189l-1.229-0.635l-0.952-0.198l-0.991-1.032l-1.667-1.07l-2.301,0.039l-2.143-1.666l-1.428,0.119l-0.952,0.773l0.119,1.428l-1.369-0.06l-0.476,1.012h-1.369l-0.773,0.714l-0.952-0.238l-0.714,0.418l-0.178,0.952l-0.893,0.832l-0.06,1.369l1.845,0.894c0,0,0.067,1.098,0.059,1.249c-0.007,0.15-1.13,0.774-1.13,0.774l-0.893-0.418l-0.536,0.952l-1.071-0.179l-1.547,0.061l-1.964-0.298l-1.309,1.31l-0.06,1.248l-0.655,0.655l0.417,1.547l-0.059,1.666l-0.714,0.894v1.845l0.654,1.369l-0.297,1.07l0.655,1.189l1.309,1.071l1.131-0.654l1.488,0.833l0.654,1.19l1.309,1.19l1.19-0.654l1.904,0.713l1.726-0.297l0.773,1.07l-0.238,1.311l1.547,1.547l2.023,0.06l1.666-0.357l1.727,1.369l-0.18,1.07l-1.25,0.238l-0.237,1.488l-1.31,1.368l1.071,0.952l0.952,1.487l1.071-0.534l1.071,0.773l1.309-1.369l1.369,1.012l0.714-1.369l0.833-0.237l0.773-1.072h1.428l0.536-1.249l1.666-0.714l1.487,1.012l1.012-0.596l1.369,0.417l1.31-0.654l0.714-1.132l1.131,0.298l0.534-1.309l0.894-0.238l0.417-0.774l-1.071-0.773l-0.357-1.189l1.368-0.834l-1.25-1.249l0.299-1.071l0.951-0.773l-0.892-1.13l1.07-0.715l0.417-0.952l2.321-1.071l-0.12-2.142l-0.476-1.19L122.739,92l-0.655-1.547l1.19-0.714l0.356-0.714l-1.249-0.833L122.679,87.061z" data-region="Vysočina"/>
+        <path id="r-JCK" d="M44.308,112.233l1.428,0.416l1.456,1.27l-0.238,0.736l1.034,1.552l1.811,0.324l0.518,1.616l1.229,1.617l0.517,1.487l1.358,0.065l2.328,2.198l1.229,0.452l1.358,1.617l-0.97,1.035l2.134,2.134h2.458l2.458,0.452l2.004,1.165l2.846-2.394l0.582-1.487l1.487,1.293l1.617,0.324l1.293-0.324l2.134,1.423l0.84-1.357l-0.258-1.294l0.258-2.198l1.811-1.487l0.647-1.876l1.681,0.065l2.328,0.711l0.388-0.711l-0.582-1.035l0.323-1.422l0.583-1.747l-0.194-2.264l-0.13-2.393l0.711-1.357l2.134,0.711l1.811,0.388l0.583,1.94l2.781-0.646l0.776-1.035l1.875,0.064l2.845,1.487l0.971,0.453l0.971,1.422l0.773-1.667l-0.952-1.487l-1.071-0.952l1.31-1.368l0.237-1.488l1.25-0.238l0.18-1.07l-1.727-1.369l-1.666,0.357l-2.023-0.06l-1.547-1.547l0.238-1.311l-0.773-1.07l-1.726,0.297l-1.904-0.713l-1.19,0.654l-1.309-1.19l-0.654-1.19l-1.488-0.833l-1.131,0.654l-1.309-1.071l-0.655-1.189l0.297-1.07l-0.654-1.369v-1.845l0.714-0.894l0.059-1.666l-0.417-1.547l-0.773-1.13l-0.536-1.31l-1.012,0.118l-1.844-1.547l-1.25,0.893l0.357,1.846l-1.547,0.832l-0.833,0.953l-1.726-0.715l-1.904-0.476l-1.071,0.179l-1.547-0.715l-1.488,0.893c0,0-0.868-0.056-1.011-0.059c-0.144-0.004-0.953-1.191-0.953-1.191h-1.428l-0.714,0.894l-3.213,0.356l-0.893-0.951h-1.13l-0.655,1.13l-1.666,0.834l-1.071-0.536l-3.273-0.119l-0.655,0.952l0.357,1.309v1.072l-0.179,1.844l0.833,1.369l-1.071,1.666l-0.833,0.655v0.893l-0.714,0.654l0.893,1.011l-1.13,0.596l0.714,1.428l-0.595,1.429l-1.428,0.535l-0.357,0.654l-1.071-0.356l-0.298,2.321l0.595,0.951l-0.297,0.834l-1.25,0.535l-0.399,1.422L44.308,112.233z" data-region="Jihočeský"/>
+        <path id="r-JMK" d="M133.133,86.327l-1.468-1.468h-4.404l-0.872,1.428h-2.937l-0.773,0.773l-0.297,1.132l1.249,0.833l-0.356,0.714l-1.19,0.714L122.739,92l-0.536,1.131l0.476,1.19l0.12,2.142l-2.321,1.071l-0.417,0.952l-1.07,0.715l0.892,1.13l-0.951,0.773l-0.299,1.071l1.25,1.249l-1.368,0.834l0.357,1.189c0,0,1.04,0.616,1.071,0.773c0.03,0.159-0.417,0.774-0.417,0.774l-0.894,0.238l-0.534,1.309l-1.131-0.298l-0.714,1.132l-1.31,0.654l-1.369-0.417l-1.012,0.596l-1.487-1.012l-1.666,0.714l-0.536,1.249h-1.428l-0.773,1.072l-0.833,0.237l-0.714,1.369l-1.369-1.012l-1.309,1.369l-1.071-0.773l-1.071,0.534l-0.773,1.667l0.84,0.131l1.682,0.193l1.939,1.424l1.941,0.193l0.452-0.776l1.939,0.194l2.846,2.005l0.323,1.034l3.751,2.069l4.462-0.063l3.428,0.646l1.293-1.488l0.712-1.938l2.393-0.13l1.035,1.1l2.392,0.388l0.324,1.617l1.229-0.389l2.135,1.294l1.939-0.518l1.294,0.841l0.646,3.233l1.035-0.13l0.775-2.716l0.518-1.875l2.135-2.651l0.517-1.812l0.776-0.323l1.164-1.164h1.229l2.393,1.035l2.069,1.229l2.07-1.359l1.745,1.164l1.552-0.387l1.617-1.488l-0.511-0.643l-0.894-1.31l-1.486-0.356l-0.061-0.952l-1.368-0.834l-1.548,0.596l-1.309-1.19l-1.249,0.061l0.059-1.369l-1.963-0.238l-1.488-0.833l0.179-1.369l-0.714-0.773l-1.964,0.773l-0.893-1.131l1.19-1.249l1.07-0.715l0.18-1.189l-1.607-0.179l0.357-1.25l-0.715-1.25l0.862-1.16l-0.921-1.576v-0.893l-0.745-0.744h-1.636l-0.237-1.279v-1.19l-1.429-0.893V92l-0.923-0.922l-0.565-1.22h-1.309l-0.893,1.012l0.951,0.951l0.982,0.982l-1.041,1.518l-0.715,0.714l-1.785-1.31l0.834-0.832l-1.071-1.429v-1.547l1.189-1.25l-1.368-0.416l-1.131-0.06L133.133,86.327z" data-region="Jihomoravský"/>
+        <path id="r-OLK" d="M150.037,57.165v2.464h-1.175l-1.07,1.071l-2.382,1.547v1.667l-0.832,0.833l0.654,1.19l-1.428,2.023l-0.417,1.844l0.982,0.982l-0.923,1.517l-0.297,1.786l0.862,0.862h1.101v1.279h1.488l0.952,0.953l1.725-0.477l1.429,2.082h1.19l1.012,0.536l1.189-0.833l1.013,1.012l1.309-0.715l1.786,0.953l-0.418,2.022h1.846l0.654,1.786l1.428,0.477l1.22,1.219l-0.148,1.221h1.31l0.653,1.309l-0.981,0.982l-0.981-0.328l-1.606,1.07v1.667l-1.28,1.28l-1.397-1.577l-1.845,0.653l0.535,1.607l-1.606,0.477l-1.19-0.357l-0.981,0.981l-0.685,1.221l-0.922-0.923l-1.578,0.089l-0.476-1.13l-0.952,0.833l0.536,1.844l-0.893,0.894l-0.536,0.833l-2.261,0.357l-1.399,1.397l-0.921-1.576v-0.893l-0.745-0.744h-1.636l-0.237-1.279v-1.19l-1.429-0.893V92l-0.923-0.922l-0.565-1.22h-1.309l-0.893,1.012l0.951,0.951l0.982,0.982l-1.041,1.518l-0.715,0.714l-1.785-1.31l0.834-0.832l-1.071-1.429v-1.547l1.189-1.25l-1.368-0.416l-1.131-0.06l0.694-1.865l0.754-1.071v-1.349l1.229-1.229v-1.786l-1.349-0.595v-1.07l-1.071-2.104l-0.992-1.943l1.329-0.893l-0.575-0.575l-0.237-1.746l-0.595-1.389v-1.349c0,0,2.353-1.883,2.379-1.944c0.027-0.061-0.595-0.992-0.595-0.992l0.357-2.062l1.111-2.143l0.414-1.949l2.069-0.97h1.617l0.064-2.005l-1.067-1.067l-1.067-0.42l-0.775-2.781l-1.682-0.905l0.905-1.746l2.005,0.517l1.487,0.323l2.457,0.711l1.003,1.002l1.714-0.55l0.26,1.682l1.356,1.035h2.069l0.519,1.811L150.037,57.165z" data-region="Olomoucký"/>
+        <path id="r-ZLK" d="M178.557,93.057l-1.368-0.64l-0.298-1.369l-1.666-1.071l-0.119-1.071l-1.31,0.537h-1.249l-1.429-1.013l-1.904-0.416l-1.903,0.773l-1.19-1.012h-1.37l-0.981,0.982l-0.981-0.328l-1.606,1.07v1.667c0,0-1.032,1.102-1.28,1.28c-0.246,0.178-1.397-1.577-1.397-1.577l-1.845,0.653l0.535,1.607l-1.606,0.477l-1.19-0.357l-0.981,0.981l-0.685,1.221l-0.922-0.923l-1.578,0.089l-0.476-1.13l-0.952,0.833l0.536,1.844l-0.893,0.894l-0.536,0.833l-2.261,0.357l-1.399,1.397l-0.862,1.16l0.715,1.25l-0.357,1.25l1.607,0.179l-0.18,1.189l-1.07,0.715l-1.19,1.249l0.893,1.131l1.964-0.773l0.714,0.773l-0.179,1.369l1.488,0.833l1.963,0.238l-0.059,1.369l1.249-0.061l1.309,1.19l1.548-0.596l1.368,0.834l0.061,0.952l1.486,0.356l0.894,1.31l0.511,0.643h1.164l1.682-1.034l1.164-2.006l2.392-0.129l0.422-3.201l0.938-0.938l3.104-0.259l1.617-2.328v-2.781l0.841-2.392v-1.683l1.293-2.004l1.746-0.453l1.617-0.841l1.423-0.518L178.557,93.057z" data-region="Zlínský"/>
+        <path id="r-MSK" d="M150.037,57.165v2.464h-1.175l-1.07,1.071l-2.382,1.547v1.667l-0.832,0.833l0.654,1.19l-1.428,2.023l-0.417,1.844l0.982,0.982l-0.923,1.517l-0.297,1.786l0.862,0.862h1.101v1.279h1.488l0.952,0.953l1.725-0.477l1.429,2.082h1.19l1.012,0.536l1.189-0.833l1.013,1.012l1.309-0.715l1.786,0.953l-0.418,2.022h1.846l0.654,1.786l1.428,0.477l1.22,1.219l-0.148,1.221h1.31l0.653,1.309h1.37l1.19,1.012l1.903-0.773l1.904,0.416l1.429,1.013h1.249l1.31-0.537l0.119,1.071l1.666,1.071l0.298,1.369l1.368,0.64l1.101-0.389l2.068-2.716l-0.129-1.552l1.423-0.646l1.163,0.581l1.94-0.388l1.617,0.518l2.069-0.97l0.323-1.552l-1.164-3.17l-0.711-2.199h-1.683l-0.71-0.84l-2.135-0.646l-0.323-1.553l-1.423-3.104l0.776-1.681l-0.646-0.259l-0.647-1.811l-1.293,0.97l-2.522-1.423l-2.199-0.323l-0.775,1.358l-1.164-1.94l-1.488-0.711l-0.711-0.905l-1.293,0.841l-1.293-0.582l0.097-1.584l-1.067-1.067l-1.552,0.258l-0.776,2.005c0,0-1.317,1.413-1.487,1.487c-0.17,0.075-1.39-0.032-1.39-0.032l-1.326-1.326l-1.358-0.453l-0.711-2.134l-1.229-1.746l-1.39,0.162l-1.326-1.326v-1.1l2.328-0.711l1.844-0.906v-1.067l-1.196-1.196l0.258-1.294l-1.293-1.293l-0.647,1.293l-0.97,0.97l-3.232-0.259L150.037,57.165z" data-region="Moravskoslezský"/>
+      </svg>
+      <div class="ps-map-legend">
+        <span class="ps-map-label" id="ps-region-label">Celá ČR</span>
+        <button class="ps-map-reset" onclick="filterRegion(null)" style="display:none" id="ps-reset-btn">Zobrazit vše</button>
+      </div>
+    </div>
+
+    <!-- FILTRY -->
+    <div class="ps-filters" id="ps-obor-filters">
+      <button class="ps-obor-btn active" data-obor="vse" onclick="filterObor('vse')">Vše</button>
+      <button class="ps-obor-btn" data-obor="Elektro" onclick="filterObor('Elektro')">⚡ Elektro</button>
+      <button class="ps-obor-btn" data-obor="SDK" onclick="filterObor('SDK')">🧱 SDK</button>
+      <button class="ps-obor-btn" data-obor="Malíř" onclick="filterObor('Malíř')">🎨 Malíř</button>
+      <button class="ps-obor-btn" data-obor="Podlahy" onclick="filterObor('Podlahy')">🪵 Podlahy</button>
+      <button class="ps-obor-btn" data-obor="Zedník" onclick="filterObor('Zedník')">🧱 Zedník</button>
+      <button class="ps-obor-btn" data-obor="Klima" onclick="filterObor('Klima')">❄️ Klima</button>
+      <button class="ps-obor-btn" data-obor="Ostatní" onclick="filterObor('Ostatní')">📦 Ostatní</button>
+    </div>
+    <input type="text" class="ps-search" id="ps-search" placeholder="Hledat partnera..." oninput="renderPartners()">
+
+    <!-- SEZNAM -->
+    <div class="ps-list" id="ps-list"></div>
+
+    <button class="ps-add-btn" onclick="openPartnerModal()">+ Přidat partnera</button>
+  </div>
+</div>
+
+<!-- ═══ PARTNER MODAL ═══ -->
+<div id="partner-modal-overlay" onclick="if(event.target===this)closePartnerModal()">
+  <div id="partner-modal">
+    <div class="pm-header">
+      <h3 id="pm-title">Nový partner</h3>
+      <button class="ps-close" onclick="closePartnerModal()">✕</button>
+    </div>
+    <div class="pm-body">
+      <div class="pm-group" style="position:relative"><label>IČO</label><input id="pf-ico" placeholder="12345678" maxlength="8" style="padding-right:80px"><button type="button" onclick="lookupARES()" id="btn-ares" style="position:absolute;right:4px;top:24px;background:#032d44;color:#fff;border:none;border-radius:3px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.05em">NAČÍST</button><div id="ares-status" style="font-size:10px;color:#888;margin-top:2px;min-height:14px"></div></div>
+      <div class="pm-group"><label>Název firmy / Jméno</label><input id="pf-firma" placeholder="např. ElektroServis Praha"></div>
+      <div class="pm-group"><label>Kontaktní osoba</label><input id="pf-osoba" placeholder="Jan Novák"></div>
+      <div class="pm-group full"><label>Ulice a č.p.</label><input id="pf-ulice" placeholder="Nové sady 988/2"></div>
+      <div class="pm-group"><label>Město</label><input id="pf-mesto" placeholder="Brno"></div>
+      <div class="pm-group"><label>PSČ</label><input id="pf-psc" placeholder="602 00" maxlength="6"></div>
+      <div class="pm-group"><label>Kraj</label>
+        <select id="pf-kraj">
+          <option value="">— vyberte —</option>
+          <option>Praha</option><option>Středočeský</option><option>Jihočeský</option>
+          <option>Plzeňský</option><option>Karlovarský</option><option>Ústecký</option>
+          <option>Liberecký</option><option>Královéhradecký</option><option>Pardubický</option>
+          <option>Vysočina</option><option>Jihomoravský</option><option>Olomoucký</option>
+          <option>Zlínský</option><option>Moravskoslezský</option>
+        </select>
+      </div>
+      <div class="pm-group"><label>Telefon</label><input id="pf-tel" placeholder="+420 ..."></div>
+      <div class="pm-group"><label>Email</label><input id="pf-email" placeholder="email@firma.cz"></div>
+      <div class="pm-group"><label>Obor</label>
+        <select id="pf-obor">
+          <option>Elektro</option><option>SDK</option><option>Malíř</option>
+          <option>Podlahy</option><option>Zedník</option><option>Klima</option><option>Ostatní</option>
+        </select>
+      </div>
+      <div class="pm-group"><label>Cena / hod (Kč)</label><input type="number" id="pf-cena" placeholder="450"></div>
+      <div class="pm-group"><label>Hodnocení</label>
+        <div class="pm-rating" id="pf-rating">
+          <span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span><span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span><span onclick="setRating(5)">★</span>
+        </div>
+      </div>
+      <div class="pm-group full"><label>Poznámky</label><textarea id="pf-pozn" placeholder="Zkušenosti, spolehlivost, speciality..."></textarea></div>
+    </div>
+    <div class="pm-footer">
+      <button class="btn-del" id="pm-delete" onclick="deletePartner()" style="display:none">🗑 Smazat</button>
+      <button class="btn-cancel" onclick="closePartnerModal()">Zrušit</button>
+      <button class="btn-save" onclick="savePartner()">Uložit</button>
+    </div>
   </div>
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9Jig_9A16cEdpuFJfVHvc34iXiBGq42FSBw2OuIoeRNiI5j0BfZQx2j-8549R1VTjQg/exec';
+if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 const MONTHS_CS  = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const STATUS_CLASS = {'Naplánováno':'s-planovano','Probíhá':'s-probiha','Hotovo':'s-hotovo','Zrušeno':'s-zruseno','Čeká na potvrzení':'s-ceka'};
 const EV_CLASS     = {'Naplánováno':'ev-planovano','Probíhá':'ev-probiha','Hotovo':'ev-hotovo','Zrušeno':'ev-zruseno','Čeká na potvrzení':'ev-ceka'};
@@ -254,21 +465,28 @@ function syncStatus(state,text){ document.getElementById('sync-dot').className=s
 async function loadData(){
   syncStatus('loading','Načítám data...');
   try {
-    const res=await fetch(SCRIPT_URL);
-    const json=await res.json();
-    data=json.data||[];
+    const res=await fetch(SUPABASE_URL+'/rest/v1/instalace?select=*',{headers:SB_HEADERS});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    data=await res.json();
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderTable();
   } catch(e){ syncStatus('error','Chyba: '+e.message); }
 }
 
-async function apiPost(payload){
-  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});
-  const json=await res.json();
-  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+async function sbInsert(table,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table,{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbUpdate(table,id,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?id=eq.'+id,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbDelete(table,id){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?id=eq.'+id,{method:'DELETE',headers:SB_HEADERS});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
 }
 
-function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderTable(); }
+function setFilter(f){ filterVal=(filterVal===f && f!=='vse')?'vse':f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===filterVal)); renderTable(); }
 function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTable(); }
 
 function getFiltered(){
@@ -333,6 +551,49 @@ function calNav(dir){ calMonth+=dir; if(calMonth>11){calMonth=0;calYear++;} if(c
 function calToday(){ calYear=today.getFullYear(); calMonth=today.getMonth(); renderCalendar(); }
 function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
+function easterDate(year) {
+  const a=year%19, b=Math.floor(year/100), c=year%100;
+  const d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25);
+  const g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30;
+  const i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7;
+  const m=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m+114)/31), day=((h+l-7*m+114)%31)+1;
+  return new Date(year, month-1, day);
+}
+function getCzechHolidays(year) {
+  const holidays = new Set();
+  const add = (m,d) => holidays.add(`${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+  add(1,1);add(5,1);add(5,8);add(7,5);add(7,6);add(9,28);add(10,28);add(11,17);add(12,24);add(12,25);add(12,26);
+  const easter = easterDate(year);
+  const gf = new Date(easter); gf.setDate(easter.getDate()-2);
+  const em = new Date(easter); em.setDate(easter.getDate()+1);
+  holidays.add(dateStr(gf)); holidays.add(dateStr(em));
+  return holidays;
+}
+const holidayCache = {};
+function isHoliday(dateString) {
+  const year = Number(dateString.split('-')[0]);
+  if (!holidayCache[year]) holidayCache[year] = getCzechHolidays(year);
+  return holidayCache[year].has(dateString);
+}
+const HOLIDAY_NAMES = {
+  '01-01':'Nový rok','05-01':'Svátek práce','05-08':'Den vítězství',
+  '07-05':'Cyril a Metoděj','07-06':'Jan Hus','09-28':'Den české státnosti',
+  '10-28':'Vznik Československa','11-17':'Den boje za svobodu',
+  '12-24':'Štědrý den','12-25':'1. svátek vánoční','12-26':'2. svátek vánoční'
+};
+function getHolidayName(dateString) {
+  const md = dateString.substring(5);
+  if (HOLIDAY_NAMES[md]) return HOLIDAY_NAMES[md];
+  const year = Number(dateString.split('-')[0]);
+  const easter = easterDate(year);
+  const gf = new Date(easter); gf.setDate(easter.getDate()-2);
+  const em = new Date(easter); em.setDate(easter.getDate()+1);
+  if (dateString === dateStr(gf)) return 'Velký pátek';
+  if (dateString === dateStr(em)) return 'Velikonoční pondělí';
+  return '';
+}
+
 function getEvents(){
   return data.filter(r=>r.datum&&r.datum!=='').map(r=>{
     const d=toInputDate(r.datum);
@@ -360,14 +621,18 @@ function renderCalendar(){
     else{dn=i-startDow+1;}
     const cd=new Date(calYear,calMonth+mo,dn);
     const isT=dateStr(cd)===dateStr(today),isSat=cd.getDay()===6,isSun=cd.getDay()===0,other=mo!==0;
+    const cdStr=dateStr(cd);
+    const hol=isHoliday(cdStr);
+    const holName=hol?getHolidayName(cdStr):'';
     const evs=events.filter(ev=>cd>=ev.start&&cd<=ev.end);
     let evHtml=evs.slice(0,3).map(ev=>{
       const cont=cd>ev.start;
       return `<div class="cal-event ${EV_CLASS[ev.status]||''} ${cont?'ev-cont':''}" onclick="event.stopPropagation();openModal('${ev.id}')" title="${ev.obj} – ${ev.misto}">${cont?'↳ '+(ev.misto||ev.obj):`${ev.obj} ${ev.misto||''}`}</div>`;
     }).join('');
-    if(evs.length>3) evHtml+=`<div style="font-size:9px;color:#4a5060;padding:1px 4px;">+${evs.length-3} další</div>`;
-    html+=`<div class="cal-day${other?' other-month':''}${isT?' today':''}${evs.length?' has-event':''}" ${(isSat||isSun)?'style="background:#161820;"':''}>
-      <div class="day-num" style="${(isSat||isSun)?'color:#c05050;':''}">${dn}</div>
+    if(evs.length>3) evHtml+=`<div style="font-size:9px;color:#888;padding:1px 4px;">+${evs.length-3} další</div>`;
+    html+=`<div class="cal-day${other?' other-month':''}${isT?' today':''}${evs.length?' has-event':''}${hol?' holiday':''}" ${(isSat||isSun)&&!hol?'style="background:#f8f6f0;"':''}>
+      ${holName?`<div class="holiday-name">${holName}</div>`:''}
+      <div class="day-num" style="${(isSat||isSun)||hol?'color:#c05050;':''}">${dn}</div>
       ${evHtml}${evs.length&&!other?'<div class="day-busy-bar"></div>':''}
     </div>`;
   }
@@ -401,6 +666,7 @@ function showSaving(t,s){ document.getElementById('saving-title').textContent=t;
 function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
 
 async function saveRecord(){
+  console.log('saveRecord called, editId=',editId);
   const isEdit = !!editId;
   const currentId = editId ? String(editId) : String(Date.now());
   const rec={
@@ -416,9 +682,9 @@ async function saveRecord(){
     poznamky:document.getElementById('f-poznamky').value.trim(),
   };
   closeModal();
-  showSaving(isEdit?'Ukládám změny...':'Přidávám instalaci...','Komunikuji s Google Sheets');
+  showSaving(isEdit?'Ukládám změny...':'Přidávám instalaci...','Ukládám data');
   try {
-    await apiPost({action:isEdit?'update':'append',record:rec});
+    if(isEdit) await sbUpdate('instalace',currentId,rec); else await sbInsert('instalace',rec);
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při ukládání: '+e.message); }
@@ -427,17 +693,265 @@ async function saveRecord(){
 async function deleteRecord(){
   if(!editId||!confirm('Opravdu smazat tento záznam?')) return;
   const id=editId; closeModal();
-  showSaving('Mažu záznam...','Komunikuji s Google Sheets');
+  showSaving('Mažu záznam...','Ukládám data');
   try {
-    await apiPost({action:'delete',id:String(id)});
+    await sbDelete('instalace',id);
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při mazání: '+e.message); }
 }
 
+/* ═══ PARTNEŘI ═══ */
+let partners=[], pFilterRegion=null, pFilterObor='vse', pEditId=null, pRating=3;
+const REGION_IDS={
+  'Karlovarský':'r-KVK','Plzeňský':'r-PLK','Ústecký':'r-ULK','Liberecký':'r-LBK',
+  'Královéhradecký':'r-HKK','Pardubický':'r-PAK','Středočeský':'r-STC','Praha':'r-PHA',
+  'Jihočeský':'r-JCK','Vysočina':'r-VYS','Jihomoravský':'r-JMK','Olomoucký':'r-OLK',
+  'Zlínský':'r-ZLK','Moravskoslezský':'r-MSK'
+};
+
+// Map click handlers
+document.querySelectorAll('.ps-map svg path').forEach(p=>{
+  p.addEventListener('click',()=>filterRegion(p.dataset.region));
+});
+
+function togglePartners(){
+  const sb=document.getElementById('partner-sidebar');
+  const ov=document.getElementById('partner-overlay');
+  const isOpen=sb.classList.contains('open');
+  sb.classList.toggle('open');
+  ov.classList.toggle('open');
+  if(!isOpen) loadPartners();
+}
+
+async function loadPartners(){
+  try {
+    const res=await fetch(SUPABASE_URL+'/rest/v1/partneri?select=*',{headers:SB_HEADERS});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    partners=await res.json();
+    renderPartners();
+  } catch(e){ console.error('Chyba načítání partnerů:',e); }
+}
+
+function filterRegion(region){
+  pFilterRegion=region;
+  document.querySelectorAll('.ps-map svg path').forEach(p=>{
+    p.classList.toggle('region-active',region&&p.dataset.region===region);
+  });
+  document.getElementById('ps-region-label').textContent=region||'Celá ČR';
+  document.getElementById('ps-reset-btn').style.display=region?'inline-block':'none';
+  renderPartners();
+}
+
+function filterObor(obor){
+  pFilterObor=obor;
+  document.querySelectorAll('.ps-obor-btn').forEach(b=>{
+    const bObor=b.dataset.obor||'vse';
+    b.classList.toggle('active', obor===bObor);
+  });
+  renderPartners();
+}
+
+function getFilteredPartners(){
+  const q=(document.getElementById('ps-search').value||'').toLowerCase();
+  return partners.filter(p=>{
+    if(pFilterRegion&&p.kraj!==pFilterRegion) return false;
+    if(pFilterObor!=='vse'&&p.obor!==pFilterObor) return false;
+    if(q&&![p.firma,p.osoba,p.obor,p.kraj,p.mesto,p.ulice,p.ico,p.pozn].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function renderPartners(){
+  const list=getFilteredPartners();
+  const el=document.getElementById('ps-list');
+  if(!list.length){
+    el.innerHTML='<div class="ps-empty">Žádní partneři nenalezeni</div>';
+    // Update region counts on map
+    updateMapCounts();
+    return;
+  }
+  el.innerHTML=list.map(p=>{
+    const stars='★'.repeat(p.hodnoceni||0)+'☆'.repeat(5-(p.hodnoceni||0));
+    return `<div class="ps-card" onclick="openPartnerModal('${p.id}')">
+      <div class="ps-card-top">
+        <div class="ps-card-name">${esc(p.firma||'')}</div>
+        <span class="ps-card-obor">${esc(p.obor||'')}</span>
+      </div>
+      <div class="ps-card-region">📍 ${p.ulice?esc(p.ulice)+', ':''}${p.mesto?esc(p.mesto)+', ':''}${esc(p.kraj||'—')}${p.psc?' '+esc(p.psc):''}${p.osoba?' · '+esc(p.osoba):''}</div>
+      <div class="ps-card-contact">
+        ${p.tel?'📞 <a href="tel:'+esc(p.tel)+'">'+esc(p.tel)+'</a>':''}
+        ${p.email?' · ✉ <a href="mailto:'+esc(p.email)+'">'+esc(p.email)+'</a>':''}
+      </div>
+      <div class="ps-card-meta">
+        <span class="ps-stars">${stars}</span>
+        ${p.cena?'<span>'+p.cena+' Kč/hod</span>':''}
+        ${p.ico?'<span>IČO: '+esc(p.ico)+'</span>':''}
+      </div>
+      ${p.pozn?'<div class="ps-card-note">'+esc(p.pozn)+'</div>':''}
+    </div>`;
+  }).join('');
+  updateMapCounts();
+}
+
+function updateMapCounts(){
+  document.querySelectorAll('.ps-map svg path').forEach(p=>{
+    const region=p.dataset.region;
+    const count=partners.filter(x=>x.kraj===region).length;
+    p.style.fill=count>0?(pFilterRegion===region?'#e2b830':'#d4e8c0'):(pFilterRegion===region?'#e2b830':'');
+  });
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function setRating(n){
+  pRating=n;
+  document.querySelectorAll('#pf-rating span').forEach((s,i)=>s.classList.toggle('filled',i<n));
+}
+
+// ARES lookup
+const ARES_KRAJ_MAP={'CZ010':'Praha','CZ020':'Středočeský','CZ031':'Jihočeský','CZ032':'Plzeňský','CZ041':'Karlovarský','CZ042':'Ústecký','CZ051':'Liberecký','CZ052':'Královéhradecký','CZ053':'Pardubický','CZ063':'Vysočina','CZ064':'Jihomoravský','CZ071':'Olomoucký','CZ072':'Zlínský','CZ080':'Moravskoslezský'};
+
+async function lookupARES(){
+  const ico=document.getElementById('pf-ico').value.trim();
+  const st=document.getElementById('ares-status');
+  if(!ico||ico.length!==8||!/^\d{8}$/.test(ico)){st.textContent='⚠ IČO musí mít 8 číslic';st.style.color='#c04040';return;}
+  st.textContent='⏳ Načítám z ARES...';st.style.color='#888';
+  document.getElementById('btn-ares').disabled=true;
+  try{
+    const r=await fetch('https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/'+ico);
+    if(!r.ok) throw new Error('Subjekt nenalezen');
+    const d=await r.json();
+    // Fill fields
+    if(d.obchodniJmeno) document.getElementById('pf-firma').value=d.obchodniJmeno;
+    const addr=d.sidlo||{};
+    if(addr.textovaAdresa){
+      const parts=addr.textovaAdresa.split(',').map(s=>s.trim());
+      if(parts.length>=2){
+        document.getElementById('pf-ulice').value=parts.slice(0,-1).join(', ');
+        const cityPsc=parts[parts.length-1];
+        const pscMatch=cityPsc.match(/(\d{3}\s?\d{2})\s+(.*)/);
+        if(pscMatch){document.getElementById('pf-psc').value=pscMatch[1];document.getElementById('pf-mesto').value=pscMatch[2];}
+        else document.getElementById('pf-mesto').value=cityPsc;
+      } else document.getElementById('pf-ulice').value=addr.textovaAdresa;
+    }
+    if(addr.kodKraje){
+      const krajCode='CZ0'+addr.kodKraje;
+      const krajName=Object.entries(ARES_KRAJ_MAP).find(([k])=>krajCode.startsWith(k.slice(0,4)));
+      if(krajName) document.getElementById('pf-kraj').value=krajName[1];
+    }
+    st.textContent='✓ Načteno z ARES';st.style.color='#40a050';
+  }catch(e){
+    st.textContent='✗ '+e.message;st.style.color='#c04040';
+  }finally{document.getElementById('btn-ares').disabled=false;}
+}
+
+function openPartnerModal(id){
+  const p=id?partners.find(x=>x.id===String(id)):null;
+  pEditId=p?String(p.id):null;
+  document.getElementById('pm-title').textContent=p?'Upravit partnera':'Nový partner';
+  document.getElementById('pm-delete').style.display=p?'inline-flex':'none';
+  document.getElementById('ares-status').textContent='';
+  if(p){
+    document.getElementById('pf-firma').value=p.firma||'';
+    document.getElementById('pf-osoba').value=p.osoba||'';
+    document.getElementById('pf-ico').value=p.ico||'';
+    document.getElementById('pf-ulice').value=p.ulice||'';
+    document.getElementById('pf-mesto').value=p.mesto||'';
+    document.getElementById('pf-psc').value=p.psc||'';
+    document.getElementById('pf-tel').value=p.tel||'';
+    document.getElementById('pf-email').value=p.email||'';
+    document.getElementById('pf-kraj').value=p.kraj||'';
+    document.getElementById('pf-obor').value=p.obor||'Elektro';
+    document.getElementById('pf-cena').value=p.cena||'';
+    document.getElementById('pf-pozn').value=p.pozn||'';
+    setRating(p.hodnoceni||3);
+  } else {
+    ['pf-firma','pf-osoba','pf-ico','pf-ulice','pf-mesto','pf-psc','pf-tel','pf-email','pf-cena','pf-pozn'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('pf-kraj').value=pFilterRegion||'';
+    document.getElementById('pf-obor').value='Elektro';
+    setRating(3);
+  }
+  document.getElementById('partner-modal-overlay').classList.add('open');
+}
+
+function closePartnerModal(){
+  document.getElementById('partner-modal-overlay').classList.remove('open');
+  pEditId=null;
+}
+
+async function savePartner(){
+  const isEdit=!!pEditId;
+  const rec={
+    id: pEditId||String(Date.now()),
+    firma: document.getElementById('pf-firma').value.trim(),
+    osoba: document.getElementById('pf-osoba').value.trim(),
+    ico:   document.getElementById('pf-ico').value.trim(),
+    ulice: document.getElementById('pf-ulice').value.trim(),
+    mesto: document.getElementById('pf-mesto').value.trim(),
+    psc:   document.getElementById('pf-psc').value.trim(),
+    tel:   document.getElementById('pf-tel').value.trim(),
+    email: document.getElementById('pf-email').value.trim(),
+    kraj:  document.getElementById('pf-kraj').value,
+    obor:  document.getElementById('pf-obor').value,
+    cena:  Number(document.getElementById('pf-cena').value)||0,
+    hodnoceni: pRating,
+    pozn:  document.getElementById('pf-pozn').value.trim()
+  };
+  if(!rec.firma){alert('Vyplňte název firmy / jméno');return;}
+  closePartnerModal();
+  showSaving(isEdit?'Ukládám partnera...':'Přidávám partnera...','Ukládám data');
+  try {
+    if(isEdit) await sbUpdate('partneri',rec.id,rec); else await sbInsert('partneri',rec);
+    showSaving('Hotovo!','Data uložena');
+    setTimeout(async()=>{hideSaving();await loadPartners();},800);
+  } catch(e){hideSaving();alert('Chyba: '+e.message);}
+}
+
+async function deletePartner(){
+  if(!pEditId||!confirm('Opravdu smazat tohoto partnera?')) return;
+  const id=pEditId; closePartnerModal();
+  showSaving('Mažu partnera...','');
+  try {
+    await sbDelete('partneri',id);
+    showSaving('Smazáno!','');
+    setTimeout(async()=>{hideSaving();await loadPartners();},800);
+  } catch(e){hideSaving();alert('Chyba: '+e.message);}
+}
+
 renderCalendar();
 loadData();
-setInterval(loadData,120000);
+// Auto-refresh every 30s (only when page visible and no modal open)
+setInterval(()=>{
+  if(document.hidden) return;
+  if(document.querySelector('.modal[style*="flex"],.modal[style*="block"],.overlay[style*="flex"],.overlay[style*="block"]')) return;
+  loadData();
+}, 10000);
+document.getElementById('user-bar-name').textContent=localStorage.getItem('ledshopik_user')||'';
+function logout(){localStorage.removeItem('ledshopik_user');window.location.href='login.html';}
 </script>
+<script>
+(function(){
+  var VK='ledshopik_app_ver';
+  function ck(){
+    fetch('https://raw.githubusercontent.com/ledshopik/app/main/version.json?t='+Date.now())
+    .then(function(r){return r.json()})
+    .then(function(d){
+      var c=localStorage.getItem(VK);
+      if(!c){localStorage.setItem(VK,d.version);return;}
+      if(c!==d.version){
+        localStorage.setItem(VK,d.version);
+        window.location.href=window.location.pathname+'?v='+Date.now();
+      }
+    }).catch(function(){});
+  }
+  ck();
+  setInterval(ck,30000);
+})();
+
+(function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-instalace').on('postgres_changes',{event:'*',schema:'public',table:'instalace'},function(){console.log('RT:instalace');if(typeof loadData==='function')loadData();}).subscribe();})();</script>
+<script>(function(){var cacheKey='ledshopik_weather',cacheTime='ledshopik_weather_time';var cached=localStorage.getItem(cacheKey),ct=localStorage.getItem(cacheTime);if(cached&&ct&&Date.now()-parseInt(ct)<1800000){try{var d=JSON.parse(cached);showMiniWeather(d);}catch(e){}return;}var loc='Ostrava';if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(pos){fetchWeather(pos.coords.latitude+','+pos.coords.longitude);},function(){fetchWeather(loc);},{timeout:5000,maximumAge:600000});}else{fetchWeather(loc);}function fetchWeather(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1').then(function(r){return r.json()}).then(function(d){localStorage.setItem(cacheKey,JSON.stringify(d));localStorage.setItem(cacheTime,String(Date.now()));showMiniWeather(d);}).catch(function(){});}function showMiniWeather(d){var el=document.getElementById('weather-mini');if(!el||!d.current_condition)return;var c=d.current_condition[0];var codes={113:'\u2600\uFE0F',116:'\u26C5',119:'\u2601\uFE0F',122:'\u2601\uFE0F',176:'\uD83C\uDF26\uFE0F',200:'\u26C8\uFE0F',227:'\uD83C\uDF28\uFE0F',266:'\uD83C\uDF27\uFE0F',296:'\uD83C\uDF27\uFE0F',302:'\uD83C\uDF27\uFE0F',332:'\u2744\uFE0F'};var emoji=codes[parseInt(c.weatherCode)]||'\uD83C\uDF24\uFE0F';var area=d.nearest_area?d.nearest_area[0].areaName[0].value:'';el.innerHTML=emoji+' '+c.temp_C+'\u00B0C <span style="color:#bbb;font-size:10px;">'+area+'</span>';}})();</script>
 </body>
 </html>

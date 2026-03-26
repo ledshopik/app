@@ -6,127 +6,155 @@
 <title>LEDshopik – Docházka</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Arial Narrow', Arial, sans-serif; background: #0f1117; color: #e8e4dc; min-height: 100vh; }
+body { font-family: 'Arial Narrow', Arial, sans-serif; background: #f4f2ed; color: #1a1a1a; min-height: 100vh; }
 button, input, select, textarea { font-family: inherit; }
+option, datalist option { color: #333; background: #fff; }
 
-#nav { background: #0a0c12; border-bottom: 1px solid #1e2230; padding: 0 24px; display: flex; align-items: stretch; gap: 0; }
-#nav a { padding: 10px 16px; font-size: 12px; font-weight: 700; letter-spacing: .1em; color: #555; text-decoration: none; text-transform: uppercase; display: flex; align-items: center; border-bottom: 2px solid transparent; }
+#nav { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 0 24px; display: flex; align-items: stretch; gap: 0; }
+#nav a { /* styles moved inline */ }
 #nav a.active { color: #60a0e0; border-bottom-color: #60a0e0; }
-#nav a:hover { color: #e8e4dc; }
+#nav a:hover { color: #1a1a1a; }
 
-#header { background: #0f1117; border-bottom: 1px solid #1e2230; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
-.header-left .eyebrow { font-size: 10px; letter-spacing: .3em; color: #4a5060; text-transform: uppercase; margin-bottom: 4px; }
-.header-left .title { font-size: 22px; font-weight: 900; letter-spacing: .06em; }
-.header-left .title span { color: #60a0e0; }
+/* App Header */
+#header {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-accent { width: 4px; height: 48px; background: #e2b830; border-radius: 2px; flex-shrink: 0; }
+.header-title-wrap { margin-left: 14px; }
+.header-eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; color: #1a1a1a; }
+.header-date { text-align: right; }
+.header-date .day { font-size: 24px; font-weight: 900; color: #e2b830; letter-spacing: .02em; line-height: 1; }
+.header-date .month { font-size: 10px; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
 
 .stats { display: flex; gap: 6px; flex-wrap: wrap; }
-.stat { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+.stat { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 6px 14px; display: flex; flex-direction: column; align-items: center; min-width: 70px; }
 .stat .num { font-size: 18px; font-weight: 800; line-height: 1; }
-.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; margin-top: 2px; }
+.stat .lbl { font-size: 9px; letter-spacing: .15em; color: #888; text-transform: uppercase; margin-top: 2px; }
 
-#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4a5060; }
-#sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #4a5060; }
+#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; }
+#sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; }
 #sync-dot.ok { background: #40a050; }
 #sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
 #sync-dot.error { background: #c05050; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #1e2230; background: #0f1117; }
-.filter-btn { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
-.filter-btn:hover { border-color: #3a3d4a; color: #c0c8d0; }
+#toolbar { padding: 14px 32px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #e8e4dc; background: #f4f2ed; }
+.filter-btn { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+.filter-btn:hover { border-color: #bbb; color: #444; }
 .filter-btn.active { background: #60a0e0; color: #fff; border-color: #60a0e0; }
 .filter-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
 #search-wrap { margin-left: auto; position: relative; }
-#search-wrap input { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; transition: border-color .2s; }
+#search-wrap input { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 6px 12px 6px 32px; font-size: 12px; width: 200px; outline: none; transition: border-color .2s; }
 #search-wrap input:focus { border-color: #60a0e0; }
-#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #4a5060; }
+#search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #888; }
 
 #btn-add { background: #60a0e0; color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 700; letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
 #btn-add:hover { background: #70b0f0; }
-#btn-refresh { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
-#btn-refresh:hover { color: #e8e4dc; }
+#btn-refresh { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+#btn-refresh:hover { color: #1a1a1a; }
 
 /* Calendar view */
 #cal-section { padding: 20px 32px; }
 .cal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-.cal-nav-btn { background: #1a1d26; border: 1px solid #2a2d3a; color: #8890a0; border-radius: 4px; padding: 4px 12px; font-size: 12px; cursor: pointer; }
-.cal-nav-btn:hover { color: #e8e4dc; }
+.cal-nav-btn { background: #f4f2ed; border: 1px solid #ddd; color: #888; border-radius: 4px; padding: 4px 12px; font-size: 12px; cursor: pointer; }
+.cal-nav-btn:hover { color: #1a1a1a; }
 .cal-month-label { font-size: 16px; font-weight: 800; min-width: 160px; text-align: center; }
 #btn-cal-today { background: #60a0e0; color: #fff; border: none; border-radius: 4px; padding: 4px 12px; font-size: 10px; font-weight: 700; cursor: pointer; }
 .cal-legend { display: flex; gap: 14px; margin-left: auto; }
-.cal-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #4a5060; }
+.cal-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #888; }
 .cal-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
 
-.cal-grid { background: #1a1d26; border-radius: 8px; overflow: hidden; }
-.cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); background: #161820; }
-.cal-wd { text-align: center; font-size: 9px; letter-spacing: .1em; color: #555; text-transform: uppercase; padding: 8px 0; }
-.cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; background: #0f1117; }
-.cal-day { background: #1a1d26; min-height: 70px; padding: 6px 8px; }
-.cal-day.other { opacity: .25; }
+.cal-grid { background: #fff; overflow: hidden; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); }
+.cal-wd { text-align: center; font-size: 9px; letter-spacing: .1em; color: #888; text-transform: uppercase; padding: 4px 0; }
+.cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-day { background: #fff; min-height: 90px; padding: 6px 8px; cursor: default; border-bottom:1px solid #ece8e0; border-right:1px solid #ece8e0; }
+.cal-day.other { opacity: .3; }
 .cal-day.today { outline: 1px solid #60a0e0; }
-.cal-day.weekend { background: #161820; }
-.dn { font-size: 10px; font-weight: 600; color: #555; margin-bottom: 3px; }
+.cal-day.weekend { background: #f8f6f0; }
+.cal-day.holiday { background: #fff0f0; }
+.cal-day.weekend.holiday { background: #f8f0f0; }
+.dn { font-size: 10px; font-weight: 600; color: #888; margin-bottom: 3px; }
 .cal-day.today .dn { color: #60a0e0; font-weight: 900; }
 .cal-day.weekend .dn { color: #c05050; }
-.cal-ev { font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 2px; margin-bottom: 1px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
+.cal-day.holiday .dn { color: #c05050; font-weight: 900; }
+.holiday-name { font-size: 7px; color: #c05050; line-height: 1.1; margin-bottom: 2px; }
+.cal-ev { font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 2px; margin-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
 .cal-ev:hover { opacity: .8; }
-.ev-dovolena  { background: #1a3a20; color: #40c060; }
-.ev-neschopenka { background: #2a1a1a; color: #e05050; }
-.ev-neplacene { background: #2a2010; color: #e2b830; }
+.ev-dovolena  { background: #e0f8e0; color: #40c060; }
+.ev-neschopenka { background: #fce8e8; color: #e05050; }
+.ev-neplacene { background: #fdf4d8; color: #e2b830; }
+.ev-lekar { background: #e8f0ff; color: #6080c0; }
+.ev-homeoffice { background: #e0e8f8; color: #6080c0; }
+.ev-jednani { background: #ece0f8; color: #8060c0; }
 
 /* Table */
 #table-wrap { padding: 0 32px 32px; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 800px; }
-thead th { background: #1a1d26; color: #4a5060; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2d3a; white-space: nowrap; cursor: pointer; user-select: none; }
+thead th { background: #fff; color: #888; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #ddd; white-space: nowrap; cursor: pointer; user-select: none; }
 thead th:hover { color: #60a0e0; }
 thead th.sorted { color: #60a0e0; }
 thead th .sort-arrow { margin-left: 4px; font-size: 9px; }
-tbody tr { border-bottom: 1px solid #1a1d26; transition: background .12s; cursor: pointer; }
-tbody tr:hover { background: #161820; }
-tbody td { padding: 11px 14px; font-size: 12px; vertical-align: middle; color: #c0c8d0; }
-td.zamestnanec { font-weight: 700; color: #e8e4dc; font-size: 13px; }
+tbody tr { border-bottom: 1px solid #f4f2ed; transition: background .12s; cursor: pointer; }
+tbody tr:hover { background: #f8f6f0; }
+tbody td { padding: 11px 14px; font-size: 12px; vertical-align: middle; color: #444; }
+td.zamestnanec { font-weight: 700; color: #1a1a1a; font-size: 13px; }
 td.datum { white-space: nowrap; }
 
 .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
-.t-dovolena   { background: #1a3a20; color: #40c060; border: 1px solid #204530; } .t-dovolena .badge-dot   { background: #40c060; }
-.t-neschopenka { background: #2a1a1a; color: #e05050; border: 1px solid #552020; } .t-neschopenka .badge-dot { background: #e05050; }
-.t-neplacene  { background: #2a2010; color: #e2b830; border: 1px solid #554020; } .t-neplacene .badge-dot  { background: #e2b830; }
+.t-dovolena   { background: #e0f0e0; color: #40c060; border: 1px solid #c0dcc0; } .t-dovolena .badge-dot   { background: #40c060; }
+.t-neschopenka { background: #fce8e8; color: #e05050; border: 1px solid #f0c8c8; } .t-neschopenka .badge-dot { background: #e05050; }
+.t-neplacene  { background: #fdf4d8; color: #e2b830; border: 1px solid #f0e0a0; } .t-neplacene .badge-dot  { background: #e2b830; }
+.t-lekar      { background: #e8f0ff; color: #6080c0; border: 1px solid #c8d8f0; } .t-lekar .badge-dot      { background: #6080c0; }
+.t-homeoffice { background: #e0e8f8; color: #6080c0; border: 1px solid #c0d0e8; } .t-homeoffice .badge-dot { background: #6080c0; }
+.t-jednani    { background: #ece0f8; color: #8060c0; border: 1px solid #d0c0e8; } .t-jednani .badge-dot    { background: #8060c0; }
 
 tbody tr[data-typ="Dovolená"]        td:first-child { border-left: 3px solid #40c060; }
 tbody tr[data-typ="Neschopenka"]     td:first-child { border-left: 3px solid #e05050; }
 tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e2b830; }
+tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6080c0; }
+tbody tr[data-typ="Home office"]    td:first-child { border-left: 3px solid #6080c0; }
+tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left: 3px solid #8060c0; }
 
-#empty-state { text-align: center; padding: 60px 20px; color: #4a5060; display: none; }
+#empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
 
 /* Modal */
-#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 #modal-overlay.open { display: flex; }
-#modal { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; width: 100%; max-width: 520px; }
-#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #1e2230; display: flex; align-items: center; justify-content: space-between; }
+#modal { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 520px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
+#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; }
 #modal-title { font-size: 16px; font-weight: 800; }
-#modal-close { background: none; border: none; color: #4a5060; font-size: 20px; cursor: pointer; }
-#modal-close:hover { color: #e8e4dc; }
-#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+#modal-close { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; }
+#modal-close:hover { color: #1a1a1a; }
+#modal-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; overflow-y: auto; flex: 1; min-height: 0; }
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group.full { grid-column: 1 / -1; }
-.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #4a5060; text-transform: uppercase; }
-.form-group input, .form-group select, .form-group textarea { background: #1a1d26; border: 1px solid #2a2d3a; border-radius: 6px; color: #e8e4dc; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
+.form-group label { font-size: 10px; font-weight: 700; letter-spacing: .15em; color: #888; text-transform: uppercase; }
+.form-group input, .form-group select, .form-group textarea { background: #fff; border: 1px solid #ddd; border-radius: 6px; color: #1a1a1a; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color .2s; }
 .form-group input:focus, .form-group select:focus { border-color: #60a0e0; }
-.form-group select option { background: #1a1d26; }
+.form-group select option { background: #fff; }
 .days-info { font-size: 12px; color: #60a0e0; font-weight: 700; margin-top: 4px; }
-#modal-footer { padding: 16px 24px; border-top: 1px solid #1e2230; display: flex; gap: 10px; justify-content: flex-end; }
-#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #552020; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
-.btn-cancel { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.rozsah-btn { background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s; }
+.rozsah-btn:hover { border-color:#bbb;color:#444; }
+.rozsah-btn.active { background:#60a0e0;color:#fff;border-color:#60a0e0; }
+#modal-footer { padding: 16px 24px; border-top: 1px solid #e8e4dc; display: flex; gap: 10px; justify-content: flex-end; }
+#btn-delete { margin-right: auto; background: none; color: #c05050; border: 1px solid #f0c8c8; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-cancel { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .btn-save { background: #60a0e0; color: #fff; border: none; border-radius: 6px; padding: 8px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .btn-save:hover { background: #70b0f0; }
 
-#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; align-items: center; justify-content: center; }
+#saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 300; align-items: center; justify-content: center; }
 #saving-overlay.open { display: flex; }
-#saving-box { background: #161820; border: 1px solid #2a2d3a; border-radius: 10px; padding: 24px 36px; text-align: center; }
+#saving-box { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 24px 36px; text-align: center; }
 #saving-box .saving-title { font-size: 14px; font-weight: 700; color: #60a0e0; margin-bottom: 6px; }
-#saving-box .saving-sub { font-size: 12px; color: #4a5060; }
+#saving-box .saving-sub { font-size: 12px; color: #888; }
 
 @media (max-width: 720px) {
   #header { padding: 12px 16px; }
@@ -137,52 +165,79 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
   .form-group.full { grid-column: 1; }
 }
 </style>
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/app/sw.js")}</script></head>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script></head>
 <body>
-
-<div id="nav">
-  <a href="index.html">⌂ Dashboard</a>
-  <a href="instalace.html">Instalace</a>
-  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#f07030'" onmouseout="this.style.color='#555'">Výroba</a>
-  <a href="obhlidky.html">Obhlídky</a>
-  <a href="reklamace.html">Reklamace</a>
-  <a href="konfigurator.html">Konfigurátor</a>
-  <a href="dochazka.html" class="active">Docházka</a>
-  <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#c8a830'" onmouseout="this.style.color='#555'">Zásobování</a>
-  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#555'">Lumibook</a>
-</div>
-
+<style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
+<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'}}).then(r=>r.json()).then(j=>{const d=Array.isArray(j)?j:(j.data||[]);const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
 <div id="header">
-  <div class="header-left">
-    <div class="eyebrow">LEDshopik · Tým</div>
-    <div class="title">DOCHÁZKA <span>&</span> ABSENCE</div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="header-accent"></div>
+    <div class="header-title-wrap">
+      <div class="header-eyebrow">LEDshopik &middot; Systém</div>
+      <div class="header-title">DOCHÁZKA</div>
+    </div>
+    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;transition:all .15s;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
   </div>
-  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-    <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">Připojování...</span></div>
-    <div class="stats">
-      <div class="stat"><div class="num" id="stat-total" style="color:#e8e4dc">0</div><div class="lbl">Celkem</div></div>
-      <div class="stat"><div class="num" id="stat-dovolena" style="color:#40c060">0</div><div class="lbl">Dovolená</div></div>
-      <div class="stat"><div class="num" id="stat-neschopenka" style="color:#e05050">0</div><div class="lbl">Neschopenka</div></div>
-      <div class="stat"><div class="num" id="stat-dnes" style="color:#60a0e0">0</div><div class="lbl">Dnes pryč</div></div>
+  <div id="team-bar" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;"></div>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div id="weather-mini" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888;"></div>
+    <div class="header-date">
+      <div class="day" id="hdr-day">&mdash;</div>
+      <div class="month" id="hdr-month">&mdash;</div>
     </div>
   </div>
 </div>
 
+<div id="nav">
+  <a href="index.html" style="padding:8px 14px;border-top:3px solid #60a0e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:4px;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">⌂ DASHBOARD<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Přehled</span></a>
+  <a href="instalace.html" style="padding:8px 14px;border-top:3px solid #e2b830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">INSTALACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Montáže</span></a>
+  <a href="vyroba.html" style="padding:8px 14px;border-top:3px solid #f07030;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">VÝROBA<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Zakázky</span></a>
+  <a href="obhlidky.html" style="padding:8px 14px;border-top:3px solid #3ab0a0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">OBHLÍDKY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Termíny</span></a>
+  <a href="reklamace.html" style="padding:8px 14px;border-top:3px solid #e05050;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">REKLAMACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Servis</span></a>
+  <a href="konfigurator.html" style="padding:8px 14px;border-top:3px solid #a070e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KONFIGURÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">RING svítidla</span></a>
+  <a href="konfigurator-profily.html" style="padding:8px 14px;border-top:3px solid #40a0a0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PROFILY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">ALU výroba</span></a>
+  <a href="zasobovani.html" style="padding:8px 14px;border-top:3px solid #c8a830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">ZÁSOBOVÁNÍ<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Dodávky</span></a>
+  <a href="lumibook.html" style="padding:8px 14px;border-top:3px solid #e8a020;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">LUMIBOOK<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalog</span></a>
+  <a href="kalkulator-instalaci.html" style="padding:8px 14px;border-top:3px solid #b08820;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KALKULÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Ceny montáží</span></a>
+  <a href="produktovy-list.html" style="padding:8px 14px;border-top:3px solid #e05050;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PRODUKTY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalogové listy</span></a>
+  <a href="dochazka.html" style="margin-left:auto;padding:10px 20px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#3a8048;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center;background:#f0f8f2;border-radius:6px 6px 0 0;line-height:1.3;border-bottom:2px solid #50a060;">🕐 DOCHÁZKA</a>
+  
+</div>
+<div id="user-controls" style="background:#fff;border-bottom:1px solid #e0e0e0;padding:6px 32px;display:flex;align-items:center;gap:14px;">
+  <span id="user-bar-name" style="font-weight:700;color:#333;font-size:12px;"></span>
+  <a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a>
+</div>
+
+<div style="padding:10px 32px;display:flex;align-items:center;gap:16px;background:#fff;border-bottom:1px solid #e8e4dc;">
+  <div id="sync-status"><div id="sync-dot"></div><span id="sync-text">—</span></div>
+  <div class="stats">
+    <div class="stat"><div class="num" id="stat-total">0</div><div class="lbl">Celkem</div></div>
+    <div class="stat"><div class="num" id="stat-dovolena" style="color:#40c060;">0</div><div class="lbl">Dovolená</div></div>
+    <div class="stat"><div class="num" id="stat-neschopenka" style="color:#e05050;">0</div><div class="lbl">Neschopenka</div></div>
+    <div class="stat"><div class="num" id="stat-lekar" style="color:#6080c0;">0</div><div class="lbl">Lékař</div></div>
+    <div class="stat"><div class="num" id="stat-homeoffice" style="color:#6080c0;">0</div><div class="lbl">Home office</div></div>
+    <div class="stat"><div class="num" id="stat-jednani" style="color:#8060c0;">0</div><div class="lbl">Jednání</div></div>
+    <div class="stat"><div class="num" id="stat-dnes" style="color:#60a0e0;">0</div><div class="lbl">Dnes</div></div>
+  </div>
+</div>
 <div id="toolbar">
   <button class="filter-btn active" data-filter="vse" onclick="setFilter('vse')">Vše</button>
   <button class="filter-btn" data-filter="Dovolená"        onclick="setFilter('Dovolená')"><span class="filter-dot" style="background:#40c060"></span>Dovolená</button>
   <button class="filter-btn" data-filter="Neschopenka"     onclick="setFilter('Neschopenka')"><span class="filter-dot" style="background:#e05050"></span>Neschopenka</button>
   <button class="filter-btn" data-filter="Neplacené volno" onclick="setFilter('Neplacené volno')"><span class="filter-dot" style="background:#e2b830"></span>Neplacené volno</button>
+  <button class="filter-btn" data-filter="Lékař" onclick="setFilter('Lékař')"><span class="filter-dot" style="background:#6080c0"></span>Lékař</button>
+  <button class="filter-btn" data-filter="Home office" onclick="setFilter('Home office')"><span class="filter-dot" style="background:#6080c0"></span>Home office</button>
+  <button class="filter-btn" data-filter="Pracovní jednání mimo firmu" onclick="setFilter('Pracovní jednání mimo firmu')"><span class="filter-dot" style="background:#8060c0"></span>Jednání</button>
   <button class="filter-btn" data-filter="aktualni"        onclick="setFilter('aktualni')"><span class="filter-dot" style="background:#60a0e0"></span>Aktuální</button>
   <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderAll()"></div>
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
   <button id="btn-add" onclick="openModal()">+ Přidat absenci</button>
-  <button onclick="exportCSV()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">↓ CSV</button>
-  <button onclick="exportPDF()" style="background:#1a1d26;color:#8890a0;border:1px solid #2a2d3a;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">↓ PDF</button>
+  <button onclick="exportCSV()" style="background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">↓ CSV</button>
+  <button onclick="exportPDF()" style="background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">↓ PDF</button>
   <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-    <span style="font-size:10px;color:#555;letter-spacing:.1em;text-transform:uppercase;">Období:</span>
-    <select id="filter-rok" onchange="renderAll()" style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:5px 10px;font-size:12px;outline:none;"></select>
-    <select id="filter-mesic" onchange="renderAll()" style="background:#1a1d26;border:1px solid #2a2d3a;border-radius:6px;color:#e8e4dc;padding:5px 10px;font-size:12px;outline:none;">
+    <span style="font-size:10px;color:#888;letter-spacing:.1em;text-transform:uppercase;">Období:</span>
+    <select id="filter-rok" onchange="renderAll()" style="background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a1a;padding:5px 10px;font-size:12px;outline:none;"></select>
+    <select id="filter-mesic" onchange="renderAll()" style="background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a1a;padding:5px 10px;font-size:12px;outline:none;">
       <option value="0">Celý rok</option>
       <option value="1">Leden</option><option value="2">Únor</option><option value="3">Březen</option>
       <option value="4">Duben</option><option value="5">Květen</option><option value="6">Červen</option>
@@ -192,10 +247,16 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
   </div>
 </div>
 
+<!-- Souhrn dovolené za měsíc -->
+<div id="vacation-summary" style="display:none;background:#f0f8f0;border-bottom:1px solid #c0dcc0;padding:10px 32px;">
+  <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#888;text-transform:uppercase;margin-bottom:6px;">Dovolená za období (pracovní dny)</div>
+  <div id="vacation-list" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
+</div>
+
 <!-- Upozornění na překryv -->
-<div id="overlap-bar" style="display:none;background:#1e1010;border-bottom:2px solid #e05050;padding:10px 32px;align-items:center;gap:10px;">
+<div id="overlap-bar" style="display:none;background:#fff0f0;border-bottom:2px solid #e05050;padding:10px 32px;align-items:center;gap:10px;">
   <span style="background:#e05050;color:#fff;font-size:9px;font-weight:900;padding:2px 8px;border-radius:2px;">!</span>
-  <span id="overlap-text" style="font-size:12px;color:#c0c8d0;"></span>
+  <span id="overlap-text" style="font-size:12px;color:#444;"></span>
 </div>
 
 <!-- Kalendář -->
@@ -209,6 +270,9 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#40c060;"></div>Dovolená</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#e05050;"></div>Neschopenka</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#e2b830;"></div>Neplacené</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#6080c0;"></div>Lékař</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#6080c0;"></div>Home office</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#8060c0;"></div>Jednání</div>
     </div>
   </div>
   <div class="cal-grid">
@@ -262,6 +326,9 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
           <option>Dovolená</option>
           <option>Neschopenka</option>
           <option>Neplacené volno</option>
+          <option>Lékař</option>
+          <option>Home office</option>
+          <option>Pracovní jednání mimo firmu</option>
         </select>
       </div>
       <div class="form-group">
@@ -271,6 +338,20 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
       <div class="form-group">
         <label>Datum do</label>
         <input type="date" id="f-datum-do" oninput="calcDays()">
+      </div>
+      <div class="form-group full">
+        <label>Časový rozsah</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="f-rozsah-btns">
+          <button type="button" class="rozsah-btn active" data-val="cely" onclick="setRozsah('cely')">Celý den</button>
+          <button type="button" class="rozsah-btn" data-val="dopoledne" onclick="setRozsah('dopoledne')">Dopoledne (do 12:00)</button>
+          <button type="button" class="rozsah-btn" data-val="odpoledne" onclick="setRozsah('odpoledne')">Odpoledne (od 12:00)</button>
+          <button type="button" class="rozsah-btn" data-val="vlastni" onclick="setRozsah('vlastni')">Vlastní</button>
+        </div>
+        <div id="f-cas-vlastni" style="display:none;margin-top:8px;display:none;gap:10px;align-items:center;">
+          <input type="time" id="f-cas-od" value="08:00" style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+          <span style="color:#888;">—</span>
+          <input type="time" id="f-cas-do" value="16:00" style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+        </div>
       </div>
       <div class="form-group full">
         <div class="days-info" id="days-info"></div>
@@ -291,16 +372,19 @@ tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e
 <div id="saving-overlay">
   <div id="saving-box">
     <div class="saving-title" id="saving-title">Ukládám...</div>
-    <div class="saving-sub" id="saving-sub">Komunikuji s Google Sheets</div>
+    <div class="saving-sub" id="saving-sub">Ukládám data</div>
   </div>
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9Jig_9A16cEdpuFJfVHvc34iXiBGq42FSBw2OuIoeRNiI5j0BfZQx2j-8549R1VTjQg/exec';
+if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 const COLS = ['id','zamestnanec','typ','datum_od','datum_do','dni','poznamka'];
 const MONTHS_CS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
-const TYP_CLASS = { 'Dovolená':'t-dovolena', 'Neschopenka':'t-neschopenka', 'Neplacené volno':'t-neplacene' };
-const TYP_CAL  = { 'Dovolená':'ev-dovolena', 'Neschopenka':'ev-neschopenka', 'Neplacené volno':'ev-neplacene' };
+const TYP_CLASS = { 'Dovolená':'t-dovolena', 'Neschopenka':'t-neschopenka', 'Neplacené volno':'t-neplacene', 'Lékař':'t-lekar', 'Home office':'t-homeoffice', 'Pracovní jednání mimo firmu':'t-jednani' };
+const TYP_CAL  = { 'Dovolená':'ev-dovolena', 'Neschopenka':'ev-neschopenka', 'Neplacené volno':'ev-neplacene', 'Lékař':'ev-lekar', 'Home office':'ev-homeoffice', 'Pracovní jednání mimo firmu':'ev-jednani' };
 
 let data=[], filterVal='vse', sortCol='datum_od', sortDir=-1, editId=null;
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
@@ -313,11 +397,80 @@ function toInputDate(d){
   return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
 }
 function fmtDate(d){ const s=toInputDate(d); if(!s) return '—'; const [y,m,day]=s.split('-'); return `${day}.${m}.${y}`; }
+// Výpočet Velikonoc (Gauss algorithm)
+function easterDate(year) {
+  const a=year%19, b=Math.floor(year/100), c=year%100;
+  const d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25);
+  const g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30;
+  const i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7;
+  const m=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m+114)/31), day=((h+l-7*m+114)%31)+1;
+  return new Date(year, month-1, day);
+}
+
+// České státní svátky pro daný rok
+function getCzechHolidays(year) {
+  const holidays = new Set();
+  const add = (m,d) => holidays.add(`${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+  add(1,1);   // Nový rok
+  add(5,1);   // Svátek práce
+  add(5,8);   // Den vítězství
+  add(7,5);   // Cyril a Metoděj
+  add(7,6);   // Jan Hus
+  add(9,28);  // Den české státnosti
+  add(10,28); // Vznik Československa
+  add(11,17); // Den boje za svobodu
+  add(12,24); // Štědrý den
+  add(12,25); // 1. svátek vánoční
+  add(12,26); // 2. svátek vánoční
+  // Velikonoce (Velký pátek + Velikonoční pondělí)
+  const easter = easterDate(year);
+  const goodFriday = new Date(easter); goodFriday.setDate(easter.getDate()-2);
+  const easterMonday = new Date(easter); easterMonday.setDate(easter.getDate()+1);
+  holidays.add(dateStr(goodFriday));
+  holidays.add(dateStr(easterMonday));
+  return holidays;
+}
+
+// Cache svátků
+const holidayCache = {};
+function isHoliday(dateString) {
+  const year = Number(dateString.split('-')[0]);
+  if (!holidayCache[year]) holidayCache[year] = getCzechHolidays(year);
+  return holidayCache[year].has(dateString);
+}
+
+const HOLIDAY_NAMES = {
+  '01-01':'Nový rok','05-01':'Svátek práce','05-08':'Den vítězství',
+  '07-05':'Cyril a Metoděj','07-06':'Jan Hus','09-28':'Den české státnosti',
+  '10-28':'Vznik Československa','11-17':'Den boje za svobodu',
+  '12-24':'Štědrý den','12-25':'1. svátek vánoční','12-26':'2. svátek vánoční'
+};
+function getHolidayName(dateString) {
+  const md = dateString.substring(5); // "MM-DD"
+  if (HOLIDAY_NAMES[md]) return HOLIDAY_NAMES[md];
+  const year = Number(dateString.split('-')[0]);
+  const easter = easterDate(year);
+  const gf = new Date(easter); gf.setDate(easter.getDate()-2);
+  const em = new Date(easter); em.setDate(easter.getDate()+1);
+  if (dateString === dateStr(gf)) return 'Velký pátek';
+  if (dateString === dateStr(em)) return 'Velikonoční pondělí';
+  return '';
+}
+
+// Počet pracovních dní (bez víkendů a svátků ČR)
 function countDays(od,doo){
   if(!od||!doo) return 0;
   const a=new Date(od+'T00:00:00'), b=new Date(doo+'T00:00:00');
   if(b<a) return 0;
-  return Math.round((b-a)/(1000*60*60*24))+1;
+  let count = 0;
+  const cur = new Date(a);
+  while(cur <= b) {
+    const dow = cur.getDay();
+    if(dow !== 0 && dow !== 6 && !isHoliday(dateStr(cur))) count++;
+    cur.setDate(cur.getDate()+1);
+  }
+  return count;
 }
 function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function syncStatus(state,text){ document.getElementById('sync-dot').className=state; document.getElementById('sync-text').textContent=text; }
@@ -325,18 +478,25 @@ function syncStatus(state,text){ document.getElementById('sync-dot').className=s
 async function loadData(){
   syncStatus('loading','Načítám data...');
   try {
-    const res=await fetch(SCRIPT_URL+'?modul=dochazka');
-    const json=await res.json();
-    data=json.data||[];
+    const res=await fetch(SUPABASE_URL+'/rest/v1/dochazka?select=*',{headers:SB_HEADERS});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    data=await res.json();
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderAll();
   } catch(e){ syncStatus('error','Chyba: '+e.message); }
 }
 
-async function apiPost(payload){
-  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({...payload,modul:'dochazka'})});
-  const json=await res.json();
-  if(!json.ok) throw new Error(json.error||'Neznámá chyba');
+async function sbInsert(rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/dochazka',{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbUpdate(id,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/dochazka?id=eq.'+id,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbDelete(id){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/dochazka?id=eq.'+id,{method:'DELETE',headers:SB_HEADERS});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
 }
 
 function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderAll(); }
@@ -390,7 +550,40 @@ function getFiltered(){
   });
 }
 
-function renderAll(){ renderStats(); checkOverlap(); renderCalendar(); renderTable(); }
+function renderAll(){ renderStats(); renderVacationSummary(); checkOverlap(); renderCalendar(); renderTable(); }
+
+function renderVacationSummary(){
+  const bar = document.getElementById('vacation-summary');
+  const list = document.getElementById('vacation-list');
+  const rok = Number(document.getElementById('filter-rok').value)||today.getFullYear();
+  const mesic = Number(document.getElementById('filter-mesic').value)||0;
+  if(!mesic){ bar.style.display='none'; return; }
+
+  // Začátek a konec vybraného měsíce
+  const mesStart = `${rok}-${String(mesic).padStart(2,'0')}-01`;
+  const lastDay = new Date(rok, mesic, 0).getDate();
+  const mesEnd = `${rok}-${String(mesic).padStart(2,'0')}-${lastDay}`;
+
+  // Spočítej pracovní dny dovolené za měsíc pro každého zaměstnance
+  const sums = {};
+  data.filter(r => r.typ === 'Dovolená').forEach(r => {
+    const od = toInputDate(r.datum_od), doo = toInputDate(r.datum_do);
+    if(!od || !doo || od > mesEnd || doo < mesStart) return;
+    // Ořízni na měsíc
+    const effOd = od < mesStart ? mesStart : od;
+    const effDo = doo > mesEnd ? mesEnd : doo;
+    const days = countDays(effOd, effDo);
+    if(days > 0){
+      sums[r.zamestnanec] = (sums[r.zamestnanec]||0) + days;
+    }
+  });
+
+  if(!Object.keys(sums).length){ bar.style.display='none'; return; }
+  bar.style.display='block';
+  list.innerHTML = Object.entries(sums).sort((a,b)=>b[1]-a[1]).map(([name,days]) =>
+    `<div style="background:#fff;border:1px solid #c0dcc0;border-radius:6px;padding:4px 12px;font-size:12px;"><b>${name}</b> <span style="color:#40a050;font-weight:800;">${days}d</span></div>`
+  ).join('');
+}
 
 function checkOverlap(){
   const bar=document.getElementById('overlap-bar');
@@ -434,6 +627,9 @@ function renderStats(){
   document.getElementById('stat-total').textContent=data.length;
   document.getElementById('stat-dovolena').textContent=data.filter(r=>r.typ==='Dovolená').length;
   document.getElementById('stat-neschopenka').textContent=data.filter(r=>r.typ==='Neschopenka').length;
+  document.getElementById('stat-lekar').textContent=data.filter(r=>r.typ==='Lékař').length;
+  document.getElementById('stat-homeoffice').textContent=data.filter(r=>r.typ==='Home office').length;
+  document.getElementById('stat-jednani').textContent=data.filter(r=>r.typ==='Pracovní jednání mimo firmu').length;
   document.getElementById('stat-dnes').textContent=data.filter(r=>{
     const od=toInputDate(r.datum_od), doo=toInputDate(r.datum_do);
     return od&&doo&&od<=todayStr&&todayStr<=doo;
@@ -461,8 +657,11 @@ function renderCalendar(){
     const isT=cdStr===dateStr(today),isSat=cd.getDay()===6,isSun=cd.getDay()===0,other=mo!==0;
     const evs=data.filter(r=>{ const od=toInputDate(r.datum_od),doo=toInputDate(r.datum_do); return od&&doo&&od<=cdStr&&cdStr<=doo; });
     let evHtml=evs.slice(0,3).map(ev=>`<div class="cal-ev ${TYP_CAL[ev.typ]||''}" title="${ev.zamestnanec}">${ev.zamestnanec}</div>`).join('');
-    if(evs.length>3) evHtml+=`<div style="font-size:8px;color:#555;">+${evs.length-3}</div>`;
-    html+=`<div class="cal-day${other?' other':''}${isT?' today':''}${(isSat||isSun)?' weekend':''}">
+    if(evs.length>3) evHtml+=`<div style="font-size:8px;color:#888;">+${evs.length-3}</div>`;
+    const hol = isHoliday(cdStr);
+    const holName = hol ? getHolidayName(cdStr) : '';
+    html+=`<div class="cal-day${other?' other':''}${isT?' today':''}${(isSat||isSun)?' weekend':''}${hol?' holiday':''}">
+      ${holName?`<div class="holiday-name">${holName}</div>`:''}
       <div class="dn">${dn}</div>${evHtml}
     </div>`;
   }
@@ -485,15 +684,38 @@ function renderTable(){
       <td class="datum">${fmtDate(r.datum_od)}</td>
       <td class="datum">${fmtDate(r.datum_do)}</td>
       <td style="font-weight:700;color:#60a0e0;">${r.dni||countDays(toInputDate(r.datum_od),toInputDate(r.datum_do))}</td>
-      <td style="font-size:11px;color:#8890a0;">${r.poznamka||''}</td>
+      <td style="font-size:11px;color:#999;">${r.poznamka||''}</td>
     </tr>`).join('');
+}
+
+let currentRozsah='cely';
+function setRozsah(val){
+  currentRozsah=val;
+  document.querySelectorAll('.rozsah-btn').forEach(b=>b.classList.toggle('active',b.dataset.val===val));
+  const vlastni=document.getElementById('f-cas-vlastni');
+  vlastni.style.display=val==='vlastni'?'flex':'none';
+  calcDays();
+}
+function getRozsahText(){
+  if(currentRozsah==='cely') return '';
+  if(currentRozsah==='dopoledne') return ' (do 12:00)';
+  if(currentRozsah==='odpoledne') return ' (od 12:00)';
+  return ' ('+document.getElementById('f-cas-od').value+' – '+document.getElementById('f-cas-do').value+')';
 }
 
 function calcDays(){
   const od=document.getElementById('f-datum-od').value;
   const doo=document.getElementById('f-datum-do').value;
   const n=countDays(od,doo);
-  document.getElementById('days-info').textContent=n>0?`Celkem ${n} dní`:'';
+  if(n>0){
+    const a=new Date(od+'T00:00:00'), b=new Date(doo+'T00:00:00');
+    const total=Math.round((b-a)/(1000*60*60*24))+1;
+    const half=currentRozsah==='dopoledne'||currentRozsah==='odpoledne';
+    const dniText=half&&n===1?'0.5 dne':n+' pracovních dní';
+    document.getElementById('days-info').textContent=dniText + (total!==n&&!half ? ` (${total} kalendářních)` : '') + getRozsahText();
+  } else {
+    document.getElementById('days-info').textContent='';
+  }
 }
 
 function openModal(id){
@@ -502,6 +724,7 @@ function openModal(id){
   document.getElementById('modal-title').textContent=r?'Upravit absenci':'Přidat absenci';
   document.getElementById('btn-delete').style.display=r?'inline-flex':'none';
   document.getElementById('days-info').textContent='';
+  setRozsah('cely');
   if(r){
     document.getElementById('f-zamestnanec').value=r.zamestnanec||'';
     document.getElementById('f-typ').value=r.typ||'Dovolená';
@@ -528,20 +751,26 @@ async function saveRecord(){
   const currentId=editId?String(editId):String(Date.now());
   const od=document.getElementById('f-datum-od').value;
   const doo=document.getElementById('f-datum-do').value;
+  const half=currentRozsah==='dopoledne'||currentRozsah==='odpoledne';
+  const dniNum=countDays(od,doo);
+  const dniVal=half&&dniNum===1?'0.5':String(dniNum);
+  const rozsahNote=getRozsahText();
+  const userNote=document.getElementById('f-poznamka').value.trim();
+  const poznamka=rozsahNote?(userNote?rozsahNote.trim()+' · '+userNote:rozsahNote.trim()):userNote;
   const rec={
     id:          currentId,
     zamestnanec: document.getElementById('f-zamestnanec').value,
     typ:         document.getElementById('f-typ').value,
     datum_od:    od,
     datum_do:    doo,
-    dni:         String(countDays(od,doo)),
-    poznamka:    document.getElementById('f-poznamka').value.trim(),
+    dni:         dniVal,
+    poznamka:    poznamka,
   };
   if(!rec.zamestnanec){ alert('Vyberte zaměstnance'); return; }
   closeModal();
-  showSaving(isEdit?'Ukládám změny...':'Přidávám absenci...','Komunikuji s Google Sheets');
+  showSaving(isEdit?'Ukládám změny...':'Přidávám absenci...','Ukládám data');
   try {
-    await apiPost({action:isEdit?'update':'append',record:rec});
+    if(isEdit) await sbUpdate(currentId,rec); else await sbInsert(rec);
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
@@ -552,7 +781,7 @@ async function deleteRecord(){
   const id=editId; closeModal();
   showSaving('Mažu...','');
   try {
-    await apiPost({action:'delete',id:String(id)});
+    await sbDelete(id);
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
@@ -560,7 +789,37 @@ async function deleteRecord(){
 
 initRokSelect();
 loadData();
-setInterval(loadData,120000);
+// Auto-refresh every 30s (only when page visible and no modal open)
+setInterval(()=>{
+  if(document.hidden) return;
+  if(document.querySelector('.modal[style*="flex"],.modal[style*="block"],.overlay[style*="flex"],.overlay[style*="block"]')) return;
+  loadData();
+}, 10000);
+document.getElementById('user-bar-name').textContent=localStorage.getItem('ledshopik_user')||'';
+function logout(){localStorage.removeItem('ledshopik_user');window.location.href='login.html';}
 </script>
+<script>
+(function(){
+  var VK='ledshopik_app_ver';
+  function ck(){
+    fetch('https://raw.githubusercontent.com/ledshopik/app/main/version.json?t='+Date.now())
+    .then(function(r){return r.json()})
+    .then(function(d){
+      var c=localStorage.getItem(VK);
+      if(!c){localStorage.setItem(VK,d.version);return;}
+      if(c!==d.version){
+        localStorage.setItem(VK,d.version);
+        window.location.href=window.location.pathname+'?v='+Date.now();
+      }
+    }).catch(function(){});
+  }
+  ck();
+  setInterval(ck,30000);
+})();
+
+(function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-dochazka').on('postgres_changes',{event:'*',schema:'public',table:'dochazka'},function(){console.log('RT:dochazka');if(typeof loadData==='function')loadData();}).subscribe();})();</script>
+<script>(function(){var cacheKey='ledshopik_weather',cacheTime='ledshopik_weather_time';var cached=localStorage.getItem(cacheKey),ct=localStorage.getItem(cacheTime);if(cached&&ct&&Date.now()-parseInt(ct)<1800000){try{var d=JSON.parse(cached);showMiniWeather(d);}catch(e){}return;}var loc='Ostrava';if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(pos){fetchWeather(pos.coords.latitude+','+pos.coords.longitude);},function(){fetchWeather(loc);},{timeout:5000,maximumAge:600000});}else{fetchWeather(loc);}function fetchWeather(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1').then(function(r){return r.json()}).then(function(d){localStorage.setItem(cacheKey,JSON.stringify(d));localStorage.setItem(cacheTime,String(Date.now()));showMiniWeather(d);}).catch(function(){});}function showMiniWeather(d){var el=document.getElementById('weather-mini');if(!el||!d.current_condition)return;var c=d.current_condition[0];var codes={113:'\u2600\uFE0F',116:'\u26C5',119:'\u2601\uFE0F',122:'\u2601\uFE0F',176:'\uD83C\uDF26\uFE0F',200:'\u26C8\uFE0F',227:'\uD83C\uDF28\uFE0F',266:'\uD83C\uDF27\uFE0F',296:'\uD83C\uDF27\uFE0F',302:'\uD83C\uDF27\uFE0F',332:'\u2744\uFE0F'};var emoji=codes[parseInt(c.weatherCode)]||'\uD83C\uDF24\uFE0F';var area=d.nearest_area?d.nearest_area[0].areaName[0].value:'';el.innerHTML=emoji+' '+c.temp_C+'\u00B0C <span style="color:#bbb;font-size:10px;">'+area+'</span>';}})();</script>
 </body>
 </html>

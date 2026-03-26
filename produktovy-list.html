@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDshopik – Generátor produktových listů</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    background: #f4f2ed;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  input, textarea, select { font-family: inherit; }
+  option, datalist option { color: #333; background: #fff; }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex; gap: 0; background: #fff; border-bottom: 1px solid #e0e0e0;
+    padding: 0 28px;
+  }
+  .tab-btn {
+    background: transparent; border: none; padding: 12px 24px;
+    font-size: 12px; font-weight: 700; letter-spacing: .12em;
+    color: #888; border-bottom: 2px solid transparent; transition: all .2s;
+  }
+  .tab-btn:hover { color: #444; }
+  .tab-btn.active { color: #e2b830; border-bottom-color: #e2b830; }
+
+  /* Main */
+  .main-wrap {
+    max-width: 900px; margin: 0 auto; padding: 24px 16px;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: #fff; border: 2px solid #e8e4dc; border-radius: 4px;
+    margin-bottom: 16px; overflow: hidden;
+  }
+  .card-header {
+    background: #f8f6f0; padding: 10px 16px;
+    font-size: 13px; font-weight: 800; letter-spacing: .08em; color: #444;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-body { padding: 16px; }
+
+  /* Inputs */
+  .field { margin-bottom: 12px; }
+  .field label {
+    display: block; font-size: 10px; font-weight: 700;
+    letter-spacing: .12em; color: #888; text-transform: uppercase; margin-bottom: 4px;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%; background: #f8f6f0; border: 1px solid #e8e4dc;
+    border-radius: 3px; padding: 8px 10px; font-size: 13px; color: #1a1a1a;
+    outline: none; transition: border-color .2s;
+  }
+  .field input:focus, .field textarea:focus { border-color: #e2b830; }
+  .field textarea { resize: vertical; min-height: 60px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 16px; border-radius: 3px; font-size: 12px; font-weight: 700;
+    letter-spacing: .06em; border: 2px solid #e8e4dc; background: #fff;
+    color: #444; transition: all .15s; white-space: nowrap;
+  }
+  .btn:hover { border-color: #bbb; }
+  .btn.primary {
+    background: #e2b830; border-color: #e2b830; color: #1a1a1a;
+  }
+  .btn.primary:hover { background: #d4a820; border-color: #d4a820; }
+  .btn.gold-outline {
+    border-color: #e2b830; color: #b89820;
+  }
+  .btn.gold-outline:hover { background: #fdf8e8; }
+  .btn.danger { border-color: #e88; color: #c44; }
+  .btn.danger:hover { background: #fef0f0; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+  /* URL input row */
+  .url-row {
+    display: flex; gap: 8px; align-items: flex-end;
+  }
+  .url-row .field { flex: 1; margin-bottom: 0; }
+
+  /* Preview card */
+  .preview-grid {
+    display: grid; grid-template-columns: 200px 1fr; gap: 16px;
+  }
+  .preview-img {
+    width: 200px; height: 150px; background: #f4f2ed; border: 1px solid #e8e4dc;
+    border-radius: 3px; object-fit: contain; display: flex; align-items: center;
+    justify-content: center; color: #bbb; font-size: 11px; overflow: hidden;
+  }
+  .preview-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .preview-meta .prod-name { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .preview-meta .prod-cat { font-size: 11px; color: #888; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+  .preview-meta .prod-sku { font-size: 12px; color: #666; }
+
+  /* Specs grid */
+  .specs-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    margin-top: 12px;
+  }
+  .spec-cell {
+    background: #f8f6f0; border: 1px solid #e8e4dc; border-radius: 3px;
+    padding: 6px 10px;
+  }
+  .spec-cell .spec-label { font-size: 9px; color: #888; letter-spacing: .1em; text-transform: uppercase; }
+  .spec-cell .spec-val { font-size: 13px; font-weight: 700; }
+
+  /* Editable fields grid */
+  .edit-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+    margin-top: 12px;
+  }
+  @media (max-width: 600px) {
+    .preview-grid { grid-template-columns: 1fr; }
+    .specs-grid { grid-template-columns: repeat(2, 1fr); }
+    .edit-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* Checkbox */
+  .checkbox-row {
+    display: flex; align-items: center; gap: 8px; margin: 10px 0;
+    font-size: 13px; color: #444;
+  }
+  .checkbox-row input[type=checkbox] { width: 16px; height: 16px; accent-color: #e2b830; }
+
+  /* Batch list */
+  .batch-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-bottom: 1px solid #f0ede6;
+    font-size: 12px;
+  }
+  .batch-item:last-child { border-bottom: none; }
+  .batch-item .batch-status { width: 20px; text-align: center; }
+  .batch-item .batch-name { flex: 1; font-weight: 600; }
+  .batch-item .batch-url { color: #888; font-size: 11px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* History table */
+  .history-table { width: 100%; border-collapse: collapse; }
+  .history-table th {
+    background: #f8f6f0; padding: 8px 12px; font-size: 10px;
+    font-weight: 700; letter-spacing: .12em; color: #888;
+    text-transform: uppercase; text-align: left; border-bottom: 2px solid #e8e4dc;
+  }
+  .history-table td {
+    padding: 7px 12px; font-size: 12px; border-bottom: 1px solid #f0ede6;
+  }
+  .history-table tr:nth-child(even) td { background: #faf9f6; }
+
+  /* Loading */
+  .loading-spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid #ddd; border-top-color: #e2b830;
+    border-radius: 50%; animation: spin .6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    padding: 24px; text-align: center; color: #bbb; font-size: 13px;
+  }
+
+  /* Progress bar */
+  .progress-bar-bg { height: 4px; background: #e8e4dc; border-radius: 2px; margin: 10px 0; }
+  .progress-bar { height: 4px; background: #e2b830; border-radius: 2px; width: 0; transition: width .3s; }
+
+/* App Header */
+#header {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-accent { width: 4px; height: 48px; background: #e2b830; border-radius: 2px; flex-shrink: 0; }
+.header-title-wrap { margin-left: 14px; }
+.header-eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; color: #1a1a1a; }
+.header-date { text-align: right; }
+.header-date .day { font-size: 24px; font-weight: 900; color: #e2b830; letter-spacing: .02em; line-height: 1; }
+.header-date .month { font-size: 10px; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
+</style>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#ffffff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script>
+</head>
+<body>
+<style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
+<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'}}).then(r=>r.json()).then(j=>{const d=Array.isArray(j)?j:(j.data||[]);const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
+<div id="header">
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="header-accent"></div>
+    <div class="header-title-wrap">
+      <div class="header-eyebrow">LEDshopik &middot; Systém</div>
+      <div class="header-title">PRODUKTY</div>
+    </div>
+    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;transition:all .15s;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
+  </div>
+  <div id="team-bar" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;"></div>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div id="weather-mini" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888;"></div>
+    <div class="header-date">
+      <div class="day" id="hdr-day">&mdash;</div>
+      <div class="month" id="hdr-month">&mdash;</div>
+    </div>
+  </div>
+</div>
+<div style="background:#fff;border-bottom:1px solid #e0e0e0;padding:0 24px;display:flex;align-items:stretch;gap:2px;font-family:Arial Narrow,Arial,sans-serif;">
+  <a href="index.html" style="padding:8px 14px;border-top:3px solid #60a0e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">⌂ DASHBOARD<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Přehled</span></a>
+  <a href="instalace.html" style="padding:8px 14px;border-top:3px solid #e2b830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">INSTALACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Montáže</span></a>
+  <a href="vyroba.html" style="padding:8px 14px;border-top:3px solid #f07030;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">VÝROBA<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Zakázky</span></a>
+  <a href="obhlidky.html" style="padding:8px 14px;border-top:3px solid #3ab0a0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">OBHLÍDKY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Termíny</span></a>
+  <a href="reklamace.html" style="padding:8px 14px;border-top:3px solid #e05050;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">REKLAMACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Servis</span></a>
+  <a href="konfigurator.html" style="padding:8px 14px;border-top:3px solid #a070e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KONFIGURÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">RING svítidla</span></a>
+  <a href="konfigurator-profily.html" style="padding:8px 14px;border-top:3px solid #40a0a0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PROFILY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">ALU výroba</span></a>
+  <a href="zasobovani.html" style="padding:8px 14px;border-top:3px solid #c8a830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">ZÁSOBOVÁNÍ<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Dodávky</span></a>
+  <a href="lumibook.html" style="padding:8px 14px;border-top:3px solid #e8a020;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">LUMIBOOK<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalog</span></a>
+  <a href="kalkulator-instalaci.html" style="padding:8px 14px;border-top:3px solid #b08820;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KALKULÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Ceny montáží</span></a>
+  <a href="produktovy-list.html" style="padding:8px 14px;border-top:3px solid #e05050;font-size:13px;font-weight:700;letter-spacing:.1em;color:#60a0e0;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid #60a0e0;line-height:1.3;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#60a0e0'">PRODUKTY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalogové listy</span></a>
+  <a href="dochazka.html" style="margin-left:auto;padding:10px 20px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#50a060;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center;background:#f0f8f2;border-radius:6px 6px 0 0;line-height:1.3;" onmouseover="this.style.color='#3a8048'" onmouseout="this.style.color='#50a060'">🕐 DOCHÁZKA</a>
+  
+</div>
+<div id="user-controls" style="background:#fff;border-bottom:1px solid #e0e0e0;padding:6px 32px;display:flex;align-items:center;gap:14px;">
+  <span id="user-bar-name" style="font-weight:700;color:#333;font-size:12px;"></span>
+  <a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a>
+</div>
+
+<!-- Tab bar -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('single')">JEDNOTLIVÝ PRODUKT</button>
+  <button class="tab-btn" onclick="switchTab('batch')">HROMADNÝ EXPORT</button>
+</div>
+
+<div class="main-wrap">
+
+  <!-- ===== TAB 1: Single product ===== -->
+  <div id="tab-single" class="tab-content active">
+
+    <!-- URL input -->
+    <div class="card">
+      <div class="card-header">📦 NAČTENÍ PRODUKTU</div>
+      <div class="card-body">
+        <div class="url-row">
+          <div class="field">
+            <label>URL produktu</label>
+            <input type="text" id="single-url" placeholder="https://www.ledshopik.cz/..." onkeydown="if(event.key==='Enter')loadSingle()">
+          </div>
+          <button class="btn primary" onclick="loadSingle()" id="btn-load-single">NAČÍST</button>
+        </div>
+        <div id="single-status" style="margin-top:8px;font-size:11px;color:#888;"></div>
+      </div>
+    </div>
+
+    <!-- Preview (hidden until loaded) -->
+    <div id="single-preview" style="display:none;">
+
+      <div class="card">
+        <div class="card-header">👁 NÁHLED PRODUKTU</div>
+        <div class="card-body">
+          <div class="preview-grid">
+            <div class="preview-img" id="preview-img-wrap">
+              <span>Bez obrázku</span>
+            </div>
+            <div class="preview-meta">
+              <div class="prod-name" id="pv-name"></div>
+              <div class="prod-cat" id="pv-category"></div>
+              <div class="prod-sku" id="pv-sku-ean"></div>
+            </div>
+          </div>
+          <div class="specs-grid" id="pv-specs"></div>
+        </div>
+      </div>
+
+      <!-- Editable fields -->
+      <div class="card">
+        <div class="card-header">✏️ ÚPRAVA DAT</div>
+        <div class="card-body">
+          <div class="edit-grid">
+            <div class="field"><label>Název</label><input type="text" id="ed-name"></div>
+            <div class="field"><label>Kategorie</label><input type="text" id="ed-category"></div>
+            <div class="field"><label>SKU</label><input type="text" id="ed-sku"></div>
+            <div class="field"><label>EAN</label><input type="text" id="ed-ean"></div>
+            <div class="field"><label>Cena (Kč)</label><input type="number" id="ed-price" step="0.01"></div>
+            <div class="field"><label>Měna</label><input type="text" id="ed-currency" value="Kč"></div>
+            <div class="field"><label>Napětí</label><input type="text" id="ed-voltage"></div>
+            <div class="field"><label>Příkon (W)</label><input type="number" id="ed-watt" step="0.1"></div>
+            <div class="field"><label>Světelný tok (lm)</label><input type="number" id="ed-lumen" step="1"></div>
+            <div class="field"><label>CCT</label><input type="text" id="ed-cct"></div>
+            <div class="field"><label>CRI</label><input type="text" id="ed-cri"></div>
+            <div class="field"><label>Krytí (IP)</label><input type="text" id="ed-ip"></div>
+            <div class="field"><label>Stmívání</label><input type="text" id="ed-dimmable"></div>
+            <div class="field"><label>Vyzařovací úhel</label><input type="text" id="ed-beamAngle"></div>
+            <div class="field"><label>Provozní teplota</label><input type="text" id="ed-operatingTemp"></div>
+            <div class="field"><label>Dělitelnost</label><input type="text" id="ed-divisibility"></div>
+            <div class="field"><label>Max. délka</label><input type="text" id="ed-maxLength"></div>
+            <div class="field"><label>Životnost</label><input type="text" id="ed-lifetime"></div>
+            <div class="field"><label>Barva PCB</label><input type="text" id="ed-pcbColor"></div>
+            <div class="field"><label>Šířka PCB</label><input type="text" id="ed-pcbWidth"></div>
+            <div class="field"><label>Záruka</label><input type="text" id="ed-warranty"></div>
+            <div class="field"><label>Dostupnost</label><input type="text" id="ed-availability"></div>
+            <div class="field"><label>URL obrázku</label><input type="text" id="ed-image"></div>
+          </div>
+          <div class="field" style="margin-top:12px;">
+            <label>Vlastní poznámka</label>
+            <textarea id="ed-note" placeholder="Volitelný text, který se zobrazí na produktovém listu..."></textarea>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="chk-qr" checked>
+            <label for="chk-qr" style="font-size:13px;color:#444;cursor:pointer;">Přidat QR kód</label>
+          </div>
+          <div class="btn-row">
+            <button class="btn primary" onclick="generatePDF(true)">📄 PDF S CENOU</button>
+            <button class="btn gold-outline" onclick="generatePDF(false)">📄 PDF BEZ CENY</button>
+            <button class="btn" onclick="saveToHistory()">💾 ULOŽIT DO HISTORIE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 2: Batch ===== -->
+  <div id="tab-batch" class="tab-content">
+    <div class="card">
+      <div class="card-header">📋 HROMADNÝ EXPORT</div>
+      <div class="card-body">
+        <div class="field">
+          <label>URL produktů (jeden na řádek)</label>
+          <textarea id="batch-urls" rows="8" placeholder="https://www.ledshopik.cz/produkt-1&#10;https://www.ledshopik.cz/produkt-2&#10;https://www.ledshopik.cz/produkt-3"></textarea>
+        </div>
+        <button class="btn primary" onclick="loadBatch()" id="btn-load-batch">NAČÍST VŠE</button>
+        <div id="batch-progress" style="display:none;margin-top:12px;">
+          <div style="font-size:11px;color:#888;margin-bottom:4px;" id="batch-progress-text">Načítání...</div>
+          <div class="progress-bar-bg"><div class="progress-bar" id="batch-progress-bar"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="batch-list-wrap" style="display:none;">
+      <div class="card">
+        <div class="card-header">📦 NAČTENÉ PRODUKTY <span id="batch-count" style="margin-left:auto;font-size:11px;color:#888;font-weight:400;"></span></div>
+        <div class="card-body" style="padding:0;">
+          <div id="batch-list"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="batchGenerateAll(true)">📄 GENEROVAT VŠE S CENOU</button>
+        <button class="btn gold-outline" onclick="batchGenerateAll(false)">📄 GENEROVAT VŠE BEZ CENY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HISTORY ===== -->
+  <div class="card" style="margin-top:24px;">
+    <div class="card-header">
+      📚 HISTORIE PRODUKTOVÝCH LISTŮ
+      <span id="history-count" style="margin-left:auto;font-size:11px;color:#888;font-weight:400;"></span>
+    </div>
+    <div class="card-body" style="padding:0;" id="history-content">
+      <div class="empty-state">Načítání...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Auth ──────────────────────────────────────────────────────────────────────
+if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
+
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+const CURRENT_USER = localStorage.getItem('ledshopik_user') || '';
+document.getElementById('user-bar-name').textContent = CURRENT_USER;
+
+function logout() { localStorage.removeItem('ledshopik_user'); window.location.href = 'login.html'; }
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let currentProduct = null;
+let batchProducts = [];
+let history = [];
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (tab==='single' && i===0) || (tab==='batch' && i===1));
+  });
+  document.getElementById('tab-single').classList.toggle('active', tab==='single');
+  document.getElementById('tab-batch').classList.toggle('active', tab==='batch');
+}
+
+// ── Scraping ──────────────────────────────────────────────────────────────────
+async function scrapeProduct(url) {
+  let html = '';
+  // Primary: codetabs proxy
+  try {
+    const r = await fetch('https://api.codetabs.com/v1/proxy/?quest=' + encodeURIComponent(url), {signal: AbortSignal.timeout(15000)});
+    if (r.ok) {
+      const txt = await r.text();
+      if (txt.length > 500 && !txt.startsWith('{"ok":false')) html = txt;
+    }
+  } catch(e) {}
+  // Fallback: Railway proxy
+  if (!html) {
+    const API_BASE = 'https://ledshopik-backend-production.up.railway.app/api';
+    try {
+      const r = await fetch(API_BASE + '/proxy?url=' + encodeURIComponent(url), {signal: AbortSignal.timeout(15000)});
+      if (r.ok) {
+        const txt = await r.text();
+        if (txt.length > 500 && !txt.startsWith('{"ok":false')) html = txt;
+      }
+    } catch(e) {}
+  }
+  if (!html) throw new Error('Nepodařilo se stáhnout stránku');
+
+  let p = { name:'', category:'', sku:'', ean:'', image:'', price:0, currency:'Kč',
+            watt:0, lumen:0, cct:'', cri:'', ip:'', dim:'', voltage:'',
+            dimmable:'', operatingTemp:'', divisibility:'', maxLength:'',
+            lifetime:'', pcbColor:'', pcbWidth:'', beamAngle:'',
+            availability:'', warranty:'', url: url, note:'' };
+
+  // Parse JSON-LD
+  const jsonLdBlocks = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi) || [];
+  for (const block of jsonLdBlocks) {
+    try {
+      const content = block.replace(/<\/?script[^>]*>/gi, '');
+      let parsed = JSON.parse(content);
+      const items = Array.isArray(parsed) ? parsed : [parsed];
+      for (const ld of items) {
+        if (ld['@type'] === 'Product') {
+          p.name = ld.name || '';
+          p.note = ld.description || '';
+          p.image = ld.image || '';
+          if (ld.offers) {
+            p.price = parseFloat(ld.offers.price) || 0;
+            p.availability = ld.offers.availability ? (ld.offers.availability.includes('InStock') ? 'SKLADEM' : 'Na objednávku') : '';
+          }
+          if (ld.sku) p.sku = ld.sku;
+          if (ld.gtin13) p.ean = ld.gtin13;
+        }
+      }
+    } catch(e) { continue; }
+  }
+
+  // Fallback meta tags
+  if (!p.name) { const m = html.match(/property=["']og:title["']\s+content=["']([^"']+)["']/i) || html.match(/content=["']([^"']+)["']\s+property=["']og:title["']/i); if (m) p.name = m[1]; }
+  if (!p.image) { const m = html.match(/property=["']og:image["']\s+content=["']([^"']+)["']/i) || html.match(/content=["']([^"']+)["']\s+property=["']og:image["']/i); if (m) p.image = m[1]; }
+
+  // Prefer maxi image
+  const maxiMatch = html.match(/["']([^"']*\/fotky\/maxi\/[^"']*\.(?:jpg|png|webp))[^"']*["']/i);
+  if (maxiMatch) p.image = maxiMatch[1];
+  if (p.image && !p.image.startsWith('http')) { try { p.image = new URL(p.image, url).href; } catch(e) {} }
+
+  // Parse body text for technical params
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const bodyText = (doc.body ? doc.body.textContent : '').replace(/\s+/g, ' ');
+
+  // Voltage
+  const voltMatch = bodyText.match(/(\d+)\s*V\s*DC/i) || bodyText.match(/napětí[^:]*?(\d+)\s*V/i);
+  if (voltMatch) p.voltage = voltMatch[1] + ' V';
+
+  // Watt
+  const wattMatch = bodyText.match(/(\d+(?:[.,]\d+)?)\s*W\s*(?:\/\s*m|na\s*metr)/i) || bodyText.match(/příkon[^:]*?(\d+(?:[.,]\d+)?)\s*W/i);
+  if (wattMatch) p.watt = parseFloat(wattMatch[1].replace(',','.'));
+
+  // Lumen
+  const lmMatch = bodyText.match(/(\d+(?:[.,]\d+)?)\s*lm\s*(?:\/\s*m|na\s*metr)/i) || bodyText.match(/(\d+(?:[.,]\d+)?)\s*lm/i);
+  if (lmMatch) p.lumen = parseFloat(lmMatch[1].replace(',','.'));
+
+  // CCT
+  const cctRange = bodyText.match(/(\d{4})\s*[-–]\s*(\d{4,5})\s*K/);
+  if (cctRange) p.cct = cctRange[1] + '-' + cctRange[2] + 'K';
+  else { const cctAll = bodyText.match(/(\d{4,5})\s*K/g); if (cctAll) { const unique = [...new Set(cctAll.map(m => m.trim()))]; p.cct = unique.join(', '); } }
+
+  // CRI
+  const criMatch = bodyText.match(/CRI[:\s>]*(\d+)/i) || bodyText.match(/Ra[:\s>]*(\d+)/i);
+  if (criMatch) p.cri = criMatch[1];
+
+  // IP
+  const ipMatch = bodyText.match(/IP\s*(\d{2})/i);
+  if (ipMatch) p.ip = 'IP' + ipMatch[1];
+
+  // Beam angle
+  const angleMatch = bodyText.match(/vyzařovací\s*úhel[^:]*?[:]\s*(\d+)\s*°/i) || bodyText.match(/úhel\s*svícení[^:]*?[:]\s*(\d+)\s*°/i) || bodyText.match(/(\d+)\s*°\s*(?:vyzař|beam)/i) || bodyText.match(/beam\s*angle[^:]*?[:]\s*(\d+)/i) || bodyText.match(/vyzařovací[^:]*?(\d+)\s*°/i);
+  if (angleMatch) p.beamAngle = angleMatch[1] + '°';
+
+  // Dimmable
+  if (/stmívatel[^\s]*\s*[:]*\s*ano/i.test(bodyText) || /dimmable/i.test(bodyText)) p.dimmable = 'Ano (PWM)';
+  else if (/stmívatel/i.test(bodyText)) p.dimmable = 'Ano';
+
+  // Operating temp
+  const tempMatch = bodyText.match(/([-−]?\d+)\s*°?\s*C\s*(?:až|[-–])\s*\+?(\d+)\s*°?\s*C/i);
+  if (tempMatch) p.operatingTemp = tempMatch[1] + ' °C až +' + tempMatch[2] + ' °C';
+
+  // Divisibility
+  const divMatch = bodyText.match(/dělitelnost[^:]*?[:]\s*(?:každých?\s*)?(\d+(?:[.,]\d+)?)\s*mm/i) || bodyText.match(/(?:každých?|každý|cut)\s*(\d+(?:[.,]\d+)?)\s*mm/i) || bodyText.match(/řez[^:]*?[:]\s*(?:každých?\s*)?(\d+(?:[.,]\d+)?)\s*mm/i) || bodyText.match(/dělení[^:]*?[:]\s*(\d+(?:[.,]\d+)?)\s*mm/i) || bodyText.match(/(?:cutting|cut\s*length)[^:]*?[:]\s*(\d+(?:[.,]\d+)?)\s*mm/i);
+  if (divMatch) p.divisibility = 'každých ' + divMatch[1] + ' mm';
+
+  // Max length
+  const maxLenMatch = bodyText.match(/max[^:]*?délka[^:]*?[:]\s*(\d+)\s*m/i) || bodyText.match(/(\d+)\s*m\s*(?:max|maximální)/i);
+  if (maxLenMatch) p.maxLength = maxLenMatch[1] + ' m';
+
+  // Lifetime
+  const lifeMatch = bodyText.match(/životnost[^:]*?[:]\s*([\d\s]+)\s*h/i) || bodyText.match(/([\d\s]+)\s*h\s*(?:životnost|life)/i) || bodyText.match(/life\s*(?:time|span)[^:]*?[:]\s*([\d\s]+)\s*h/i) || bodyText.match(/([\d]{4,6})\s*(?:hodin|hours|h\b)/i);
+  if (lifeMatch) p.lifetime = lifeMatch[1].replace(/\s/g,'').replace(/(\d)(?=(\d{3})+$)/g, '$1 ') + ' h';
+
+  // PCB color
+  const pcbColorMatch = bodyText.match(/barva\s*PCB[^:]*?[:]\s*(\w+)/i);
+  if (pcbColorMatch) p.pcbColor = pcbColorMatch[1];
+
+  // PCB width
+  const pcbWidthMatch = bodyText.match(/šířka\s*PCB[^:]*?[:]\s*(\d+)\s*mm/i);
+  if (pcbWidthMatch) p.pcbWidth = pcbWidthMatch[1] + ' mm';
+
+  // Warranty
+  const warrantyMatch = bodyText.match(/záruka[^:]*?[:]\s*(\d+)\s*(?:rok|let|year)/i) || bodyText.match(/(\d+)\s*(?:rok|let|year)\s*(?:záruk|warranty|garanc)/i) || bodyText.match(/warranty[^:]*?[:]\s*(\d+)/i) || bodyText.match(/záruka\s*(\d+)/i);
+  if (warrantyMatch) { const y = parseInt(warrantyMatch[1]); p.warranty = y + (y === 1 ? ' rok' : y < 5 ? ' roky' : ' let'); }
+
+  // Try parsing structured parameter tables (th+td pairs in <table class="parametry"> and similar)
+  if (doc.body) {
+    const rows = doc.querySelectorAll('table.parametry tr, table.params tr, table.specifications tr, tr, .param-row, .spec-row');
+    for (const row of rows) {
+      // Try th+td first (eshop pattern), then td+td
+      const th = row.querySelector('th');
+      const td = row.querySelector('td');
+      let label, value;
+      if (th && td) {
+        label = (th.textContent || '').trim().toLowerCase().replace(/[:：]/g,'');
+        value = (td.textContent || '').trim();
+      } else {
+        const cells = row.querySelectorAll('td, span, div');
+        if (cells.length < 2) continue;
+        label = (cells[0].textContent || '').trim().toLowerCase().replace(/[:：]/g,'');
+        value = (cells[1].textContent || '').trim();
+      }
+      if (!label || !value) continue;
+      // Map label → field
+      if (!p.beamAngle && (label.includes('vyzařovací') || label.includes('úhel svícení') || label.includes('úhel'))) p.beamAngle = value.match(/\d+/) ? value.match(/\d+/)[0] + '°' : value;
+      if (!p.divisibility && (label.includes('dělitelnost') || label.includes('dělení') || label.includes('řez') || label.includes('cut'))) { const dv = value.match(/(\d+(?:[.,]\d+)?)\s*(mm|cm)/i); p.divisibility = dv ? (dv[2]==='cm' ? (parseFloat(dv[1])*10)+'mm' : dv[1]+'mm') : value; }
+      if (!p.lifetime && (label.includes('životnost') || label.includes('life'))) { const lv = value.match(/([\d\s]+)\s*(?:h|hod)/i); p.lifetime = lv ? lv[1].trim().replace(/\s/g,' ') + ' h' : value; }
+      if (!p.warranty && (label.includes('záruka') || label.includes('warranty') || label.includes('garanc'))) { const wm = value.match(/(\d+)\s*měs/i); const wr = value.match(/(\d+)\s*(?:rok|let|year)/i); if (wm) { const y = Math.round(parseInt(wm[1])/12); p.warranty = y + (y===1?' rok':y<5?' roky':' let'); } else if (wr) { const y=parseInt(wr[1]); p.warranty = y + (y===1?' rok':y<5?' roky':' let'); } else p.warranty = value; }
+      if (!p.dimmable && (label.includes('stmívat') || label.includes('dimm'))) p.dimmable = value;
+      if (!p.operatingTemp && (label.includes('provozní teplot') || label.includes('operating temp'))) p.operatingTemp = value.replace(/~/g,' až ');
+      if (!p.maxLength && (label.includes('max') && (label.includes('délk') || label.includes('zapoj')))) p.maxLength = value;
+      if (!p.pcbColor && label.includes('barva') && (label.includes('pcb') || label.includes('desk'))) p.pcbColor = value;
+      if (!p.pcbWidth && label.includes('šířka') && (label.includes('pcb') || label.includes('pásk') || label.includes('desk'))) p.pcbWidth = value;
+      if (!p.voltage && (label.includes('napětí') || label.includes('napájení') || label.includes('voltage'))) { const vm = value.match(/(\d+)\s*V/); if (vm) p.voltage = vm[1] + ' V'; else p.voltage = value; }
+      if (!p.watt && (label.includes('příkon') || label.includes('výkon') || label.includes('watt'))) { const wm = value.match(/(\d+(?:[.,]\d+)?)/); if (wm) p.watt = parseFloat(wm[1].replace(',','.')); }
+      if (!p.lumen && (label.includes('světelný tok') || label.includes('svítivost') || label.includes('lumen'))) { const lm = value.match(/(\d+(?:[.,]\d+)?)/); if (lm) p.lumen = parseFloat(lm[1].replace(',','.')); }
+      if (!p.cri && (label.includes('cri') || label.includes('podání barev') || label.includes('ra '))) { const cm = value.match(/(\d+)/); if (cm) p.cri = cm[1]; }
+      if (!p.ip && (label.includes('ip') && label.includes('krytí') || label === 'ip krytí' || label === 'krytí')) { const im = value.match(/IP\s*(\d+)/i); if (im) p.ip = 'IP' + im[1]; }
+      if (!p.cct && (label.includes('teplota světla') || label.includes('cct') || label.includes('barva světla'))) p.cct = value;
+    }
+  }
+
+  // SKU fallback from body
+  if (!p.sku) { const skuMatch = bodyText.match(/SKU[:\s]*([A-Z0-9][-A-Z0-9_]+)/i); if (skuMatch) p.sku = skuMatch[1]; }
+
+  // EAN fallback
+  if (!p.ean) { const eanMatch = bodyText.match(/EAN[:\s]*(\d{13})/i); if (eanMatch) p.ean = eanMatch[1]; }
+
+  // Category detection
+  const nl = (p.name || url).toLowerCase();
+  if (nl.includes('pásek') || nl.includes('pasek') || nl.includes('strip')) p.category = 'LED pásek';
+  else if (nl.includes('profil')) p.category = 'ALU profil';
+  else if (nl.includes('zdroj') || nl.includes('mean well') || nl.includes('driver')) p.category = 'Napájecí zdroj';
+  else if (nl.includes('neon')) p.category = 'LED neon';
+  else if (nl.includes('dimmer') || nl.includes('ovlada') || nl.includes('stmiv')) p.category = 'Ovladač';
+  else if (nl.includes('svítidlo') || nl.includes('svitidlo')) p.category = 'Svítidlo';
+  else if (nl.includes('panel')) p.category = 'LED panel';
+  else p.category = 'Produkt';
+
+  // Efficiency calculation
+  p.efficiency = (p.watt > 0 && p.lumen > 0) ? Math.round(p.lumen / p.watt) : 0;
+
+  // Clean note
+  if (p.note) {
+    const garbage = ['javascript','cookie','nalezen','not found','unavailable','error','vyžaduje'];
+    if (garbage.some(g => p.note.toLowerCase().includes(g))) p.note = '';
+    if (p.note.length > 200) p.note = p.note.split(/[.!]/).slice(0,2).join('. ').trim();
+  }
+
+  // Price fallback
+  if (!p.price) { const priceMatch = bodyText.match(/(\d[\d\s]*(?:[.,]\d+)?)\s*Kč/i); if (priceMatch) p.price = parseFloat(priceMatch[1].replace(/\s/g,'').replace(',','.')); }
+
+  return p;
+}
+
+// ── Single product loading ────────────────────────────────────────────────────
+async function loadSingle() {
+  const url = document.getElementById('single-url').value.trim();
+  if (!url) return;
+  const status = document.getElementById('single-status');
+  const btn = document.getElementById('btn-load-single');
+  btn.disabled = true;
+  status.innerHTML = '<span class="loading-spinner"></span> Načítání produktu...';
+
+  try {
+    currentProduct = await scrapeProduct(url);
+    showPreview(currentProduct);
+    status.innerHTML = '<span style="color:#3a8048;">✓ Produkt načten</span>';
+  } catch(e) {
+    status.innerHTML = '<span style="color:#c44;">✕ ' + e.message + '</span>';
+  }
+  btn.disabled = false;
+}
+
+function showPreview(p) {
+  document.getElementById('single-preview').style.display = 'block';
+
+  // Image
+  const imgWrap = document.getElementById('preview-img-wrap');
+  if (p.image) {
+    imgWrap.innerHTML = '<img src="' + p.image + '" onerror="this.parentElement.innerHTML=\'<span>Bez obrázku</span>\'">';
+  } else {
+    imgWrap.innerHTML = '<span>Bez obrázku</span>';
+  }
+
+  // Meta
+  document.getElementById('pv-name').textContent = p.name || 'Neznámý produkt';
+  document.getElementById('pv-category').textContent = p.category;
+  document.getElementById('pv-sku-ean').textContent = (p.sku ? 'SKU: ' + p.sku : '') + (p.ean ? ' | EAN: ' + p.ean : '');
+
+  // Specs
+  const specs = [
+    {l:'Napětí', v:p.voltage}, {l:'Příkon', v:p.watt ? p.watt+' W' : ''},
+    {l:'Sv. tok', v:p.lumen ? p.lumen+' lm' : ''}, {l:'CCT', v:p.cct},
+    {l:'CRI', v:p.cri ? 'Ra '+p.cri : ''}, {l:'Krytí', v:p.ip}
+  ];
+  document.getElementById('pv-specs').innerHTML = specs.map(s =>
+    '<div class="spec-cell"><div class="spec-label">' + s.l + '</div><div class="spec-val">' + (s.v || '—') + '</div></div>'
+  ).join('');
+
+  // Fill editable fields
+  const fields = ['name','category','sku','ean','price','currency','voltage','watt','lumen','cct','cri','ip',
+    'dimmable','beamAngle','operatingTemp','divisibility','maxLength','lifetime','pcbColor','pcbWidth','warranty','availability','image'];
+  fields.forEach(f => {
+    const el = document.getElementById('ed-' + f);
+    if (el) el.value = p[f] || '';
+  });
+  document.getElementById('ed-note').value = p.note || '';
+}
+
+function getEditedProduct() {
+  const p = Object.assign({}, currentProduct || {});
+  const fields = ['name','category','sku','ean','price','currency','voltage','watt','lumen','cct','cri','ip',
+    'dimmable','beamAngle','operatingTemp','divisibility','maxLength','lifetime','pcbColor','pcbWidth','warranty','availability','image'];
+  fields.forEach(f => {
+    const el = document.getElementById('ed-' + f);
+    if (el) {
+      if (f === 'price' || f === 'watt' || f === 'lumen') p[f] = parseFloat(el.value) || 0;
+      else p[f] = el.value;
+    }
+  });
+  p.note = document.getElementById('ed-note').value;
+  p.efficiency = (p.watt > 0 && p.lumen > 0) ? Math.round(p.lumen / p.watt) : 0;
+  return p;
+}
+
+// ── Batch loading ─────────────────────────────────────────────────────────────
+async function loadBatch() {
+  const urls = document.getElementById('batch-urls').value.split('\n').map(u => u.trim()).filter(u => u);
+  if (!urls.length) return;
+
+  batchProducts = [];
+  const btn = document.getElementById('btn-load-batch');
+  btn.disabled = true;
+  document.getElementById('batch-progress').style.display = 'block';
+  document.getElementById('batch-list-wrap').style.display = 'none';
+
+  for (let i = 0; i < urls.length; i++) {
+    document.getElementById('batch-progress-text').textContent = 'Načítání ' + (i+1) + ' / ' + urls.length + '...';
+    document.getElementById('batch-progress-bar').style.width = ((i+1)/urls.length*100) + '%';
+    try {
+      const p = await scrapeProduct(urls[i]);
+      batchProducts.push({product: p, status: 'ok'});
+    } catch(e) {
+      batchProducts.push({product: {name: urls[i], url: urls[i]}, status: 'error', error: e.message});
+    }
+    if (i < urls.length - 1) await new Promise(r => setTimeout(r, 300));
+  }
+
+  document.getElementById('batch-progress-text').textContent = 'Hotovo — ' + batchProducts.filter(b=>b.status==='ok').length + ' / ' + urls.length + ' načteno';
+  renderBatchList();
+  btn.disabled = false;
+}
+
+function renderBatchList() {
+  document.getElementById('batch-list-wrap').style.display = 'block';
+  document.getElementById('batch-count').textContent = batchProducts.length + ' produktů';
+  const el = document.getElementById('batch-list');
+  el.innerHTML = batchProducts.map((b, i) => {
+    const icon = b.status === 'ok' ? '<span style="color:#3a8048;">✓</span>' : '<span style="color:#c44;">✕</span>';
+    const name = b.product.name || 'Neznámý';
+    const urlShort = (b.product.url || '').replace(/^https?:\/\//, '').substring(0, 50);
+    return '<div class="batch-item"><div class="batch-status">' + icon + '</div><div class="batch-name">' + name + '</div><div class="batch-url">' + urlShort + '</div></div>';
+  }).join('');
+}
+
+async function batchGenerateAll(withPrice) {
+  const ok = batchProducts.filter(b => b.status === 'ok');
+  for (let i = 0; i < ok.length; i++) {
+    generatePDFForProduct(ok[i].product, withPrice, document.getElementById('chk-qr')?.checked !== false);
+    if (i < ok.length - 1) await new Promise(r => setTimeout(r, 800));
+  }
+}
+
+// ── Contextual recommendations ────────────────────────────────────────────────
+function getRecommendedUse(category) {
+  const cat = (category || '').toLowerCase();
+  if (cat.includes('pásek') || cat.includes('strip')) return ['Kuchyňská linka','Nepřímé osvětlení','SDK podhled','Vitrína','Ložnice','Pracovní osvětlení'];
+  if (cat.includes('svítidlo')) return ['Kancelář','Obchod','Restaurace','Lobby','Chodba'];
+  if (cat.includes('profil')) return ['LED pásek','Lineární osvětlení','Dekorativní lišta','Kuchyňská linka'];
+  if (cat.includes('zdroj')) return ['LED pásky','LED svítidla','LED neony'];
+  if (cat.includes('neon')) return ['Dekorativní osvětlení','Nepřímé světlo','Fasáda','Vitrína'];
+  if (cat.includes('panel')) return ['Kancelář','Obchod','Škola','Zdravotnictví'];
+  if (cat.includes('ovlada') || cat.includes('dimmer')) return ['LED pásky','LED svítidla','Stmívání','Barevné scény'];
+  return ['LED osvětlení','Interiér','Exteriér'];
+}
+
+function getInstallRecommendations(category) {
+  const cat = (category || '').toLowerCase();
+  if (cat.includes('pásek') || cat.includes('strip')) return ['Montáž do ALU profilu pro chlazení','Napájení 24V DC zdrojem','Vhodný stmívač PWM / TRIAC','Nedělat spoje pod úhlem','Chránit před vlhkostí (IP20)'];
+  if (cat.includes('svítidlo')) return ['Montáž dle přiloženého návodu','Zajistit dostatečnou nosnost stropu','Připojit na odpovídající jistič'];
+  if (cat.includes('profil')) return ['Řezat pilou na kov','Očistit řeznou hranu','Použít originální příslušenství','Zajistit odvod tepla'];
+  if (cat.includes('zdroj')) return ['Umístit na větrané místo','Nepřekročit max. zatížení','Chránit před vlhkostí'];
+  if (cat.includes('neon')) return ['Montáž do originálních úchytů','Nepřekračovat min. poloměr ohybu','Napájení odpovídajícím zdrojem'];
+  return ['Postupujte dle přiloženého návodu'];
+}
+
+// ── PDF generation ────────────────────────────────────────────────────────────
+function generatePDF(withPrice) {
+  const p = getEditedProduct();
+  const addQR = document.getElementById('chk-qr').checked;
+  generatePDFForProduct(p, withPrice, addQR);
+}
+
+function generatePDFForProduct(p, withPrice, addQR) {
+  const uses = getRecommendedUse(p.category);
+  const installs = getInstallRecommendations(p.category);
+  const warrantyYears = p.warranty ? p.warranty.replace(/[^\d]/g,'') : '';
+  const qrUrl = addQR && p.url ? 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=' + encodeURIComponent(p.url) : '';
+
+  // Build specs list for tech params section
+  const techSpecs = [
+    {l:'Napětí', v:p.voltage}, {l:'Příkon', v:p.watt ? p.watt+' W' : ''},
+    {l:'Světelný tok', v:p.lumen ? p.lumen+' lm' : ''}, {l:'Účinnost', v:p.efficiency ? p.efficiency+' lm/W' : ''},
+    {l:'Teplota chromatičnosti', v:p.cct}, {l:'Index podání barev', v:p.cri ? 'Ra '+p.cri : ''},
+    {l:'Krytí', v:p.ip}, {l:'Stmívání', v:p.dimmable},
+    {l:'Vyzařovací úhel', v:p.beamAngle}, {l:'Provozní teplota', v:p.operatingTemp},
+    {l:'Dělitelnost', v:p.divisibility}, {l:'Max. délka', v:p.maxLength},
+    {l:'Životnost', v:p.lifetime}, {l:'Barva PCB', v:p.pcbColor},
+    {l:'Šířka PCB', v:p.pcbWidth}, {l:'EAN', v:p.ean},
+    {l:'SKU', v:p.sku}, {l:'Dostupnost', v:p.availability}
+  ].filter(s => s.v);
+
+  const techRows = techSpecs.map(s =>
+    '<div style="padding:6px 0;border-bottom:1px solid #f0ede6;"><div style="font-size:8px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1px;">' + s.l + '</div><div style="font-size:12px;font-weight:700;color:#1a1a1a;">' + s.v + '</div></div>'
+  ).join('');
+
+  // Split into 3 columns
+  const third = Math.ceil(techSpecs.length / 3);
+  const col1 = techSpecs.slice(0, third);
+  const col2 = techSpecs.slice(third, third*2);
+  const col3 = techSpecs.slice(third*2);
+
+  function colHTML(items) {
+    return items.map(s =>
+      '<div style="padding:6px 0;border-bottom:1px solid #f0ede6;"><div style="font-size:8px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1px;">' + s.l + '</div><div style="font-size:12px;font-weight:700;color:#1a1a1a;">' + s.v + '</div></div>'
+    ).join('');
+  }
+
+  const cctSubtitle = p.cct ? p.cct : '';
+  const skuEan = [p.sku ? 'SKU: '+p.sku : '', p.ean ? 'EAN: '+p.ean : ''].filter(Boolean).join(' | ');
+
+  const w = window.open('', '_blank');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Produktový list — ' + (p.name||'Produkt') + '</title>');
+  w.document.write('<style>');
+  w.document.write(`
+    @page { margin: 10mm 12mm; size: A4; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; color: #1a1a1a; font-size: 11px; line-height: 1.4; background: #fff; }
+    .page { max-width: 780px; margin: 0 auto; padding: 0; }
+
+    /* Dark header band */
+    .header-band { background: #032d44; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .header-left { flex: 1; }
+    .header-cat { font-size: 9px; letter-spacing: .25em; color: #f5a100; text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
+    .header-name { font-size: 22px; font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 4px; }
+    .header-sub { font-size: 12px; color: #ccc; margin-bottom: 4px; font-weight: 600; }
+    .header-sku { font-size: 10px; color: #888; }
+    .header-right { text-align: right; flex-shrink: 0; margin-left: 20px; }
+    .stock-badge { display: inline-block; background: #2e7d32; color: #fff; font-size: 9px; font-weight: 800; padding: 4px 12px; border-radius: 3px; letter-spacing: .08em; margin-bottom: 8px; }
+    .header-logo { height: 50px; }
+
+    /* Specs bar with golden accent */
+    .specs-bar { display: flex; border-radius: 6px; margin-bottom: 16px; overflow: hidden; background: linear-gradient(135deg, #e8f2f8, #f0f8ff); border: 2px solid #032d44; }
+    .spec-box { flex: 1; padding: 12px 10px; text-align: center; border-right: 1px solid rgba(3,45,68,.2); }
+    .spec-box:last-child { border-right: none; }
+    .spec-box .val { font-size: 16px; font-weight: 900; color: #1a1a1a; }
+    .spec-box .lbl { font-size: 7px; color: #032d44; letter-spacing: .12em; text-transform: uppercase; margin-top: 2px; font-weight: 700; }
+
+    .product-img { text-align: center; margin: 16px 0; padding: 16px; background: #f8f6f0; border-radius: 8px; border: 1px solid #e8e4dc; }
+    .product-img img { max-width: 300px; max-height: 200px; }
+
+    .section-title { font-size: 10px; font-weight: 800; letter-spacing: .18em; color: #032d44; text-transform: uppercase; margin: 20px 0 10px; padding-bottom: 5px; border-bottom: 2.5px solid #032d44; }
+
+    .tech-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 16px; border: 1px solid #e8e4dc; border-radius: 6px; padding: 8px 14px; background: #fdfcf8; }
+    .tech-col div { padding: 7px 0; border-bottom: 1px solid #f0ede6; }
+    .tech-label { font-size: 8px; color: #888; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px; }
+    .tech-val { font-size: 12px; font-weight: 800; color: #1a1a1a; }
+
+    .use-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .use-tag { background: #e8f0f8; border: 1px solid #c0d0e0; border-radius: 4px; padding: 5px 12px; font-size: 10px; color: #2a4a6a; font-weight: 600; }
+
+    .install-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px; }
+    .install-list { list-style: none; padding: 0; }
+    .install-list li { padding: 4px 0; font-size: 10px; color: #333; }
+    .install-list li::before { content: '\\2713'; color: #2e7d32; font-weight: 900; margin-right: 8px; font-size: 12px; }
+
+    .cert-row { display: flex; gap: 10px; margin: 12px 0; }
+    .cert-badge { background: #032d44; border-radius: 4px; padding: 8px 14px; font-size: 10px; font-weight: 700; color: #f5a100; text-align: center; letter-spacing: .05em; }
+
+    .price-box { background: linear-gradient(135deg, #032d44, #064a6e); border-radius: 8px; padding: 16px 20px; margin: 16px 0; display: flex; align-items: center; justify-content: space-between; }
+    .price-label { font-size: 11px; color: #888; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+    .price-val { font-size: 26px; font-weight: 900; color: #f5a100; }
+
+    .note-box { background: #e8f2f8; border-left: 4px solid #032d44; border-radius: 0 6px 6px 0; padding: 12px 16px; margin: 12px 0; font-size: 11px; color: #444; line-height: 1.5; }
+    .note-box .note-title { font-size: 9px; font-weight: 700; color: #032d44; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
+
+    .qr-section { text-align: right; margin: 12px 0; }
+    .qr-section img { width: 80px; height: 80px; border-radius: 4px; }
+    .qr-section .qr-label { font-size: 8px; color: #888; margin-top: 3px; }
+
+    .footer { background: #032d44; border-radius: 6px; padding: 10px 16px; margin-top: 20px; font-size: 8px; color: #888; text-align: center; letter-spacing: .05em; }
+    .footer strong { color: #f5a100; }
+
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  `);
+  w.document.write('</style></head><body>');
+  w.document.write('<div class="page">');
+
+  // Header band (dark)
+  w.document.write('<div class="header-band">');
+  w.document.write('<div class="header-left">');
+  w.document.write('<div class="header-cat">PRODUKTOVÝ LIST · ' + (p.category || 'PRODUKT').toUpperCase() + '</div>');
+  w.document.write('<div class="header-name">' + (p.name || 'Produkt') + '</div>');
+  if (cctSubtitle) w.document.write('<div class="header-sub">' + cctSubtitle + '</div>');
+  if (skuEan) w.document.write('<div class="header-sku">' + skuEan + '</div>');
+  w.document.write('</div>');
+  w.document.write('<div class="header-right">');
+  if (p.availability) w.document.write('<div class="stock-badge">' + p.availability.toUpperCase() + '</div><br>');
+  w.document.write('<img class="header-logo" src="ledshopik_logo_vertical_regular.png" onerror="this.style.display=\'none\'">');
+  w.document.write('</div>');
+  w.document.write('</div>');
+
+  // Specs bar
+  const barSpecs = [
+    {l:'Napětí', v:p.voltage || '—'},
+    {l:'Příkon', v:p.watt ? p.watt+' W' : '—'},
+    {l:'Světelný tok', v:p.lumen ? p.lumen+' lm' : '—'},
+    {l:'Účinnost', v:p.efficiency ? p.efficiency+' lm/W' : '—'},
+    {l:'Krytí', v:p.ip || '—'},
+    {l:'Teplota světla', v:p.cct || '—'}
+  ];
+  w.document.write('<div class="specs-bar">');
+  barSpecs.forEach(s => {
+    w.document.write('<div class="spec-box"><div class="val">' + s.v + '</div><div class="lbl">' + s.l + '</div></div>');
+  });
+  w.document.write('</div>');
+
+  // Product image
+  if (p.image) {
+    w.document.write('<div class="product-img"><img src="' + p.image + '" onerror="this.parentElement.style.display=\'none\'"></div>');
+  }
+
+  // Tech params
+  if (techSpecs.length) {
+    w.document.write('<div class="section-title">Technické parametry</div>');
+    w.document.write('<div class="tech-grid">');
+    w.document.write('<div class="tech-col">' + colHTML(col1) + '</div>');
+    w.document.write('<div class="tech-col">' + colHTML(col2) + '</div>');
+    w.document.write('<div class="tech-col">' + colHTML(col3) + '</div>');
+    w.document.write('</div>');
+  }
+
+  // Recommended use
+  w.document.write('<div class="section-title">Doporučené použití</div>');
+  w.document.write('<div class="use-tags">');
+  uses.forEach(u => w.document.write('<span class="use-tag">' + u + '</span>'));
+  w.document.write('</div>');
+
+  // Installation recommendations
+  w.document.write('<div class="section-title">Instalační doporučení</div>');
+  w.document.write('<ul class="install-list">');
+  installs.forEach(i => w.document.write('<li>' + i + '</li>'));
+  w.document.write('</ul>');
+
+  // Warranty & certification
+  w.document.write('<div class="section-title">Záruka a certifikace</div>');
+  w.document.write('<div class="cert-row">');
+  if (warrantyYears) w.document.write('<div class="cert-badge">🛡 Záruka ' + warrantyYears + ' roky</div>');
+  w.document.write('<div class="cert-badge">CE certifikát</div>');
+  w.document.write('<div class="cert-badge">RoHS</div>');
+  w.document.write('</div>');
+
+  // Price
+  if (withPrice && p.price) {
+    w.document.write('<div class="price-box">');
+    w.document.write('<div class="price-label">Cena bez DPH</div>');
+    w.document.write('<div class="price-val">' + formatPrice(p.price) + ' ' + (p.currency || 'Kč') + '</div>');
+    w.document.write('</div>');
+  }
+
+  // Note
+  if (p.note) {
+    w.document.write('<div class="note-box"><div class="note-title">Poznámka</div>' + p.note + '</div>');
+  }
+
+  // QR code
+  if (addQR && qrUrl) {
+    w.document.write('<div class="qr-section"><img src="' + qrUrl + '"><div class="qr-label">Naskenujte pro detail produktu</div></div>');
+  }
+
+  // Footer
+  w.document.write('<div class="footer"><strong>LEDshopik.cz</strong> | BE-LIGHT, s.r.o., Nové sady 988/2, 602 00 Brno | IČ: 05099749 | www.ledshopik.cz · Produktový list · 2026</div>');
+
+  w.document.write('</div>'); // .page
+  w.document.write('</body></html>');
+  w.document.close();
+
+  setTimeout(() => { w.print(); }, 600);
+}
+
+function formatPrice(n) {
+  return n.toLocaleString('cs-CZ', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+}
+
+// ── History (API) ─────────────────────────────────────────────────────────────
+async function loadHistory() {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/produktove_listy?select=*&uzivatel=eq.' + encodeURIComponent(CURRENT_USER), {
+      headers: SB_HEADERS
+    });
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      history = data;
+      renderHistory();
+    }
+  } catch(e) {
+    console.error('Chyba načítání historie:', e);
+    document.getElementById('history-content').innerHTML = '<div class="empty-state">Chyba připojení k serveru</div>';
+  }
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-content');
+  const countEl = document.getElementById('history-count');
+  if (!history.length) {
+    el.innerHTML = '<div class="empty-state">Zatím žádné uložené produktové listy</div>';
+    countEl.textContent = '';
+    return;
+  }
+  countEl.textContent = history.length + ' záznamů';
+  el.innerHTML = '<div style="overflow-x:auto"><table class="history-table"><thead><tr>' +
+    '<th>Název</th><th>Kategorie</th><th>SKU</th><th>URL</th><th>Datum</th><th></th>' +
+    '</tr></thead><tbody>' +
+    history.map(r => {
+      const urlShort = (r.url || '').replace(/^https?:\/\//, '').substring(0, 40);
+      const date = r.datum || r.created_at || '';
+      return '<tr>' +
+        '<td style="font-weight:600;">' + (r.nazev || '—') + '</td>' +
+        '<td>' + (r.kategorie || '—') + '</td>' +
+        '<td>' + (r.sku || '—') + '</td>' +
+        '<td><a href="' + (r.url || '#') + '" target="_blank" style="color:#60a0e0;font-size:11px;">' + urlShort + '</a></td>' +
+        '<td style="font-size:11px;color:#888;">' + date + '</td>' +
+        '<td>' +
+          '<button class="btn" style="padding:4px 8px;font-size:10px;margin-right:4px;" onclick="reloadFromHistory(\'' + (r.url||'').replace(/'/g,"\\'") + '\')" title="Načíst znovu">↻</button>' +
+          '<button class="btn danger" style="padding:4px 8px;font-size:10px;" onclick="deleteFromHistory(\'' + r.id + '\')" title="Smazat">✕</button>' +
+        '</td>' +
+        '</tr>';
+    }).join('') +
+    '</tbody></table></div>';
+}
+
+async function saveToHistory() {
+  const p = getEditedProduct();
+  if (!p.name && !p.url) { alert('Nejprve načtěte produkt.'); return; }
+
+  const now = new Date();
+  const datum = now.toLocaleDateString('cs-CZ') + ' ' + now.toLocaleTimeString('cs-CZ', {hour:'2-digit',minute:'2-digit'});
+
+  const record = {
+    id: String(Date.now()),
+    uzivatel: CURRENT_USER,
+    nazev: p.name || '',
+    kategorie: p.category || '',
+    sku: p.sku || '',
+    url: p.url || '',
+    datum: datum,
+    cena: String(p.price || 0),
+    data_json: JSON.stringify(p)
+  };
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/produktove_listy', {
+      method: 'POST',
+      headers: {...SB_HEADERS, 'Prefer':'return=minimal'},
+      body: JSON.stringify(record)
+    });
+    if (res.ok) {
+      await loadHistory();
+      alert('Uloženo do historie.');
+    } else {
+      const err = await res.json().catch(()=>({}));
+      alert('Chyba: ' + (err.message || 'Neznámá chyba'));
+    }
+  } catch(e) {
+    alert('Chyba připojení k serveru');
+  }
+}
+
+async function deleteFromHistory(id) {
+  if (!confirm('Opravdu smazat tento záznam?')) return;
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/produktove_listy?id=eq.' + encodeURIComponent(id), {
+      method: 'DELETE',
+      headers: SB_HEADERS
+    });
+    if (res.ok) await loadHistory();
+  } catch(e) {
+    alert('Chyba při mazání');
+  }
+}
+
+async function reloadFromHistory(url) {
+  if (!url) return;
+  // Strip fragment (#) from URL - causes proxy issues
+  url = url.split('#')[0];
+  switchTab('single');
+  document.getElementById('single-url').value = url;
+  await loadSingle();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadHistory();
+</script>
+<script>
+(function(){
+  var VK='ledshopik_app_ver';
+  function ck(){
+    fetch('https://raw.githubusercontent.com/ledshopik/app/main/version.json?t='+Date.now())
+    .then(function(r){return r.json()})
+    .then(function(d){
+      var c=localStorage.getItem(VK);
+      if(!c){localStorage.setItem(VK,d.version);return;}
+      if(c!==d.version){
+        localStorage.setItem(VK,d.version);
+        window.location.href=window.location.pathname+'?v='+Date.now();
+      }
+    }).catch(function(){});
+  }
+  ck();
+  setInterval(ck,30000);
+})();
+
+(function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
+</script>
+<script>(function(){var cacheKey='ledshopik_weather',cacheTime='ledshopik_weather_time';var cached=localStorage.getItem(cacheKey),ct=localStorage.getItem(cacheTime);if(cached&&ct&&Date.now()-parseInt(ct)<1800000){try{var d=JSON.parse(cached);showMiniWeather(d);}catch(e){}return;}var loc='Ostrava';if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(pos){fetchWeather(pos.coords.latitude+','+pos.coords.longitude);},function(){fetchWeather(loc);},{timeout:5000,maximumAge:600000});}else{fetchWeather(loc);}function fetchWeather(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1').then(function(r){return r.json()}).then(function(d){localStorage.setItem(cacheKey,JSON.stringify(d));localStorage.setItem(cacheTime,String(Date.now()));showMiniWeather(d);}).catch(function(){});}function showMiniWeather(d){var el=document.getElementById('weather-mini');if(!el||!d.current_condition)return;var c=d.current_condition[0];var codes={113:'\u2600\uFE0F',116:'\u26C5',119:'\u2601\uFE0F',122:'\u2601\uFE0F',176:'\uD83C\uDF26\uFE0F',200:'\u26C8\uFE0F',227:'\uD83C\uDF28\uFE0F',266:'\uD83C\uDF27\uFE0F',296:'\uD83C\uDF27\uFE0F',302:'\uD83C\uDF27\uFE0F',332:'\u2744\uFE0F'};var emoji=codes[parseInt(c.weatherCode)]||'\uD83C\uDF24\uFE0F';var area=d.nearest_area?d.nearest_area[0].areaName[0].value:'';el.innerHTML=emoji+' '+c.temp_C+'\u00B0C <span style="color:#bbb;font-size:10px;">'+area+'</span>';}})();</script>
+</body>
+</html>

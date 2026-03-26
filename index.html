@@ -3,176 +3,355 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LEDshopik – Dashboard</title>
+<title>LEDshopik – Workspace</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Arial Narrow', Arial, sans-serif; background: #13151c; color: #e8e4dc; min-height: 100vh; }
+body { font-family: 'Arial Narrow', Arial, sans-serif; background: #f4f2ed; color: #1a1a1a; min-height: 100vh; }
 button, input, select { font-family: inherit; }
+option, datalist option { color: #333; background: #fff; }
 
 #header {
-  background: #13151c;
-  border-bottom: 1px solid #1e2230;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
   padding: 20px 32px;
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 100;
 }
 .header-accent { width: 4px; height: 48px; background: #e2b830; border-radius: 2px; flex-shrink: 0; }
 .header-title-wrap { margin-left: 14px; }
-.header-eyebrow { font-size: 10px; letter-spacing: .3em; color: #555; text-transform: uppercase; margin-bottom: 4px; }
-.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; }
+.header-eyebrow { font-size: 10px; letter-spacing: .3em; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.header-title { font-size: 26px; font-weight: 900; letter-spacing: .05em; line-height: 1; color: #1a1a1a; text-align: center; }
 .header-date { text-align: right; }
 .header-date .day { font-size: 24px; font-weight: 900; color: #e2b830; letter-spacing: .02em; line-height: 1; }
-.header-date .month { font-size: 10px; color: #555; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
+.header-date .month { font-size: 10px; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
 
-#user-bar {
-  background: #1c1f2a;
-  border-bottom: 1px solid #1e2230;
-  padding: 0 32px;
-  display: flex; align-items: stretch; gap: 0;
-  flex-wrap: wrap;
+#nav-bar {
+  background: #f4f2ed;
+  padding: 0;
+  display: flex; align-items: stretch; gap: 0; flex-wrap: wrap;
 }
-#user-bar .user-label { font-size: 10px; color: #555; letter-spacing: .1em; text-transform: uppercase; }
+#nav-bar a {
+  background: #fff;
+  border: 1px solid #e8e4dc;
+  margin: -0.5px;
+  min-width: 90px;
+  min-height: 56px;
+  justify-content: center;
+  box-shadow: none;
+  transition: all .2s ease;
+  transform: translateY(0);
+  position: relative;
+  z-index: 1;
+}
+#nav-bar a:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 8px 20px rgba(0,0,0,.1), 0 2px 6px rgba(0,0,0,.06);
+  border-color: #e2b830;
+  z-index: 10;
+  background: #fff;
+}
+#nav-bar a:active {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 3px 8px rgba(0,0,0,.08);
+}
+#user-controls {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 6px 32px;
+  display: flex; align-items: center; gap: 14px;
+}
+#user-controls .user-label { font-size: 10px; color: #888; letter-spacing: .1em; text-transform: uppercase; }
 #user-select {
-  background: #13151c; border: 1px solid #2a2d3a; border-radius: 4px;
-  color: #e8e4dc; padding: 4px 10px; font-size: 12px; outline: none; cursor: pointer;
+  background: #f4f2ed; border: 1px solid #ddd; border-radius: 4px;
+  color: #1a1a1a; padding: 4px 10px; font-size: 12px; outline: none; cursor: pointer;
 }
-#sync-status { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 11px; color: #555; }
-#sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #555; }
+#sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; }
+#sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #888; }
 #sync-dot.ok { background: #40a050; }
 #sync-dot.loading { background: #e2b830; animation: pulse .8s infinite; }
 #sync-dot.error { background: #c05050; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-#btn-refresh-all { background: #1a1d26; color: #8890a0; border: 1px solid #2a2d3a; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
-#btn-refresh-all:hover { color: #e8e4dc; }
+#btn-refresh-all { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
+#btn-refresh-all:hover { color: #1a1a1a; }
 
-#main { max-width: 1100px; margin: 0 auto; padding: 24px 32px; }
+#main { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
 
 /* Module cards */
-.modules-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 2px; }
+.modules-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-bottom: 2px; }
+.tools-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 2px; margin-top:14px; margin-bottom: 14px; }
+.tool-card { display:flex; align-items:center; gap:14px; padding:16px 22px; text-decoration:none; border-left:3px solid transparent; transition:all .15s; border-top:2px solid rgba(255,255,255,.9); border-right:2px solid rgba(0,0,0,.1); border-bottom:3px solid rgba(0,0,0,.15); box-shadow:0 2px 4px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.5); }
+.tool-card:hover { filter:brightness(.97); }
+.tool-card .tool-icon { font-size:22px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; }
+.tool-card .tool-info { flex:1; }
+.tool-card .tool-label { font-size:10px; letter-spacing:.2em; text-transform:uppercase; margin-bottom:4px; font-weight:800; }
+.tool-card .tool-desc { font-size:12px; color:#777; }
+.tool-card .tool-arrow { font-size:11px; font-weight:700; letter-spacing:.05em; }
 .module-card {
-  background: #1c1f2a; padding: 20px; cursor: pointer;
-  border-top: 2px solid transparent;
-  transition: background .15s;
+  background: #fff; padding: 20px; cursor: pointer;
+  border-top: 3px solid transparent;
+  transition: all .15s;
   text-decoration: none; color: inherit; display: block;
+  text-align: center;
+  border-right: 1px solid rgba(0,0,0,.06);
+  border-bottom: 2px solid rgba(0,0,0,.08);
+  box-shadow: 0 2px 6px rgba(0,0,0,.06), inset 0 1px 0 rgba(255,255,255,.8);
 }
-.module-card:hover { background: #21253a; }
+.module-card:hover { background: #f8f6f0; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
 .module-card .mod-label { font-size: 9px; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 12px; }
-.module-card .mod-count { font-size: 44px; font-weight: 900; line-height: 1; color: #fff; margin-bottom: 14px; }
-.module-card .mod-count.text { font-size: 16px; color: #e8e4dc; margin: 16px 0 14px; }
+.module-card .mod-count { font-size: 44px; font-weight: 900; line-height: 1; color: #1a1a1a; margin-bottom: 14px; }
+.module-card .mod-count.text { font-size: 16px; color: #1a1a1a; margin: 16px 0 14px; }
 .mod-stats { display: flex; flex-direction: column; gap: 6px; }
 .mod-stat-row { display: flex; justify-content: space-between; align-items: center; }
-.mod-stat-row .lbl { font-size: 11px; color: #555; }
+.mod-stat-row .lbl { font-size: 11px; color: #888; }
 .mod-stat-row .val { font-size: 13px; font-weight: 700; }
-.mod-footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid #2a2d3a; font-size: 10px; letter-spacing: .1em; }
+.mod-footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid #ddd; font-size: 10px; letter-spacing: .1em; }
+
+/* Dashboard main 3-col */
+.dashboard-main { display: grid; grid-template-columns: 280px 1fr 300px; gap: 2px; }
+.dash-left, .dash-right { display: flex; flex-direction: column; gap: 2px; }
 
 /* Bottom panels */
-.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
-.panel { background: #1c1f2a; padding: 20px; }
-.panel-title { font-size: 9px; letter-spacing: .2em; color: #555; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-.panel-title-line { height: 2px; width: 16px; border-radius: 1px; }
+.panel { background: #fff; padding: 20px; }
 
 /* Calendar */
-.cal-wrap { margin-bottom: 2px; }
-.cal-header-row { background: #1c1f2a; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
-.cal-header-row .cal-title { font-size: 9px; letter-spacing: .2em; color: #555; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.cal-wrap { }
+.cal-header-row { background: #fff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+.cal-header-row .cal-title { font-size: 9px; letter-spacing: .2em; color: #888; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
 .cal-nav { display: flex; align-items: center; gap: 8px; }
-.cal-nav button { background: #13151c; border: 1px solid #2a2d3a; color: #8890a0; border-radius: 4px; padding: 3px 10px; font-size: 12px; cursor: pointer; }
-.cal-nav button:hover { color: #e8e4dc; }
+.cal-nav button { background: #fff; border: 1px solid #ddd; color: #999; border-radius: 4px; padding: 3px 10px; font-size: 12px; cursor: pointer; }
+.cal-nav button:hover { color: #1a1a1a; }
 .cal-month { font-size: 13px; font-weight: 700; min-width: 130px; text-align: center; }
 #btn-cal-today { background: #e2b830; color: #111; border: none; border-radius: 4px; padding: 3px 10px; font-size: 10px; font-weight: 700; cursor: pointer; }
-.cal-grid-wrap { background: #1c1f2a; padding: 16px 20px 20px; }
+.cal-grid-wrap { background: #fff; padding: 16px 20px 20px; }
 .cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 4px; }
-.cal-wd { text-align: center; font-size: 9px; letter-spacing: .1em; color: #555; text-transform: uppercase; padding: 4px 0; }
+.cal-wd { text-align: center; font-size: 9px; letter-spacing: .1em; color: #888; text-transform: uppercase; padding: 4px 0; }
 .cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.cal-day { min-height: 110px; background: #13151c; padding: 6px 8px; position: relative; cursor: default; }
+.cal-day { min-height: 110px; background: #fff; padding: 6px 8px; position: relative; cursor: default; border-bottom:1px solid #ece8e0; border-right:1px solid #ece8e0; }
 .cal-day.other { opacity: .3; }
 .cal-day.today { outline: 1px solid #e2b830; }
 .cal-day.today .dn { color: #e2b830; font-weight: 900; }
-.cal-day.weekend { background: #161820; }
-.dn { font-size: 10px; font-weight: 600; color: #555; margin-bottom: 3px; }
-.cal-day.has-ev .dn { color: #c0c8d0; }
+.cal-day.weekend { background: #f8f6f0; }
+.dn { font-size: 10px; font-weight: 600; color: #888; margin-bottom: 3px; }
+.cal-day.has-ev .dn { color: #444; }
 .cal-ev { font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 2px; margin-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
 .cal-ev:hover { opacity: .8; }
-.ev-inst { background: #2a2010; color: #e2b830; }
-.ev-obh  { background: #1a2a20; color: #3ab0a0; }
-.ev-rek  { background: #2a1010; color: #e05050; }
-.ev-dov  { background: #1a3a20; color: #40c060; }
-.ev-nesc { background: #2a1a1a; color: #e05050; }
-.ev-vyr  { background: #2a1500; color: #f07030; }
-.ev-zas  { background: #1a1800; color: #c8a830; }
-.ev-nepl { background: #2a2010; color: #e2b830; }
+.ev-inst { background: #fdf4d8; color: #a08020; }
+.ev-obh  { background: #e0f4e8; color: #208070; }
+.ev-rek  { background: #fce8e8; color: #c03030; }
+.ev-dov  { background: #e0f8e0; color: #30a050; }
+.ev-nesc { background: #fce8e8; color: #c03030; }
+.ev-vyr  { background: #fff0e0; color: #c05020; }
+.ev-zas  { background: #f8f4e0; color: #a09020; }
+.ev-nepl { background: #fdf4d8; color: #a08020; }
+.cal-day.holiday { background: #fff0f0; }
+.cal-day.weekend.holiday { background: #f8f0f0; }
+.cal-day.holiday .dn { color: #c05050; font-weight: 900; }
+.holiday-name { font-size: 7px; color: #c05050; line-height: 1.1; margin-bottom: 2px; }
 
 /* Schedule */
 .sched-item { display: flex; align-items: stretch; gap: 0; margin-bottom: 8px; }
 .sched-time { font-size: 10px; font-weight: 900; padding: 7px 10px; display: flex; align-items: center; justify-content: center; min-width: 52px; flex-shrink: 0; }
 .sched-content { padding: 7px 14px; flex: 1; font-size: 12px; border-left: 2px solid; }
 
+/* Unified panel styling */
+.panel-title {
+  font-size: 10px; letter-spacing: .18em; color: #666; text-transform: uppercase;
+  margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+  font-weight: 800; padding-bottom: 12px; border-bottom: 1px solid #ece8e0;
+}
+.panel-title-line { height: 3px; width: 20px; border-radius: 2px; flex-shrink: 0; }
+
 /* Alerts */
-.alert-item { padding: 9px 14px; margin-bottom: 7px; display: flex; gap: 10px; align-items: center; border-left: 3px solid; }
-.alert-badge { font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 2px; flex-shrink: 0; }
-.alert-text { font-size: 11px; color: #8890a0; }
+.alert-item {
+  padding: 10px 14px; margin-bottom: 6px; display: flex; gap: 10px; align-items: center;
+  border-left: 3px solid; border-radius: 0 6px 6px 0; transition: all .15s;
+}
+.alert-item:hover { transform: translateX(2px); }
+.alert-badge {
+  font-size: 9px; font-weight: 900; width: 22px; height: 22px;
+  border-radius: 50%; flex-shrink: 0; display: flex; align-items: center;
+  justify-content: center; line-height: 1;
+}
+.alert-text { font-size: 11px; color: #333; line-height: 1.4; }
 
 /* Tasks */
-.task-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1e2230; cursor: pointer; }
-.task-item:last-child { border-bottom: none; }
-.task-cb { width: 16px; height: 16px; border: 2px solid #2a2d3a; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: all .15s; }
+.task-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  margin-bottom: 6px; border-radius: 0 8px 8px 0; border-left: 3px solid #ccc;
+  cursor: pointer; transition: all .15s; position: relative;
+}
+.task-item:hover { transform: translateX(2px); filter: brightness(.97); }
+.task-item:last-child { margin-bottom: 0; }
+.task-item.typ-rychly { background: #fafaf6; }
+.task-item.typ-ticket { background: #fafaf6; }
+.task-item.typ-upominka { background: #fafaf6; }
+.task-cb {
+  width: 20px; height: 20px; border: 2px solid #ccc; border-radius: 50%;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all .2s; background: #fff;
+}
+.task-cb:hover { border-color: #40a050; background: #f0faf0; }
 .task-item.done .task-cb { background: #40a050; border-color: #40a050; color: #fff; }
-.task-item.done .task-text { text-decoration: line-through; color: #555; }
-.task-text { font-size: 12px; flex: 1; }
+.task-item.done .task-text { text-decoration: line-through; color: #999; }
+.task-item.done { opacity: .65; }
+.task-text { font-size: 12px; flex: 1; font-weight: 600; color: #333; }
 .task-tag { font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+
+/* Task 2.0 styles */
+.task-filter-btn {
+  background: #f4f2ed; color: #888; border: 1px solid #e0dcd4; border-radius: 20px;
+  padding: 3px 12px; font-size: 9px; font-weight: 700; cursor: pointer;
+  transition: all .15s; letter-spacing: .03em;
+}
+.task-filter-btn:hover { background: #ece8e0; color: #555; }
+.task-filter-btn.active { background: #6080c0; color: #fff; border-color: #6080c0; }
+.task-type-tag {
+  font-size: 8px; padding: 2px 8px; border-radius: 20px; font-weight: 700;
+  letter-spacing: .05em; display: inline-flex; align-items: center;
+}
+.task-type-rychly { background:#e0f4e0;color:#2a6a2a; }
+.task-type-ticket { background:#ece0f8;color:#6a3a9a; }
+.task-type-upominka { background:#fef0d8;color:#8a6a10; }
+.task-priority-dot { display: none; }
+.task-item.pri-vysoka { border-left-color: #e05050 !important; }
+.task-item.pri-normalni { border-left-color: #e2b830 !important; }
+.task-item.pri-nizka { border-left-color: #6080c0 !important; }
+.task-overdue { color:#c04040; font-weight:700; }
+.task-due-badge {
+  font-size: 9px; color: #888; background: #f0ece4; padding: 1px 6px;
+  border-radius: 10px; white-space: nowrap;
+}
+.task-add-area {
+  margin-top: 14px; display: flex; gap: 6px; padding-top: 14px;
+  border-top: 1px solid #ece8e0;
+}
+.task-add-input {
+  background: #fafaf6; border: 1px solid #e0dcd4; border-radius: 8px;
+  color: #1a1a1a; padding: 8px 12px; font-size: 12px; flex: 1; outline: none;
+  transition: border-color .15s;
+}
+.task-add-input:focus { border-color: #6080c0; background: #fff; }
+.task-add-btn {
+  background: #6080c0; color: #fff; border: none; border-radius: 8px;
+  padding: 8px 16px; font-size: 13px; font-weight: 800; cursor: pointer;
+  transition: all .15s; line-height: 1;
+}
+.task-add-btn:hover { background: #4a6aa8; transform: scale(1.05); }
+
+/* Form groups */
+.fg { display:flex;flex-direction:column;gap:4px; }
+.fg label { font-size:10px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase; }
+.fg input, .fg select, .fg textarea { background:#fff;border:1px solid #ddd;border-radius:4px;color:#1a1a1a;padding:6px 10px;font-size:12px;outline:none;font-family:inherit; }
+
+/* Team bar */
+.team-bar { background:#fff; border-bottom:1px solid #e0e0e0; padding:8px 32px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.team-bar-title { font-size:9px; letter-spacing:.2em; color:#888; text-transform:uppercase; font-weight:700; margin-right:4px; }
+.team-avatar { position:relative; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; cursor:default; flex-shrink:0; }
+.team-avatar .team-dot { position:absolute; bottom:-1px; right:-1px; width:12px; height:12px; border-radius:50%; border:2px solid #fff; }
+.team-avatar-tooltip { display:none; position:absolute; bottom:110%; left:50%; transform:translateX(-50%); background:#333; color:#fff; font-size:10px; padding:3px 8px; border-radius:4px; white-space:nowrap; z-index:50; }
+.team-avatar:hover .team-avatar-tooltip { display:block; }
+
+/* Weather widget */
+.weather-widget { display:flex; align-items:center; gap:10px; margin-left:12px; }
+.weather-now { display:flex; align-items:center; gap:6px; }
+.weather-now .w-icon { font-size:22px; line-height:1; }
+.weather-now .w-temp { font-size:20px; font-weight:900; color:#1a1a1a; line-height:1; }
+.weather-now .w-desc { font-size:9px; color:#888; letter-spacing:.05em; }
+.weather-forecast { display:flex; gap:8px; margin-left:6px; }
+.weather-fc-day { text-align:center; }
+.weather-fc-day .fc-name { font-size:8px; color:#888; text-transform:uppercase; letter-spacing:.05em; }
+.weather-fc-day .fc-icon { font-size:14px; line-height:1.2; }
+.weather-fc-day .fc-temp { font-size:10px; font-weight:700; color:#1a1a1a; }
+
+/* Weekly overview */
+.week-grid-wrap { background:#fff; padding:16px 20px; margin-bottom:2px; }
+.week-grid-title { font-size:9px; letter-spacing:.2em; color:#888; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.week-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.week-col { min-height:60px; padding:6px; border-radius:4px; background:#fafaf6; position:relative; }
+.week-col.wk-weekend { background:#f4f0ea; }
+.week-col.wk-today { outline:2px solid #e2b830; }
+.week-col .wk-day-name { font-size:9px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:4px; }
+.week-col.wk-today .wk-day-name { color:#e2b830; }
+.week-col .wk-badge { font-size:9px; font-weight:700; padding:2px 5px; border-radius:3px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
+
+/* Timeline / Activity */
+.timeline-panel { background:#fff; padding:20px; }
+.tl-item { display:flex; align-items:flex-start; gap:10px; padding:7px 0; border-bottom:1px solid #f0ece4; }
+.tl-item:last-child { border-bottom:none; }
+.tl-icon { font-size:16px; flex-shrink:0; width:28px; text-align:center; }
+.tl-border { width:3px; border-radius:2px; flex-shrink:0; align-self:stretch; }
+.tl-text { font-size:12px; color:#333; flex:1; }
+.tl-time { font-size:10px; color:#999; white-space:nowrap; flex-shrink:0; }
 
 @media (max-width: 768px) {
   #main { padding: 16px; }
   .modules-grid { grid-template-columns: repeat(2,1fr); }
-  .bottom-grid { grid-template-columns: 1fr; }
+  .tools-row { grid-template-columns: 1fr; }
+  .dashboard-main { grid-template-columns: 1fr; }
   #header { padding: 14px 16px; }
   #user-bar { padding: 8px 16px; }
 }
 </style>
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/app/sw.js")}</script></head>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script></head>
 <body>
 
 <div id="header">
-  <div style="display:flex;align-items:center;">
+  <div style="display:flex;align-items:center;gap:16px;">
     <div class="header-accent"></div>
     <div class="header-title-wrap">
       <div class="header-eyebrow">LEDshopik · Systém</div>
-      <div class="header-title">DASHBOARD</div>
+      <div class="header-title">WORKSPACE</div>
     </div>
+    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;transition:all .15s;flex-shrink:0;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
   </div>
-  <div class="header-date">
-    <div class="day" id="hdr-day">—</div>
-    <div class="month" id="hdr-month">—</div>
+  <div id="team-bar" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;"></div>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div id="weather-widget" class="weather-widget"></div>
+    <div class="header-date">
+      <div class="day" id="hdr-day">—</div>
+      <div class="month" id="hdr-month">—</div>
+    </div>
   </div>
 </div>
 
-<div id="user-bar">
-  <a href="index.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#e2b830;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:6px;border-bottom:2px solid #e2b830;">⌂ Dashboard</a>
-  <a href="instalace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e2b830'" onmouseout="this.style.color='#555'">Instalace</a>
-  <a href="vyroba.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#f07030'" onmouseout="this.style.color='#555'">Výroba</a>
-  <a href="obhlidky.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#3ab0a0'" onmouseout="this.style.color='#555'">Obhlídky</a>
-  <a href="reklamace.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e05050'" onmouseout="this.style.color='#555'">Reklamace</a>
-  <a href="konfigurator.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#a070e0'" onmouseout="this.style.color='#555'">Konfigurátor</a>
-  <a href="dochazka.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#555'">Docházka</a>
-  <a href="zasobovani.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#c8a830'" onmouseout="this.style.color='#555'">Zásobování</a>
-  <a href="lumibook.html" style="padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;color:#555;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;border-bottom:2px solid transparent;" onmouseover="this.style.color='#e8a020'" onmouseout="this.style.color='#555'">Lumibook</a>
+<div id="nav-bar">
+  <a href="index.html" style="padding:8px 14px;border-top:3px solid #60a0e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#60a0e0;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:4px;border-bottom:2px solid #60a0e0;line-height:1.3;" onmouseover="this.style.color='#60a0e0'" onmouseout="this.style.color='#60a0e0'">⌂ DASHBOARD<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Přehled</span></a>
+  <a href="instalace.html" style="padding:8px 14px;border-top:3px solid #e2b830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">INSTALACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Montáže</span></a>
+  <a href="vyroba.html" style="padding:8px 14px;border-top:3px solid #f07030;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">VÝROBA<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Zakázky</span></a>
+  <a href="obhlidky.html" style="padding:8px 14px;border-top:3px solid #3ab0a0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">OBHLÍDKY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Termíny</span></a>
+  <a href="reklamace.html" style="padding:8px 14px;border-top:3px solid #e05050;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">REKLAMACE<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Servis</span></a>
+  <a href="konfigurator.html" style="padding:8px 14px;border-top:3px solid #a070e0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KONFIGURÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">RING svítidla</span></a>
+  <a href="konfigurator-profily.html" style="padding:8px 14px;border-top:3px solid #40a0a0;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PROFILY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">ALU výroba</span></a>
+  <a href="zasobovani.html" style="padding:8px 14px;border-top:3px solid #c8a830;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">ZÁSOBOVÁNÍ<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Dodávky</span></a>
+  <a href="lumibook.html" style="padding:8px 14px;border-top:3px solid #e8a020;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">LUMIBOOK<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalog</span></a>
+  <a href="kalkulator-instalaci.html" style="padding:8px 14px;border-top:3px solid #b08820;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">KALKULÁTOR<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Ceny montáží</span></a>
+  <a href="produktovy-list.html" style="padding:8px 14px;border-top:3px solid #e05050;font-size:13px;font-weight:700;letter-spacing:.1em;color:#666;text-decoration:none;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid transparent;line-height:1.3;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#666'">PRODUKTY<span style="font-size:10px;font-weight:600;letter-spacing:.05em;color:#f5a100;opacity:1;text-transform:none;">Katalogové listy</span></a>
+  <a href="dochazka.html" style="margin-left:auto;padding:10px 20px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#50a060;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center;background:#f0f8f2;border-radius:6px 6px 0 0;line-height:1.3;" onmouseover="this.style.color='#3a8048'" onmouseout="this.style.color='#50a060'">🕐 DOCHÁZKA</a>
+  
+</div>
+<style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
+<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'}}).then(r=>r.json()).then(j=>{const d=Array.isArray(j)?j:(j.data||[]);const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
+<div id="user-controls">
+  <span id="user-bar-name" style="font-weight:700;color:#333;font-size:12px;"></span>
+  <a href="#" onclick="logout();return false;" style="color:#c04040;text-decoration:none;font-size:11px;">Odhlásit</a>
+  <div style="width:1px;height:16px;background:#e0e0e0;"></div>
+  <div class="user-label">Zobrazit jako:</div>
+  <select id="user-select" onchange="setUser(this.value)">
+    <option value="vse">Všichni</option>
+    <option value="Ondra">Ondra</option>
+    <option value="David">David</option>
+    <option value="Michal">Michal</option>
+    <option value="Erik">Erik</option>
+    <option value="Lukáš">Lukáš</option>
+    <option value="Mário">Mário</option>
+    <option value="Tom">Tom</option>
+    <option value="Kuba">Kuba</option>
+    <option value="Petr">Petr</option>
+    <option value="Miriam">Miriam</option>
+    <option value="Filip">Filip</option>
+    <option value="Eve">Eve</option>
+  </select>
   <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
-    <div class="user-label">Zobrazit jako:</div>
-    <select id="user-select" onchange="setUser(this.value)">
-      <option value="vse">Všichni</option>
-      <option value="Ondra">Ondra</option>
-      <option value="David">David</option>
-      <option value="Michal">Michal</option>
-      <option value="Erik">Erik</option>
-      <option value="Lukáš">Lukáš</option>
-      <option value="Mário">Mário</option>
-      <option value="Tom">Tom</option>
-      <option value="Kuba">Kuba</option>
-      <option value="Petr">Petr</option>
-      <option value="Miriam">Miriam</option>
-      <option value="Filip">Filip</option>
-      <option value="Eve">Eve</option>
-    </select>
     <div id="sync-status">
       <div id="sync-dot" class="loading"></div>
       <span id="sync-text">Načítám...</span>
@@ -220,17 +399,10 @@ button, input, select { font-family: inherit; }
       <div class="mod-stats">
         <div class="mod-stat-row"><span class="lbl">Nové</span><span class="val" id="mc-rek-nova" style="color:#e050e0;">—</span></div>
         <div class="mod-stat-row"><span class="lbl">V řešení</span><span class="val" id="mc-rek-res" style="color:#e2b830;">—</span></div>
+        <div class="mod-stat-row"><span class="lbl">U dodavatele</span><span class="val" id="mc-rek-dod" style="color:#6080c0;">—</span></div>
         <div class="mod-stat-row"><span class="lbl">Vyřízeno</span><span class="val" id="mc-rek-vyr" style="color:#40a050;">—</span></div>
       </div>
       <div class="mod-footer" style="color:#e05050;">OTEVŘÍT →</div>
-    </a>
-    <a href="konfigurator.html" class="module-card" style="border-top-color:#a070e0;">
-      <div class="mod-label" style="color:#a070e0;">Konfigurátor</div>
-      <div class="mod-count text">Ceník výroby svítidel RING</div>
-      <div class="mod-stats">
-        <div class="mod-stat-row"><span class="lbl">7 parametrů</span><span class="val" style="color:#a070e0;">✓</span></div>
-      </div>
-      <div class="mod-footer" style="color:#a070e0;">OTEVŘÍT →</div>
     </a>
     <a href="zasobovani.html" class="module-card" style="border-top-color:#c8a830;">
       <div class="mod-label" style="color:#c8a830;">Zásobování</div>
@@ -251,92 +423,191 @@ button, input, select { font-family: inherit; }
       <div class="mod-footer" style="color:#e8a020;">OTEVŘÍT →</div>
     </a>
   </div>
-
-  <!-- Calendar -->
-  <div class="cal-wrap">
-    <div class="cal-header-row">
-      <div class="cal-title">
-        <div style="width:16px;height:2px;background:#e2b830;border-radius:1px;"></div>
-        Kalendář
+  <div class="tools-row">
+    <a href="konfigurator.html" class="tool-card" style="border-left-color:#a070e0;background:#f8f4ff;">
+      <div class="tool-icon" style="background:#efe8ff;color:#a070e0;">⚙</div>
+      <div class="tool-info">
+        <div class="tool-label" style="color:#a070e0;">Konfigurátor</div>
+        <div class="tool-desc">Ceník výroby svítidel RING · 7 parametrů</div>
       </div>
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#2a2010;"></div>Instalace</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#1a2a20;"></div>Obhlídka</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#1a3a20;"></div>Dovolená</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#2a1500;"></div>Výroba</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#1a1800;"></div>Zásobování</div>
-          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;"><div style="width:10px;height:10px;border-radius:2px;background:#2a1a1a;"></div>Neschopenka</div>
-        </div>
-        <div class="cal-nav">
-          <button onclick="calNav(-1)">&#8592;</button>
-          <div class="cal-month" id="cal-month-label"></div>
-          <button onclick="calNav(1)">&#8594;</button>
-          <button id="btn-cal-today" onclick="calToday()">Dnes</button>
-        </div>
+      <div class="tool-arrow" style="color:#a070e0;">OTEVŘÍT →</div>
+    </a>
+    <a href="konfigurator-profily.html" class="tool-card" style="border-left-color:#40a0a0;background:#f0fafa;">
+      <div class="tool-icon" style="background:#e0f4f4;color:#40a0a0;">▦</div>
+      <div class="tool-info">
+        <div class="tool-label" style="color:#40a0a0;">Profily</div>
+        <div class="tool-desc">Ceník výroby ALU profilů · 7 parametrů</div>
       </div>
-    </div>
-    <div class="cal-grid-wrap">
-      <div class="cal-weekdays">
-        <div class="cal-wd">Po</div><div class="cal-wd">Út</div><div class="cal-wd">St</div>
-        <div class="cal-wd">Čt</div><div class="cal-wd">Pá</div>
-        <div class="cal-wd" style="color:#c05050;">So</div>
-        <div class="cal-wd" style="color:#c05050;">Ne</div>
+      <div class="tool-arrow" style="color:#40a0a0;">OTEVŘÍT →</div>
+    </a>
+    <a href="kalkulator-instalaci.html" class="tool-card" style="border-left-color:#b08820;background:#fdf8ee;">
+      <div class="tool-icon" style="background:#f5edda;color:#b08820;">🧮</div>
+      <div class="tool-info">
+        <div class="tool-label" style="color:#b08820;">Kalkulátor instalací</div>
+        <div class="tool-desc">Odhad ceny montáže · doprava + práce + doplňky · ±20%</div>
       </div>
-      <div class="cal-days" id="cal-days"></div>
-    </div>
+      <div class="tool-arrow" style="color:#b08820;">OTEVŘÍT →</div>
+    </a>
+    <a href="produktovy-list.html" class="tool-card" style="border-left-color:#e05050;background:#fef4f4;">
+      <div class="tool-icon" style="background:#fde8e8;color:#e05050;">📄</div>
+      <div class="tool-info">
+        <div class="tool-label" style="color:#e05050;">Produktové listy</div>
+        <div class="tool-desc">Generátor katalogových listů z eshopu</div>
+      </div>
+      <div class="tool-arrow" style="color:#e05050;">OTEVŘÍT →</div>
+    </a>
   </div>
 
-  <!-- Bottom row -->
-  <div class="bottom-grid">
-    <!-- Schedule -->
-    <div class="panel">
-      <div class="panel-title">
-        <div class="panel-title-line" style="background:#e2b830;"></div>
-        Dnešní program
+  <!-- Dashboard 3-column layout -->
+  <div class="dashboard-main">
+    <!-- Left: Schedule + Alerts -->
+    <div class="dash-left">
+      <div class="panel">
+        <div class="panel-title">
+          <div class="panel-title-line" style="background:#e2b830;"></div>
+          Dnešní program
+        </div>
+        <div id="schedule-list">
+          <div style="font-size:12px;color:#888;">Načítám...</div>
+        </div>
       </div>
-      <div id="schedule-list">
-        <div style="font-size:12px;color:#555;">Načítám...</div>
-      </div>
-    </div>
-
-    <!-- Alerts + Tasks -->
-    <div style="display:flex;flex-direction:column;gap:2px;">
-      <div class="panel" style="flex:1;">
+      <div class="panel">
         <div class="panel-title">
           <div class="panel-title-line" style="background:#e05050;"></div>
           Upozornění
         </div>
         <div id="alerts-list">
-          <div style="font-size:12px;color:#555;">Načítám...</div>
+          <div style="font-size:12px;color:#888;">Načítám...</div>
         </div>
       </div>
+    </div>
+
+    <!-- Center: Calendar -->
+    <div class="dash-center">
+      <div class="cal-wrap">
+        <div class="cal-header-row">
+          <div class="cal-title">
+            <div style="width:16px;height:2px;background:#e2b830;border-radius:1px;"></div>
+            Kalendář
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fdf4d8;"></div>Instalace</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f4e8;"></div>Obhlídka</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f8e0;"></div>Dovolená</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fff0e0;"></div>Výroba</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#f8f4e0;"></div>Zásobování</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fce8e8;"></div>Neschopenka</div>
+            </div>
+            <div class="cal-nav">
+              <button onclick="calNav(-1)">&#8592;</button>
+              <div class="cal-month" id="cal-month-label"></div>
+              <button onclick="calNav(1)">&#8594;</button>
+              <button id="btn-cal-today" onclick="calToday()">Dnes</button>
+            </div>
+          </div>
+        </div>
+        <div class="cal-grid-wrap">
+          <div class="cal-weekdays">
+            <div class="cal-wd">Po</div><div class="cal-wd">Út</div><div class="cal-wd">St</div>
+            <div class="cal-wd">Čt</div><div class="cal-wd">Pá</div>
+            <div class="cal-wd" style="color:#c05050;">So</div>
+            <div class="cal-wd" style="color:#c05050;">Ne</div>
+          </div>
+          <div class="cal-days" id="cal-days"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Tasks 2.0 -->
+    <div class="dash-right">
       <div class="panel" style="flex:1;">
         <div class="panel-title">
           <div class="panel-title-line" style="background:#6080c0;"></div>
-          Úkoly
+          Moje úkoly
+          <div style="margin-left:auto;display:flex;gap:4px;">
+            <button class="task-filter-btn active" data-f="aktivni" onclick="filterTasks('aktivni')">Aktivní</button>
+            <button class="task-filter-btn" data-f="hotovo" onclick="filterTasks('hotovo')">Hotové</button>
+            <button class="task-filter-btn" data-f="vse" onclick="filterTasks('vse')">Vše</button>
+          </div>
         </div>
         <div id="tasks-list"></div>
-        <div style="margin-top:10px;">
-          <input type="text" id="new-task-input" placeholder="Přidat úkol..." style="background:#13151c;border:1px solid #2a2d3a;border-radius:4px;color:#e8e4dc;padding:6px 10px;font-size:12px;width:100%;outline:none;">
+        <div class="task-add-area">
+          <input type="text" id="new-task-input" class="task-add-input" placeholder="Nový úkol..." onkeydown="if(event.key==='Enter')quickAddTask()">
+          <button onclick="openTaskModal()" class="task-add-btn" title="Podrobný úkol">+</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline / Activity -->
+  <div id="timeline-panel" class="timeline-panel" style="margin-top:2px;display:none;"></div>
+
+  <!-- Task Modal -->
+  <div id="task-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeTaskModal()">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:10px;width:100%;max-width:480px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;">
+      <div style="padding:16px 20px;border-bottom:1px solid #e8e4dc;display:flex;align-items:center;justify-content:space-between;">
+        <div id="tm-title" style="font-size:15px;font-weight:800;">Nový úkol</div>
+        <button onclick="closeTaskModal()" style="background:none;border:none;color:#888;font-size:18px;cursor:pointer;">✕</button>
+      </div>
+      <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow-y:auto;flex:1;">
+        <input type="hidden" id="tm-id">
+        <div style="grid-column:1/-1;" class="fg"><label>Text úkolu</label><input id="tm-text" placeholder="Co je potřeba udělat..."></div>
+        <div class="fg"><label>Typ</label>
+          <select id="tm-typ">
+            <option value="rychly">Rychlý úkol</option>
+            <option value="ticket">Ticket (dlouhodobý)</option>
+            <option value="upominka">Upomínka</option>
+          </select>
+        </div>
+        <div class="fg"><label>Priorita</label>
+          <select id="tm-priorita">
+            <option value="nizka">Nízká</option>
+            <option value="normalni" selected>Normální</option>
+            <option value="vysoka">Vysoká ⚠</option>
+          </select>
+        </div>
+        <div class="fg"><label>Přiřazeno komu</label>
+          <select id="tm-prirazeno">
+            <option value="Ondra">Ondra</option><option value="David">David</option><option value="Michal">Michal</option>
+            <option value="Erik">Erik</option><option value="Lukáš">Lukáš</option><option value="Mário">Mário</option>
+            <option value="Tom">Tom</option><option value="Kuba">Kuba</option><option value="Petr">Petr</option>
+            <option value="Miriam">Miriam</option><option value="Filip">Filip</option><option value="Eve">Eve</option>
+          </select>
+        </div>
+        <div class="fg"><label>Stav</label>
+          <select id="tm-stav">
+            <option value="aktivni">Aktivní</option>
+            <option value="hotovo">Hotovo</option>
+            <option value="zruseno">Zrušeno</option>
+          </select>
+        </div>
+        <div class="fg"><label>Termín</label><input type="date" id="tm-termin"></div>
+        <div class="fg"><label>Upomínka</label><input type="datetime-local" id="tm-upominka"></div>
+        <div style="grid-column:1/-1;" class="fg"><label>Poznámka</label><input id="tm-poznamka" placeholder="Volitelná poznámka..."></div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid #e8e4dc;display:flex;gap:10px;justify-content:flex-end;align-items:center;">
+        <button id="tm-delete-btn" onclick="deleteTaskById(document.getElementById('tm-id').value)" style="display:none;margin-right:auto;background:none;color:#c05050;border:1px solid #f0c8c8;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;">🗑 Smazat</button>
+        <button onclick="closeTaskModal()" style="background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;">Zrušit</button>
+        <button onclick="saveTask()" style="background:#6080c0;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:12px;font-weight:700;cursor:pointer;">Uložit</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 // ── Konfigurace ────────────────────────────────────────────────────────────────
-const SCRIPT_INSTALACE = 'https://script.google.com/macros/s/AKfycbx9Jig_9A16cEdpuFJfVHvc34iXiBGq42FSBw2OuIoeRNiI5j0BfZQx2j-8549R1VTjQg/exec'; // URL scriptu pro instalace+obhlidky
-const SCRIPT_VYROBA    = 'https://script.google.com/macros/s/AKfycbyBVbjLotrlstadbsSHLvrl-SLPp7Kpopc7NfazwnTcTDWeviT93LP_pYP-LH9UfFD5/exec';
-const SCRIPT_ZASOBOVANI = 'https://script.google.com/macros/s/AKfycbx3P3afYwkaVnC7Wh3_iTP5XS5PvC2pbwogDrkmOsQdCW3yQ8AX_p0dB_nICvmAr76E6A/exec';
-  const SCRIPT_REKLAMACE = 'https://script.google.com/macros/s/AKfycby1CrDyJardzxDfKV0Bog2DznHIOPmOAL8tI6TgnWDKiWPTdH-kanpx0ZTeJi17WnDhOA/exec'; // URL scriptu pro reklamace
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+
 
 const MONTHS_CS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const today = new Date();
 let calYear = today.getFullYear(), calMonth = today.getMonth();
-let dataInst=[], dataObh=[], dataRek=[], dataDoch=[], dataVyr=[], dataZas=[], currentUser='vse';
-let tasks = JSON.parse(localStorage.getItem('dashboard_tasks')||'[]');
+let dataInst=[], dataObh=[], dataRek=[], dataRekDod=[], dataDoch=[], dataVyr=[], dataZas=[], currentUser='vse';
+let dataUkoly = [];
 
 // ── Header datum ──────────────────────────────────────────────────────────────
 function initHeader(){
@@ -362,23 +633,33 @@ function syncStatus(state,text){
   document.getElementById('sync-text').textContent=text;
 }
 
+async function sbFetch(table){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?select=*',{headers:SB_HEADERS});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  return res.json();
+}
+
 async function loadAll(){
   syncStatus('loading','Načítám...');
   try {
-    const [rInst, rObh, rRek, rDoch, rVyr, rZas] = await Promise.all([
-      fetch(SCRIPT_INSTALACE).then(r=>r.json()),
-      fetch(SCRIPT_INSTALACE+'?modul=obhlidky').then(r=>r.json()),
-      fetch(SCRIPT_REKLAMACE).then(r=>r.json()),
-      fetch(SCRIPT_INSTALACE+'?modul=dochazka').then(r=>r.json()),
-      fetch(SCRIPT_VYROBA).then(r=>r.json()),
-      fetch(SCRIPT_ZASOBOVANI+'?modul=zasilky').then(r=>r.json()),
+    const [rInst, rObh, rRek, rRekDod, rDoch, rVyr, rZas, rUkoly] = await Promise.all([
+      sbFetch('instalace'),
+      sbFetch('obhlidky'),
+      sbFetch('reklamace'),
+      sbFetch('reklamace_dodavatel').catch(()=>[]),
+      sbFetch('dochazka'),
+      sbFetch('vyroba'),
+      sbFetch('zasilky'),
+      sbFetch('ukoly').catch(()=>[]),
     ]);
-    dataInst = rInst.data||[];
-    dataObh  = rObh.data||[];
-    dataRek  = rRek.data||[];
-    dataDoch = rDoch.data||[];
-    dataVyr  = rVyr.data||[];
-    dataZas  = rZas.data||[];
+    dataInst = rInst;
+    dataObh  = rObh;
+    dataRek  = rRek;
+    dataRekDod = rRekDod;
+    dataDoch = rDoch;
+    dataVyr  = rVyr;
+    dataZas  = rZas;
+    dataUkoly = rUkoly;
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderAll();
   } catch(e){
@@ -392,6 +673,9 @@ function renderAll(){
   renderSchedule();
   renderAlerts();
   renderTasks();
+  renderTeamBar();
+  //renderWeeklyOverview();
+  renderTimeline();
 }
 
 // ── Module cards ──────────────────────────────────────────────────────────────
@@ -413,6 +697,7 @@ function renderModuleCards(){
   document.getElementById('mc-rek-total').textContent = rek.length||'0';
   document.getElementById('mc-rek-nova').textContent  = rek.filter(r=>r.stav==='Nová').length;
   document.getElementById('mc-rek-res').textContent   = rek.filter(r=>r.stav==='V řešení'||r.stav==='V řešení u dodavatele').length;
+  document.getElementById('mc-rek-dod').textContent   = dataRekDod.filter(r=>String(r.stav)!=='Vyřízeno'&&String(r.stav)!=='Zamítnuto').length;
   document.getElementById('mc-rek-vyr').textContent   = rek.filter(r=>r.stav==='Vyřízené').length;
 
   document.getElementById('mc-vyr-total').textContent  = dataVyr.filter(r=>r.stav!=='Vydáno zákazníkovi').length||'0';
@@ -433,6 +718,49 @@ function toInputDate(d){
   return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
 }
 function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+function easterDate(year) {
+  const a=year%19, b=Math.floor(year/100), c=year%100;
+  const d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25);
+  const g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30;
+  const i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7;
+  const m=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m+114)/31), day=((h+l-7*m+114)%31)+1;
+  return new Date(year, month-1, day);
+}
+function getCzechHolidays(year) {
+  const holidays = new Set();
+  const add = (m,d) => holidays.add(`${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+  add(1,1);add(5,1);add(5,8);add(7,5);add(7,6);add(9,28);add(10,28);add(11,17);add(12,24);add(12,25);add(12,26);
+  const easter = easterDate(year);
+  const gf = new Date(easter); gf.setDate(easter.getDate()-2);
+  const em = new Date(easter); em.setDate(easter.getDate()+1);
+  holidays.add(dateStr(gf)); holidays.add(dateStr(em));
+  return holidays;
+}
+const holidayCache = {};
+function isHoliday(dateString) {
+  const year = Number(dateString.split('-')[0]);
+  if (!holidayCache[year]) holidayCache[year] = getCzechHolidays(year);
+  return holidayCache[year].has(dateString);
+}
+const HOLIDAY_NAMES = {
+  '01-01':'Nový rok','05-01':'Svátek práce','05-08':'Den vítězství',
+  '07-05':'Cyril a Metoděj','07-06':'Jan Hus','09-28':'Den české státnosti',
+  '10-28':'Vznik Československa','11-17':'Den boje za svobodu',
+  '12-24':'Štědrý den','12-25':'1. svátek vánoční','12-26':'2. svátek vánoční'
+};
+function getHolidayName(dateString) {
+  const md = dateString.substring(5);
+  if (HOLIDAY_NAMES[md]) return HOLIDAY_NAMES[md];
+  const year = Number(dateString.split('-')[0]);
+  const easter = easterDate(year);
+  const gf = new Date(easter); gf.setDate(easter.getDate()-2);
+  const em = new Date(easter); em.setDate(easter.getDate()+1);
+  if (dateString === dateStr(gf)) return 'Velký pátek';
+  if (dateString === dateStr(em)) return 'Velikonoční pondělí';
+  return '';
+}
 
 function calNav(dir){ calMonth+=dir; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
 function calToday(){ calYear=today.getFullYear(); calMonth=today.getMonth(); renderCalendar(); }
@@ -491,12 +819,16 @@ function renderCalendar(){
     else if(i>=startDow+dim){dn=i-startDow-dim+1;mo=1;}
     else{dn=i-startDow+1;}
     const cd=new Date(calYear,calMonth+mo,dn);
-    const isT=dateStr(cd)===dateStr(today),isSat=cd.getDay()===6,isSun=cd.getDay()===0,other=mo!==0;
+    const cdStr=dateStr(cd);
+    const isT=cdStr===dateStr(today),isSat=cd.getDay()===6,isSun=cd.getDay()===0,other=mo!==0;
     const evs=events.filter(ev=>cd>=ev.start&&cd<=ev.end);
     let evHtml=evs.slice(0,3).map(ev=>`<div class="cal-ev ${ev.cls}" onclick="window.location='${ev.url}'" title="${ev.label}">${ev.label}</div>`).join('');
-    if(evs.length>3) evHtml+=`<div style="font-size:8px;color:#555;">+${evs.length-3}</div>`;
-    html+=`<div class="cal-day${other?' other':''}${isT?' today':''}${evs.length?' has-ev':''}${(isSat||isSun)?' weekend':''}">
-      <div class="dn" style="${(isSat||isSun)?'color:#c05050;':''}">${dn}</div>${evHtml}
+    if(evs.length>3) evHtml+=`<div style="font-size:8px;color:#888;">+${evs.length-3}</div>`;
+    const hol=isHoliday(cdStr);
+    const holName=hol?getHolidayName(cdStr):'';
+    html+=`<div class="cal-day${other?' other':''}${isT?' today':''}${evs.length?' has-ev':''}${(isSat||isSun)?' weekend':''}${hol?' holiday':''}">
+      ${holName?`<div class="holiday-name">${holName}</div>`:''}
+      <div class="dn" style="${(isSat||isSun)||hol?'color:#c05050;':''}">${dn}</div>${evHtml}
     </div>`;
   }
   document.getElementById('cal-days').innerHTML=html;
@@ -507,13 +839,13 @@ function renderSchedule(){
   const todayStr=dateStr(today);
   const items=[];
   filterByUser(dataInst,'technik').filter(r=>toInputDate(r.datum)===todayStr).forEach(r=>{
-    items.push({color:'#e2b830',bg:'#2a2010',label:`Instalace — ${r.misto||r.obj}`,time:'Celý den'});
+    items.push({color:'#e2b830',bg:'#fdf4d8',label:`Instalace — ${r.misto||r.obj}`,time:'Celý den'});
   });
   filterByUser(dataObh,'technik').filter(r=>toInputDate(r.datum)===todayStr).forEach(r=>{
-    items.push({color:'#3ab0a0',bg:'#1a2820',label:`Obhlídka — ${r.misto||r.zakaznik}`,time:'Celý den'});
+    items.push({color:'#3ab0a0',bg:'#e0f4e8',label:`Obhlídka — ${r.misto||r.zakaznik}`,time:'Celý den'});
   });
   const el=document.getElementById('schedule-list');
-  if(!items.length){ el.innerHTML='<div style="font-size:12px;color:#555;">Dnes žádné akce</div>'; return; }
+  if(!items.length){ el.innerHTML='<div style="font-size:12px;color:#888;">Dnes žádné akce</div>'; return; }
   el.innerHTML=items.map(t=>`
     <div class="sched-item">
       <div class="sched-time" style="background:${t.color};color:#111;">${t.time}</div>
@@ -530,7 +862,8 @@ function renderAlerts(){
     if(r.stav==='Vyřízené'||r.stav==='Zamítnuto') return;
     const d=toInputDate(r.datum_deadline); if(!d) return;
     const diff=Math.ceil((new Date(d+'T00:00:00')-todayMs)/(1000*60*60*24));
-    if(diff<=3) alerts.push({type:'warn',text:`Reklamace ${r.obj||'#'+r.id} — deadline za ${diff<=0?'PO TERMÍNU':diff+' dny/dní'}`});
+    if(diff<=0) alerts.push({type:'warn',text:`Reklamace ${r.obj||'#'+r.id} — PO TERMÍNU`});
+    else if(diff<=3) alerts.push({type:'orange',text:`Reklamace ${r.obj||'#'+r.id} — deadline za ${diff} dny/dní`});
   });
   filterByUser(dataInst,'technik').forEach(r=>{
     const d=toInputDate(r.datum); if(!d) return;
@@ -545,38 +878,455 @@ function renderAlerts(){
   });
 
   const el=document.getElementById('alerts-list');
-  if(!alerts.length){ el.innerHTML='<div style="font-size:12px;color:#555;">Žádná upozornění</div>'; return; }
-  el.innerHTML=alerts.map(a=>`
-    <div class="alert-item" style="background:${a.type==='warn'?'#1a0f0f':'#0f1218'};border-color:${a.type==='warn'?'#e05050':'#6080c0'};">
-      <div class="alert-badge" style="background:${a.type==='warn'?'#e05050':'#6080c0'};color:${a.type==='warn'?'#fff':'#fff'};">${a.type==='warn'?'!':'i'}</div>
+  if(!alerts.length){ el.innerHTML='<div style="font-size:12px;color:#999;padding:8px 0;">Žádná upozornění</div>'; return; }
+  const ALERT_STYLES = {
+    warn:  { bg:'#fef4f4', border:'#e05050', badgeBg:'#e05050', badgeColor:'#fff', icon:'!' },
+    orange:{ bg:'#fef8f0', border:'#e89030', badgeBg:'#e89030', badgeColor:'#fff', icon:'!' },
+    info:  { bg:'#f0f4fb', border:'#6080c0', badgeBg:'#6080c0', badgeColor:'#fff', icon:'i' }
+  };
+  el.innerHTML=alerts.map(a=>{
+    const s = ALERT_STYLES[a.type] || ALERT_STYLES.info;
+    return `<div class="alert-item" style="background:${s.bg};border-color:${s.border};">
+      <div class="alert-badge" style="background:${s.badgeBg};color:${s.badgeColor};">${s.icon}</div>
       <span class="alert-text">${a.text}</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
-// ── Tasks ─────────────────────────────────────────────────────────────────────
-function saveTasks(){ localStorage.setItem('dashboard_tasks',JSON.stringify(tasks)); }
+// ── Supabase CRUD ─────────────────────────────────────────────────────────────
+async function sbInsert(table,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table,{method:'POST',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbUpdate(table,id,rec){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?id=eq.'+id,{method:'PATCH',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+async function sbDelete(table,id){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/'+table+'?id=eq.'+id,{method:'DELETE',headers:SB_HEADERS});
+  if(!res.ok){ const t=await res.text(); throw new Error(t); }
+}
+
+// ── Tasks 2.0 ─────────────────────────────────────────────────────────────────
+let taskFilter = 'aktivni';
+
+function filterTasks(f){
+  taskFilter = f;
+  document.querySelectorAll('.task-filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.f===f));
+  renderTasks();
+}
 
 function renderTasks(){
   const el=document.getElementById('tasks-list');
-  if(!tasks.length){ el.innerHTML='<div style="font-size:12px;color:#555;padding:4px 0;">Žádné úkoly</div>'; return; }
-  el.innerHTML=tasks.map((t,i)=>`
-    <div class="task-item${t.done?' done':''}" onclick="toggleTask(${i})">
-      <div class="task-cb">${t.done?'✓':''}</div>
-      <div class="task-text">${t.text}</div>
-      <div onclick="event.stopPropagation();deleteTask(${i})" style="font-size:11px;color:#555;cursor:pointer;padding:2px 6px;">✕</div>
-    </div>`).join('');
+  const user = currentUser==='vse' ? (localStorage.getItem('ledshopik_user')||'') : currentUser;
+
+  let filtered = dataUkoly.filter(t => {
+    if(t.prirazeno_komu !== user && t.uzivatel !== user) return false;
+    if(taskFilter==='aktivni') return t.stav==='aktivni';
+    if(taskFilter==='hotovo') return t.stav==='hotovo';
+    return true;
+  });
+
+  // Sort: overdue first, then by priority, then by date
+  const priOrder = {vysoka:0, normalni:1, nizka:2};
+  filtered.sort((a,b) => {
+    if(a.stav!==b.stav) return a.stav==='aktivni'?-1:1;
+    return (priOrder[a.priorita]||1) - (priOrder[b.priorita]||1);
+  });
+
+  if(!filtered.length){
+    el.innerHTML='<div style="font-size:12px;color:#999;padding:12px 0;">Žádné úkoly</div>';
+    return;
+  }
+
+  el.innerHTML = filtered.map(t => {
+    const isDone = t.stav==='hotovo';
+    const isAssigned = t.prirazeno_komu === user && t.uzivatel !== user;
+    const pri = t.priorita || 'normalni';
+    const typeCls = 'task-type-'+(t.typ||'rychly');
+    const typeLabels = {rychly:'Úkol',ticket:'Ticket',upominka:'Upomínka'};
+
+    // Termin
+    let terminHtml = '';
+    if(t.termin && !isDone){
+      const d = new Date(t.termin+'T00:00:00');
+      const diff = Math.round((d - new Date(new Date().toDateString()))/(1000*60*60*24));
+      if(diff<0) terminHtml = '<span class="task-overdue">po termínu</span>';
+      else if(diff===0) terminHtml = '<span class="task-due-badge" style="color:#e08030;background:#fef4ea;font-weight:700;">dnes</span>';
+      else if(diff<=3) terminHtml = '<span class="task-due-badge" style="color:#e08030;">za '+diff+'d</span>';
+      else terminHtml = '<span class="task-due-badge">'+t.termin.split('-').reverse().join('.')+'</span>';
+    }
+
+    return '<div class="task-item'+(isDone?' done':'')+' typ-'+(t.typ||'rychly')+' pri-'+pri+'" onclick="openTaskModal(\''+t.id+'\')">'
+      +'<div class="task-cb" onclick="event.stopPropagation();toggleTaskDone(\''+t.id+'\')">'+(isDone?'✓':'')+'</div>'
+      +'<div style="flex:1;min-width:0;">'
+        +'<div class="task-text">'+(t.text||'')+'</div>'
+        +'<div style="display:flex;gap:5px;align-items:center;margin-top:3px;flex-wrap:wrap;">'
+          +'<span class="task-type-tag '+typeCls+'">'+typeLabels[t.typ||'rychly']+'</span>'
+          +(isAssigned?'<span style="font-size:9px;color:#6080c0;font-weight:600;">od '+t.uzivatel+'</span>':'')
+          +terminHtml
+        +'</div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
 }
 
-function toggleTask(i){ tasks[i].done=!tasks[i].done; saveTasks(); renderTasks(); }
-function deleteTask(i){ tasks.splice(i,1); saveTasks(); renderTasks(); }
+async function toggleTaskDone(id){
+  const t = dataUkoly.find(x=>x.id===id);
+  if(!t) return;
+  t.stav = t.stav==='hotovo'?'aktivni':'hotovo';
+  renderTasks();
+  try { await sbUpdate('ukoly',t.id,{stav:t.stav}); } catch(e){}
+}
+
+async function quickAddTask(){
+  const inp = document.getElementById('new-task-input');
+  const text = inp.value.trim();
+  if(!text) return;
+  const user = localStorage.getItem('ledshopik_user')||'';
+  const rec = {
+    id: String(Date.now()),
+    uzivatel: user,
+    prirazeno_komu: user,
+    text: text,
+    typ: 'rychly',
+    priorita: 'normalni',
+    termin: '',
+    upominka: '',
+    stav: 'aktivni',
+    poznamka: ''
+  };
+  dataUkoly.push(rec);
+  renderTasks();
+  inp.value = '';
+  try { await sbInsert('ukoly',rec); } catch(e){ alert('Chyba: '+e.message); }
+}
+
+async function deleteTaskById(id){
+  if(!confirm('Smazat úkol?')) return;
+  dataUkoly = dataUkoly.filter(t=>t.id!==id);
+  renderTasks();
+  closeTaskModal();
+  try { await sbDelete('ukoly',id); } catch(e){}
+}
+
+async function saveTask(){
+  const id = document.getElementById('tm-id').value;
+  const isEdit = !!id && dataUkoly.some(t=>t.id===id);
+  const user = localStorage.getItem('ledshopik_user')||'';
+
+  const rec = {
+    id: isEdit ? id : String(Date.now()),
+    uzivatel: isEdit ? (dataUkoly.find(t=>t.id===id)||{}).uzivatel || user : user,
+    prirazeno_komu: document.getElementById('tm-prirazeno').value || user,
+    text: document.getElementById('tm-text').value.trim(),
+    typ: document.getElementById('tm-typ').value,
+    priorita: document.getElementById('tm-priorita').value,
+    termin: document.getElementById('tm-termin').value || '',
+    upominka: document.getElementById('tm-upominka').value || '',
+    stav: document.getElementById('tm-stav').value,
+    poznamka: document.getElementById('tm-poznamka').value.trim()
+  };
+
+  if(!rec.text){ alert('Vyplň text úkolu'); return; }
+
+  if(isEdit){
+    const idx = dataUkoly.findIndex(t=>t.id===id);
+    if(idx>=0) dataUkoly[idx] = rec;
+  } else {
+    dataUkoly.push(rec);
+  }
+
+  renderTasks();
+  closeTaskModal();
+
+  try {
+    if(isEdit) await sbUpdate('ukoly',rec.id,rec); else await sbInsert('ukoly',rec);
+  } catch(e){ alert('Chyba: '+e.message); }
+}
+
+function openTaskModal(id){
+  const t = id ? dataUkoly.find(x=>x.id===id) : null;
+  const user = localStorage.getItem('ledshopik_user')||'';
+  document.getElementById('tm-title').textContent = t ? 'Upravit úkol' : 'Nový úkol';
+  document.getElementById('tm-delete-btn').style.display = t ? 'inline-flex' : 'none';
+  document.getElementById('tm-id').value = t ? t.id : '';
+  const quickInput = document.getElementById('new-task-input');
+  document.getElementById('tm-text').value = t ? t.text : (quickInput ? quickInput.value.trim() : '');
+  document.getElementById('tm-typ').value = t ? t.typ : 'rychly';
+  document.getElementById('tm-priorita').value = t ? t.priorita : 'normalni';
+  document.getElementById('tm-prirazeno').value = t ? t.prirazeno_komu : user;
+  document.getElementById('tm-stav').value = t ? t.stav : 'aktivni';
+  document.getElementById('tm-termin').value = t ? t.termin : '';
+  document.getElementById('tm-upominka').value = t ? t.upominka : '';
+  document.getElementById('tm-poznamka').value = t ? t.poznamka : '';
+  document.getElementById('task-modal-overlay').style.display = 'flex';
+}
+
+function closeTaskModal(){
+  document.getElementById('task-modal-overlay').style.display = 'none';
+}
+
+// ── Weather widget ────────────────────────────────────────────────────────────
+const WEATHER_CODE_EMOJI = {113:'☀️',116:'⛅',119:'☁️',122:'☁️',143:'🌫️',176:'🌦️',200:'⛈️',227:'🌨️',230:'❄️',248:'🌫️',260:'🌫️',263:'🌦️',266:'🌧️',293:'🌧️',296:'🌧️',299:'🌧️',302:'🌧️',305:'🌧️',308:'🌧️',311:'🌧️',314:'🌧️',317:'🌨️',320:'🌨️',323:'🌨️',326:'🌨️',329:'❄️',332:'❄️',335:'❄️',338:'❄️',350:'🌧️',353:'🌦️',356:'🌧️',359:'🌧️',362:'🌨️',365:'🌨️',368:'🌨️',371:'❄️',374:'🌨️',377:'🌨️',386:'⛈️',389:'⛈️',392:'⛈️',395:'❄️'};
+const DAY_NAMES_CS = ['Ne','Po','Út','St','Čt','Pá','So'];
+
+async function loadWeather(){
+  try {
+    const cacheKey = 'ledshopik_weather';
+    const cacheTimeKey = 'ledshopik_weather_time';
+    const cached = localStorage.getItem(cacheKey);
+    const cachedTime = Number(localStorage.getItem(cacheTimeKey)||0);
+    let data;
+    if(cached && (Date.now()-cachedTime < 30*60*1000)){
+      data = JSON.parse(cached);
+    } else {
+      // Geolokace → IP lokace → fallback Ostrava
+      let location = '';
+      try {
+        const pos = await new Promise((resolve, reject) => {
+          if (!navigator.geolocation) return reject('no geolocation');
+          navigator.geolocation.getCurrentPosition(resolve, reject, {timeout: 5000, maximumAge: 600000});
+        });
+        location = pos.coords.latitude.toFixed(4) + ',' + pos.coords.longitude.toFixed(4);
+      } catch(geoErr) {
+        try { const ipRes = await fetch('https://ipapi.co/city/'); location = await ipRes.text(); } catch(e2) {}
+      }
+      if (!location || location.length < 2) location = 'Ostrava';
+      const res = await fetch('https://wttr.in/' + encodeURIComponent(location) + '?format=j1');
+      data = await res.json();
+      if(data.nearest_area && data.nearest_area[0]){
+        data._cityName = data.nearest_area[0].areaName[0].value;
+      }
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      localStorage.setItem(cacheTimeKey, String(Date.now()));
+    }
+    renderWeather(data);
+  } catch(e){ /* fail silently */ }
+}
+
+function renderWeather(data){
+  const el = document.getElementById('weather-widget');
+  if(!data || !data.current_condition || !data.current_condition[0]) return;
+  const cur = data.current_condition[0];
+  const code = Number(cur.weatherCode);
+  const emoji = WEATHER_CODE_EMOJI[code] || '🌤️';
+  const temp = cur.temp_C;
+  const descArr = cur.lang_cs || cur.weatherDesc;
+  const desc = descArr && descArr[0] ? (descArr[0].value || '') : '';
+
+  let forecastHtml = '';
+  if(data.weather){
+    data.weather.slice(0,3).forEach((day,i)=>{
+      const dt = new Date(day.date+'T00:00:00');
+      const dayName = i===0 ? 'Dnes' : DAY_NAMES_CS[dt.getDay()];
+      const fCode = Number(day.hourly && day.hourly[4] ? day.hourly[4].weatherCode : 0);
+      const fEmoji = WEATHER_CODE_EMOJI[fCode] || '🌤️';
+      const maxT = day.maxtempC;
+      forecastHtml += '<div class="weather-fc-day"><div class="fc-name">'+dayName+'</div><div class="fc-icon">'+fEmoji+'</div><div class="fc-temp">'+maxT+'°</div></div>';
+    });
+  }
+
+  const cityName = data._cityName || (data.nearest_area && data.nearest_area[0] ? data.nearest_area[0].areaName[0].value : '');
+  el.innerHTML = '<div class="weather-now"><span class="w-icon">'+emoji+'</span><div><div class="w-temp">'+temp+'°C</div><div class="w-desc">'+desc+(cityName?' · '+cityName:'')+'</div></div></div>'
+    + '<div class="weather-forecast">'+forecastHtml+'</div>';
+}
+
+// ── Team bar ─────────────────────────────────────────────────────────────────
+function renderTeamBar(){
+  const el = document.getElementById('team-bar');
+  // Collect all team member names from the user select
+  const allMembers = ['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];
+  const todayStr = dateStr(today);
+
+  // Parse absence: who is on leave today
+  const absenceMap = {}; // name -> {type, emoji, color}
+  const TYPE_MAP = {
+    'Dovolená':    {emoji:'🔵', color:'#4090d0', bg:'#3070b0'},
+    'Neschopenka': {emoji:'🔴', color:'#e05050', bg:'#c03030'},
+    'Neplacené volno': {emoji:'🟠', color:'#e08030', bg:'#c06020'},
+    'Lékař':       {emoji:'🟣', color:'#a060d0', bg:'#8040b0'}
+  };
+
+  dataDoch.forEach(r=>{
+    if(!r.datum_od || !r.datum_do || !r.zamestnanec) return;
+    const from = toInputDate(r.datum_od);
+    const to = toInputDate(r.datum_do);
+    if(!from || !to) return;
+    if(todayStr >= from && todayStr <= to){
+      const name = r.zamestnanec.trim();
+      const typeInfo = TYPE_MAP[r.typ] || {emoji:'🟠', color:'#e08030', bg:'#c06020'};
+      absenceMap[name] = {type: r.typ, ...typeInfo};
+    }
+  });
+
+  const COLORS = ['#4090d0','#e2b830','#3ab0a0','#f07030','#a070e0','#e05050','#40a050','#c8a830','#6080c0','#e050a0','#50c080','#b08820'];
+
+  let html = '<span class="team-bar-title">Tým dnes</span>';
+  allMembers.forEach((name,i)=>{
+    const initials = name.substring(0,2).toUpperCase();
+    const absence = absenceMap[name];
+    const dotColor = absence ? absence.color : '#40a050';
+    const tooltip = absence ? (name+' — '+absence.type) : (name+' — v práci');
+    const bgColor = COLORS[i % COLORS.length];
+    html += '<div class="team-avatar" style="background:'+bgColor+';" title="'+tooltip+'">'
+      + initials
+      + '<div class="team-dot" style="background:'+dotColor+';"></div>'
+      + '<div class="team-avatar-tooltip">'+tooltip+'</div>'
+      + '</div>';
+  });
+
+  el.innerHTML = html;
+  el.style.display = 'flex';
+}
+
+// ── Weekly overview ──────────────────────────────────────────────────────────
+function renderWeeklyOverview(){
+  const el = document.getElementById('week-grid-wrap');
+  const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const dow = todayDate.getDay(); // 0=Sun
+  const mondayOffset = dow === 0 ? -6 : 1 - dow;
+  const monday = new Date(todayDate);
+  monday.setDate(todayDate.getDate() + mondayOffset);
+
+  const days = [];
+  const DAY_SHORT = ['Po','Út','St','Čt','Pá','So','Ne'];
+  for(let i=0;i<7;i++){
+    const d = new Date(monday);
+    d.setDate(monday.getDate()+i);
+    days.push({date:d, str:dateStr(d), name:DAY_SHORT[i], isWeekend:i>=5, isToday:dateStr(d)===dateStr(todayDate)});
+  }
+
+  // Collect events for this week
+  const weekEvents = {}; // dateStr -> [{label, color, bg}]
+  days.forEach(d => weekEvents[d.str] = []);
+
+  // Installations this week
+  filterByUser(dataInst,'technik').forEach(r=>{
+    const d = toInputDate(r.datum_montaze) || toInputDate(r.datum);
+    if(!d) return;
+    // Check if multi-day
+    const start = new Date(d+'T00:00:00');
+    const len = Math.max(1, Number(r.delka)||1);
+    for(let i=0;i<len;i++){
+      const day = new Date(start);
+      day.setDate(start.getDate()+i);
+      const ds = dateStr(day);
+      if(weekEvents[ds]) weekEvents[ds].push({label:(r.misto||r.obj||'INS'), color:'#a08020', bg:'#fdf4d8'});
+    }
+  });
+
+  // Production deadlines
+  dataVyr.filter(r=>r.deadline && r.stav!=='Vydáno zákazníkovi').forEach(r=>{
+    const d = toInputDate(r.deadline);
+    if(d && weekEvents[d]) weekEvents[d].push({label:(r.obj||'VYR')+' DL', color:'#c05020', bg:'#fff0e0'});
+  });
+
+  // Inspections
+  filterByUser(dataObh,'technik').forEach(r=>{
+    const d = toInputDate(r.datum_obhlidky) || toInputDate(r.datum);
+    if(d && weekEvents[d]) weekEvents[d].push({label:(r.misto||r.zakaznik||'OBH'), color:'#208070', bg:'#e0f4e8'});
+  });
+
+  let html = '<div class="week-grid-title"><div class="panel-title-line" style="background:#e2b830;"></div>Týdenní přehled</div>';
+  html += '<div class="week-grid">';
+  days.forEach(d=>{
+    const cls = 'week-col'+(d.isWeekend?' wk-weekend':'')+(d.isToday?' wk-today':'');
+    let evHtml = '';
+    weekEvents[d.str].slice(0,4).forEach(ev=>{
+      evHtml += '<span class="wk-badge" style="background:'+ev.bg+';color:'+ev.color+';">'+ev.label+'</span>';
+    });
+    if(weekEvents[d.str].length>4) evHtml += '<span style="font-size:8px;color:#888;">+'+( weekEvents[d.str].length-4)+'</span>';
+    html += '<div class="'+cls+'"><div class="wk-day-name">'+d.name+' '+d.date.getDate()+'.</div>'+evHtml+'</div>';
+  });
+  html += '</div>';
+
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
+// ── Timeline / Activity ──────────────────────────────────────────────────────
+function renderTimeline(){
+  const el = document.getElementById('timeline-panel');
+  const activities = [];
+
+  // Installations
+  dataInst.forEach(r=>{
+    const d = toInputDate(r.datum) || toInputDate(r.zalozeno);
+    if(!d) return;
+    activities.push({date:d, icon:'🔧', color:'#e2b830', text:'Nová instalace: '+(r.zakaznik||r.misto||r.obj||'—'), module:'inst'});
+  });
+
+  // Production
+  dataVyr.forEach(r=>{
+    const d = toInputDate(r.zalozeno) || toInputDate(r.deadline);
+    if(!d) return;
+    const stavText = r.stav ? ' — '+r.stav.toLowerCase() : '';
+    activities.push({date:d, icon:'🏭', color:'#f07030', text:'Výroba #'+(r.obj||r.id)+stavText, module:'vyr'});
+  });
+
+  // Reklamace
+  dataRek.forEach(r=>{
+    const d = toInputDate(r.zalozeno) || toInputDate(r.datum);
+    if(!d) return;
+    const stavText = r.stav ? ' — '+r.stav.toLowerCase() : '';
+    activities.push({date:d, icon:'⚠️', color:'#e05050', text:'Reklamace '+(r.zakaznik||r.obj||'—')+stavText, module:'rek'});
+  });
+
+  // Inspections
+  dataObh.forEach(r=>{
+    const d = toInputDate(r.datum) || toInputDate(r.zalozeno);
+    if(!d) return;
+    activities.push({date:d, icon:'👁', color:'#3ab0a0', text:'Obhlídka: '+(r.zakaznik||r.misto||'—'), module:'obh'});
+  });
+
+  // Zásobování
+  dataZas.forEach(r=>{
+    const d = toInputDate(r.datum) || toInputDate(r.zalozeno);
+    if(!d) return;
+    activities.push({date:d, icon:'📦', color:'#c8a830', text:'Zásilka: '+(r.dodavatel||r.cislo_obj||'—')+' — '+(r.stav||''), module:'zas'});
+  });
+
+  // Sort by date descending
+  activities.sort((a,b) => b.date.localeCompare(a.date));
+
+  // Take last ~10
+  const top = activities.slice(0,10);
+
+  if(!top.length){
+    el.style.display = 'none';
+    return;
+  }
+
+  // Relative time
+  function relTime(ds){
+    const diff = Math.round((today - new Date(ds+'T12:00:00'))/(1000*60*60*24));
+    if(diff<=0) return 'dnes';
+    if(diff===1) return 'včera';
+    if(diff<7) return 'před '+diff+' dny';
+    if(diff<14) return 'před týdnem';
+    if(diff<30) return 'před '+Math.floor(diff/7)+' týdny';
+    return ds.split('-').reverse().join('.');
+  }
+
+  let html = '<div class="panel-title"><div class="panel-title-line" style="background:#e2b830;"></div>Poslední aktivita</div>';
+  top.forEach(a=>{
+    html += '<div class="tl-item">'
+      + '<div class="tl-icon">'+a.icon+'</div>'
+      + '<div class="tl-border" style="background:'+a.color+';"></div>'
+      + '<div class="tl-text">'+a.text+'</div>'
+      + '<div class="tl-time">'+relTime(a.date)+'</div>'
+      + '</div>';
+  });
+
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
 
 document.addEventListener('DOMContentLoaded',()=>{
   const inp=document.getElementById('new-task-input');
   inp.addEventListener('keydown',e=>{
-    if(e.key==='Enter'&&inp.value.trim()){
-      tasks.push({text:inp.value.trim(),done:false});
-      saveTasks(); renderTasks(); inp.value='';
-    }
+    if(e.key==='Enter') quickAddTask();
   });
   const savedUser=localStorage.getItem('dashboard_user')||'vse';
   document.getElementById('user-select').value=savedUser;
@@ -586,7 +1336,35 @@ document.addEventListener('DOMContentLoaded',()=>{
 initHeader();
 renderTasks();
 loadAll();
-setInterval(loadAll,120000);
+loadWeather();
+// Auto-refresh every 30s (only when page visible and no modal open)
+setInterval(()=>{
+  if(document.hidden) return;
+  if(document.querySelector('.modal[style*="flex"],.modal[style*="block"],.overlay[style*="flex"],.overlay[style*="block"]')) return;
+  loadAll();
+}, 10000);
+document.getElementById('user-bar-name').textContent=localStorage.getItem('ledshopik_user')||'';
+function logout(){localStorage.removeItem('ledshopik_user');window.location.href='login.html';}
 </script>
+<script>
+(function(){
+  var VK='ledshopik_app_ver';
+  function ck(){
+    fetch('https://raw.githubusercontent.com/ledshopik/app/main/version.json?t='+Date.now())
+    .then(function(r){return r.json()})
+    .then(function(d){
+      var c=localStorage.getItem(VK);
+      if(!c){localStorage.setItem(VK,d.version);return;}
+      if(c!==d.version){
+        localStorage.setItem(VK,d.version);
+        window.location.href=window.location.pathname+'?v='+Date.now();
+      }
+    }).catch(function(){});
+  }
+  ck();
+  setInterval(ck,30000);
+})();
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-all').on('postgres_changes',{event:'*',schema:'public'},function(){console.log('RT update');if(typeof loadAll==='function')loadAll();}).subscribe();})();</script>
 </body>
 </html>
