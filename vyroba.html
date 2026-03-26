@@ -136,7 +136,7 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
 #saving-box .saving-sub { font-size: 12px; color: #888; }
 
 /* Calendar */
-#calendar-section { display: none; margin: 0 32px 40px; background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
+#calendar-section { margin: 0 32px 40px; background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
 #cal-header { padding: 16px 24px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 #cal-header .cal-title { font-size: 15px; font-weight: 800; letter-spacing: .06em; }
 #cal-nav { display: flex; align-items: center; gap: 10px; }
@@ -262,10 +262,6 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
   <button id="btn-add" onclick="openModal()">+ Nová výroba</button>
   <button onclick="toggleNastaveni()" style="background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">⚙ Nastavení</button>
-  <div class="view-toggle">
-    <button id="view-table" class="active" onclick="setView('table')">📋 Tabulka</button>
-    <button id="view-cal" onclick="setView('calendar')">📅 Kalendář</button>
-  </div>
 </div>
 
 <div id="nastaveni-panel" style="display:none;background:#f8f6f0;border-bottom:1px solid #ddd;padding:16px 32px;">
@@ -469,6 +465,7 @@ async function loadData(){
     data=await res.json();
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderTable();
+    renderCalendar();
   } catch(e){ syncStatus('error','Chyba: '+e.message); }
 }
 
@@ -691,14 +688,7 @@ function onZadalChange(){
 }
 
 // ── View toggle ──────────────────────────────────────────────────────────────
-function setView(v){
-  currentView=v;
-  document.getElementById('view-table').classList.toggle('active',v==='table');
-  document.getElementById('view-cal').classList.toggle('active',v==='calendar');
-  document.getElementById('table-wrap').style.display=v==='table'?'':'none';
-  document.getElementById('calendar-section').style.display=v==='calendar'?'block':'none';
-  if(v==='calendar') renderCalendar();
-}
+function setView(v){ currentView=v; renderCalendar(); }
 
 // ── Calendar helpers ─────────────────────────────────────────────────────────
 function calNav(dir){ calMonth+=dir; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
