@@ -704,6 +704,7 @@ let activeRoom = '__all__';
 let customRooms = [];  // Manually created rooms
 let tempImg = null;
 let currentProjectId = null; // ID projektu na serveru
+var _saveTimer=null;
 
 // ══════════════════════════════════════
 // INIT
@@ -718,7 +719,6 @@ loadDBFromServer();
 // ══════════════════════════════════════
 // PERSISTENCE (server-first, localStorage as cache)
 // ══════════════════════════════════════
-var _saveTimer=null;
 function save() {
   // Local cache
   try {
@@ -990,7 +990,7 @@ async function importFromEshop() {
     } catch(e) {}
     // Fallback: public CORS proxies
     if (!html) {
-      const proxies = ['https://corsproxy.io/?url=','https://api.allorigins.win/raw?url='];
+      const proxies = ['https://api.codetabs.com/v1/proxy/?quest=','https://corsproxy.io/?url=','https://api.allorigins.win/raw?url='];
       for (const proxy of proxies) {
         try {
           const r = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(10000)});
