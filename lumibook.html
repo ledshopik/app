@@ -1046,9 +1046,9 @@ async function importFromEshop() {
     }
 
     // IMAGE: 1) fotky/maxi (full size), 2) og:image, 3) any zeta image enlarged
-    const maxiMatch = html.match(/fotky\/maxi\/[^"'> ]+\.(?:jpg|jpeg|png|webp)/i);
+    const maxiMatch = html.match(/(?:projekt\/public\/)?fotky\/maxi\/[^"'> ?]+\.(?:jpg|jpeg|png|webp)/i);
     if (maxiMatch) {
-      p.image = maxiMatch[0];
+      p.image = maxiMatch[0].replace(/^fotky\//, 'projekt/public/fotky/');
     } else {
       const ogImg = html.match(/property=["']og:image["']\s+content=["']([^"']+)["']/i);
       if (ogImg) p.image = ogImg[1];
