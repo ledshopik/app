@@ -697,6 +697,7 @@ let dbFromSheets = false;
 
 let database = [];        // Saved product database
 let editIdx = -1;
+let tempExtraImages = [];
 let view = 'grid';
 let tagN = 1;
 let activeRoom = '__all__';
@@ -1366,7 +1367,7 @@ function bindImgUpload() {
 }
 bindImgUpload();
 
-let tempExtraImages = [];
+// tempExtraImages declared at top with other state vars
 function bindExtraImgUpload() {
   document.getElementById('extra-img-file').addEventListener('change', function(e) {
     const files = Array.from(e.target.files);
