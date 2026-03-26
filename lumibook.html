@@ -1216,8 +1216,23 @@ async function importFromEshop() {
 
     if (p.image) {
       tempImg = p.image;
-      document.getElementById('img-zone').innerHTML = '<img src="' + p.image + '" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'"><input type="file" id="img-file" accept="image/*">';
-      bindImgUpload();
+      // Try direct load first, then proxy through codetabs if blocked
+      var imgEl = new Image();
+      imgEl.referrerPolicy = 'no-referrer';
+      imgEl.crossOrigin = 'anonymous';
+      imgEl.onload = function(){
+        document.getElementById('img-zone').innerHTML = '<img src="' + p.image + '" referrerpolicy="no-referrer"><input type="file" id="img-file" accept="image/*">';
+        bindImgUpload();
+      };
+      imgEl.onerror = function(){
+        // Proxy image through codetabs
+        var proxyImg = 'https://api.codetabs.com/v1/proxy/?quest=' + encodeURIComponent(p.image);
+        document.getElementById('img-zone').innerHTML = '<img src="' + proxyImg + '" referrerpolicy="no-referrer"><input type="file" id="img-file" accept="image/*">';
+        tempImg = proxyImg;
+        bindImgUpload();
+      };
+      imgEl.src = p.image;
+      document.getElementById('f-img-url').value = p.image;
     }
 
     document.getElementById('modal-bg').classList.add('open');
