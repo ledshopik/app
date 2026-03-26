@@ -915,10 +915,18 @@ async function importFromEshop() {
       const metaDesc = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
       if (metaDesc) p.note = metaDesc[1];
     }
-    // Fallback image: eshop-specific patterns
+    // Fallback image: eshop-specific patterns (full URLs)
     if (!p.image) {
-      const imgPat = html.match(/["'](https?:\/\/[^"']*\/fotky\/[^"']*\.(?:jpg|png|webp)[^"']*)["']/i);
+      const imgPat = html.match(/["'](https?:\/\/[^"']*\/fotky\/[^"']*\.(?:jpg|jpeg|png|webp)[^"']*)["']/i);
       if (imgPat) p.image = imgPat[1];
+    }
+    // Fallback: relative zeta/temp/fotky paths (LEDshopik eshop)
+    if (!p.image) {
+      const zetaImg = html.match(/["'](zeta\/temp\/fotky\/[^"']*\.(?:jpg|jpeg|png|webp))[^"']*/i);
+      if (zetaImg) {
+        var imgPath = zetaImg[1].replace(/shrink_\d+_\d+/, 'shrink_500_500');
+        try { p.image = new URL(imgPath, url).href; } catch(e) { p.image = 'https://www.ledshopik.cz/' + imgPath; }
+      }
     }
     // Fix relative image URLs
     if (p.image && !p.image.startsWith('http')) {
