@@ -188,6 +188,16 @@
 .header-date { text-align: right; }
 .header-date .day { font-size: 24px; font-weight: 900; color: #e2b830; letter-spacing: .02em; line-height: 1; }
 .header-date .month { font-size: 10px; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-top: 2px; }
+.weather-widget { display:flex; align-items:center; gap:10px; margin-left:12px; }
+.weather-now { display:flex; align-items:center; gap:6px; }
+.weather-now .w-icon { font-size:22px; line-height:1; }
+.weather-now .w-temp { font-size:20px; font-weight:900; color:#1a1a1a; line-height:1; }
+.weather-now .w-desc { font-size:9px; color:#888; letter-spacing:.05em; }
+.weather-forecast { display:flex; gap:8px; margin-left:6px; }
+.weather-fc-day { text-align:center; }
+.weather-fc-day .fc-name { font-size:8px; color:#888; text-transform:uppercase; letter-spacing:.05em; }
+.weather-fc-day .fc-icon { font-size:14px; line-height:1.2; }
+.weather-fc-day .fc-temp { font-size:10px; font-weight:700; color:#1a1a1a; }
 </style>
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#ffffff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script>
 </head>
@@ -205,7 +215,7 @@
   </div>
   <div id="team-bar" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;"></div>
   <div style="display:flex;align-items:center;gap:20px;">
-    <div id="weather-mini" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888;"></div>
+    <div id="weather-widget" class="weather-widget"></div>
     <div class="header-date">
       <div class="day" id="hdr-day">&mdash;</div>
       <div class="month" id="hdr-month">&mdash;</div>
@@ -1073,6 +1083,6 @@ loadHistory();
 
 (function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
 </script>
-<script>(function(){var cacheKey='ledshopik_weather',cacheTime='ledshopik_weather_time';var cached=localStorage.getItem(cacheKey),ct=localStorage.getItem(cacheTime);if(cached&&ct&&Date.now()-parseInt(ct)<1800000){try{var d=JSON.parse(cached);showMiniWeather(d);}catch(e){}return;}var loc='Ostrava';if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(pos){fetchWeather(pos.coords.latitude+','+pos.coords.longitude);},function(){fetchWeather(loc);},{timeout:5000,maximumAge:600000});}else{fetchWeather(loc);}function fetchWeather(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1').then(function(r){return r.json()}).then(function(d){localStorage.setItem(cacheKey,JSON.stringify(d));localStorage.setItem(cacheTime,String(Date.now()));showMiniWeather(d);}).catch(function(){});}function showMiniWeather(d){var el=document.getElementById('weather-mini');if(!el||!d.current_condition)return;var c=d.current_condition[0];var codes={113:'\u2600\uFE0F',116:'\u26C5',119:'\u2601\uFE0F',122:'\u2601\uFE0F',176:'\uD83C\uDF26\uFE0F',200:'\u26C8\uFE0F',227:'\uD83C\uDF28\uFE0F',266:'\uD83C\uDF27\uFE0F',296:'\uD83C\uDF27\uFE0F',302:'\uD83C\uDF27\uFE0F',332:'\u2744\uFE0F'};var emoji=codes[parseInt(c.weatherCode)]||'\uD83C\uDF24\uFE0F';var area=d.nearest_area?d.nearest_area[0].areaName[0].value:'';el.innerHTML=emoji+' '+c.temp_C+'\u00B0C <span style="color:#bbb;font-size:10px;">'+area+'</span>';}})();</script>
+<script>(function(){var WCE={113:'☀️',116:'⛅',119:'☁️',122:'☁️',143:'🌫️',176:'🌦️',200:'⛈️',227:'🌨️',230:'❄️',248:'🌫️',260:'🌫️',263:'🌦️',266:'🌧️',293:'🌧️',296:'🌧️',299:'🌧️',302:'🌧️',305:'🌧️',308:'🌧️',311:'🌧️',314:'🌧️',317:'🌨️',320:'🌨️',323:'🌨️',326:'🌨️',329:'❄️',332:'❄️',335:'❄️',338:'❄️',350:'🌧️',353:'🌦️',356:'🌧️',359:'🌧️',362:'🌨️',365:'🌨️',368:'🌨️',371:'❄️',374:'🌨️',377:'🌨️',386:'⛈️',389:'⛈️',392:'⛈️',395:'❄️'};var DN=['Ne','Po','Út','St','Čt','Pá','So'];var ck='ledshopik_weather',ct='ledshopik_weather_time';var cached=localStorage.getItem(ck),ctime=localStorage.getItem(ct);if(cached&&ctime&&Date.now()-parseInt(ctime)<1800000){try{renderW(JSON.parse(cached));}catch(e){}return;}if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){doFetch(p.coords.latitude+','+p.coords.longitude);},function(){doFetch('Ostrava');},{timeout:5000,maximumAge:600000});}else{doFetch('Ostrava');}function doFetch(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1').then(function(r){return r.json()}).then(function(d){localStorage.setItem(ck,JSON.stringify(d));localStorage.setItem(ct,String(Date.now()));renderW(d);}).catch(function(){});}function renderW(d){var el=document.getElementById('weather-widget');if(!el||!d||!d.current_condition||!d.current_condition[0])return;var c=d.current_condition[0];var emoji=WCE[Number(c.weatherCode)]||'🌤️';var desc=(c.lang_cs&&c.lang_cs[0]?c.lang_cs[0].value:(c.weatherDesc&&c.weatherDesc[0]?c.weatherDesc[0].value:''));var city=d.nearest_area?d.nearest_area[0].areaName[0].value:'';var fc='';if(d.weather){d.weather.slice(0,3).forEach(function(day,i){var dt=new Date(day.date+'T00:00:00');var dn=i===0?'Dnes':DN[dt.getDay()];var fCode=Number(day.hourly&&day.hourly[4]?day.hourly[4].weatherCode:0);fc+='<div class="weather-fc-day"><div class="fc-name">'+dn+'</div><div class="fc-icon">'+(WCE[fCode]||'🌤️')+'</div><div class="fc-temp">'+day.maxtempC+'°</div></div>';});}el.innerHTML='<div class="weather-now"><span class="w-icon">'+emoji+'</span><div><div class="w-temp">'+c.temp_C+'°C</div><div class="w-desc">'+desc+(city?' · '+city:'')+'</div></div></div><div class="weather-forecast">'+fc+'</div>';}})();</script>
 </body>
 </html>

@@ -277,27 +277,39 @@
   #sestavy-total-row .label { font-size: 12px; letter-spacing: .1em; color: #aaa; }
   #sestavy-total-row .value { font-size: 22px; font-weight: 800; color: #e2b830; }
   #sestavy-empty { padding: 20px; text-align: center; color: #bbb; font-size: 13px; background: #fff; border: 2px solid #e8e4dc; border-radius: 4px; }
+
+/* Shared: Weather + Team bar */
+.weather-widget { display:flex; align-items:center; gap:10px; margin-left:12px; }
+.weather-now { display:flex; align-items:center; gap:6px; }
+.weather-now .w-icon { font-size:22px; line-height:1; }
+.weather-now .w-temp { font-size:20px; font-weight:900; color:#1a1a1a; line-height:1; }
+.weather-now .w-desc { font-size:9px; color:#888; letter-spacing:.05em; }
+.weather-forecast { display:flex; gap:8px; margin-left:6px; }
+.weather-fc-day { text-align:center; }
+.weather-fc-day .fc-name { font-size:8px; color:#888; text-transform:uppercase; letter-spacing:.05em; }
+.weather-fc-day .fc-icon { font-size:14px; line-height:1.2; }
+.weather-fc-day .fc-temp { font-size:10px; font-weight:700; color:#1a1a1a; }
 </style>
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script>
 </head>
 <body>
 <style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
 <script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'}}).then(r=>r.json()).then(j=>{const d=Array.isArray(j)?j:(j.data||[]);const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
-<div id="header">
+<div id="header" style="background:#fff;border-bottom:1px solid #e8e4dc;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
   <div style="display:flex;align-items:center;gap:16px;">
-    <div class="header-accent"></div>
-    <div class="header-title-wrap">
-      <div class="header-eyebrow">LEDshopik &middot; Systém</div>
-      <div class="header-title">PROFILY</div>
+    <div class="header-accent" style="width:4px;height:36px;background:#e2b830;border-radius:2px;flex-shrink:0;"></div>
+    <div>
+      <div style="font-size:9px;letter-spacing:.3em;color:#888;text-transform:uppercase;margin-bottom:2px;">LEDshopik &middot; Systém</div>
+      <div style="font-size:22px;font-weight:900;letter-spacing:.04em;color:#1a1a1a;line-height:1;">PROFILY</div>
     </div>
-    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;transition:all .15s;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
+    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;flex-shrink:0;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
   </div>
   <div id="team-bar" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;"></div>
   <div style="display:flex;align-items:center;gap:20px;">
-    <div id="weather-mini" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888;"></div>
-    <div class="header-date">
-      <div class="day" id="hdr-day">&mdash;</div>
-      <div class="month" id="hdr-month">&mdash;</div>
+    <div id="weather-widget" class="weather-widget"></div>
+    <div style="text-align:right;">
+      <div id="hdr-day" style="font-size:24px;font-weight:900;color:#e2b830;line-height:1;">—</div>
+      <div id="hdr-month" style="font-size:10px;color:#888;letter-spacing:.15em;text-transform:uppercase;margin-top:2px;">—</div>
     </div>
   </div>
 </div>
@@ -943,6 +955,17 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
 (function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
 </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-sestavy_profily').on('postgres_changes',{event:'*',schema:'public',table:'sestavy_profily'},function(){console.log('RT:sestavy_profily');if(typeof loadSestavy==='function')loadSestavy();}).subscribe();})();</script>
-<script>(function(){var cacheKey='ledshopik_weather',cacheTime='ledshopik_weather_time';var cached=localStorage.getItem(cacheKey),ct=localStorage.getItem(cacheTime);if(cached&&ct&&Date.now()-parseInt(ct)<1800000){try{var d=JSON.parse(cached);showMiniWeather(d);}catch(e){}return;}var loc='Ostrava';if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(pos){fetchWeather(pos.coords.latitude+','+pos.coords.longitude);},function(){fetchWeather(loc);},{timeout:5000,maximumAge:600000});}else{fetchWeather(loc);}function fetchWeather(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1').then(function(r){return r.json()}).then(function(d){localStorage.setItem(cacheKey,JSON.stringify(d));localStorage.setItem(cacheTime,String(Date.now()));showMiniWeather(d);}).catch(function(){});}function showMiniWeather(d){var el=document.getElementById('weather-mini');if(!el||!d.current_condition)return;var c=d.current_condition[0];var codes={113:'\u2600\uFE0F',116:'\u26C5',119:'\u2601\uFE0F',122:'\u2601\uFE0F',176:'\uD83C\uDF26\uFE0F',200:'\u26C8\uFE0F',227:'\uD83C\uDF28\uFE0F',266:'\uD83C\uDF27\uFE0F',296:'\uD83C\uDF27\uFE0F',302:'\uD83C\uDF27\uFE0F',332:'\u2744\uFE0F'};var emoji=codes[parseInt(c.weatherCode)]||'\uD83C\uDF24\uFE0F';var area=d.nearest_area?d.nearest_area[0].areaName[0].value:'';el.innerHTML=emoji+' '+c.temp_C+'\u00B0C <span style="color:#bbb;font-size:10px;">'+area+'</span>';}})();</script>
+
+<script>(function(){
+var WCE={113:'☀️',116:'⛅',119:'☁️',122:'☁️',143:'🌫️',176:'🌦️',200:'⛈️',227:'🌨️',230:'❄️',248:'🌫️',260:'🌫️',263:'🌦️',266:'🌧️',293:'🌧️',296:'🌧️',299:'🌧️',302:'🌧️',305:'🌧️',308:'🌧️',311:'🌧️',314:'🌧️',317:'🌨️',320:'🌨️',323:'🌨️',326:'🌨️',329:'❄️',332:'❄️',335:'❄️',338:'❄️',350:'🌧️',353:'🌦️',356:'🌧️',359:'🌧️',362:'🌨️',365:'🌨️',368:'🌨️',371:'❄️',374:'🌨️',377:'🌨️',386:'⛈️',389:'⛈️',392:'⛈️',395:'❄️'};
+var DN=['Ne','Po','Út','St','Čt','Pá','So'];
+var ck='ledshopik_weather',ct='ledshopik_weather_time';
+var cached=localStorage.getItem(ck),ctime=localStorage.getItem(ct);
+if(cached&&ctime&&Date.now()-parseInt(ctime)<1800000){try{renderW(JSON.parse(cached));}catch(e){}return;}
+if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){doFetch(p.coords.latitude+','+p.coords.longitude);},function(){doFetch('Ostrava');},{timeout:5000,maximumAge:600000});}else{doFetch('Ostrava');}
+function doFetch(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1').then(function(r){return r.json()}).then(function(d){localStorage.setItem(ck,JSON.stringify(d));localStorage.setItem(ct,String(Date.now()));renderW(d);}).catch(function(){});}
+function renderW(d){var el=document.getElementById('weather-widget');if(!el||!d||!d.current_condition||!d.current_condition[0])return;var c=d.current_condition[0];var emoji=WCE[Number(c.weatherCode)]||'🌤️';var desc=(c.lang_cs&&c.lang_cs[0]?c.lang_cs[0].value:(c.weatherDesc&&c.weatherDesc[0]?c.weatherDesc[0].value:''));var city=d.nearest_area?d.nearest_area[0].areaName[0].value:'';var fc='';if(d.weather){d.weather.slice(0,3).forEach(function(day,i){var dt=new Date(day.date+'T00:00:00');var dn=i===0?'Dnes':DN[dt.getDay()];var fCode=Number(day.hourly&&day.hourly[4]?day.hourly[4].weatherCode:0);fc+='<div class="weather-fc-day"><div class="fc-name">'+dn+'</div><div class="fc-icon">'+(WCE[fCode]||'🌤️')+'</div><div class="fc-temp">'+day.maxtempC+'°</div></div>';});}el.innerHTML='<div class="weather-now"><span class="w-icon">'+emoji+'</span><div><div class="w-temp">'+c.temp_C+'°C</div><div class="w-desc">'+desc+(city?' · '+city:'')+'</div></div></div><div class="weather-forecast">'+fc+'</div>';}
+})();</script>
+<script>(function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})()</script>
 </body>
 </html>
