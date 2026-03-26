@@ -1076,10 +1076,10 @@ async function importFromEshop() {
     var lm = allText.match(/(\d+(?:[.,]\d+)?)\s*lm\s*(?:\/\s*m|na\s*metr)/i) || allText.match(/(\d+(?:[.,]\d+)?)\s*lm/i);
     if (lm) p.lumen = parseFloat(lm[1].replace(',','.'));
 
-    // CCT — from name pipes, then body, deduplicated
-    var cctRange = allText.match(/(\d{4})\s*[-–]\s*(\d{4,5})\s*K/);
-    if (cctRange) { p.cct = cctRange[1] + '-' + cctRange[2] + 'K'; }
-    else { var cctAll = allText.match(/(\d{4,5})\s*K/g); if (cctAll) { var unique = [...new Set(cctAll.map(function(m){return m.trim()}))]; p.cct = unique.join(', '); } }
+    // CCT — detect range first (2000K-6500K or 2000-6500K), then individual values
+    var cctRange = allText.match(/(\d{4})\s*K?\s*[-–]\s*(\d{4,5})\s*K/);
+    if (cctRange) { p.cct = cctRange[1] + 'K-' + cctRange[2] + 'K'; }
+    else { var cctAll = allText.match(/(\d{4,5})\s*K/g); if (cctAll) { var unique = [...new Set(cctAll.map(function(m){return m.trim().replace(/\s/g,'')}))]; if (unique.length === 2) { var nums = unique.map(function(s){return parseInt(s)}).sort(function(a,b){return a-b}); p.cct = nums[0]+'K-'+nums[1]+'K'; } else { p.cct = unique.join(', '); } } }
 
     // CRI
     var criM = allText.match(/CRI[:\s>]*(\d+)/i) || allText.match(/Ra[:\s>]*(\d+)/i);
