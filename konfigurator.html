@@ -235,7 +235,8 @@
     <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;transition:all .15s;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
   </div>
   <div id="team-bar" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;"></div>
-  <div style="display:flex;align-items:center;gap:16px;">
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div id="weather-mini" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888;"></div>
     <div class="header-date">
       <div class="day" id="hdr-day">&mdash;</div>
       <div class="month" id="hdr-month">&mdash;</div>
@@ -643,5 +644,7 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
 })();
 
 (function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
-</script></body>
+</script>
+<script>(function(){var cacheKey='ledshopik_weather',cacheTime='ledshopik_weather_time';var cached=localStorage.getItem(cacheKey),ct=localStorage.getItem(cacheTime);if(cached&&ct&&Date.now()-parseInt(ct)<1800000){try{var d=JSON.parse(cached);showMiniWeather(d);}catch(e){}return;}var loc='Ostrava';if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(pos){fetchWeather(pos.coords.latitude+','+pos.coords.longitude);},function(){fetchWeather(loc);},{timeout:5000,maximumAge:600000});}else{fetchWeather(loc);}function fetchWeather(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1').then(function(r){return r.json()}).then(function(d){localStorage.setItem(cacheKey,JSON.stringify(d));localStorage.setItem(cacheTime,String(Date.now()));showMiniWeather(d);}).catch(function(){});}function showMiniWeather(d){var el=document.getElementById('weather-mini');if(!el||!d.current_condition)return;var c=d.current_condition[0];var codes={113:'\u2600\uFE0F',116:'\u26C5',119:'\u2601\uFE0F',122:'\u2601\uFE0F',176:'\uD83C\uDF26\uFE0F',200:'\u26C8\uFE0F',227:'\uD83C\uDF28\uFE0F',266:'\uD83C\uDF27\uFE0F',296:'\uD83C\uDF27\uFE0F',302:'\uD83C\uDF27\uFE0F',332:'\u2744\uFE0F'};var emoji=codes[parseInt(c.weatherCode)]||'\uD83C\uDF24\uFE0F';var area=d.nearest_area?d.nearest_area[0].areaName[0].value:'';el.innerHTML=emoji+' '+c.temp_C+'\u00B0C <span style="color:#bbb;font-size:10px;">'+area+'</span>';}})();</script>
+</body>
 </html>
