@@ -835,6 +835,15 @@ async function saveRecord(){
         })});
       } catch(emailErr){ console.warn('Email notification failed:',emailErr); }
     }
+    // Telegram notifikace Erikovi při nové reklamaci
+    if(!isEdit){
+      try {
+        const tgToken='8732172656:AAEZcCL3DKV7kXHo1VG_RTDCRfTI9hD6sqU';
+        const erikChatId='7152131081';
+        const tgText='🔴 *Nová reklamace*\n\nObj. č.: '+(rec.obj||'—')+'\nZákazník: '+(rec.zakaznik||'—')+'\nPopis: '+(rec.popis||'—').substring(0,100)+'\nZadal: '+(rec.zadal||'—');
+        fetch('https://api.telegram.org/bot'+tgToken+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:erikChatId,text:tgText,parse_mode:'Markdown'})}).catch(function(){});
+      } catch(tgErr){}
+    }
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba při ukládání: '+e.message); }
