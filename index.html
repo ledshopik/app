@@ -346,21 +346,68 @@ option, datalist option { color: #333; background: #fff; }
   .modules-grid {
     grid-template-columns: 1fr 1fr !important;
   }
+  /* Calendar */
+  .cal-header-row {
+    flex-wrap: wrap !important;
+    padding: 8px 8px !important;
+    gap: 4px !important;
+  }
+  .cal-header-row > div {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+  }
+  .cal-header-row div[style*="gap:10px"],
+  .cal-header-row div[style*="gap:14px"] {
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+  }
+  .cal-header-row div[style*="font-size:9px"] {
+    font-size: 7px !important;
+  }
   .cal-grid-wrap {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    padding: 8px 10px !important;
+    overflow-x: hidden !important;
+    padding: 4px 4px !important;
+  }
+  .cal-weekdays {
+    font-size: 8px !important;
   }
   .cal-day {
-    min-height: 70px !important;
-    padding: 3px 4px !important;
-    font-size: 10px !important;
+    min-height: 50px !important;
+    padding: 2px 2px !important;
+    font-size: 9px !important;
   }
   .cal-ev {
     font-size: 7px !important;
     padding: 1px 2px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
   }
   .dn {
+    font-size: 10px !important;
+  }
+  .cal-nav button {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+  }
+  /* Task filters */
+  .task-section-header {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    padding: 8px 12px !important;
+  }
+  .task-filter-btn {
+    padding: 2px 8px !important;
+    font-size: 8px !important;
+  }
+  .task-add-input {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  .task-item {
+    padding: 8px 10px !important;
+  }
+  .task-text {
     font-size: 11px !important;
   }
   #task-modal-overlay {
