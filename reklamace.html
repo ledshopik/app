@@ -810,7 +810,7 @@ async function saveRecord(){
     if(!isEdit && rec.notifikovat==='ano' && rec.email){
       try {
         const makeWebhook='https://hook.eu1.make.com/lertvmhri71fvkr87sra6jy7haiuvbeq';
-        await fetch(makeWebhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        fetch(makeWebhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
           to:rec.email,
           cc:'reklamace@ledshopik.cz',
           subject:'Potvrzení přijetí reklamace z objednávky č. '+(rec.obj||'—')+' — LEDshopik.cz',
@@ -818,7 +818,7 @@ async function saveRecord(){
           zakaznik:rec.zakaznik||'—',
           datum:rec.datum_nahlaseni||new Date().toLocaleDateString('cs-CZ'),
           popis:rec.popis||'—'
-        })});
+        })}).catch(function(){});
       } catch(emailErr){ console.warn('Email notification failed:',emailErr); }
     }
     // Telegram notifikace Erikovi při nové reklamaci
