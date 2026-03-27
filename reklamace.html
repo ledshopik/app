@@ -809,35 +809,15 @@ async function saveRecord(){
     // Email notification to customer
     if(!isEdit && rec.notifikovat==='ano' && rec.email){
       try {
-        const emailUrl=RAILWAY_API+'/email/send';
-        const emailSubject='Potvrzení přijetí reklamace z objednávky č. '+(rec.obj||'—')+' — LEDshopik.cz';
-        const emailHtml=`<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a;">
-          <div style="background:#e2b830;padding:16px 24px;">
-            <h2 style="margin:0;font-size:18px;color:#1a1a1a;font-weight:800;">LEDshopik.cz</h2>
-            <p style="margin:4px 0 0;font-size:11px;color:#555;">Servisní oddělení</p>
-          </div>
-          <div style="padding:24px;border:1px solid #e8e4dc;border-top:none;background:#fff;">
-            <p style="font-size:14px;margin:0 0 16px;">Vážený zákazníku,</p>
-            <p style="font-size:14px;margin:0 0 20px;">potvrzujeme přijetí Vaší reklamace.</p>
-            <table style="width:100%;border-collapse:collapse;margin:0 0 20px;font-size:13px;">
-              <tr style="background:#f8f6f0;"><td style="padding:10px 14px;font-weight:700;border:1px solid #e8e4dc;width:180px;">Číslo objednávky</td><td style="padding:10px 14px;border:1px solid #e8e4dc;">${rec.obj||'—'}</td></tr>
-              <tr><td style="padding:10px 14px;font-weight:700;border:1px solid #e8e4dc;">Zákazník</td><td style="padding:10px 14px;border:1px solid #e8e4dc;">${rec.zakaznik||'—'}</td></tr>
-              <tr style="background:#f8f6f0;"><td style="padding:10px 14px;font-weight:700;border:1px solid #e8e4dc;">Datum přijetí reklamace</td><td style="padding:10px 14px;border:1px solid #e8e4dc;">${rec.datum_nahlaseni||new Date().toLocaleDateString('cs-CZ')}</td></tr>
-              <tr><td style="padding:10px 14px;font-weight:700;border:1px solid #e8e4dc;">Popis závady</td><td style="padding:10px 14px;border:1px solid #e8e4dc;">${rec.popis||'—'}</td></tr>
-            </table>
-            <p style="font-size:13px;margin:0 0 20px;">O průběhu řešení reklamace Vás budeme informovat.</p>
-            <p style="font-size:13px;margin:0 0 6px;">V případě dotazů nás kontaktujte na <a href="mailto:reklamace@ledshopik.cz" style="color:#e2b830;font-weight:700;">reklamace@ledshopik.cz</a> nebo tel. <strong>+420 778 519 348</strong>.</p>
-            <hr style="border:none;border-top:1px solid #e8e4dc;margin:20px 0;">
-            <p style="font-size:12px;margin:0 0 2px;">S pozdravem,</p>
-            <p style="font-size:12px;font-weight:700;margin:0 0 2px;">Servisní oddělení LEDshopik.cz</p>
-            <p style="font-size:11px;color:#999;margin:0;">BE-LIGHT, s.r.o. · Nové sady 988/2, 602 00 Brno · www.ledshopik.cz</p>
-          </div>
-        </div>`;
-        await fetch(emailUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-          to:rec.email+',reklamace@ledshopik.cz',
-          from:'"LEDshopik Reklamace" <reklamace@ledshopik.cz>',
-          subject:emailSubject,
-          html:emailHtml
+        const makeWebhook='https://hook.eu1.make.com/lertvmhri71fvkr87sra6jy7haiuvbeq';
+        await fetch(makeWebhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+          to:rec.email,
+          cc:'reklamace@ledshopik.cz',
+          subject:'Potvrzení přijetí reklamace z objednávky č. '+(rec.obj||'—')+' — LEDshopik.cz',
+          obj:rec.obj||'—',
+          zakaznik:rec.zakaznik||'—',
+          datum:rec.datum_nahlaseni||new Date().toLocaleDateString('cs-CZ'),
+          popis:rec.popis||'—'
         })});
       } catch(emailErr){ console.warn('Email notification failed:',emailErr); }
     }
