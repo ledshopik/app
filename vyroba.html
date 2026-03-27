@@ -332,7 +332,12 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
     padding: 12px 16px !important;
   }
   #modal-footer {
-    padding: 10px 16px !important;
+    padding: 10px 16px calc(16px + env(safe-area-inset-bottom, 20px)) 16px !important;
+    background: #fff !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 10 !important;
+    border-top: 1px solid #e8e4dc !important;
   }
 }
 
