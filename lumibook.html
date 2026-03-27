@@ -488,13 +488,18 @@ a{color:var(--accent);text-decoration:none}
   .card {
     width: 100% !important;
   }
-  .modal, [id*="modal"]:not([id*="overlay"]) {
-    width: 95vw !important;
-    max-width: 95vw !important;
-    margin: 10px auto !important;
+  .modal-bg {
+    padding: 0 !important;
+    align-items: flex-start !important;
   }
-  .modal-body, #modal-body {
-    max-height: 60vh !important;
+  .modal-bg > div {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    overflow-y: auto !important;
   }
 }
 
@@ -508,13 +513,6 @@ a{color:var(--accent);text-decoration:none}
   }
   table {
     min-width: auto !important;
-  }
-  .modal, [id*="modal"]:not([id*="overlay"]) {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-    min-height: 100vh;
   }
 }
 </style>
