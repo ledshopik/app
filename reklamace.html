@@ -1164,6 +1164,58 @@ setInterval(()=>{
 }, 10000);
 document.getElementById('user-bar-name').textContent=localStorage.getItem('ledshopik_user')||'';
 function logout(){localStorage.removeItem('ledshopik_user');window.location.href='login.html';}
+
+// ── Telegram deadline notifikace (frontend) ──────────────────────────────────
+const TG_BOT='8732172656:AAEZcCL3DKV7kXHo1VG_RTDCRfTI9hD6sqU';
+const TG_ERIK='7152131081';
+
+function checkDeadlines(){
+  if(!data||!data.length) return;
+  const now=new Date();
+  const today=now.toISOString().slice(0,10);
+  const sentKey='tg_rekl_sent_'+today;
+  if(localStorage.getItem(sentKey)) return; // max 1x denně
+
+  const alerts7=[];
+  const alerts10=[];
+
+  data.forEach(function(r){
+    if(!r.datum_deadline||r.stav==='Vyřízené'||r.stav==='Zamítnuto') return;
+    var dl=new Date(r.datum_deadline);
+    var diff=Math.ceil((dl-now)/(24*60*60*1000));
+
+    // 7 dní před deadline — všechny reklamace
+    if(diff>0&&diff<=7){
+      alerts7.push('• *'+( r.obj||r.id)+'* — '+(r.zakaznik||'?')+' — zbývá '+diff+' dní');
+    }
+    // 10 dní před deadline — reklamace u dodavatele
+    if(r.stav==='U dodavatele'&&diff>0&&diff<=10){
+      alerts10.push('• *'+(r.obj||r.id)+'* — '+(r.zakaznik||'?')+' — zbývá '+diff+' dní');
+    }
+  });
+
+  if(alerts7.length===0&&alerts10.length===0) return;
+
+  var msg='';
+  if(alerts7.length) msg+='⚠️ *Blížící se deadliny reklamací (7 dní)*\n\n'+alerts7.join('\n')+'\n\n';
+  if(alerts10.length) msg+='📦 *Reklamace u dodavatele — deadline do 10 dní*\n\n'+alerts10.join('\n');
+
+  fetch('https://api.telegram.org/bot'+TG_BOT+'/sendMessage',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({chat_id:TG_ERIK,text:msg.trim(),parse_mode:'Markdown'})
+  }).then(function(){
+    localStorage.setItem(sentKey,'1');
+    console.log('TG deadline notifikace odeslána');
+  }).catch(function(e){console.error('TG error:',e);});
+}
+
+// Check po načtení dat
+var _origLoadData=loadData;
+loadData=async function(){
+  await _origLoadData();
+  checkDeadlines();
+};
 </script>
 <script>
 (function(){
