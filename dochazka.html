@@ -828,7 +828,7 @@ function renderCalendar(){
     if(evs.length>3) evHtml+=`<div style="font-size:8px;color:#888;">+${evs.length-3}</div>`;
     const hol = isHoliday(cdStr);
     const holName = hol ? getHolidayName(cdStr) : '';
-    html+=`<div class="cal-day${other?' other':''}${isT?' today':''}${(isSat||isSun)?' weekend':''}${hol?' holiday':''}">
+    html+=`<div class="cal-day${other?' other':''}${isT?' today':''}${(isSat||isSun)?' weekend':''}${hol?' holiday':''}" onclick="openModalForDate('${cdStr}')" style="cursor:pointer;">
       ${holName?`<div class="holiday-name">${holName}</div>`:''}
       <div class="dn">${dn}</div>${evHtml}
     </div>`;
@@ -886,6 +886,12 @@ function calcDays(){
   }
 }
 
+function openModalForDate(dateStr){
+  openModal(null);
+  document.getElementById('f-datum-od').value=dateStr;
+  document.getElementById('f-datum-do').value=dateStr;
+  calcDays();
+}
 function openModal(id){
   const r=id?data.find(x=>x.id===String(id)):null;
   editId=r?String(r.id):null;

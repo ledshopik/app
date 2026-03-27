@@ -164,6 +164,7 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
 .ev-hotovo    { background: #d0e8d0; color: #40a050; }
 .ev-vydano    { background: #e0e0e0; color: #999; }
 .ev-urgent    { background: #f0c8c8; color: #e04040; }
+.ev-instalace { background: #fdf4d8; color: #b08820; font-style: italic; }
 .cal-day.holiday { background: #fff0f0; }
 .cal-day.weekend.holiday { background: #f8f0f0; }
 .cal-day.holiday .day-num { color: #c05050; font-weight: 900; }
@@ -893,13 +894,35 @@ function getHolidayName(ds) {
   return '';
 }
 
+var instalaceData=[];
+(function loadInstalace(){
+  fetch(SUPABASE_URL+'/rest/v1/instalace?select=*',{headers:SB_HEADERS})
+    .then(function(r){return r.json()})
+    .then(function(j){instalaceData=Array.isArray(j)?j:[];renderCalendar();})
+    .catch(function(){});
+})();
 function getCalEvents(){
-  return data.filter(function(r){ return r.deadline && r.deadline!==''; }).map(function(r){
+  var evs=data.filter(function(r){ return r.deadline && r.deadline!==''; }).map(function(r){
     var d=toInputDate(r.deadline);
     if(!d) return null;
     var evClass = r.priorita==='Urgentní' ? 'ev-urgent' : (EV_CLASS_VYR[r.stav]||'');
-    return {id:r.id, obj:r.obj||'', zakaznik:r.zakaznik||'', stav:r.stav||'', priorita:r.priorita||'', date:d, evClass:evClass};
+    return {id:r.id, obj:r.obj||'', zakaznik:r.zakaznik||'', stav:r.stav||'', priorita:r.priorita||'', date:d, evClass:evClass, typ:'VYR'};
   }).filter(Boolean);
+  // Add instalace/montáže events
+  instalaceData.forEach(function(r){
+    if(!r.datum_od) return;
+    var od=toInputDate(r.datum_od);
+    var doo=r.datum_do?toInputDate(r.datum_do):od;
+    if(!od) return;
+    var d=new Date(od+'T00:00:00');
+    var end=new Date((doo||od)+'T00:00:00');
+    while(d<=end){
+      var ds=dateStr(d);
+      evs.push({id:'ins-'+r.id, obj:r.obj||'', zakaznik:r.misto||r.zakaznik||'', stav:r.status||'', priorita:'', date:ds, evClass:'ev-instalace', typ:'INS', technik:r.technik||''});
+      d.setDate(d.getDate()+1);
+    }
+  });
+  return evs;
 }
 
 function renderCalendar(){
@@ -923,8 +946,11 @@ function renderCalendar(){
     var holName=hol?getHolidayName(cdStr):'';
     var evs=events.filter(function(ev){ return ev.date===cdStr; });
     var evHtml=evs.slice(0,3).map(function(ev){
-      var label=(ev.obj?ev.obj+' ':'')+(ev.zakaznik||'?');
-      return '<div class="cal-event '+ev.evClass+'" onclick="event.stopPropagation();openModal(\''+ev.id+'\')" title="'+label+' ('+ev.stav+')">'+label+'</div>';
+      var prefix=ev.typ==='INS'?'🔧 ':'';
+      var label=prefix+(ev.obj?ev.obj+' ':'')+(ev.zakaznik||'?');
+      var titleText=label+' ('+(ev.typ==='INS'?'Montáž'+(ev.technik?' · '+ev.technik:''):ev.stav)+')';
+      var onclick=ev.typ==='INS'?'':'event.stopPropagation();openModal(\''+ev.id+'\')';
+      return '<div class="cal-event '+ev.evClass+'" '+(onclick?'onclick="'+onclick+'"':'')+' title="'+titleText+'">'+label+'</div>';
     }).join('');
     if(evs.length>3) evHtml+='<div style="font-size:9px;color:#888;padding:1px 4px;">+'+String(evs.length-3)+' další</div>';
     html+='<div class="cal-day'+(other?' other-month':'')+(isT?' today':'')+(evs.length?' has-event':'')+(hol?' holiday':'')+'" '+((isSat||isSun)&&!hol?'style="background:#f8f6f0;"':'')+'>';
