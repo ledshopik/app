@@ -807,7 +807,7 @@ async function saveRecord(){
       await autoCreateDod(rec);
     }
     // Email notification to customer
-    if(rec.notifikovat==='ano' && rec.email){
+    if(!isEdit && rec.notifikovat==='ano' && rec.email){
       try {
         const emailUrl=RAILWAY_API+'/email/send';
         const emailSubject='Potvrzení přijetí reklamace z objednávky č. '+(rec.obj||'—')+' — LEDshopik.cz';
