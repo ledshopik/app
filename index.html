@@ -346,13 +346,34 @@ option, datalist option { color: #333; background: #fff; }
   .modules-grid {
     grid-template-columns: 1fr 1fr !important;
   }
-  .modal, [id*="modal"]:not([id*="overlay"]) {
-    width: 95vw !important;
-    max-width: 95vw !important;
-    margin: 10px auto !important;
+  .cal-grid-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 8px 10px !important;
   }
-  .modal-body {
-    max-height: 60vh !important;
+  .cal-day {
+    min-height: 70px !important;
+    padding: 3px 4px !important;
+    font-size: 10px !important;
+  }
+  .cal-ev {
+    font-size: 7px !important;
+    padding: 1px 2px !important;
+  }
+  .dn {
+    font-size: 11px !important;
+  }
+  #task-modal-overlay {
+    padding: 0 !important;
+  }
+  #task-modal-overlay > div {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    overflow-y: auto !important;
   }
 }
 
@@ -376,13 +397,6 @@ option, datalist option { color: #333; background: #fff; }
   }
   table {
     min-width: auto !important;
-  }
-  .modal, [id*="modal"]:not([id*="overlay"]) {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-    min-height: 100vh;
   }
 }
 </style>
