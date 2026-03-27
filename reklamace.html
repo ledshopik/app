@@ -796,6 +796,7 @@ async function saveRecord(){
     reseni:document.getElementById('f-reseni').value.trim(),
     email:document.getElementById('f-email').value.trim(),
     notifikovat:document.getElementById('f-notifikovat').checked?'ano':'ne',
+    zadal:localStorage.getItem('ledshopik_user')||'',
   };
   closeModal();
   showSaving(isEdit?'Ukládám změny...':'Přidávám reklamaci...','Ukládám data');
