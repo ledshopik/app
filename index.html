@@ -1185,6 +1185,9 @@ async function saveTask(){
 
   if(!rec.text){ alert('Vyplň text úkolu'); return; }
 
+  const wasNew = !isEdit;
+  const oldPrirazeno = isEdit ? (dataUkoly.find(t=>t.id===id)||{}).prirazeno_komu : null;
+
   if(isEdit){
     const idx = dataUkoly.findIndex(t=>t.id===id);
     if(idx>=0) dataUkoly[idx] = rec;
@@ -1198,6 +1201,27 @@ async function saveTask(){
   try {
     if(isEdit) await sbUpdate('ukoly',rec.id,rec); else await sbInsert('ukoly',rec);
   } catch(e){ alert('Chyba: '+e.message); }
+
+  // Telegram notifikace při přiřazení úkolu
+  const TG_BOT_UKOLY = '8732172656:AAEZcCL3DKV7kXHo1VG_RTDCRfTI9hD6sqU';
+  const TG_CHAT_IDS = {
+    'Ondra': '8703966707',
+    'Erik': '7152131081',
+    'Michal': '8370547459'
+  };
+  const assignee = rec.prirazeno_komu;
+  const assigneeChatId = TG_CHAT_IDS[assignee];
+  const isNewAssignment = wasNew || (isEdit && oldPrirazeno !== assignee);
+  if(assigneeChatId && assignee !== user && isNewAssignment){
+    const terminTxt = rec.termin ? '\nTermín: '+rec.termin : '';
+    const prioritaMap = {normalni:'normální',vysoka:'🔴 vysoká',nizka:'nízká'};
+    const priTxt = rec.priorita ? '\nPriorita: '+(prioritaMap[rec.priorita]||rec.priorita) : '';
+    const tgText = '📋 *Nový úkol pro tebe*\n\n'+rec.text+priTxt+terminTxt+'\n\nZadal: '+user;
+    fetch('https://api.telegram.org/bot'+TG_BOT_UKOLY+'/sendMessage',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:assigneeChatId,text:tgText,parse_mode:'Markdown'})
+    }).catch(function(){});
+  }
 }
 
 function openTaskModal(id){
