@@ -575,6 +575,12 @@ const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
 const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 const TABLE = 'vyroba';
+const TG_BOT = '8732172656:AAEZcCL3DKV7kXHo1VG_RTDCRfTI9hD6sqU';
+const TG_CHAT_IDS = {'Ondra':'8703966707','Erik':'7152131081','Michal':'8370547459','BeLight Warehouse':'8722260762'};
+function sendTg(chatId,text){if(!chatId)return;fetch('https://api.telegram.org/bot'+TG_BOT+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chatId,text:text,parse_mode:'Markdown'})}).catch(()=>{});}
+function tgKey(prefix,id){return prefix+'_'+id+'_'+dateStr(today);}
+function tgSent(k){return!!localStorage.getItem(k);}
+function tgMark(k){localStorage.setItem(k,'1');}
 
 const STATUS_CLASS = {
   'Čeká na výrobu':                's-ceka',
@@ -623,6 +629,7 @@ async function loadData(){
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderTable();
     renderCalendar();
+    checkVyrobaDeadlines();
   } catch(e){ syncStatus('error','Chyba: '+e.message); }
 }
 
@@ -766,6 +773,7 @@ function hideSaving(){ document.getElementById('saving-overlay').classList.remov
 async function saveRecord(){
   console.log('saveRecord called, editId=',editId);
   const isEdit=!!editId;
+  const oldStav=editId?(data.find(x=>x.id===String(editId))?.stav||''):'';
   const currentId=editId?String(editId):String(Date.now());
   const rec={
     id:             currentId,
@@ -787,6 +795,15 @@ async function saveRecord(){
   showSaving(isEdit?'Ukládám změny...':'Přidávám zakázku...','Ukládám data');
   try {
     if(isEdit) await sbUpdate(currentId,rec); else await sbInsert(rec);
+    // Telegram: nová zakázka → technik
+    if(!isEdit && rec.technik){
+      const chatId=TG_CHAT_IDS[rec.technik];
+      if(chatId) sendTg(chatId,'🏭 *Nová výroba přiřazena*\n\nZakázka: *'+(rec.obj||'—')+'*\nZákazník: '+(rec.zakaznik||'—')+'\nDeadline: '+(rec.deadline?fmtDate(rec.deadline):'—')+'\nZadal: '+(rec.zadal||'—'));
+    }
+    // Telegram: stav → Hotovo → BeLight Warehouse
+    if(isEdit && rec.stav==='Hotovo' && oldStav!=='Hotovo'){
+      sendTg('8722260762','✅ *Výroba dokončena — Hotovo*\n\nZakázka: *'+(rec.obj||'—')+'*\nZákazník: '+(rec.zakaznik||'—')+'\nTechnik: '+(rec.technik||'—'));
+    }
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
@@ -798,12 +815,30 @@ async function deleteRecord(){
   showSaving('Mažu...','');
   try {
     await sbDelete(String(id));
+    // Vyčistit TG notifikace pro smazanou zakázku
+    Object.keys(localStorage).filter(k=>k.startsWith('vyr_dl_'+id+'_')).forEach(k=>localStorage.removeItem(k));
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
 }
 
-const ZAMESTNANCI = ['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];
+const ZAMESTNANCI = ['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve','BeLight Warehouse'];
+
+function checkVyrobaDeadlines(){
+  const ds=dateStr(today);
+  data.forEach(r=>{
+    if(r.stav==='Vydáno zákazníkovi'||r.stav==='Hotovo') return;
+    const d=toInputDate(r.deadline); if(!d) return;
+    const diff=Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
+    if(diff<0||diff>2) return;
+    const k=tgKey('vyr_dl',r.id);
+    if(tgSent(k)) return;
+    const chatId=TG_CHAT_IDS[r.technik]; if(!chatId) return;
+    const when=diff===0?'*DNES*':(diff+' dny/dní');
+    sendTg(chatId,'⏰ *Deadline výroby za '+when+'*\n\nZakázka: *'+(r.obj||'—')+'*\nZákazník: '+(r.zakaznik||'—')+'\nDeadline: '+fmtDate(r.deadline)+(r.priorita==='Urgentní'?'\n⚡ URGENTNÍ':''));
+    tgMark(k);
+  });
+}
 
 function getTel(jmeno){ return localStorage.getItem('tel_'+jmeno)||''; }
 function setTel(jmeno,tel){ localStorage.setItem('tel_'+jmeno,tel); }
@@ -813,6 +848,7 @@ function toggleNastaveni(){
   p.style.display=p.style.display==='none'?'block':'none';
   if(p.style.display==='block'){
     const hotovoChatIdEl=document.getElementById('hotovo_chat_id'); if(hotovoChatIdEl) hotovoChatIdEl.value=localStorage.getItem('hotovo_chat_id')||'';
+    const notifHourEl=document.getElementById('notif_hour'); if(notifHourEl) notifHourEl.value=localStorage.getItem('ledshopik_notif_hour')||'8';
     document.getElementById('tel-inputs').innerHTML=ZAMESTNANCI.map(z=>`
       <div>
         <div style="font-size:10px;color:#888;margin-bottom:4px;">${z}</div>
@@ -829,6 +865,8 @@ function saveNastaveniVyroba(){
   });
   const hotovoChatId=document.getElementById('hotovo_chat_id');
   if(hotovoChatId) localStorage.setItem('hotovo_chat_id',hotovoChatId.value.trim());
+  const notifHourEl=document.getElementById('notif_hour');
+  if(notifHourEl&&notifHourEl.value!=='') localStorage.setItem('ledshopik_notif_hour',notifHourEl.value);
   toggleNastaveni();
 }
 

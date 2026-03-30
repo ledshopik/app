@@ -1119,6 +1119,7 @@ function renderTasks(){
         +'<div style="display:flex;gap:5px;align-items:center;margin-top:3px;flex-wrap:wrap;">'
           +'<span class="task-type-tag '+typeCls+'">'+typeLabels[t.typ||'rychly']+'</span>'
           +(isAssigned?'<span style="font-size:9px;color:#6080c0;font-weight:600;">od '+t.uzivatel+'</span>':'')
+          +(t.uzivatel===user&&t.prirazeno_komu!==user?'<span style="font-size:9px;color:#e08030;font-weight:600;">pro '+t.prirazeno_komu+'</span>':'')
           +terminHtml
         +'</div>'
       +'</div>'
