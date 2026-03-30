@@ -824,7 +824,7 @@ function renderCalendar(){
     const cdStr=dateStr(cd);
     const isT=cdStr===dateStr(today),isSat=cd.getDay()===6,isSun=cd.getDay()===0,other=mo!==0;
     const evs=data.filter(r=>{ const od=toInputDate(r.datum_od),doo=toInputDate(r.datum_do); return od&&doo&&od<=cdStr&&cdStr<=doo; });
-    let evHtml=evs.slice(0,3).map(ev=>`<div class="cal-ev ${TYP_CAL[ev.typ]||''}" title="${ev.zamestnanec}">${ev.zamestnanec}</div>`).join('');
+    let evHtml=evs.slice(0,3).map(ev=>`<div class="cal-ev ${TYP_CAL[ev.typ]||''}" title="${ev.zamestnanec}" onclick="event.stopPropagation();openModal('${ev.id}')">${ev.zamestnanec}</div>`).join('');
     if(evs.length>3) evHtml+=`<div style="font-size:8px;color:#888;">+${evs.length-3}</div>`;
     const hol = isHoliday(cdStr);
     const holName = hol ? getHolidayName(cdStr) : '';
