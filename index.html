@@ -684,6 +684,7 @@ option, datalist option { color: #333; background: #fff; }
             <button class="task-filter-btn active" data-f="aktivni" onclick="filterTasks('aktivni')">Aktivní</button>
             <button class="task-filter-btn" data-f="hotovo" onclick="filterTasks('hotovo')">Hotové</button>
             <button class="task-filter-btn" data-f="vse" onclick="filterTasks('vse')">Vše</button>
+            <button id="btn-delete-done" onclick="deleteDoneTasks()" style="display:none;margin-left:4px;background:none;border:1px solid #f0c8c8;color:#c05050;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">🗑 Smazat vše</button>
           </div>
         </div>
         <div id="tasks-list"></div>
@@ -1068,6 +1069,19 @@ let taskFilter = 'aktivni';
 function filterTasks(f){
   taskFilter = f;
   document.querySelectorAll('.task-filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.f===f));
+  document.getElementById('btn-delete-done').style.display = f==='hotovo' ? 'inline-block' : 'none';
+  renderTasks();
+}
+
+async function deleteDoneTasks(){
+  const user = localStorage.getItem('ledshopik_user')||'';
+  const done = dataUkoly.filter(t => t.stav==='hotovo' && (t.uzivatel===user||t.prirazeno_komu===user));
+  if(!done.length){ alert('Žádné vyřízené úkoly.'); return; }
+  if(!confirm(`Smazat ${done.length} vyřízených úkolů?`)) return;
+  for(const t of done){
+    dataUkoly = dataUkoly.filter(x=>x.id!==t.id);
+    sbDelete('ukoly',t.id).catch(()=>{});
+  }
   renderTasks();
 }
 
