@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>LEDshopik — Přehled Telegram notifikací</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; }
+  h1 { font-size: 18px; font-weight: 700; letter-spacing: .1em; color: #f07030; border-bottom: 2px solid #f07030; padding-bottom: 8px; margin-bottom: 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #f4f2ed; padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #888; border-bottom: 2px solid #ddd; }
+  td { padding: 10px 12px; border-bottom: 1px solid #eee; vertical-align: top; }
+  tr:hover td { background: #fafaf6; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; }
+  .okamzite { background: #e0f0e0; color: #40a050; }
+  .cron { background: #fff0e0; color: #e08030; }
+  .presny { background: #e0eeff; color: #4070c0; }
+  .footer { margin-top: 32px; font-size: 11px; color: #aaa; }
+</style>
+</head>
+<body>
+<h1>LEDSHOPIK — PŘEHLED TELEGRAM NOTIFIKACÍ</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Co</th>
+      <th>Kdy</th>
+      <th>Typ</th>
+      <th>Komu</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Nová výroba přiřazena</td>
+      <td>Okamžitě při uložení</td>
+      <td><span class="badge okamzite">Okamžitě</span></td>
+      <td>Technik</td>
+    </tr>
+    <tr>
+      <td>Výroba — stav změněn na Hotovo</td>
+      <td>Okamžitě při uložení</td>
+      <td><span class="badge okamzite">Okamžitě</span></td>
+      <td>BeLight Warehouse</td>
+    </tr>
+    <tr>
+      <td>Výroba — deadline dnes nebo za 2 dny</td>
+      <td>Každý den v 8:00</td>
+      <td><span class="badge cron">Cron 8:00</span></td>
+      <td>Technik + Zadavatel</td>
+    </tr>
+    <tr>
+      <td>Instalace — dnes nebo za 2 dny</td>
+      <td>Každý den v 8:00</td>
+      <td><span class="badge cron">Cron 8:00</span></td>
+      <td>Technik + Zadavatel</td>
+    </tr>
+    <tr>
+      <td>Obhlídka — dnes nebo za 2 dny</td>
+      <td>Každý den v 8:00</td>
+      <td><span class="badge cron">Cron 8:00</span></td>
+      <td>Technik + Zadavatel</td>
+    </tr>
+    <tr>
+      <td>Reklamace — deadline do 7 dní</td>
+      <td>Každý den (Make.com)</td>
+      <td><span class="badge cron">Cron</span></td>
+      <td>Erik</td>
+    </tr>
+    <tr>
+      <td>Reklamace u dodavatele — deadline do 10 dní</td>
+      <td>Každý den (Make.com)</td>
+      <td><span class="badge cron">Cron</span></td>
+      <td>Erik</td>
+    </tr>
+    <tr>
+      <td>Nová reklamace</td>
+      <td>Okamžitě při uložení</td>
+      <td><span class="badge okamzite">Okamžitě</span></td>
+      <td>Erik</td>
+    </tr>
+    <tr>
+      <td>Úkol přiřazen jiné osobě</td>
+      <td>Okamžitě při uložení</td>
+      <td><span class="badge okamzite">Okamžitě</span></td>
+      <td>Příjemce úkolu</td>
+    </tr>
+    <tr>
+      <td>Upomínka úkolu</td>
+      <td>V nastavený čas (±1 min)</td>
+      <td><span class="badge presny">Přesný čas</span></td>
+      <td>Zadavatel úkolu</td>
+    </tr>
+  </tbody>
+</table>
+<div class="footer">
+  Telegram bot: @ledshopik_notifikace_bot &nbsp;|&nbsp;
+  Make.com scénáře: Ranní notifikace (8:00) + Notifikace reklamace &nbsp;|&nbsp;
+  Upomínky: Railway cron každou minutu
+</div>
+</body>
+</html>

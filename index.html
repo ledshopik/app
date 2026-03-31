@@ -1301,8 +1301,9 @@ async function loadWeather(){
     const cachedTime = Number(localStorage.getItem(cacheTimeKey)||0);
     let data;
     if(cached && (Date.now()-cachedTime < 30*60*1000)){
-      data = JSON.parse(cached);
-    } else {
+      try { const c=JSON.parse(cached); if(c&&c.current_condition&&c.current_condition[0]) data=c; } catch(e){}
+    }
+    if(!data) {
       // Geolokace → IP lokace → fallback Ostrava
       let location = '';
       try {
