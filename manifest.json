@@ -2,7 +2,7 @@
   "name": "LEDshopik Systém",
   "short_name": "LEDshopik",
   "description": "Interní systém LEDshopik",
-  "start_url": "/app/index.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#13151c",
   "theme_color": "#e2b830",
