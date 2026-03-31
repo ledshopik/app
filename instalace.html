@@ -91,7 +91,7 @@ tbody tr[data-status="Čeká na potvrzení"] td:first-child { border-left: 3px s
 .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
 .cal-weekday { text-align: center; font-size: 9px; letter-spacing: .1em; color: #888; padding: 4px 0; text-transform: uppercase; }
 .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.cal-day { min-height: 90px; background: #fff; padding: 6px 8px; position: relative; overflow: hidden; cursor: default; border-bottom:1px solid #ece8e0; border-right:1px solid #ece8e0; }
+.cal-day { min-height: 90px; background: #fff; padding: 6px 8px; position: relative; overflow: hidden; cursor: pointer; border-bottom:1px solid #ece8e0; border-right:1px solid #ece8e0; }
 .cal-day.other-month { opacity: .3; }
 .cal-day.today { outline: 1px solid #e2b830; }
 .cal-day.today .day-num { color: #e2b830; font-weight: 900; }
@@ -747,6 +747,7 @@ function renderTable(){
 
 function calNav(dir){ calMonth+=dir; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
 function calToday(){ calYear=today.getFullYear(); calMonth=today.getMonth(); renderCalendar(); }
+function openModalForDate(dateStr){ openModal(null); document.getElementById('f-datum').value=dateStr; }
 function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
 function easterDate(year) {
@@ -828,7 +829,7 @@ function renderCalendar(){
       return `<div class="cal-event ${EV_CLASS[ev.status]||''} ${cont?'ev-cont':''}" onclick="event.stopPropagation();openModal('${ev.id}')" title="${ev.obj} – ${ev.misto}">${cont?'↳ '+(ev.misto||ev.obj):`${ev.obj} ${ev.misto||''}`}</div>`;
     }).join('');
     if(evs.length>3) evHtml+=`<div style="font-size:9px;color:#888;padding:1px 4px;">+${evs.length-3} další</div>`;
-    html+=`<div class="cal-day${other?' other-month':''}${isT?' today':''}${evs.length?' has-event':''}${hol?' holiday':''}" ${(isSat||isSun)&&!hol?'style="background:#f8f6f0;"':''}>
+    html+=`<div class="cal-day${other?' other-month':''}${isT?' today':''}${evs.length?' has-event':''}${hol?' holiday':''}" onclick="openModalForDate('${cdStr}')" ${(isSat||isSun)&&!hol?'style="background:#f8f6f0;"':''}>
       ${holName?`<div class="holiday-name">${holName}</div>`:''}
       <div class="day-num" style="${(isSat||isSun)||hol?'color:#c05050;':''}">${dn}</div>
       ${evHtml}${evs.length&&!other?'<div class="day-busy-bar"></div>':''}
