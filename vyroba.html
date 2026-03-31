@@ -418,24 +418,6 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
   <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
   <button id="btn-add" onclick="openModal()">+ Nová výroba</button>
-  <button onclick="toggleNastaveni()" style="background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">⚙ Nastavení</button>
-</div>
-
-<div id="nastaveni-panel" style="display:none;background:#f8f6f0;border-bottom:1px solid #ddd;padding:16px 32px;">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-    <div style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#f07030;">⚙ NASTAVENÍ — Telegram Chat ID</div>
-    <button onclick="saveNastaveniVyroba()" style="background:#f07030;color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:11px;font-weight:700;cursor:pointer;">Uložit</button>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;" id="tel-inputs"></div>
-  <div style="margin-top:16px;padding-top:14px;border-top:1px solid #ddd;">
-    <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#f07030;margin-bottom:8px;">NOTIFIKACE — STAV HOTOVO</div>
-    <div>
-      <div style="font-size:10px;color:#888;margin-bottom:4px;">Chat ID příjemce</div>
-      <input type="text" id="hotovo_chat_id" placeholder="např. 8703966707"
-        style="background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a1a;padding:6px 10px;font-size:12px;outline:none;width:300px;">
-    </div>
-  </div>
-  <div style="font-size:10px;color:#888;margin-top:8px;">Chat ID se automaticky předvyplní při zadávání nové výroby podle zvoleného jména. Chat ID zjistíš přes @ledshopik_notifikace_bot → /start.</div>
 </div>
 
 <div id="urgent-bar">
@@ -843,32 +825,6 @@ function checkVyrobaDeadlines(){
 function getTel(jmeno){ return localStorage.getItem('tel_'+jmeno)||''; }
 function setTel(jmeno,tel){ localStorage.setItem('tel_'+jmeno,tel); }
 
-function toggleNastaveni(){
-  const p=document.getElementById('nastaveni-panel');
-  p.style.display=p.style.display==='none'?'block':'none';
-  if(p.style.display==='block'){
-    const hotovoChatIdEl=document.getElementById('hotovo_chat_id'); if(hotovoChatIdEl) hotovoChatIdEl.value=localStorage.getItem('hotovo_chat_id')||'';
-    const notifHourEl=document.getElementById('notif_hour'); if(notifHourEl) notifHourEl.value=localStorage.getItem('ledshopik_notif_hour')||'8';
-    document.getElementById('tel-inputs').innerHTML=ZAMESTNANCI.map(z=>`
-      <div>
-        <div style="font-size:10px;color:#888;margin-bottom:4px;">${z}</div>
-        <input type="tel" id="tel_${z}" value="${getTel(z)}" placeholder="+420..."
-          style="background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a1a;padding:6px 10px;font-size:12px;outline:none;width:100%;">
-      </div>`).join('');
-  }
-}
-
-function saveNastaveniVyroba(){
-  ZAMESTNANCI.forEach(z=>{
-    const el=document.getElementById('tel_'+z);
-    if(el) setTel(z,el.value.trim());
-  });
-  const hotovoChatId=document.getElementById('hotovo_chat_id');
-  if(hotovoChatId) localStorage.setItem('hotovo_chat_id',hotovoChatId.value.trim());
-  const notifHourEl=document.getElementById('notif_hour');
-  if(notifHourEl&&notifHourEl.value!=='') localStorage.setItem('ledshopik_notif_hour',notifHourEl.value);
-  toggleNastaveni();
-}
 
 // Předvyplnit telefony při změně technika/zadavatele
 function onTechnikChange(){
