@@ -801,13 +801,40 @@ async function batchGenerateAll(withPrice) {
   }
 }
 
-function batchExport(withPrice) {
+async function batchExport(withPrice) {
   const mode = document.querySelector('input[name="batch-mode"]:checked')?.value || 'individual';
   if (mode === 'combined') {
-    batchGenerateAllInOne(withPrice);
+    await batchGenerateAllInOne(withPrice);
   } else {
-    batchGenerateAll(withPrice);
+    await batchGenerateAll(withPrice);
   }
+  await batchSaveToHistory();
+}
+
+async function batchSaveToHistory() {
+  const ok = batchProducts.filter(b => b.status === 'ok');
+  if (!ok.length) return;
+  const now = new Date();
+  const datum = now.toLocaleDateString('cs-CZ') + ' ' + now.toLocaleTimeString('cs-CZ', {hour:'2-digit',minute:'2-digit'});
+  const records = ok.map(b => ({
+    id: String(Date.now() + Math.random()),
+    uzivatel: CURRENT_USER,
+    nazev: b.product.name || '',
+    kategorie: b.product.category || '',
+    sku: b.product.sku || '',
+    url: b.product.url || '',
+    datum: datum,
+    cena: String(b.product.price || 0),
+    data_json: JSON.stringify(b.product)
+  }));
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/produktove_listy', {
+      method: 'POST',
+      headers: {...SB_HEADERS, 'Prefer':'return=minimal'},
+      body: JSON.stringify(records)
+    });
+    await loadHistory();
+  } catch(e) {}
 }
 
 async function batchGenerateAllInOne(withPrice) {
