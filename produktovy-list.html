@@ -474,7 +474,7 @@ function logout() { localStorage.removeItem('ledshopik_user'); window.location.h
 // ── State ─────────────────────────────────────────────────────────────────────
 let currentProduct = null;
 let batchProducts = [];
-let history = [];
+let historyData = [];
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
 function switchTab(tab) {
@@ -1121,7 +1121,7 @@ async function loadHistory() {
     });
     const data = await res.json();
     if (Array.isArray(data)) {
-      history = data;
+      historyData = data;
       renderHistory();
     } else {
       console.error('Historie: neočekávaná odpověď', data);
@@ -1136,16 +1136,16 @@ async function loadHistory() {
 function renderHistory() {
   const el = document.getElementById('history-content');
   const countEl = document.getElementById('history-count');
-  if (!history.length) {
+  if (!historyData.length) {
     el.innerHTML = '<div class="empty-state">Zatím žádné uložené produktové listy</div>';
     countEl.textContent = '';
     return;
   }
-  countEl.textContent = history.length + ' záznamů';
+  countEl.textContent = historyData.length + ' záznamů';
   el.innerHTML = '<div style="overflow-x:auto"><table class="history-table"><thead><tr>' +
     '<th>Název</th><th>Kategorie</th><th>SKU</th><th>URL</th><th>Datum</th><th></th>' +
     '</tr></thead><tbody>' +
-    history.map(r => {
+    historyData.map(r => {
       const urlShort = (r.url || '').replace(/^https?:\/\//, '').substring(0, 40);
       const date = r.datum || r.created_at || '';
       return '<tr>' +
