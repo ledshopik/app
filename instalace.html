@@ -628,7 +628,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 const MONTHS_CS  = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const TG_BOT = '8732172656:AAEZcCL3DKV7kXHo1VG_RTDCRfTI9hD6sqU';
-const TG_CHAT_IDS = {'Ondra':'8703966707','Erik':'7152131081','Michal':'8370547459','BeLight Warehouse':'8722260762','Petr':'8749994116','Miriam':'8589677590','Filip':'8640125863','David':'6850619823','Lukáš':'8647300288','Tom':'8722260762','Kuba':'8722260762'};
+const TG_CHAT_IDS = {'Ondra':'8703966707','Erik':'7152131081','Michal':'8370547459','BeLight Warehouse':'8722260762','Petr':'8749994116','Miriam':'8589677590','Filip':'8640125863','David':'6850619823','Lukáš':'8647300288','Tom':'8722260762','Kuba':'8722260762','Eve':'8767189722'};
 function sendTg(chatId,text){if(!chatId)return;fetch('https://api.telegram.org/bot'+TG_BOT+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chatId,text:text,parse_mode:'Markdown'})}).catch(()=>{});}
 function tgKey(prefix,id,ds){return prefix+'_'+id+'_'+(ds||new Date().toISOString().slice(0,10));}
 function tgSent(k){return!!localStorage.getItem(k);}
