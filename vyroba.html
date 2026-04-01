@@ -106,6 +106,18 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
 
 #empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
 
+/* Quick stav popup */
+#stav-overlay { display:none; position:fixed; inset:0; z-index:300; }
+#stav-overlay.open { display:block; }
+#stav-popup { display:none; position:fixed; background:#fff; border:1px solid #e0e0e0; border-radius:14px; box-shadow:0 8px 40px rgba(0,0,0,.18); padding:14px; z-index:301; min-width:240px; }
+#stav-popup.open { display:block; }
+#stav-popup .sp-title { font-size:10px; font-weight:700; letter-spacing:.12em; color:#aaa; text-transform:uppercase; margin-bottom:10px; padding:0 4px; }
+.sp-btn { display:flex; align-items:center; gap:12px; width:100%; padding:16px 18px; border:2px solid transparent; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; margin-bottom:7px; text-align:left; transition:filter .1s; }
+.sp-btn:last-child { margin-bottom:0; }
+.sp-btn:active { filter:brightness(.92); }
+.sp-btn.sp-active { border-color:rgba(0,0,0,.18); }
+.sp-dot2 { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+
 /* Modal */
 #modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 #modal-overlay.open { display: flex; }
@@ -627,6 +639,55 @@ async function sbDelete(id){
   if(!res.ok){ const t=await res.text(); throw new Error(t); }
 }
 
+// ── Quick stav popup ──────────────────────────────────────────────────────────
+let stavPopupId=null;
+function openStavPopup(id,event){
+  stavPopupId=id;
+  const popup=document.getElementById('stav-popup');
+  const overlay=document.getElementById('stav-overlay');
+  const rec=data.find(x=>x.id===String(id));
+  const cur=rec?rec.stav:'';
+  popup.querySelectorAll('.sp-btn').forEach(b=>b.classList.toggle('sp-active',b.dataset.stav===cur));
+  // Pozice
+  const rect=event.currentTarget.getBoundingClientRect();
+  popup.style.top=(rect.bottom+8)+'px';
+  popup.style.left=rect.left+'px';
+  overlay.classList.add('open');
+  popup.classList.add('open');
+  // Korekce pokud vyjede mimo obrazovku
+  requestAnimationFrame(()=>{
+    const pw=popup.offsetWidth, ph=popup.offsetHeight;
+    if(parseFloat(popup.style.left)+pw>window.innerWidth-10) popup.style.left=(window.innerWidth-pw-10)+'px';
+    if(parseFloat(popup.style.top)+ph>window.innerHeight-10) popup.style.top=(rect.top-ph-8)+'px';
+  });
+}
+function closeStavPopup(){
+  document.getElementById('stav-overlay').classList.remove('open');
+  document.getElementById('stav-popup').classList.remove('open');
+  stavPopupId=null;
+}
+async function quickChangeStav(newStav){
+  if(!stavPopupId) return;
+  const id=stavPopupId;
+  closeStavPopup();
+  const rec=data.find(x=>x.id===String(id));
+  if(!rec||rec.stav===newStav) return;
+  const oldStav=rec.stav;
+  rec.stav=newStav;
+  renderTable();
+  try{
+    await sbUpdate(String(id),{stav:newStav});
+    if(newStav==='Hotovo'&&oldStav!=='Hotovo'){
+      sendTg('8722260762','✅ *Výroba dokončena — Hotovo*\n\nZakázka: *'+(rec.obj||'—')+'*\nZákazník: '+(rec.zakaznik||'—')+'\nTechnik: '+(rec.technik||'—'));
+    }
+    syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
+  }catch(e){
+    rec.stav=oldStav;
+    renderTable();
+    alert('Chyba: '+e.message);
+  }
+}
+
 function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderTable(); }
 function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTable(); }
 
@@ -708,7 +769,7 @@ function renderTable(){
       <td><span class="${cd_map[i].cls}" style="font-size:11px;">${cd_map[i].text}</span></td>
       <td>${r.technik||'—'}</td>
       <td style="font-size:11px;color:#999;">${r.zadal||'—'}</td>
-      <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
+      <td onclick="event.stopPropagation();openStavPopup('${r.id}',event)" style="cursor:pointer;"><span class="badge ${STATUS_CLASS[r.stav]||''}" style="pointer-events:none;"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
       <td style="font-size:11px;color:#999;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.poznamka||''}</td>
     </tr>`).join('');
 }
@@ -982,5 +1043,14 @@ function doFetch(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1')
 function renderW(d){var el=document.getElementById('weather-widget');if(!el||!d||!d.current_condition||!d.current_condition[0])return;var c=d.current_condition[0];var emoji=WCE[Number(c.weatherCode)]||'🌤️';var desc=(c.lang_cs&&c.lang_cs[0]?c.lang_cs[0].value:(c.weatherDesc&&c.weatherDesc[0]?c.weatherDesc[0].value:''));var city=d.nearest_area?d.nearest_area[0].areaName[0].value:'';var fc='';if(d.weather){d.weather.slice(0,3).forEach(function(day,i){var dt=new Date(day.date+'T00:00:00');var dn=i===0?'Dnes':DN[dt.getDay()];var fCode=Number(day.hourly&&day.hourly[4]?day.hourly[4].weatherCode:0);fc+='<div class="weather-fc-day"><div class="fc-name">'+dn+'</div><div class="fc-icon">'+(WCE[fCode]||'🌤️')+'</div><div class="fc-temp">'+day.maxtempC+'°</div></div>';});}el.innerHTML='<div class="weather-now"><span class="w-icon">'+emoji+'</span><div><div class="w-temp">'+c.temp_C+'°C</div><div class="w-desc">'+desc+(city?' · '+city:'')+'</div></div></div><div class="weather-forecast">'+fc+'</div>';}
 })();</script>
 <script>(function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})()</script>
+
+<div id="stav-overlay" onclick="closeStavPopup()"></div>
+<div id="stav-popup">
+  <div class="sp-title">Změnit stav</div>
+  <button class="sp-btn" style="background:#e8f0ff;color:#5070b0;" data-stav="Čeká na výrobu" onclick="quickChangeStav('Čeká na výrobu')"><span class="sp-dot2" style="background:#6080c0;"></span>Čeká na výrobu</button>
+  <button class="sp-btn" style="background:#fdf4d8;color:#b08820;" data-stav="Ve výrobě" onclick="quickChangeStav('Ve výrobě')"><span class="sp-dot2" style="background:#e2b830;"></span>Ve výrobě</button>
+  <button class="sp-btn" style="background:#e0f0e0;color:#308040;" data-stav="Hotovo" onclick="quickChangeStav('Hotovo')"><span class="sp-dot2" style="background:#40a050;"></span>Hotovo</button>
+  <button class="sp-btn" style="background:#e0f8f4;color:#2a9080;" data-stav="Vydáno zákazníkovi" onclick="quickChangeStav('Vydáno zákazníkovi')"><span class="sp-dot2" style="background:#3ab0a0;"></span>Vydáno zákazníkovi</button>
+</div>
 </body>
 </html>
