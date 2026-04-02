@@ -443,6 +443,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
       <thead><tr>
         <th class="th-check"><input type="checkbox" class="row-checkbox" id="check-all" onclick="toggleSelectAll(this)"></th>
         <th onclick="sortBy('cislo_obj')" data-col="cislo_obj">OBJ. Č. <span class="sort-arrow"></span></th>
+        <th onclick="sortBy('zakaznik')" data-col="zakaznik">Zákazník <span class="sort-arrow"></span></th>
         <th onclick="sortBy('dodavatel')" data-col="dodavatel">Dodavatel <span class="sort-arrow"></span></th>
         <th onclick="sortBy('zeme')" data-col="zeme">Země <span class="sort-arrow"></span></th>
         <th onclick="sortBy('obsah')" data-col="obsah">Obsah <span class="sort-arrow"></span></th>
@@ -455,7 +456,6 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
         <th onclick="sortBy('ocekavane_doruceni')" data-col="ocekavane_doruceni">Doručení <span class="sort-arrow"></span></th>
         <th>Zbývá</th>
         <th>Tracking</th>
-        <th onclick="sortBy('vazba_zakazka')" data-col="vazba_zakazka">Vazba <span class="sort-arrow"></span></th>
         <th onclick="sortBy('stav')" data-col="stav">Stav <span class="sort-arrow"></span></th>
         <th>Faktura</th>
       </tr></thead>
@@ -529,6 +529,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
     </div>
     <div id="modal-body">
       <div class="form-group"><label>OBJ. Č.</label><input type="text" id="f-cislo" placeholder="např. 2024-CN-001"></div>
+      <div class="form-group"><label>Zákazník</label><input type="text" id="f-zakaznik" placeholder="Jméno zákazníka"></div>
       <div class="form-group"><label>Dodavatel</label>
         <select id="f-dodavatel"><option value="">— vyberte —</option></select>
       </div>
@@ -562,7 +563,6 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
       <div class="form-group"><label>Termín dokončení výroby</label><input type="date" id="f-termin-dod"></div>
       <div class="form-group"><label>Očekávané doručení</label><input type="date" id="f-doruceni"></div>
       <div class="form-group"><label>Tracking číslo</label><input type="text" id="f-tracking" placeholder="např. 1Z999AA1..."></div>
-      <div class="form-group"><label>Vazba na zakázku</label><input type="text" id="f-vazba" placeholder="OBJ. Č. zákazníka"></div>
       <div class="form-group"><label>Stav</label>
         <select id="f-stav">
           <option>Objednáno</option><option>Potvrzeno dodavatelem</option>
@@ -754,7 +754,7 @@ const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
 const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 const BACKEND_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
-const COLS_ZAS = ['id','cislo_obj','dodavatel','zeme','zpusob_dopravy','obsah','pocet_ks','hodnota','mena','datum_objednani','termin_zakaznik','termin_dodavatel','ocekavane_doruceni','tracking','vazba_zakazka','stav','faktura','poznamka'];
+const COLS_ZAS = ['id','cislo_obj','zakaznik','dodavatel','zeme','zpusob_dopravy','obsah','pocet_ks','hodnota','mena','datum_objednani','termin_zakaznik','termin_dodavatel','ocekavane_doruceni','tracking','stav','faktura','poznamka'];
 const COLS_DOD = ['id','nazev','zeme','kontakt','email','web','doprava_vychozi','poznamka'];
 
 const STATUS_CLASS = {
@@ -844,7 +844,7 @@ function getFiltered(){
   return dataZas.filter(r=>{
     if(filterVal==='aktivni'){ if(r.stav==='Doručeno'||r.stav==='Zrušeno') return false; }
     else if(filterVal!=='vse'){ if(r.stav!==filterVal) return false; }
-    if(q&&![r.cislo_obj,r.dodavatel,r.obsah,r.tracking,r.vazba_zakazka].join(' ').toLowerCase().includes(q)) return false;
+    if(q&&![r.cislo_obj,r.zakaznik,r.dodavatel,r.obsah,r.tracking].join(' ').toLowerCase().includes(q)) return false;
     return true;
   }).sort((a,b)=>{
     const va=a[sortCol]||'', vb=b[sortCol]||'';
@@ -890,6 +890,7 @@ function renderTable(){
     return `<tr data-id="${r.id}" class="${isSelected?'row-selected':''}" style="${isDelay&&!isSelected?'background:#fce8e8;':''}" onclick="openModal('${r.id}')">
       <td class="td-check" onclick="event.stopPropagation()"><input type="checkbox" class="row-checkbox" ${isSelected?'checked':''} onchange="toggleSelect('${r.id}',this)"></td>
       <td class="cislo">${r.cislo_obj||'—'}</td>
+      <td style="font-size:11px;">${r.zakaznik||'—'}</td>
       <td class="dodavatel-name">${r.dodavatel||'—'}</td>
       <td style="font-size:11px;">${r.zeme||'—'}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.obsah||'—'}</td>
@@ -902,7 +903,7 @@ function renderTable(){
       <td class="datum">${fmtDate(r.ocekavane_doruceni)}</td>
       <td><span class="${cd.cls}" style="font-size:11px;">${cd.text}</span></td>
       <td>${tracking}</td>
-      <td style="font-size:11px;color:#999;">${r.vazba_zakazka||'—'}</td>
+
       <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
       <td>${faktura}</td>
     </tr>`;
@@ -947,6 +948,7 @@ function openModal(id){
   updateDodavatelSelect();
   if(r){
     document.getElementById('f-cislo').value=r.cislo_obj||'';
+    document.getElementById('f-zakaznik').value=r.zakaznik||'';
     document.getElementById('f-dodavatel').value=r.dodavatel||'';
     document.getElementById('f-zeme').value=r.zeme||'Čína';
     document.getElementById('f-doprava').value=r.zpusob_dopravy||'Letecky';
@@ -959,12 +961,11 @@ function openModal(id){
     document.getElementById('f-termin-dod').value=toInputDate(r.termin_dodavatel);
     document.getElementById('f-doruceni').value=toInputDate(r.ocekavane_doruceni);
     document.getElementById('f-tracking').value=r.tracking||'';
-    document.getElementById('f-vazba').value=r.vazba_zakazka||'';
     document.getElementById('f-stav').value=r.stav||'Objednáno';
     document.getElementById('f-faktura').value=r.faktura||'';
     document.getElementById('f-poznamka').value=r.poznamka||'';
   } else {
-    ['f-cislo','f-obsah','f-pocet','f-hodnota','f-tracking','f-vazba','f-faktura','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
+    ['f-cislo','f-zakaznik','f-obsah','f-pocet','f-hodnota','f-tracking','f-faktura','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('f-dodavatel').value='';
     document.getElementById('f-zeme').value='Čína';
     document.getElementById('f-doprava').value='Letecky';
@@ -1019,6 +1020,7 @@ async function saveRecord(){
   const rec={
     id: editId||String(Date.now()),
     cislo_obj:        document.getElementById('f-cislo').value.trim(),
+    zakaznik:         document.getElementById('f-zakaznik').value.trim(),
     dodavatel:        document.getElementById('f-dodavatel').value,
     zeme:             document.getElementById('f-zeme').value,
     zpusob_dopravy:   document.getElementById('f-doprava').value,
@@ -1031,7 +1033,6 @@ async function saveRecord(){
     termin_dodavatel: document.getElementById('f-termin-dod').value,
     ocekavane_doruceni: document.getElementById('f-doruceni').value,
     tracking:         document.getElementById('f-tracking').value.trim(),
-    vazba_zakazka:    document.getElementById('f-vazba').value.trim(),
     stav:             document.getElementById('f-stav').value,
     faktura:          modalUploadData || document.getElementById('f-faktura').value.trim(),
     poznamka:         document.getElementById('f-poznamka').value.trim(),
@@ -1183,6 +1184,7 @@ function checkDelays(){
 function exportXLSX(){
   const rows=dataZas.map(r=>({
     'OBJ. Č.': r.cislo_obj||'',
+    'Zákazník': r.zakaznik||'',
     'Dodavatel': r.dodavatel||'',
     'Země': r.zeme||'',
     'Obsah': r.obsah||'',
@@ -1195,7 +1197,6 @@ function exportXLSX(){
     'Termín dokončení výroby': r.termin_dodavatel||'',
     'Očekávané doručení': r.ocekavane_doruceni||'',
     'Tracking': r.tracking||'',
-    'Vazba': r.vazba_zakazka||'',
     'Stav': r.stav||'',
     'Faktura': r.faktura||'',
     'Poznámka': r.poznamka||'',
