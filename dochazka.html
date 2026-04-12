@@ -920,6 +920,14 @@ function overlayClick(e){ if(e.target===document.getElementById('modal-overlay')
 function showSaving(t,s){ document.getElementById('saving-title').textContent=t; document.getElementById('saving-sub').textContent=s; document.getElementById('saving-overlay').classList.add('open'); }
 function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
 
+function sendTg(chatId, text){
+  fetch('https://api.telegram.org/bot8732172656:AAEZcCL3DKV7kXHo1VG_RTDCRfTI9hD6sqU/sendMessage',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({chat_id: chatId, text: text, parse_mode:'Markdown'})
+  }).catch(()=>{});
+}
+function fmtDateCZ(s){ if(!s) return ''; const d=new Date(s+'T00:00:00'); return d.getDate()+'. '+(d.getMonth()+1)+'. '+d.getFullYear(); }
+
 async function saveRecord(){
   const isEdit=!!editId;
   const currentId=editId?String(editId):String(Date.now());
@@ -946,6 +954,15 @@ async function saveRecord(){
   try {
     if(isEdit) await sbUpdate(currentId,rec); else await sbInsert(rec);
     showSaving('Hotovo!','Data uložena');
+    // Notifikace Ondrovi při dovolené / HO (jen nový záznam, ne sám sobě)
+    const currentUser = localStorage.getItem('ledshopik_user')||'';
+    if(!isEdit && (rec.typ==='Dovolená'||rec.typ==='Home office') && rec.zamestnanec!=='Ondra'){
+      const icon = rec.typ==='Dovolená' ? '🏖' : '🏠';
+      const datOd = fmtDateCZ(rec.datum_od);
+      const datDo = rec.datum_do && rec.datum_do!==rec.datum_od ? ' – '+fmtDateCZ(rec.datum_do) : '';
+      const dniText = rec.dni ? ` (${rec.dni} ${parseFloat(rec.dni)===1?'den':'dní'})` : '';
+      sendTg('8703966707', `${icon} *${rec.zamestnanec}* zadal ${rec.typ.toLowerCase()}\n📅 ${datOd}${datDo}${dniText}`);
+    }
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
 }
