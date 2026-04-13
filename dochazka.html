@@ -94,6 +94,15 @@ option, datalist option { color: #333; background: #fff; }
 .ev-homeoffice { background: #e0e8f8; color: #6080c0; }
 .ev-jednani { background: #ece0f8; color: #8060c0; }
 
+/* Detail overlay */
+#detail-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:1000; align-items:center; justify-content:center; }
+#detail-overlay.open { display:flex; }
+#detail-box { background:#fff; border-radius:12px; padding:28px 32px; min-width:340px; max-width:460px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,.18); }
+#detail-box .d-label { font-size:10px; font-weight:700; letter-spacing:.12em; color:#aaa; text-transform:uppercase; margin-bottom:3px; }
+#detail-box .d-value { font-size:14px; color:#1a1a1a; margin-bottom:16px; }
+#detail-box .d-note { background:#f8f6f0; border-radius:6px; padding:10px 14px; font-size:13px; color:#444; margin-bottom:16px; }
+#detail-box .d-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:4px; }
+
 /* Table */
 #table-wrap { padding: 0 32px 32px; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 800px; }
@@ -468,6 +477,27 @@ tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left
     <tbody id="tbody"></tbody>
   </table>
   <div id="empty-state"><div style="font-size:36px;margin-bottom:10px;">📅</div><p>Žádné záznamy</p></div>
+</div>
+
+<!-- Detail overlay -->
+<div id="detail-overlay" onclick="if(event.target===this)closeDetail()">
+  <div id="detail-box">
+    <div id="d-typ-badge" style="margin-bottom:16px;"></div>
+    <div class="d-label">Zaměstnanec</div>
+    <div class="d-value" id="d-zamestnanec"></div>
+    <div class="d-label">Období</div>
+    <div class="d-value" id="d-datum"></div>
+    <div class="d-label">Počet dní</div>
+    <div class="d-value" id="d-dni"></div>
+    <div id="d-poznamka-wrap">
+      <div class="d-label">Poznámka</div>
+      <div class="d-note" id="d-poznamka"></div>
+    </div>
+    <div class="d-footer">
+      <button class="btn-cancel" onclick="closeDetail()">Zavřít</button>
+      <button class="btn-save" onclick="closeDetail();openModal(_detailId)">✎ Upravit</button>
+    </div>
+  </div>
 </div>
 
 <!-- Modal -->
@@ -846,7 +876,7 @@ function renderTable(){
   if(!rows.length){ tbody.innerHTML=''; document.getElementById('empty-state').style.display='block'; return; }
   document.getElementById('empty-state').style.display='none';
   tbody.innerHTML=rows.map(r=>`
-    <tr data-id="${r.id}" data-typ="${r.typ}" onclick="openModal('${r.id}')">
+    <tr data-id="${r.id}" data-typ="${r.typ}" onclick="openDetail('${r.id}')">
       <td class="zamestnanec">${r.zamestnanec||'—'}</td>
       <td><span class="badge ${TYP_CLASS[r.typ]||''}"><span class="badge-dot"></span>${r.typ||'—'}</span></td>
       <td class="datum">${fmtDate(r.datum_od)}</td>
@@ -916,6 +946,23 @@ function openModal(id){
   document.getElementById('modal-overlay').classList.add('open');
 }
 function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); editId=null; }
+
+let _detailId = null;
+function openDetail(id){
+  const r = data.find(x=>x.id===String(id)); if(!r) return;
+  _detailId = id;
+  document.getElementById('d-typ-badge').innerHTML = `<span class="badge ${TYP_CLASS[r.typ]||''}"><span class="badge-dot"></span>${r.typ||'—'}</span>`;
+  document.getElementById('d-zamestnanec').textContent = r.zamestnanec||'—';
+  const od = fmtDate(r.datum_od), doo = fmtDate(r.datum_do);
+  document.getElementById('d-datum').textContent = od===doo ? od : od+' — '+doo;
+  const dni = r.dni || countDays(toInputDate(r.datum_od), toInputDate(r.datum_do));
+  document.getElementById('d-dni').textContent = dni + (parseFloat(dni)===1 ? ' den' : ' dní');
+  const pWrap = document.getElementById('d-poznamka-wrap');
+  if(r.poznamka){ document.getElementById('d-poznamka').textContent = r.poznamka; pWrap.style.display='block'; }
+  else { pWrap.style.display='none'; }
+  document.getElementById('detail-overlay').classList.add('open');
+}
+function closeDetail(){ document.getElementById('detail-overlay').classList.remove('open'); _detailId=null; }
 function overlayClick(e){ if(e.target===document.getElementById('modal-overlay')) closeModal(); }
 function showSaving(t,s){ document.getElementById('saving-title').textContent=t; document.getElementById('saving-sub').textContent=s; document.getElementById('saving-overlay').classList.add('open'); }
 function hideSaving(){ document.getElementById('saving-overlay').classList.remove('open'); }
