@@ -468,6 +468,7 @@ const today=new Date();
 let calYear=today.getFullYear(), calMonth=today.getMonth();
 
 function syncStatus(state,text){ document.getElementById('sync-dot').className=state; document.getElementById('sync-text').textContent=text; }
+function checkInstalaceNotif(){ /* TG notifikace zpracovány v renderTable */ }
 
 async function loadData(){
   syncStatus('loading','Načítám data...');
