@@ -923,7 +923,7 @@ function openModalForDate(dateStr){
   calcDays();
 }
 function openModal(id){
-  const r=id?data.find(x=>x.id===String(id)):null;
+  const r=id?data.find(x=>String(x.id)===String(id)):null;
   editId=r?String(r.id):null;
   document.getElementById('modal-title').textContent=r?'Upravit absenci':'Přidat absenci';
   document.getElementById('btn-delete').style.display=r?'inline-flex':'none';
@@ -949,7 +949,7 @@ function closeModal(){ document.getElementById('modal-overlay').classList.remove
 
 let _detailId = null;
 function openDetail(id){
-  const r = data.find(x=>x.id===String(id)); if(!r) return;
+  const r = data.find(x=>String(x.id)===String(id)); if(!r) return;
   _detailId = id;
   document.getElementById('d-typ-badge').innerHTML = `<span class="badge ${TYP_CLASS[r.typ]||''}"><span class="badge-dot"></span>${r.typ||'—'}</span>`;
   document.getElementById('d-zamestnanec').textContent = r.zamestnanec||'—';

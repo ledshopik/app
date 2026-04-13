@@ -112,6 +112,40 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
 
 #empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
 
+/* Kalendář */
+#cal-header { padding: 16px 24px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+#cal-header .cal-title { font-size: 15px; font-weight: 800; letter-spacing: .06em; }
+#cal-nav { display: flex; align-items: center; gap: 10px; }
+#cal-nav button { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
+#cal-nav button:hover { color: #1a1a1a; }
+#cal-month-label { font-size: 14px; font-weight: 700; min-width: 140px; text-align: center; letter-spacing: .05em; }
+#btn-today { background: #f07030; color: #fff; border: none; border-radius: 6px; padding: 5px 14px; font-size: 11px; font-weight: 700; cursor: pointer; }
+#cal-legend { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #888; }
+.leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+#cal-grid { padding: 16px 24px 20px; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
+.cal-weekday { text-align: center; font-size: 9px; letter-spacing: .1em; color: #888; padding: 4px 0; text-transform: uppercase; }
+.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-day { min-height: 90px; background: #fff; padding: 6px 8px; position: relative; overflow: hidden; cursor: default; border-bottom: 1px solid #ece8e0; border-right: 1px solid #ece8e0; }
+.cal-day.other-month { opacity: .3; }
+.cal-day.today { outline: 1px solid #f07030; }
+.cal-day.today .day-num { color: #f07030; font-weight: 900; }
+.day-num { font-size: 10px; font-weight: 600; color: #888; margin-bottom: 3px; }
+.cal-day.has-event .day-num { color: #444; }
+.cal-event { font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 2px; margin-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
+.cal-event:hover { opacity: .8; }
+.day-busy-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #f07030, #e2b830); opacity: .6; }
+.cal-day.holiday { background: #fff0f0; }
+.cal-day.holiday .day-num { color: #c05050; font-weight: 900; }
+.holiday-name { font-size: 7px; color: #c05050; line-height: 1.1; margin-bottom: 2px; }
+.ev-ceka-vyr  { background: #c8d8f0; color: #6080c0; }
+.ev-vyroba    { background: #fde0a0; color: #c8901a; }
+.ev-hotovo    { background: #c0dcc0; color: #40a050; }
+.ev-vydano    { background: #c0e8e0; color: #3ab0a0; }
+.ev-urgent    { background: #f0c8c8; color: #e04040; }
+.ev-instalace { background: #e0e8f8; color: #6080c0; }
+
 /* Modal */
 #modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 #modal-overlay.open { display: flex; }
