@@ -956,12 +956,13 @@ async function saveRecord(){
     showSaving('Hotovo!','Data uložena');
     // Notifikace Ondrovi při dovolené / HO (jen nový záznam, ne sám sobě)
     const currentUser = localStorage.getItem('ledshopik_user')||'';
-    if(!isEdit && (rec.typ==='Dovolená'||rec.typ==='Home office') && rec.zamestnanec!=='Ondra'){
-      const icon = rec.typ==='Dovolená' ? '🏖' : '🏠';
+    if(!isEdit && rec.zamestnanec!=='Ondra'){
+      const icons = {'Dovolená':'🏖','Home office':'🏠','Neschopenka':'🤒','Lékař':'🏥','Neplacené volno':'📋','Pracovní jednání mimo firmu':'🤝'};
+      const icon = icons[rec.typ] || '📅';
       const datOd = fmtDateCZ(rec.datum_od);
       const datDo = rec.datum_do && rec.datum_do!==rec.datum_od ? ' – '+fmtDateCZ(rec.datum_do) : '';
       const dniText = rec.dni ? ` (${rec.dni} ${parseFloat(rec.dni)===1?'den':'dní'})` : '';
-      sendTg('8703966707', `${icon} *${rec.zamestnanec}* zadal ${rec.typ.toLowerCase()}\n📅 ${datOd}${datDo}${dniText}`);
+      sendTg('8703966707', `${icon} *${rec.zamestnanec}* zadal: ${rec.typ}\n📅 ${datOd}${datDo}${dniText}`);
     }
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
