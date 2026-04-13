@@ -91,7 +91,7 @@ option, datalist option { color: #333; background: #fff; }
 .ev-neschopenka { background: #fce8e8; color: #e05050; }
 .ev-neplacene { background: #fdf4d8; color: #e2b830; }
 .ev-lekar { background: #e8f0ff; color: #6080c0; }
-.ev-homeoffice { background: #d0f0ec; color: #3090a0; }
+.ev-homeoffice { background: #fde8d0; color: #d07030; }
 .ev-jednani { background: #ece0f8; color: #8060c0; }
 
 /* Detail overlay */
@@ -122,14 +122,14 @@ td.datum { white-space: nowrap; }
 .t-neschopenka { background: #fce8e8; color: #e05050; border: 1px solid #f0c8c8; } .t-neschopenka .badge-dot { background: #e05050; }
 .t-neplacene  { background: #fdf4d8; color: #e2b830; border: 1px solid #f0e0a0; } .t-neplacene .badge-dot  { background: #e2b830; }
 .t-lekar      { background: #e8f0ff; color: #6080c0; border: 1px solid #c8d8f0; } .t-lekar .badge-dot      { background: #6080c0; }
-.t-homeoffice { background: #d0f0ec; color: #3090a0; border: 1px solid #a0d8d0; } .t-homeoffice .badge-dot { background: #3090a0; }
+.t-homeoffice { background: #fde8d0; color: #d07030; border: 1px solid #f0c8a0; } .t-homeoffice .badge-dot { background: #d07030; }
 .t-jednani    { background: #ece0f8; color: #8060c0; border: 1px solid #d0c0e8; } .t-jednani .badge-dot    { background: #8060c0; }
 
 tbody tr[data-typ="Dovolená"]        td:first-child { border-left: 3px solid #40c060; }
 tbody tr[data-typ="Neschopenka"]     td:first-child { border-left: 3px solid #e05050; }
 tbody tr[data-typ="Neplacené volno"] td:first-child { border-left: 3px solid #e2b830; }
 tbody tr[data-typ="Lékař"]          td:first-child { border-left: 3px solid #6080c0; }
-tbody tr[data-typ="Home office"]    td:first-child { border-left: 3px solid #3090a0; }
+tbody tr[data-typ="Home office"]    td:first-child { border-left: 3px solid #d07030; }
 tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left: 3px solid #8060c0; }
 
 #empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
@@ -345,7 +345,7 @@ tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script></head>
 <body>
 <style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
-<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#3090a0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'}}).then(r=>r.json()).then(j=>{const d=Array.isArray(j)?j:(j.data||[]);const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
+<script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#d07030','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'}}).then(r=>r.json()).then(j=>{const d=Array.isArray(j)?j:(j.data||[]);const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
 <div id="header">
   <div style="display:flex;align-items:center;gap:16px;">
     <div class="header-accent"></div>
@@ -392,7 +392,7 @@ tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left
     <div class="stat"><div class="num" id="stat-dovolena" style="color:#40c060;">0</div><div class="lbl">Dovolená</div></div>
     <div class="stat"><div class="num" id="stat-neschopenka" style="color:#e05050;">0</div><div class="lbl">Neschopenka</div></div>
     <div class="stat"><div class="num" id="stat-lekar" style="color:#6080c0;">0</div><div class="lbl">Lékař</div></div>
-    <div class="stat"><div class="num" id="stat-homeoffice" style="color:#3090a0;">0</div><div class="lbl">Home office</div></div>
+    <div class="stat"><div class="num" id="stat-homeoffice" style="color:#d07030;">0</div><div class="lbl">Home office</div></div>
     <div class="stat"><div class="num" id="stat-jednani" style="color:#8060c0;">0</div><div class="lbl">Jednání</div></div>
     <div class="stat"><div class="num" id="stat-dnes" style="color:#60a0e0;">0</div><div class="lbl">Dnes</div></div>
   </div>
@@ -403,7 +403,7 @@ tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left
   <button class="filter-btn" data-filter="Neschopenka"     onclick="setFilter('Neschopenka')"><span class="filter-dot" style="background:#e05050"></span>Neschopenka</button>
   <button class="filter-btn" data-filter="Neplacené volno" onclick="setFilter('Neplacené volno')"><span class="filter-dot" style="background:#e2b830"></span>Neplacené volno</button>
   <button class="filter-btn" data-filter="Lékař" onclick="setFilter('Lékař')"><span class="filter-dot" style="background:#6080c0"></span>Lékař</button>
-  <button class="filter-btn" data-filter="Home office" onclick="setFilter('Home office')"><span class="filter-dot" style="background:#3090a0"></span>Home office</button>
+  <button class="filter-btn" data-filter="Home office" onclick="setFilter('Home office')"><span class="filter-dot" style="background:#d07030"></span>Home office</button>
   <button class="filter-btn" data-filter="Pracovní jednání mimo firmu" onclick="setFilter('Pracovní jednání mimo firmu')"><span class="filter-dot" style="background:#8060c0"></span>Jednání</button>
   <button class="filter-btn" data-filter="aktualni"        onclick="setFilter('aktualni')"><span class="filter-dot" style="background:#60a0e0"></span>Aktuální</button>
   <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderAll()"></div>
@@ -448,7 +448,7 @@ tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#e05050;"></div>Neschopenka</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#e2b830;"></div>Neplacené</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#6080c0;"></div>Lékař</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#3090a0;"></div>Home office</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#d07030;"></div>Home office</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#8060c0;"></div>Jednání</div>
     </div>
   </div>
