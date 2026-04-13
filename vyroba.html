@@ -451,6 +451,7 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
       <th onclick="sortBy('technik')"       data-col="technik">      Technik       <span class="sort-arrow"></span></th>
       <th onclick="sortBy('zadal')"         data-col="zadal">        Zadal         <span class="sort-arrow"></span></th>
       <th onclick="sortBy('stav')"          data-col="stav">         Stav          <span class="sort-arrow"></span></th>
+      <th onclick="sortBy('datum_hotovo')"  data-col="datum_hotovo"> Vyrobeno      <span class="sort-arrow"></span></th>
       <th>Poznámka</th>
     </tr></thead>
     <tbody id="tbody"></tbody>
@@ -546,6 +547,10 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
       </div>
 
       <div class="form-group full"><label>Poznámka</label><textarea id="f-poznamka" placeholder="Specifika výroby, materiál, rozměry..."></textarea></div>
+      <div class="form-group full" id="stav-log-wrap" style="display:none;">
+        <label>Historie stavů</label>
+        <div id="stav-log-list" style="background:#f8f6f0;border:1px solid #e8e4dc;border-radius:4px;padding:8px 12px;font-size:11px;color:#444;max-height:120px;overflow-y:auto;"></div>
+      </div>
     </div>
     <div id="modal-footer">
       <button id="btn-delete" onclick="deleteRecord()" style="display:none">🗑 Smazat</button>
@@ -666,6 +671,16 @@ function closeStavPopup(){
   document.getElementById('stav-popup').classList.remove('open');
   stavPopupId=null;
 }
+function buildStavUpdate(rec, newStav){
+  const now = new Date().toISOString();
+  const user = localStorage.getItem('ledshopik_user')||'?';
+  const log = Array.isArray(rec.stav_log) ? [...rec.stav_log] : [];
+  log.push({stav: newStav, cas: now, user});
+  const update = {stav: newStav, stav_log: log};
+  if(newStav==='Hotovo' && rec.stav!=='Hotovo') update.datum_hotovo = now.slice(0,10);
+  return update;
+}
+
 async function quickChangeStav(newStav){
   if(!stavPopupId) return;
   const id=stavPopupId;
@@ -673,10 +688,11 @@ async function quickChangeStav(newStav){
   const rec=data.find(x=>x.id===String(id));
   if(!rec||rec.stav===newStav) return;
   const oldStav=rec.stav;
-  rec.stav=newStav;
+  const update=buildStavUpdate(rec, newStav);
+  Object.assign(rec, update);
   renderTable();
   try{
-    await sbUpdate(String(id),{stav:newStav});
+    await sbUpdate(String(id), update);
     if(newStav==='Hotovo'&&oldStav!=='Hotovo'){
       sendTg('8722260762','✅ *Výroba dokončena — Hotovo*\n\nZakázka: *'+(rec.obj||'—')+'*\nZákazník: '+(rec.zakaznik||'—')+'\nTechnik: '+(rec.technik||'—'));
     }
@@ -770,6 +786,7 @@ function renderTable(){
       <td>${r.technik||'—'}</td>
       <td style="font-size:11px;color:#999;">${r.zadal||'—'}</td>
       <td onclick="event.stopPropagation();openStavPopup('${r.id}',event)" style="cursor:pointer;"><span class="badge ${STATUS_CLASS[r.stav]||''}" style="pointer-events:none;"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
+      <td class="datum" style="color:${r.datum_hotovo?'#3a8048':'#ccc'};">${r.datum_hotovo?fmtDate(r.datum_hotovo):'—'}</td>
       <td style="font-size:11px;color:#999;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.poznamka||''}</td>
     </tr>`).join('');
 }
@@ -791,8 +808,23 @@ function openModal(id){
     document.getElementById('f-zadal').value=r.zadal||'';
     document.getElementById('f-stav').value=r.stav||'Čeká na výrobu';
     document.getElementById('f-poznamka').value=r.poznamka||'';
+    // Historie stavů
+    const log = Array.isArray(r.stav_log) ? r.stav_log : [];
+    const logWrap = document.getElementById('stav-log-wrap');
+    const logList = document.getElementById('stav-log-list');
+    if(log.length){
+      logList.innerHTML = log.slice().reverse().map(e=>{
+        const dt = e.cas ? new Date(e.cas) : null;
+        const cas = dt ? dt.toLocaleDateString('cs-CZ')+' '+dt.toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'}) : '—';
+        return `<div style="padding:3px 0;border-bottom:1px solid #ede9e0;"><strong>${e.stav||'—'}</strong> <span style="color:#999;">— ${cas} — ${e.user||'?'}</span></div>`;
+      }).join('');
+      logWrap.style.display='block';
+    } else {
+      logWrap.style.display='none';
+    }
   } else {
     ['f-obj','f-zakaznik','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
+    document.getElementById('stav-log-wrap').style.display='none';
     document.getElementById('f-typ').value='Pájení';
     document.getElementById('f-narocnost').value='Jednoduchá';
     document.getElementById('f-priorita').value='Normální';
@@ -826,9 +858,22 @@ async function saveRecord(){
     deadline:       document.getElementById('f-deadline').value,
     technik:        document.getElementById('f-technik').value,
     zadal:          document.getElementById('f-zadal').value,
-    stav:           document.getElementById('f-stav').value,
     poznamka:       document.getElementById('f-poznamka').value.trim(),
   };
+  // Stav log + datum_hotovo
+  const existingRec = isEdit ? (data.find(x=>x.id===currentId)||{}) : {};
+  const newStav = document.getElementById('f-stav').value;
+  if(!isEdit || newStav !== oldStav){
+    const stavUpdate = buildStavUpdate({...existingRec, stav: oldStav||''}, newStav);
+    rec.stav = newStav;
+    rec.stav_log = stavUpdate.stav_log;
+    if(stavUpdate.datum_hotovo) rec.datum_hotovo = stavUpdate.datum_hotovo;
+    else if(existingRec.datum_hotovo) rec.datum_hotovo = existingRec.datum_hotovo;
+  } else {
+    rec.stav = newStav;
+    if(existingRec.stav_log) rec.stav_log = existingRec.stav_log;
+    if(existingRec.datum_hotovo) rec.datum_hotovo = existingRec.datum_hotovo;
+  }
   closeModal();
   showSaving(isEdit?'Ukládám změny...':'Přidávám zakázku...','Ukládám data');
   try {
