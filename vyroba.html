@@ -106,18 +106,6 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
 
 #empty-state { text-align: center; padding: 60px 20px; color: #888; display: none; }
 
-/* Quick stav popup */
-#stav-overlay { display:none; position:fixed; inset:0; z-index:300; }
-#stav-overlay.open { display:block; }
-#stav-popup { display:none; position:fixed; background:#fff; border:1px solid #e0e0e0; border-radius:14px; box-shadow:0 8px 40px rgba(0,0,0,.18); padding:14px; z-index:301; min-width:240px; }
-#stav-popup.open { display:block; }
-#stav-popup .sp-title { font-size:10px; font-weight:700; letter-spacing:.12em; color:#aaa; text-transform:uppercase; margin-bottom:10px; padding:0 4px; }
-.sp-btn { display:flex; align-items:center; gap:12px; width:100%; padding:16px 18px; border:2px solid transparent; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; margin-bottom:7px; text-align:left; transition:filter .1s; }
-.sp-btn:last-child { margin-bottom:0; }
-.sp-btn:active { filter:brightness(.92); }
-.sp-btn.sp-active { border-color:rgba(0,0,0,.18); }
-.sp-dot2 { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
-
 /* Modal */
 #modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 #modal-overlay.open { display: flex; }
@@ -146,47 +134,6 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
 #saving-box { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 24px 36px; text-align: center; }
 #saving-box .saving-title { font-size: 14px; font-weight: 700; color: #f07030; margin-bottom: 6px; }
 #saving-box .saving-sub { font-size: 12px; color: #888; }
-
-/* Calendar */
-#calendar-section { margin: 0 32px 40px; background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
-#cal-header { padding: 16px 24px; border-bottom: 1px solid #e8e4dc; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-#cal-header .cal-title { font-size: 15px; font-weight: 800; letter-spacing: .06em; }
-#cal-nav { display: flex; align-items: center; gap: 10px; }
-#cal-nav button { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
-#cal-nav button:hover { color: #1a1a1a; }
-#cal-month-label { font-size: 14px; font-weight: 700; min-width: 140px; text-align: center; letter-spacing: .05em; }
-#btn-today { background: #f07030; color: #fff; border: none; border-radius: 6px; padding: 5px 14px; font-size: 11px; font-weight: 700; cursor: pointer; }
-#cal-legend { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-.leg { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #888; }
-.leg-dot { width: 10px; height: 10px; border-radius: 2px; }
-#cal-grid { padding: 16px 24px 20px; }
-.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
-.cal-weekday { text-align: center; font-size: 9px; letter-spacing: .1em; color: #888; padding: 4px 0; text-transform: uppercase; }
-.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.cal-day { min-height: 90px; background: #fff; padding: 6px 8px; position: relative; overflow: hidden; cursor: pointer; border-bottom:1px solid #ece8e0; border-right:1px solid #ece8e0; }
-.cal-day.other-month { opacity: .3; }
-.cal-day.today { outline: 1px solid #f07030; }
-.cal-day.today .day-num { color: #f07030; font-weight: 900; }
-.day-num { font-size: 10px; font-weight: 600; color: #888; margin-bottom: 3px; }
-.cal-day.has-event .day-num { color: #444; }
-.cal-event { font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 2px; margin-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
-.cal-event:hover { opacity: .8; }
-.ev-ceka-vyr  { background: #c8d8f0; color: #4090e0; }
-.ev-vyroba    { background: #fde0c8; color: #f07030; }
-.ev-hotovo    { background: #d0e8d0; color: #40a050; }
-.ev-vydano    { background: #e0e0e0; color: #999; }
-.ev-urgent    { background: #f0c8c8; color: #e04040; }
-.ev-instalace { background: #fdf4d8; color: #b08820; font-style: italic; }
-.cal-day.holiday { background: #fff0f0; }
-.cal-day.weekend.holiday { background: #f8f0f0; }
-.cal-day.holiday .day-num { color: #c05050; font-weight: 900; }
-.holiday-name { font-size: 7px; color: #c05050; line-height: 1.1; margin-bottom: 2px; }
-.day-busy-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #f07030, #ff8040); opacity: .6; }
-/* View toggle tabs */
-.view-toggle { display: flex; gap: 4px; margin-left: 8px; }
-.view-toggle button { background: #f4f2ed; color: #888; border: 1px solid #ddd; border-radius: 6px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: .06em; cursor: pointer; transition: all .15s; }
-.view-toggle button:hover { border-color: #bbb; color: #444; }
-.view-toggle button.active { background: #f07030; color: #fff; border-color: #f07030; }
 
 @media (max-width: 720px) {
   #header { padding: 12px 16px; }
@@ -370,21 +317,21 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
 <body>
 <style>.tb-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;position:relative;cursor:default;flex-shrink:0}.tb-avatar .tb-dot{position:absolute;bottom:-2px;right:-2px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff}</style>
 <script>(function(){const TB_COLORS={'Dovolená':'#4090e0','Neschopenka':'#e04040','Neplacené volno':'#e89030','Lékař':'#9060c0','Home office':'#6080c0','Pracovní jednání mimo firmu':'#8060c0'};const BG='#5080b0,#6090a0,#508060,#806090,#907050,#605080,#708050,#805070,#607080,#806050,#508080,#705080'.split(',');const NAMES=['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];fetch('https://fqxtlmppfyzsyaxbhbzh.supabase.co/rest/v1/dochazka?select=*',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q'}}).then(r=>r.json()).then(j=>{const d=Array.isArray(j)?j:[];const today=new Date().toISOString().slice(0,10);const sm={};d.forEach(r=>{if(!r.zamestnanec||!r.datum_od)return;const od=r.datum_od.split('.').reverse().join('-')||r.datum_od;const doD=r.datum_do?(r.datum_do.split('.').reverse().join('-')||r.datum_do):od;if(today>=od&&today<=doD)sm[r.zamestnanec]=r.typ||'Práce';});document.getElementById('team-bar').innerHTML=NAMES.map((n,i)=>{const st=sm[n];const dc=st?TB_COLORS[st]||'#40a050':'#40a050';const title=n+(st?' - '+st:' - v práci');return '<div class="tb-avatar" style="background:'+BG[i%BG.length]+';'+(st&&st!=='Práce'?'opacity:.6;':'')+'" title="'+title+'"><span>'+n.substring(0,2).toUpperCase()+'</span><div class="tb-dot" style="background:'+dc+'"></div></div>';}).join('');}).catch(()=>{});})();</script>
-<div id="header" style="background:#fff;border-bottom:1px solid #e8e4dc;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+<div id="header">
   <div style="display:flex;align-items:center;gap:16px;">
-    <div class="header-accent" style="width:4px;height:36px;background:#e2b830;border-radius:2px;flex-shrink:0;"></div>
-    <div>
-      <div style="font-size:9px;letter-spacing:.3em;color:#888;text-transform:uppercase;margin-bottom:2px;">LEDshopik &middot; Systém</div>
-      <div style="font-size:22px;font-weight:900;letter-spacing:.04em;color:#1a1a1a;line-height:1;">VÝROBA</div>
+    <div class="header-accent"></div>
+    <div class="header-title-wrap">
+      <div class="header-eyebrow">LEDshopik &middot; Systém</div>
+      <div class="header-title">VÝROBA</div>
     </div>
-    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;flex-shrink:0;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
+    <a href="manual.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#bbb;font-size:10px;font-weight:700;letter-spacing:.06em;transition:all .15s;" onmouseover="this.style.borderColor='#e2b830';this.style.color='#e2b830'" onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#bbb'">📖 MANUÁL</a>
   </div>
   <div id="team-bar" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;"></div>
   <div style="display:flex;align-items:center;gap:20px;">
-    <div id="weather-widget" class="weather-widget"></div>
-    <div style="text-align:right;">
-      <div id="hdr-day" style="font-size:24px;font-weight:900;color:#e2b830;line-height:1;">—</div>
-      <div id="hdr-month" style="font-size:10px;color:#888;letter-spacing:.15em;text-transform:uppercase;margin-top:2px;">—</div>
+    <div id="weather-mini" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888;"></div>
+    <div class="header-date">
+      <div class="day" id="hdr-day">&mdash;</div>
+      <div class="month" id="hdr-month">&mdash;</div>
     </div>
   </div>
 </div>
@@ -425,11 +372,29 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
   <button class="filter-btn" data-filter="Čeká na výrobu"          onclick="setFilter('Čeká na výrobu')"><span class="filter-dot" style="background:#6080c0"></span>Čeká na výrobu</button>
   <button class="filter-btn" data-filter="Ve výrobě"     onclick="setFilter('Ve výrobě')"><span class="filter-dot" style="background:#e2b830"></span>Ve výrobě</button>
   <button class="filter-btn" data-filter="Hotovo"        onclick="setFilter('Hotovo')"><span class="filter-dot" style="background:#40a050"></span>Hotovo</button>
-  <button class="filter-btn" data-filter="Vydáno zákazníkovi" onclick="setFilter('Vydáno zákazníkovi')"><span class="filter-dot" style="background:#3ab0a0"></span>Vydáno</button>
+  <button class="filter-btn" data-filter="Vychystáno/odesláno" onclick="setFilter('Vychystáno/odesláno')"><span class="filter-dot" style="background:#3ab0a0"></span>Vydáno</button>
   <button class="filter-btn" data-filter="Urgentní"      onclick="setFilter('Urgentní')"><span class="filter-dot" style="background:#f07030"></span>Urgentní</button>
   <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
   <button id="btn-add" onclick="openModal()">+ Nová výroba</button>
+  <button onclick="toggleNastaveni()" style="background:#f4f2ed;color:#888;border:1px solid #ddd;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">⚙ Nastavení</button>
+</div>
+
+<div id="nastaveni-panel" style="display:none;background:#f8f6f0;border-bottom:1px solid #ddd;padding:16px 32px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <div style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#f07030;">⚙ NASTAVENÍ — Telegram Chat ID</div>
+    <button onclick="saveNastaveniVyroba()" style="background:#f07030;color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:11px;font-weight:700;cursor:pointer;">Uložit</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;" id="tel-inputs"></div>
+  <div style="margin-top:16px;padding-top:14px;border-top:1px solid #ddd;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#f07030;margin-bottom:8px;">NOTIFIKACE — STAV HOTOVO</div>
+    <div>
+      <div style="font-size:10px;color:#888;margin-bottom:4px;">Chat ID příjemce</div>
+      <input type="text" id="hotovo_chat_id" placeholder="např. 8703966707"
+        style="background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a1a;padding:6px 10px;font-size:12px;outline:none;width:300px;">
+    </div>
+  </div>
+  <div style="font-size:10px;color:#888;margin-top:8px;">Chat ID se automaticky předvyplní při zadávání nové výroby podle zvoleného jména. Chat ID zjistíš přes @ledshopik_notifikace_bot → /start.</div>
 </div>
 
 <div id="urgent-bar">
@@ -542,7 +507,7 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
           <option>Čeká na výrobu</option>
           <option>Ve výrobě</option>
           <option>Hotovo</option>
-          <option>Vydáno zákazníkovi</option>
+          <option>Vychystáno/odesláno</option>
         </select>
       </div>
 
@@ -573,18 +538,12 @@ const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
 const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 const TABLE = 'vyroba';
-const TG_BOT = '8732172656:AAEZcCL3DKV7kXHo1VG_RTDCRfTI9hD6sqU';
-const TG_CHAT_IDS = {'Ondra':'8703966707','Erik':'7152131081','Michal':'8370547459','BeLight Warehouse':'8722260762','Petr':'8749994116','Miriam':'8589677590','Filip':'8640125863','David':'6850619823','Lukáš':'8647300288','Tom':'8722260762','Kuba':'8722260762','Eve':'8767189722','Mário':'8654467847'};
-function sendTg(chatId,text){if(!chatId)return;fetch('https://api.telegram.org/bot'+TG_BOT+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chatId,text:text,parse_mode:'Markdown'})}).catch(()=>{});}
-function tgKey(prefix,id){return prefix+'_'+id+'_'+dateStr(today);}
-function tgSent(k){return!!localStorage.getItem(k);}
-function tgMark(k){localStorage.setItem(k,'1');}
 
 const STATUS_CLASS = {
   'Čeká na výrobu':                's-ceka',
   'Ve výrobě':           's-vyroba',
   'Hotovo':              's-hotovo',
-  'Vydáno zákazníkovi':  's-vydano',
+  'Vychystáno/odesláno':  's-vydano',
 };
 const NAROCNOST_CLASS = { 'Jednoduchá':'narocnost-1', 'Střední':'narocnost-2', 'Složitá':'narocnost-3' };
 
@@ -605,7 +564,7 @@ function fmtDate(d){ const s=toInputDate(d); if(!s) return '—'; const [y,m,day
 function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
 function calcCountdown(deadline, stav){
-  if(stav==='Vydáno zákazníkovi') return {text:'Vydáno',cls:'countdown-done'};
+  if(stav==='Vychystáno/odesláno') return {text:'Vydáno',cls:'countdown-done'};
   if(stav==='Hotovo') return {text:'Hotovo',cls:'countdown-done'};
   const d=toInputDate(deadline); if(!d) return {text:'—',cls:''};
   const diff=Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
@@ -644,71 +603,11 @@ async function sbDelete(id){
   if(!res.ok){ const t=await res.text(); throw new Error(t); }
 }
 
-// ── Quick stav popup ──────────────────────────────────────────────────────────
-let stavPopupId=null;
-function openStavPopup(id,event){
-  stavPopupId=id;
-  const popup=document.getElementById('stav-popup');
-  const overlay=document.getElementById('stav-overlay');
-  const rec=data.find(x=>x.id===String(id));
-  const cur=rec?rec.stav:'';
-  popup.querySelectorAll('.sp-btn').forEach(b=>b.classList.toggle('sp-active',b.dataset.stav===cur));
-  // Pozice
-  const rect=event.currentTarget.getBoundingClientRect();
-  popup.style.top=(rect.bottom+8)+'px';
-  popup.style.left=rect.left+'px';
-  overlay.classList.add('open');
-  popup.classList.add('open');
-  // Korekce pokud vyjede mimo obrazovku
-  requestAnimationFrame(()=>{
-    const pw=popup.offsetWidth, ph=popup.offsetHeight;
-    if(parseFloat(popup.style.left)+pw>window.innerWidth-10) popup.style.left=(window.innerWidth-pw-10)+'px';
-    if(parseFloat(popup.style.top)+ph>window.innerHeight-10) popup.style.top=(rect.top-ph-8)+'px';
-  });
-}
-function closeStavPopup(){
-  document.getElementById('stav-overlay').classList.remove('open');
-  document.getElementById('stav-popup').classList.remove('open');
-  stavPopupId=null;
-}
-function buildStavUpdate(rec, newStav){
-  const now = new Date().toISOString();
-  const user = localStorage.getItem('ledshopik_user')||'?';
-  const log = Array.isArray(rec.stav_log) ? [...rec.stav_log] : [];
-  log.push({stav: newStav, cas: now, user});
-  const update = {stav: newStav, stav_log: log};
-  if(newStav==='Hotovo' && rec.stav!=='Hotovo') update.datum_hotovo = now.slice(0,10);
-  return update;
-}
-
-async function quickChangeStav(newStav){
-  if(!stavPopupId) return;
-  const id=stavPopupId;
-  closeStavPopup();
-  const rec=data.find(x=>x.id===String(id));
-  if(!rec||rec.stav===newStav) return;
-  const oldStav=rec.stav;
-  const update=buildStavUpdate(rec, newStav);
-  Object.assign(rec, update);
-  renderTable();
-  try{
-    await sbUpdate(String(id), update);
-    if(newStav==='Hotovo'&&oldStav!=='Hotovo'){
-      sendTg('8722260762','✅ *Výroba dokončena — Hotovo*\n\nZakázka: *'+(rec.obj||'—')+'*\nZákazník: '+(rec.zakaznik||'—')+'\nTechnik: '+(rec.technik||'—'));
-    }
-    syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
-  }catch(e){
-    rec.stav=oldStav;
-    renderTable();
-    alert('Chyba: '+e.message);
-  }
-}
-
 function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderTable(); }
 function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTable(); }
 
 function getCountdownDays(deadline, stav){
-  if(stav==='Vydáno zákazníkovi'||stav==='Hotovo') return 9999;
+  if(stav==='Vychystáno/odesláno'||stav==='Hotovo') return 9999;
   const d=toInputDate(deadline); if(!d) return 9998;
   return Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
 }
@@ -716,7 +615,7 @@ function getCountdownDays(deadline, stav){
 function getFiltered(){
   const q=(document.getElementById('search').value||'').toLowerCase();
   return data.filter(r=>{
-    if(filterVal==='aktivni') { if(r.stav==='Vydáno zákazníkovi') return false; }
+    if(filterVal==='aktivni') { if(r.stav==='Vychystáno/odesláno') return false; }
     else if(filterVal==='Urgentní') { if(r.priorita!=='Urgentní') return false; }
     else if(filterVal!=='vse') { if(r.stav!==filterVal) return false; }
     if(q&&![r.obj,r.zakaznik,r.typ,r.technik,r.zadal,r.poznamka].join(' ').toLowerCase().includes(q)) return false;
@@ -740,19 +639,19 @@ function renderTable(){
   const rows=getFiltered();
 
   // Statistiky
-  document.getElementById('stat-total').textContent=data.filter(r=>r.stav!=='Vydáno zákazníkovi').length;
+  document.getElementById('stat-total').textContent=data.filter(r=>r.stav!=='Vychystáno/odesláno').length;
   document.getElementById('stat-ceka').textContent=data.filter(r=>r.stav==='Čeká na výrobu').length;
   document.getElementById('stat-vyroba').textContent=data.filter(r=>r.stav==='Ve výrobě').length;
   document.getElementById('stat-hotovo').textContent=data.filter(r=>r.stav==='Hotovo').length;
-  document.getElementById('stat-urgent').textContent=data.filter(r=>r.priorita==='Urgentní'&&r.stav!=='Vydáno zákazníkovi').length;
+  document.getElementById('stat-urgent').textContent=data.filter(r=>r.priorita==='Urgentní'&&r.stav!=='Vychystáno/odesláno').length;
 
   // Urgentní upozornění
   const todayStr=dateStr(today);
-  const urgent=data.filter(r=>r.priorita==='Urgentní'&&r.stav!=='Vydáno zákazníkovi'&&r.stav!=='Hotovo');
+  const urgent=data.filter(r=>r.priorita==='Urgentní'&&r.stav!=='Vychystáno/odesláno'&&r.stav!=='Hotovo');
   const blizici=data.filter(r=>{
     const d=toInputDate(r.deadline); if(!d) return false;
     const diff=Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
-    return diff<=2&&diff>=0&&r.stav!=='Vydáno zákazníkovi'&&r.stav!=='Hotovo';
+    return diff<=2&&diff>=0&&r.stav!=='Vychystáno/odesláno'&&r.stav!=='Hotovo';
   });
   const bar=document.getElementById('urgent-bar');
   const msgs=[];
@@ -785,8 +684,7 @@ function renderTable(){
       <td><span class="${cd_map[i].cls}" style="font-size:11px;">${cd_map[i].text}</span></td>
       <td>${r.technik||'—'}</td>
       <td style="font-size:11px;color:#999;">${r.zadal||'—'}</td>
-      <td onclick="event.stopPropagation();openStavPopup('${r.id}',event)" style="cursor:pointer;"><span class="badge ${STATUS_CLASS[r.stav]||''}" style="pointer-events:none;"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
-      <td class="datum" style="color:${r.datum_hotovo?'#3a8048':'#ccc'};">${r.datum_hotovo?fmtDate(r.datum_hotovo):'—'}</td>
+      <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
       <td style="font-size:11px;color:#999;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.poznamka||''}</td>
     </tr>`).join('');
 }
@@ -878,15 +776,6 @@ async function saveRecord(){
   showSaving(isEdit?'Ukládám změny...':'Přidávám zakázku...','Ukládám data');
   try {
     if(isEdit) await sbUpdate(currentId,rec); else await sbInsert(rec);
-    // Telegram: nová zakázka → technik
-    if(!isEdit && rec.technik){
-      const chatId=TG_CHAT_IDS[rec.technik];
-      if(chatId) sendTg(chatId,'🏭 *Nová výroba přiřazena*\n\nZakázka: *'+(rec.obj||'—')+'*\nZákazník: '+(rec.zakaznik||'—')+'\nDeadline: '+(rec.deadline?fmtDate(rec.deadline):'—')+'\nZadal: '+(rec.zadal||'—'));
-    }
-    // Telegram: stav → Hotovo → BeLight Warehouse
-    if(isEdit && rec.stav==='Hotovo' && oldStav!=='Hotovo'){
-      sendTg('8722260762','✅ *Výroba dokončena — Hotovo*\n\nZakázka: *'+(rec.obj||'—')+'*\nZákazník: '+(rec.zakaznik||'—')+'\nTechnik: '+(rec.technik||'—'));
-    }
     showSaving('Hotovo!','Data uložena');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
@@ -898,8 +787,6 @@ async function deleteRecord(){
   showSaving('Mažu...','');
   try {
     await sbDelete(String(id));
-    // Vyčistit TG notifikace pro smazanou zakázku
-    Object.keys(localStorage).filter(k=>k.startsWith('vyr_dl_'+id+'_')).forEach(k=>localStorage.removeItem(k));
     showSaving('Smazáno!','');
     setTimeout(async()=>{ hideSaving(); await loadData(); },800);
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
@@ -907,19 +794,27 @@ async function deleteRecord(){
 
 const ZAMESTNANCI = ['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve','BeLight Warehouse'];
 
-function checkVyrobaDeadlines(){
-  const ds=dateStr(today);
-  data.forEach(r=>{
-    if(r.stav==='Vydáno zákazníkovi'||r.stav==='Hotovo') return;
-    const d=toInputDate(r.deadline); if(!d) return;
-    const diff=Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
-    if(diff<0||diff>2) return;
-    const k=tgKey('vyr_dl',r.id);
-    if(tgSent(k)) return;
-    const chatId=TG_CHAT_IDS[r.technik]; if(!chatId) return;
-    const when=diff===0?'*DNES*':(diff+' dny/dní');
-    sendTg(chatId,'⏰ *Deadline výroby za '+when+'*\n\nZakázka: *'+(r.obj||'—')+'*\nZákazník: '+(r.zakaznik||'—')+'\nDeadline: '+fmtDate(r.deadline)+(r.priorita==='Urgentní'?'\n⚡ URGENTNÍ':''));
-    tgMark(k);
+function getTel(jmeno){ return localStorage.getItem('tel_'+jmeno)||''; }
+function setTel(jmeno,tel){ localStorage.setItem('tel_'+jmeno,tel); }
+
+function toggleNastaveni(){
+  const p=document.getElementById('nastaveni-panel');
+  p.style.display=p.style.display==='none'?'block':'none';
+  if(p.style.display==='block'){
+    const hotovoChatIdEl=document.getElementById('hotovo_chat_id'); if(hotovoChatIdEl) hotovoChatIdEl.value=localStorage.getItem('hotovo_chat_id')||'';
+    document.getElementById('tel-inputs').innerHTML=ZAMESTNANCI.map(z=>`
+      <div>
+        <div style="font-size:10px;color:#888;margin-bottom:4px;">${z}</div>
+        <input type="tel" id="tel_${z}" value="${getTel(z)}" placeholder="+420..."
+          style="background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a1a;padding:6px 10px;font-size:12px;outline:none;width:100%;">
+      </div>`).join('');
+  }
+}
+
+function saveNastaveniVyroba(){
+  ZAMESTNANCI.forEach(z=>{
+    const el=document.getElementById('tel_'+z);
+    if(el) setTel(z,el.value.trim());
   });
 }
 
@@ -1076,26 +971,6 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
 (function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
 </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-vyroba').on('postgres_changes',{event:'*',schema:'public',table:'vyroba'},function(){console.log('RT:vyroba');if(typeof loadData==='function')loadData();}).subscribe();})();</script>
-
-<script>(function(){
-var WCE={113:'☀️',116:'⛅',119:'☁️',122:'☁️',143:'🌫️',176:'🌦️',200:'⛈️',227:'🌨️',230:'❄️',248:'🌫️',260:'🌫️',263:'🌦️',266:'🌧️',293:'🌧️',296:'🌧️',299:'🌧️',302:'🌧️',305:'🌧️',308:'🌧️',311:'🌧️',314:'🌧️',317:'🌨️',320:'🌨️',323:'🌨️',326:'🌨️',329:'❄️',332:'❄️',335:'❄️',338:'❄️',350:'🌧️',353:'🌦️',356:'🌧️',359:'🌧️',362:'🌨️',365:'🌨️',368:'🌨️',371:'❄️',374:'🌨️',377:'🌨️',386:'⛈️',389:'⛈️',392:'⛈️',395:'❄️'};
-var DN=['Ne','Po','Út','St','Čt','Pá','So'];
-var ck='ledshopik_weather',ct='ledshopik_weather_time';
-var cached=localStorage.getItem(ck),ctime=localStorage.getItem(ct);
-if(cached&&ctime&&Date.now()-parseInt(ctime)<1800000){try{var p=JSON.parse(cached);if(p&&p.current_condition&&p.current_condition[0]){renderW(p);return;}}catch(e){}}
-if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){doFetch(p.coords.latitude+','+p.coords.longitude);},function(){doFetch('Ostrava');},{timeout:5000,maximumAge:600000});}else{doFetch('Ostrava');}
-function doFetch(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1').then(function(r){return r.json()}).then(function(d){localStorage.setItem(ck,JSON.stringify(d));localStorage.setItem(ct,String(Date.now()));renderW(d);}).catch(function(){});}
-function renderW(d){var el=document.getElementById('weather-widget');if(!el||!d||!d.current_condition||!d.current_condition[0])return;var c=d.current_condition[0];var emoji=WCE[Number(c.weatherCode)]||'🌤️';var desc=(c.lang_cs&&c.lang_cs[0]?c.lang_cs[0].value:(c.weatherDesc&&c.weatherDesc[0]?c.weatherDesc[0].value:''));var city=d.nearest_area?d.nearest_area[0].areaName[0].value:'';var fc='';if(d.weather){d.weather.slice(0,3).forEach(function(day,i){var dt=new Date(day.date+'T00:00:00');var dn=i===0?'Dnes':DN[dt.getDay()];var fCode=Number(day.hourly&&day.hourly[4]?day.hourly[4].weatherCode:0);fc+='<div class="weather-fc-day"><div class="fc-name">'+dn+'</div><div class="fc-icon">'+(WCE[fCode]||'🌤️')+'</div><div class="fc-temp">'+day.maxtempC+'°</div></div>';});}el.innerHTML='<div class="weather-now"><span class="w-icon">'+emoji+'</span><div><div class="w-temp">'+c.temp_C+'°C</div><div class="w-desc">'+desc+(city?' · '+city:'')+'</div></div></div><div class="weather-forecast">'+fc+'</div>';}
-})();</script>
-<script>(function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})()</script>
-
-<div id="stav-overlay" onclick="closeStavPopup()"></div>
-<div id="stav-popup">
-  <div class="sp-title">Změnit stav</div>
-  <button class="sp-btn" style="background:#e8f0ff;color:#5070b0;" data-stav="Čeká na výrobu" onclick="quickChangeStav('Čeká na výrobu')"><span class="sp-dot2" style="background:#6080c0;"></span>Čeká na výrobu</button>
-  <button class="sp-btn" style="background:#fdf4d8;color:#b08820;" data-stav="Ve výrobě" onclick="quickChangeStav('Ve výrobě')"><span class="sp-dot2" style="background:#e2b830;"></span>Ve výrobě</button>
-  <button class="sp-btn" style="background:#e0f0e0;color:#308040;" data-stav="Hotovo" onclick="quickChangeStav('Hotovo')"><span class="sp-dot2" style="background:#40a050;"></span>Hotovo</button>
-  <button class="sp-btn" style="background:#e0f8f4;color:#2a9080;" data-stav="Vydáno zákazníkovi" onclick="quickChangeStav('Vydáno zákazníkovi')"><span class="sp-dot2" style="background:#3ab0a0;"></span>Vydáno zákazníkovi</button>
-</div>
+<script>(function(){var cacheKey='ledshopik_weather',cacheTime='ledshopik_weather_time';var cached=localStorage.getItem(cacheKey),ct=localStorage.getItem(cacheTime);if(cached&&ct&&Date.now()-parseInt(ct)<1800000){try{var d=JSON.parse(cached);showMiniWeather(d);}catch(e){}return;}var loc='Ostrava';if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(pos){fetchWeather(pos.coords.latitude+','+pos.coords.longitude);},function(){fetchWeather(loc);},{timeout:5000,maximumAge:600000});}else{fetchWeather(loc);}function fetchWeather(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1').then(function(r){return r.json()}).then(function(d){localStorage.setItem(cacheKey,JSON.stringify(d));localStorage.setItem(cacheTime,String(Date.now()));showMiniWeather(d);}).catch(function(){});}function showMiniWeather(d){var el=document.getElementById('weather-mini');if(!el||!d.current_condition)return;var c=d.current_condition[0];var codes={113:'\u2600\uFE0F',116:'\u26C5',119:'\u2601\uFE0F',122:'\u2601\uFE0F',176:'\uD83C\uDF26\uFE0F',200:'\u26C8\uFE0F',227:'\uD83C\uDF28\uFE0F',266:'\uD83C\uDF27\uFE0F',296:'\uD83C\uDF27\uFE0F',302:'\uD83C\uDF27\uFE0F',332:'\u2744\uFE0F'};var emoji=codes[parseInt(c.weatherCode)]||'\uD83C\uDF24\uFE0F';var area=d.nearest_area?d.nearest_area[0].areaName[0].value:'';el.innerHTML=emoji+' '+c.temp_C+'\u00B0C <span style="color:#bbb;font-size:10px;">'+area+'</span>';}})();</script>
 </body>
 </html>

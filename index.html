@@ -193,16 +193,6 @@ option, datalist option { color: #333; background: #fff; }
 .task-cb:hover { border-color: #40a050; background: #f0faf0; }
 .task-item.done .task-cb { background: #40a050; border-color: #40a050; color: #fff; }
 .task-item.done .task-text { text-decoration: line-through; color: #999; }
-/* Potvrzovací popup pro hotovo */
-#task-done-overlay { display:none; position:fixed; inset:0; z-index:400; }
-#task-done-overlay.open { display:block; }
-#task-done-popup { display:none; position:fixed; background:#fff; border:1px solid #e0e0e0; border-radius:14px; box-shadow:0 8px 40px rgba(0,0,0,.18); padding:20px 22px; z-index:401; min-width:220px; }
-#task-done-popup.open { display:block; }
-#task-done-popup .tdp-title { font-size:13px; font-weight:700; color:#1a1a1a; margin-bottom:4px; }
-#task-done-popup .tdp-sub { font-size:11px; color:#888; margin-bottom:16px; }
-#task-done-popup .tdp-btns { display:flex; gap:8px; }
-#task-done-popup .tdp-yes { flex:1; padding:12px; background:#40a050; color:#fff; border:none; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; }
-#task-done-popup .tdp-no  { flex:1; padding:12px; background:#f4f2ed; color:#666; border:none; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; }
 .task-item.done { opacity: .65; }
 .task-text { font-size: 12px; flex: 1; font-weight: 600; color: #333; }
 .task-tag { font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
@@ -297,8 +287,7 @@ option, datalist option { color: #333; background: #fff; }
   #main { padding: 16px; width: 100%; box-sizing: border-box; }
   .modules-grid { grid-template-columns: repeat(2,1fr); }
   .tools-row { grid-template-columns: 1fr; }
-  .dashboard-main { grid-template-columns: 1fr; width: 100%; }
-  .dash-left, .dash-right, .dash-center { width: 100%; min-width: 0; }
+  .dashboard-main { grid-template-columns: 1fr; }
   #header { padding: 14px 16px; }
   #user-bar { padding: 8px 16px; }
   .cal-grid-wrap { padding: 4px !important; }
@@ -610,6 +599,40 @@ option, datalist option { color: #333; background: #fff; }
       <div class="mod-footer" style="color:#e8a020;">OTEVŘÍT →</div>
     </a>
   </div>
+  <div class="tools-row">
+    <a href="konfigurator.html" class="tool-card" style="border-left-color:#a070e0;background:#f8f4ff;">
+      <div class="tool-icon" style="background:#efe8ff;color:#a070e0;">⚙</div>
+      <div class="tool-info">
+        <div class="tool-label" style="color:#a070e0;">Konfigurátor</div>
+        <div class="tool-desc">Ceník výroby svítidel RING · 7 parametrů</div>
+      </div>
+      <div class="tool-arrow" style="color:#a070e0;">OTEVŘÍT →</div>
+    </a>
+    <a href="konfigurator-profily.html" class="tool-card" style="border-left-color:#40a0a0;background:#f0fafa;">
+      <div class="tool-icon" style="background:#e0f4f4;color:#40a0a0;">▦</div>
+      <div class="tool-info">
+        <div class="tool-label" style="color:#40a0a0;">Profily</div>
+        <div class="tool-desc">Ceník výroby ALU profilů · 7 parametrů</div>
+      </div>
+      <div class="tool-arrow" style="color:#40a0a0;">OTEVŘÍT →</div>
+    </a>
+    <a href="kalkulator-instalaci.html" class="tool-card" style="border-left-color:#b08820;background:#fdf8ee;">
+      <div class="tool-icon" style="background:#f5edda;color:#b08820;">🧮</div>
+      <div class="tool-info">
+        <div class="tool-label" style="color:#b08820;">Kalkulátor instalací</div>
+        <div class="tool-desc">Odhad ceny montáže · doprava + práce + doplňky · ±20%</div>
+      </div>
+      <div class="tool-arrow" style="color:#b08820;">OTEVŘÍT →</div>
+    </a>
+    <a href="produktovy-list.html" class="tool-card" style="border-left-color:#e05050;background:#fef4f4;">
+      <div class="tool-icon" style="background:#fde8e8;color:#e05050;">📄</div>
+      <div class="tool-info">
+        <div class="tool-label" style="color:#e05050;">Produktové listy</div>
+        <div class="tool-desc">Generátor katalogových listů z eshopu</div>
+      </div>
+      <div class="tool-arrow" style="color:#e05050;">OTEVŘÍT →</div>
+    </a>
+  </div>
 
   <!-- Dashboard 3-column layout -->
   <div class="dashboard-main">
@@ -682,7 +705,6 @@ option, datalist option { color: #333; background: #fff; }
             <button class="task-filter-btn active" data-f="aktivni" onclick="filterTasks('aktivni')">Aktivní</button>
             <button class="task-filter-btn" data-f="hotovo" onclick="filterTasks('hotovo')">Hotové</button>
             <button class="task-filter-btn" data-f="vse" onclick="filterTasks('vse')">Vše</button>
-            <button id="btn-delete-done" onclick="deleteDoneTasks()" style="display:none;margin-left:4px;background:none;border:1px solid #f0c8c8;color:#c05050;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">🗑 Smazat vše</button>
           </div>
         </div>
         <div id="tasks-list"></div>
@@ -1067,19 +1089,6 @@ let taskFilter = 'aktivni';
 function filterTasks(f){
   taskFilter = f;
   document.querySelectorAll('.task-filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.f===f));
-  document.getElementById('btn-delete-done').style.display = f==='hotovo' ? 'inline-block' : 'none';
-  renderTasks();
-}
-
-async function deleteDoneTasks(){
-  const user = localStorage.getItem('ledshopik_user')||'';
-  const done = dataUkoly.filter(t => t.stav==='hotovo' && (t.uzivatel===user||t.prirazeno_komu===user));
-  if(!done.length){ alert('Žádné vyřízené úkoly.'); return; }
-  if(!confirm(`Smazat ${done.length} vyřízených úkolů?`)) return;
-  for(const t of done){
-    dataUkoly = dataUkoly.filter(x=>x.id!==t.id);
-    sbDelete('ukoly',t.id).catch(()=>{});
-  }
   renderTasks();
 }
 
@@ -1131,7 +1140,6 @@ function renderTasks(){
         +'<div style="display:flex;gap:5px;align-items:center;margin-top:3px;flex-wrap:wrap;">'
           +'<span class="task-type-tag '+typeCls+'">'+typeLabels[t.typ||'rychly']+'</span>'
           +(isAssigned?'<span style="font-size:9px;color:#6080c0;font-weight:600;">od '+t.uzivatel+'</span>':'')
-          +(t.uzivatel===user&&t.prirazeno_komu!==user?'<span style="font-size:9px;color:#e08030;font-weight:600;">pro '+t.prirazeno_komu+'</span>':'')
           +terminHtml
         +'</div>'
       +'</div>'
@@ -1139,43 +1147,12 @@ function renderTasks(){
   }).join('');
 }
 
-let pendingDoneId = null;
-function toggleTaskDone(id){
+async function toggleTaskDone(id){
   const t = dataUkoly.find(x=>x.id===id);
   if(!t) return;
-  if(t.stav==='hotovo'){
-    // Odznačení — bez potvrzení
-    t.stav='aktivni';
-    renderTasks();
-    sbUpdate('ukoly',t.id,{stav:'aktivni'}).catch(()=>{});
-    return;
-  }
-  // Označení jako hotovo — zobraz popup
-  pendingDoneId = id;
-  const popup = document.getElementById('task-done-popup');
-  const overlay = document.getElementById('task-done-overlay');
-  document.getElementById('tdp-task-text').textContent = t.text ? (t.text.length>60?t.text.slice(0,60)+'…':t.text) : '';
-  // Pozice — vycentrovat na obrazovce
-  popup.style.top = '50%';
-  popup.style.left = '50%';
-  popup.style.transform = 'translate(-50%,-50%)';
-  overlay.classList.add('open');
-  popup.classList.add('open');
-}
-function closeDonePopup(){
-  document.getElementById('task-done-overlay').classList.remove('open');
-  document.getElementById('task-done-popup').classList.remove('open');
-  pendingDoneId = null;
-}
-async function confirmTaskDone(){
-  if(!pendingDoneId) return;
-  const id = pendingDoneId;
-  closeDonePopup();
-  const t = dataUkoly.find(x=>x.id===id);
-  if(!t) return;
-  t.stav = 'hotovo';
+  t.stav = t.stav==='hotovo'?'aktivni':'hotovo';
   renderTasks();
-  try { await sbUpdate('ukoly',t.id,{stav:'hotovo'}); } catch(e){}
+  try { await sbUpdate('ukoly',t.id,{stav:t.stav}); } catch(e){}
 }
 
 async function quickAddTask(){
@@ -1229,9 +1206,6 @@ async function saveTask(){
 
   if(!rec.text){ alert('Vyplň text úkolu'); return; }
 
-  const wasNew = !isEdit;
-  const oldPrirazeno = isEdit ? (dataUkoly.find(t=>t.id===id)||{}).prirazeno_komu : null;
-
   if(isEdit){
     const idx = dataUkoly.findIndex(t=>t.id===id);
     if(idx>=0) dataUkoly[idx] = rec;
@@ -1245,35 +1219,6 @@ async function saveTask(){
   try {
     if(isEdit) await sbUpdate('ukoly',rec.id,rec); else await sbInsert('ukoly',rec);
   } catch(e){ alert('Chyba: '+e.message); }
-
-  // Telegram notifikace při přiřazení úkolu
-  const TG_BOT_UKOLY = '8732172656:AAEZcCL3DKV7kXHo1VG_RTDCRfTI9hD6sqU';
-  const TG_CHAT_IDS = {
-    'Ondra': '8703966707',
-    'Erik': '7152131081',
-    'Michal': '8370547459',
-    'BeLight Warehouse': '8722260762',
-    'Petr': '8749994116',
-    'Miriam': '8589677590',
-    'Filip': '8640125863',
-    'David': '6850619823',
-    'Lukáš': '8647300288',
-    'Eve': '8767189722',
-    'Mário': '8654467847'
-  };
-  const assignee = rec.prirazeno_komu;
-  const assigneeChatId = TG_CHAT_IDS[assignee];
-  const isNewAssignment = wasNew || (isEdit && oldPrirazeno !== assignee);
-  if(assigneeChatId && assignee !== user && isNewAssignment){
-    const terminTxt = rec.termin ? '\nTermín: '+rec.termin : '';
-    const prioritaMap = {normalni:'normální',vysoka:'🔴 vysoká',nizka:'nízká'};
-    const priTxt = rec.priorita ? '\nPriorita: '+(prioritaMap[rec.priorita]||rec.priorita) : '';
-    const tgText = '📋 *Nový úkol pro tebe*\n\n'+rec.text+priTxt+terminTxt+'\n\nZadal: '+user;
-    fetch('https://api.telegram.org/bot'+TG_BOT_UKOLY+'/sendMessage',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chat_id:assigneeChatId,text:tgText,parse_mode:'Markdown'})
-    }).catch(function(){});
-  }
 }
 
 function openTaskModal(id){
@@ -1310,9 +1255,8 @@ async function loadWeather(){
     const cachedTime = Number(localStorage.getItem(cacheTimeKey)||0);
     let data;
     if(cached && (Date.now()-cachedTime < 30*60*1000)){
-      try { const c=JSON.parse(cached); if(c&&c.current_condition&&c.current_condition[0]) data=c; } catch(e){}
-    }
-    if(!data) {
+      data = JSON.parse(cached);
+    } else {
       // Geolokace → IP lokace → fallback Ostrava
       let location = '';
       try {
@@ -1598,15 +1542,5 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
 })();
 </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-all').on('postgres_changes',{event:'*',schema:'public'},function(){console.log('RT update');if(typeof loadAll==='function')loadAll();}).subscribe();})();</script>
-
-<div id="task-done-overlay" onclick="closeDonePopup()"></div>
-<div id="task-done-popup">
-  <div class="tdp-title">Označit jako hotovo?</div>
-  <div class="tdp-sub" id="tdp-task-text"></div>
-  <div class="tdp-btns">
-    <button class="tdp-yes" onclick="confirmTaskDone()">✓ Hotovo</button>
-    <button class="tdp-no" onclick="closeDonePopup()">Zrušit</button>
-  </div>
-</div>
 </body>
 </html>
