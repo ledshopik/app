@@ -203,7 +203,7 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
   <button class="filter-btn" data-filter="Čeká na výrobu"          onclick="setFilter('Čeká na výrobu')"><span class="filter-dot" style="background:#6080c0"></span>Čeká na výrobu</button>
   <button class="filter-btn" data-filter="Ve výrobě"     onclick="setFilter('Ve výrobě')"><span class="filter-dot" style="background:#e2b830"></span>Ve výrobě</button>
   <button class="filter-btn" data-filter="Hotovo"        onclick="setFilter('Hotovo')"><span class="filter-dot" style="background:#40a050"></span>Hotovo</button>
-  <button class="filter-btn" data-filter="Vydáno zákazníkovi" onclick="setFilter('Vydáno zákazníkovi')"><span class="filter-dot" style="background:#3ab0a0"></span>Vydáno</button>
+  <button class="filter-btn" data-filter="Vychystáno/odesláno" onclick="setFilter('Vychystáno/odesláno')"><span class="filter-dot" style="background:#3ab0a0"></span>Vydáno</button>
   <button class="filter-btn" data-filter="Urgentní"      onclick="setFilter('Urgentní')"><span class="filter-dot" style="background:#f07030"></span>Urgentní</button>
   <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search" placeholder="Hledat..." oninput="renderTable()"></div>
   <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
@@ -311,7 +311,7 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
           <option>Čeká na výrobu</option>
           <option>Ve výrobě</option>
           <option>Hotovo</option>
-          <option>Vydáno zákazníkovi</option>
+          <option>Vychystáno/odesláno</option>
         </select>
       </div>
       <div class="form-group"><label>Tel. technika</label><input type="tel" id="f-tel-technik" placeholder="+420..."></div>
@@ -344,7 +344,7 @@ const STATUS_CLASS = {
   'Čeká na výrobu':                's-ceka',
   'Ve výrobě':           's-vyroba',
   'Hotovo':              's-hotovo',
-  'Vydáno zákazníkovi':  's-vydano',
+  'Vychystáno/odesláno':  's-vydano',
 };
 const NAROCNOST_CLASS = { 'Jednoduchá':'narocnost-1', 'Střední':'narocnost-2', 'Složitá':'narocnost-3' };
 
@@ -361,7 +361,7 @@ function fmtDate(d){ const s=toInputDate(d); if(!s) return '—'; const [y,m,day
 function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
 function calcCountdown(deadline, stav){
-  if(stav==='Vydáno zákazníkovi') return {text:'Vydáno',cls:'countdown-done'};
+  if(stav==='Vychystáno/odesláno') return {text:'Vydáno',cls:'countdown-done'};
   if(stav==='Hotovo') return {text:'Hotovo',cls:'countdown-done'};
   const d=toInputDate(deadline); if(!d) return {text:'—',cls:''};
   const diff=Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
@@ -402,7 +402,7 @@ function setFilter(f){ filterVal=f; document.querySelectorAll('.filter-btn').for
 function sortBy(col){ sortDir=sortCol===col?sortDir*-1:1; sortCol=col; renderTable(); }
 
 function getCountdownDays(deadline, stav){
-  if(stav==='Vydáno zákazníkovi'||stav==='Hotovo') return 9999;
+  if(stav==='Vychystáno/odesláno'||stav==='Hotovo') return 9999;
   const d=toInputDate(deadline); if(!d) return 9998;
   return Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
 }
@@ -410,7 +410,7 @@ function getCountdownDays(deadline, stav){
 function getFiltered(){
   const q=(document.getElementById('search').value||'').toLowerCase();
   return data.filter(r=>{
-    if(filterVal==='aktivni') { if(r.stav==='Vydáno zákazníkovi') return false; }
+    if(filterVal==='aktivni') { if(r.stav==='Vychystáno/odesláno') return false; }
     else if(filterVal==='Urgentní') { if(r.priorita!=='Urgentní') return false; }
     else if(filterVal!=='vse') { if(r.stav!==filterVal) return false; }
     if(q&&![r.obj,r.zakaznik,r.typ,r.technik,r.zadal,r.poznamka].join(' ').toLowerCase().includes(q)) return false;
@@ -434,19 +434,19 @@ function renderTable(){
   const rows=getFiltered();
 
   // Statistiky
-  document.getElementById('stat-total').textContent=data.filter(r=>r.stav!=='Vydáno zákazníkovi').length;
+  document.getElementById('stat-total').textContent=data.filter(r=>r.stav!=='Vychystáno/odesláno').length;
   document.getElementById('stat-ceka').textContent=data.filter(r=>r.stav==='Čeká na výrobu').length;
   document.getElementById('stat-vyroba').textContent=data.filter(r=>r.stav==='Ve výrobě').length;
   document.getElementById('stat-hotovo').textContent=data.filter(r=>r.stav==='Hotovo').length;
-  document.getElementById('stat-urgent').textContent=data.filter(r=>r.priorita==='Urgentní'&&r.stav!=='Vydáno zákazníkovi').length;
+  document.getElementById('stat-urgent').textContent=data.filter(r=>r.priorita==='Urgentní'&&r.stav!=='Vychystáno/odesláno').length;
 
   // Urgentní upozornění
   const todayStr=dateStr(today);
-  const urgent=data.filter(r=>r.priorita==='Urgentní'&&r.stav!=='Vydáno zákazníkovi'&&r.stav!=='Hotovo');
+  const urgent=data.filter(r=>r.priorita==='Urgentní'&&r.stav!=='Vychystáno/odesláno'&&r.stav!=='Hotovo');
   const blizici=data.filter(r=>{
     const d=toInputDate(r.deadline); if(!d) return false;
     const diff=Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
-    return diff<=2&&diff>=0&&r.stav!=='Vydáno zákazníkovi'&&r.stav!=='Hotovo';
+    return diff<=2&&diff>=0&&r.stav!=='Vychystáno/odesláno'&&r.stav!=='Hotovo';
   });
   const bar=document.getElementById('urgent-bar');
   const msgs=[];
