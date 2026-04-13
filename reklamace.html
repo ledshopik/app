@@ -598,6 +598,7 @@ function toInputDate(d){
   const dt=new Date(d); if(isNaN(dt)) return '';
   return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
 }
+function objLink(v){ const d=String(v||'').replace(/\D/g,''); if(d.length<4) return v||'—'; return `<a href="https://www.ledshopik.cz/administrace.php?objednavky&id=${d.slice(-6)}" target="_blank" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">${v}</a>`; }
 function fmtDate(d){
   const s=toInputDate(d); if(!s) return '—';
   const [y,m,day]=s.split('-'); return `${day}.${m}.${y}`;
@@ -712,7 +713,7 @@ function renderTable(){
 
   tbody.innerHTML=rows.map(r=>`
     <tr data-id="${r.id}" data-stav="${String(r.stav)}" onclick="openModal('${r.id}')">
-      <td class="obj">${String(r.obj||'')||'—'}</td>
+      <td class="obj">${objLink(r.obj)}</td>
       <td class="zakaznik">${String(r.zakaznik||'')||'—'}</td>
       <td><span style="font-size:11px;color:#999;">${String(r.typ||'')||'—'}</span></td>
       <td class="popis">${String(r.popis||'')}</td>

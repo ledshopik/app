@@ -518,6 +518,7 @@ function toInputDate(d){
   return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
 }
 
+function objLink(v){ const d=String(v||'').replace(/\D/g,''); if(d.length<4) return v||'—'; return `<a href="https://www.ledshopik.cz/administrace.php?objednavky&id=${d.slice(-6)}" target="_blank" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">${v}</a>`; }
 function fmtDate(d){
   const s=toInputDate(d);
   if(!s) return '—';
@@ -542,7 +543,7 @@ function renderTable(){
   document.getElementById('empty-state').style.display='none';
   tbody.innerHTML=rows.map(r=>`
     <tr data-id="${r.id}" data-status="${r.status}" onclick="openModal('${r.id}')">
-      <td class="obj">${r.obj||'—'}</td>
+      <td class="obj">${objLink(r.obj)}</td>
       <td class="misto">${r.misto||'—'}</td>
       <td>${r.obsah||'—'}</td>
       <td class="datum">${fmtDate(r.datum)}</td>
