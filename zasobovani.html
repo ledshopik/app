@@ -611,6 +611,7 @@ function toInputDate(d){
   return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
 }
 function fmtDate(d){ const s=toInputDate(d); if(!s) return '—'; const [y,m,day]=s.split('-'); return `${day}.${m}.${y}`; }
+function objLink(v){ const d=String(v||'').replace(/\D/g,''); if(d.length<4) return v||'—'; return `<a href="https://www.ledshopik.cz/administrace.php?objednavky&id=${d.slice(-6)}" target="_blank" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">${v}</a>`; }
 
 function calcCountdown(doruceni, stav){
   if(stav==='Doručeno'||stav==='Zrušeno') return {text:stav==='Doručeno'?'✓':'—',cls:'countdown-done'};
@@ -721,7 +722,7 @@ function renderTable(){
     const tracking=r.tracking?`<a href="${trackingUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;font-family:monospace;color:#c8a830;text-decoration:none;" title="Sledovat zásilku">🔍 ${r.tracking}</a>`:'—';
     return `<tr data-id="${r.id}" class="${isSelected?'row-selected':''}" style="${isDelay&&!isSelected?'background:#fce8e8;':''}" onclick="openModal('${r.id}')">
       <td class="td-check" onclick="event.stopPropagation()"><input type="checkbox" class="row-checkbox" ${isSelected?'checked':''} onchange="toggleSelect('${r.id}',this)"></td>
-      <td class="cislo">${r.cislo_obj||'—'}</td>
+      <td class="cislo">${objLink(r.cislo_obj)}</td>
       <td class="dodavatel-name">${r.dodavatel||'—'}</td>
       <td style="font-size:11px;">${r.zeme||'—'}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.obsah||'—'}</td>

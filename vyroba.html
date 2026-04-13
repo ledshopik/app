@@ -358,6 +358,7 @@ function toInputDate(d){
   return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
 }
 function fmtDate(d){ const s=toInputDate(d); if(!s) return '—'; const [y,m,day]=s.split('-'); return `${day}.${m}.${y}`; }
+function objLink(v){ const d=String(v||'').replace(/\D/g,''); if(d.length<4) return v||'—'; return `<a href="https://www.ledshopik.cz/administrace.php?objednavky&id=${d.slice(-6)}" target="_blank" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">${v}</a>`; }
 function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
 function calcCountdown(deadline, stav){
@@ -470,7 +471,7 @@ function renderTable(){
   tbody.innerHTML=rows.map((r,i)=>`
     <tr data-id="${r.id}" data-priorita="${r.priorita}" onclick="openModal('${r.id}')">
       <td>${r.priorita==='Urgentní'?'<span class="prio-urgent">⚡ URGENTNÍ</span>':'<span class="prio-normal">Normální</span>'}</td>
-      <td class="obj">${r.obj||'—'}</td>
+      <td class="obj">${objLink(r.obj)}</td>
       <td class="zakaznik">${r.zakaznik||'—'}</td>
       <td style="font-size:11px;">${r.typ||'—'}</td>
       <td><span class="${NAROCNOST_CLASS[r.narocnost]||''}" style="font-size:11px;font-weight:700;">${r.narocnost||'—'}</span></td>
