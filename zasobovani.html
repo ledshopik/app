@@ -143,6 +143,28 @@ td.dodavatel-name { font-weight: 600; color: #1a1a1a; }
 #modal-dod-overlay.open { display: flex; }
 #modal-dod { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 500px; }
 
+/* Modal dopravce */
+#modal-dopr-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#modal-dopr-overlay.open { display: flex; }
+#modal-dopr { background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-width: 520px; }
+
+/* Dopravce detail popup */
+#dopr-popup { display: none; position: fixed; z-index: 250; background: #fff; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 6px 28px rgba(0,0,0,.18); padding: 0; width: 300px; }
+#dopr-popup.open { display: block; }
+#dopr-popup .dp-header { padding: 14px 16px 10px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; }
+#dopr-popup .dp-name { font-size: 14px; font-weight: 800; color: #1a1a1a; }
+#dopr-popup .dp-close { background: none; border: none; color: #aaa; font-size: 16px; cursor: pointer; padding: 0 2px; }
+#dopr-popup .dp-close:hover { color: #444; }
+#dopr-popup .dp-body { padding: 12px 16px; display: flex; flex-direction: column; gap: 7px; }
+#dopr-popup .dp-row { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; }
+#dopr-popup .dp-lbl { font-size: 9px; font-weight: 700; letter-spacing: .12em; color: #aaa; text-transform: uppercase; min-width: 80px; padding-top: 1px; }
+#dopr-popup .dp-val { color: #333; flex: 1; }
+#dopr-popup .dp-val a { color: #c8a830; text-decoration: none; }
+#dopr-popup .dp-val a:hover { text-decoration: underline; }
+#dopr-popup .dp-footer { padding: 10px 16px 12px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 8px; }
+.dopr-link { color: #c8a830; cursor: pointer; font-size: 11px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; }
+.dopr-link:hover { text-decoration: underline; }
+
 #saving-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 300; align-items: center; justify-content: center; }
 #saving-overlay.open { display: flex; }
 #saving-box { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 24px 36px; text-align: center; }
@@ -239,6 +261,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
   <button class="tab-btn" onclick="switchTab('evidence')">📋 Evidence</button>
   <div style="flex:1;"></div>
   <button class="tab-btn" onclick="switchTab('dodavatele')">🏭 Dodavatelé</button>
+  <button class="tab-btn" onclick="switchTab('dopravci')">🚚 Dopravci</button>
 </div>
 
 <!-- Upozornění na zpoždění -->
@@ -317,6 +340,29 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
       <tbody id="tbody-dod"></tbody>
     </table>
     <div id="empty-dod" style="text-align:center;padding:60px 20px;color:#888;display:none;"><div style="font-size:36px;margin-bottom:10px;">🏭</div><p>Žádní dodavatelé</p></div>
+  </div>
+</div>
+
+<!-- DOPRAVCI TAB -->
+<div id="tab-dopravci" style="display:none;">
+  <div id="toolbar-dopr" style="display:flex;padding:14px 32px;gap:10px;align-items:center;border-bottom:1px solid #e8e4dc;background:#f4f2ed;">
+    <button onclick="openModalDopr()" style="background:#c8a830;color:#000;border:none;border-radius:6px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;">+ Nový dopravce</button>
+    <div style="font-size:11px;color:#888;margin-left:8px;"><b style="color:#c8a830;">TIP:</b> Po přidání dopravce bude jeho název v zásilkách klikatelný → zobrazí kontakty a tracking</div>
+  </div>
+  <div style="padding:0 32px 32px;overflow-x:auto;">
+    <table>
+      <thead><tr>
+        <th>Název</th>
+        <th>Tel. centrála</th>
+        <th>Tel. kurýr</th>
+        <th>Adresa depa</th>
+        <th>Tracking URL</th>
+        <th>Poznámka</th>
+        <th></th>
+      </tr></thead>
+      <tbody id="tbody-dopr"></tbody>
+    </table>
+    <div id="empty-dopr" style="text-align:center;padding:60px 20px;color:#888;display:none;"><div style="font-size:36px;margin-bottom:10px;">🚚</div><p>Žádní dopravci</p><p style="font-size:11px;margin-top:6px;">Přidejte dopravce a jejich kontakty.</p></div>
   </div>
 </div>
 
@@ -461,6 +507,41 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
   </div>
 </div>
 
+<!-- Modal dopravce -->
+<div id="modal-dopr-overlay">
+  <div id="modal-dopr">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid #e8e4dc;display:flex;align-items:center;justify-content:space-between;">
+      <div id="modal-dopr-title" style="font-size:16px;font-weight:800;">Nový dopravce</div>
+      <button onclick="closeModalDopr()" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="form-group" style="grid-column:1/-1;"><label>Název dopravce</label><input type="text" id="fdr-nazev" placeholder="např. DHL, FedEx, PPL..."></div>
+      <div class="form-group"><label>Tel. centrála</label><input type="tel" id="fdr-tel-centrala" placeholder="+420 800 ..."></div>
+      <div class="form-group"><label>Tel. kurýr</label><input type="tel" id="fdr-tel-kuryra" placeholder="+420 ..."></div>
+      <div class="form-group" style="grid-column:1/-1;"><label>Adresa depa</label><input type="text" id="fdr-adresa" placeholder="Ulice, Město, PSČ"></div>
+      <div class="form-group" style="grid-column:1/-1;"><label>URL trackingu</label><input type="url" id="fdr-tracking-url" placeholder="https://www.dhl.com/tracking?..."></div>
+      <div class="form-group" style="grid-column:1/-1;"><label>Poznámka</label><textarea id="fdr-poznamka" style="background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a1a;padding:8px 12px;font-size:13px;outline:none;width:100%;resize:vertical;min-height:60px;" placeholder="Provozní hodiny, poznámky..."></textarea></div>
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid #e8e4dc;display:flex;gap:10px;justify-content:flex-end;">
+      <button id="btn-dopr-delete" onclick="deleteDopr()" style="display:none;margin-right:auto;background:none;color:#c05050;border:1px solid #f0c8c8;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">🗑 Smazat</button>
+      <button class="btn-cancel" onclick="closeModalDopr()">Zrušit</button>
+      <button class="btn-save" onclick="saveDopr()">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dopravce detail popup -->
+<div id="dopr-popup">
+  <div class="dp-header">
+    <div class="dp-name" id="dp-name">—</div>
+    <button class="dp-close" onclick="hideDopravciDetail()">✕</button>
+  </div>
+  <div class="dp-body" id="dp-body"></div>
+  <div class="dp-footer">
+    <button onclick="editDoprFromPopup()" style="background:#f4f2ed;border:1px solid #ddd;color:#666;border-radius:6px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;">✏ Upravit</button>
+  </div>
+</div>
+
 <!-- Bulk action bar -->
 <div id="bulk-bar">
   <span class="bulk-count" id="bulk-count">0 vybráno</span>
@@ -588,6 +669,7 @@ const SB_HEADERS = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY
 const BACKEND_URL = 'https://ledshopik-backend-production.up.railway.app/api/compat';
 const COLS_ZAS = ['id','cislo_obj','dodavatel','zeme','zpusob_dopravy','obsah','pocet_ks','hodnota','mena','datum_objednani','termin_zakaznik','termin_dodavatel','ocekavane_doruceni','tracking','vazba_zakazka','stav','faktura','poznamka'];
 const COLS_DOD = ['id','nazev','zeme','kontakt','email','web','doprava_vychozi','poznamka'];
+const COLS_DOPR = ['id','nazev','adresa','tel_centrala','tel_kuryra','tracking_url','poznamka'];
 
 const STATUS_CLASS = {
   'Objednáno':             's-objednano',
@@ -598,7 +680,7 @@ const STATUS_CLASS = {
   'Zrušeno':               's-zruseno',
 };
 
-let dataZas=[], dataDod=[], filterVal='aktivni', sortCol='ocekavane_doruceni', sortDir=1, editId=null, editDodId=null;
+let dataZas=[], dataDod=[], dataDopravci=[], filterVal='aktivni', sortCol='ocekavane_doruceni', sortDir=1, editId=null, editDodId=null, editDoprId=null, _doprPopupId=null;
 const selectedIds = new Set();
 let modalUploadData = ''; // stores base64 data URL from modal file upload
 let bulkUploadData = ''; // stores base64 data URL from bulk file upload
@@ -612,6 +694,12 @@ function toInputDate(d){
 }
 function fmtDate(d){ const s=toInputDate(d); if(!s) return '—'; const [y,m,day]=s.split('-'); return `${day}.${m}.${y}`; }
 function objLink(v){ const d=String(v||'').replace(/\D/g,''); if(d.length<4) return v||'—'; return `<a href="https://www.ledshopik.cz/administrace.php?objednavky&id=${d.slice(-6)}" target="_blank" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">${v}</a>`; }
+function dopravceLink(val){
+  if(!val) return '—';
+  const d=dataDopravci.find(d=>val.toLowerCase().includes(d.nazev.toLowerCase())||d.nazev.toLowerCase().includes(val.toLowerCase()));
+  if(d) return `<span class="dopr-link" onclick="event.stopPropagation();showDopravciDetail('${d.id}',event)" title="Zobrazit detail dopravce">${val} 🔗</span>`;
+  return val;
+}
 
 function calcCountdown(doruceni, stav){
   if(stav==='Doručeno'||stav==='Zrušeno') return {text:stav==='Doručeno'?'✓':'—',cls:'countdown-done'};
@@ -629,17 +717,20 @@ function syncStatus(state,text){ document.getElementById('sync-dot').className=s
 async function loadData(){
   syncStatus('loading','Načítám data...');
   try {
-    const [rZas, rDod, rEvi] = await Promise.all([
+    const [rZas, rDod, rEvi, rDopr] = await Promise.all([
       fetch(SUPABASE_URL+'/rest/v1/zasilky?select=*',{headers:SB_HEADERS}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}),
       fetch(SUPABASE_URL+'/rest/v1/dodavatele?select=*',{headers:SB_HEADERS}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}),
-      fetch(SUPABASE_URL+'/rest/v1/evidence?select=*',{headers:SB_HEADERS}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).catch(()=>[])
+      fetch(SUPABASE_URL+'/rest/v1/evidence?select=*',{headers:SB_HEADERS}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).catch(()=>[]),
+      fetch(SUPABASE_URL+'/rest/v1/dopravci?select=*',{headers:SB_HEADERS}).then(r=>{if(!r.ok)return [];return r.json();}).catch(()=>[])
     ]);
     dataZas = rZas;
     dataDod  = rDod;
     dataEvi  = rEvi;
+    dataDopravci = Array.isArray(rDopr) ? rDopr : [];
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderTable();
     renderDodavatele();
+    renderDopravci();
     updateDodavatelSelect();
     renderEvidence();
   } catch(e){ syncStatus('error','Chyba: '+e.message); }
@@ -659,12 +750,13 @@ async function sbDelete(table,id){
 }
 
 function switchTab(tab){
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
-    const tabs=['zasilky','dodavatele','evidence'];
-    b.classList.toggle('active', tabs[i]===tab);
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    const m=(b.getAttribute('onclick')||'').match(/switchTab\('(\w+)'\)/);
+    if(m) b.classList.toggle('active', m[1]===tab);
   });
   document.getElementById('tab-zasilky').style.display = tab==='zasilky'?'block':'none';
   document.getElementById('tab-dodavatele').style.display = tab==='dodavatele'?'block':'none';
+  document.getElementById('tab-dopravci').style.display = tab==='dopravci'?'block':'none';
   document.getElementById('tab-evidence').style.display = tab==='evidence'?'block':'none';
   if(tab==='evidence') renderEvidence();
 }
@@ -728,7 +820,7 @@ function renderTable(){
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.obsah||'—'}</td>
       <td style="text-align:center;">${r.pocet_ks||'—'}</td>
       <td style="font-weight:700;color:#c8a830;">${hodnota}</td>
-      <td style="font-size:11px;">${r.zpusob_dopravy||'—'}</td>
+      <td style="font-size:11px;">${dopravceLink(r.zpusob_dopravy)}</td>
       <td class="datum">${fmtDate(r.datum_objednani)}</td>
       <td class="datum">${fmtDate(r.termin_zakaznik)}</td>
       <td class="datum">${fmtDate(r.termin_dodavatel)}</td>
@@ -943,6 +1035,116 @@ async function deleteDodavatel(){
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
 }
 
+
+// === DOPRAVCI ===
+
+function renderDopravci(){
+  const tbody=document.getElementById('tbody-dopr');
+  if(!tbody) return;
+  if(!dataDopravci.length){ tbody.innerHTML=''; document.getElementById('empty-dopr').style.display='block'; return; }
+  document.getElementById('empty-dopr').style.display='none';
+  tbody.innerHTML=dataDopravci.map(d=>`
+    <tr onclick="openModalDopr('${d.id}')" style="cursor:pointer;border-bottom:1px solid #f0ede6;">
+      <td style="font-weight:700;color:#1a1a1a;padding:10px 14px;">${d.nazev||'—'}</td>
+      <td style="padding:10px 14px;font-size:12px;">${d.tel_centrala?`<a href="tel:${d.tel_centrala}" onclick="event.stopPropagation()" style="color:#c8a830;">${d.tel_centrala}</a>`:'—'}</td>
+      <td style="padding:10px 14px;font-size:12px;">${d.tel_kuryra?`<a href="tel:${d.tel_kuryra}" onclick="event.stopPropagation()" style="color:#c8a830;">${d.tel_kuryra}</a>`:'—'}</td>
+      <td style="padding:10px 14px;font-size:11px;color:#666;">${d.adresa||'—'}</td>
+      <td style="padding:10px 14px;font-size:11px;">${d.tracking_url?`<a href="${d.tracking_url}" target="_blank" onclick="event.stopPropagation()" style="color:#c8a830;">🔗 Tracking</a>`:'—'}</td>
+      <td style="padding:10px 14px;font-size:11px;color:#999;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.poznamka||''}</td>
+      <td style="padding:10px 14px;"><button onclick="event.stopPropagation();openModalDopr('${d.id}')" style="background:#f4f2ed;border:1px solid #ddd;color:#888;border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;">Upravit</button></td>
+    </tr>`).join('');
+}
+
+function openModalDopr(id){
+  const d=id?dataDopravci.find(x=>String(x.id)===String(id)):null;
+  editDoprId=d?String(d.id):null;
+  document.getElementById('modal-dopr-title').textContent=d?'Upravit dopravce':'Nový dopravce';
+  document.getElementById('btn-dopr-delete').style.display=d?'inline-flex':'none';
+  if(d){
+    document.getElementById('fdr-nazev').value=d.nazev||'';
+    document.getElementById('fdr-tel-centrala').value=d.tel_centrala||'';
+    document.getElementById('fdr-tel-kuryra').value=d.tel_kuryra||'';
+    document.getElementById('fdr-adresa').value=d.adresa||'';
+    document.getElementById('fdr-tracking-url').value=d.tracking_url||'';
+    document.getElementById('fdr-poznamka').value=d.poznamka||'';
+  } else {
+    ['fdr-nazev','fdr-tel-centrala','fdr-tel-kuryra','fdr-adresa','fdr-tracking-url','fdr-poznamka'].forEach(fid=>document.getElementById(fid).value='');
+  }
+  document.getElementById('modal-dopr-overlay').classList.add('open');
+}
+
+function closeModalDopr(){ document.getElementById('modal-dopr-overlay').classList.remove('open'); editDoprId=null; }
+
+async function saveDopr(){
+  const isEdit=!!editDoprId;
+  const rec={
+    id: editDoprId||String(Date.now()),
+    nazev: document.getElementById('fdr-nazev').value.trim(),
+    tel_centrala: document.getElementById('fdr-tel-centrala').value.trim(),
+    tel_kuryra: document.getElementById('fdr-tel-kuryra').value.trim(),
+    adresa: document.getElementById('fdr-adresa').value.trim(),
+    tracking_url: document.getElementById('fdr-tracking-url').value.trim(),
+    poznamka: document.getElementById('fdr-poznamka').value.trim(),
+  };
+  if(!rec.nazev){ alert('Vyplňte název dopravce'); return; }
+  closeModalDopr();
+  showSaving(isEdit?'Ukládám dopravce...':'Přidávám dopravce...','');
+  try {
+    if(isEdit) await sbUpdate('dopravci',rec.id,rec); else await sbInsert('dopravci',rec);
+    showSaving('Hotovo!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+async function deleteDopr(){
+  if(!editDoprId||!confirm('Opravdu smazat tohoto dopravce?')) return;
+  const id=editDoprId; closeModalDopr();
+  showSaving('Mažu...','');
+  try {
+    await sbDelete('dopravci',id);
+    showSaving('Smazáno!','');
+    setTimeout(async()=>{ hideSaving(); await loadData(); },800);
+  } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
+}
+
+function showDopravciDetail(id, evt){
+  const d=dataDopravci.find(x=>String(x.id)===String(id));
+  if(!d) return;
+  _doprPopupId=String(id);
+  document.getElementById('dp-name').textContent=d.nazev||'—';
+  const rows=[
+    {lbl:'Adresa depa', val: d.adresa||'—'},
+    {lbl:'Tel. centrála', val: d.tel_centrala?`<a href="tel:${d.tel_centrala}">${d.tel_centrala}</a>`:'—'},
+    {lbl:'Tel. kurýr', val: d.tel_kuryra?`<a href="tel:${d.tel_kuryra}">${d.tel_kuryra}</a>`:'—'},
+    {lbl:'Tracking', val: d.tracking_url?`<a href="${d.tracking_url}" target="_blank">🔗 Otevřít tracking</a>`:'—'},
+    d.poznamka?{lbl:'Poznámka', val: d.poznamka}:null,
+  ].filter(Boolean);
+  document.getElementById('dp-body').innerHTML=rows.map(r=>`<div class="dp-row"><span class="dp-lbl">${r.lbl}</span><span class="dp-val">${r.val}</span></div>`).join('');
+  const popup=document.getElementById('dopr-popup');
+  popup.classList.add('open');
+  // Pozicovat popup u kliknutého prvku
+  if(evt){
+    const r=evt.target.getBoundingClientRect();
+    const top=r.bottom+6+window.scrollY;
+    const left=Math.min(r.left, window.innerWidth-320);
+    popup.style.top=top+'px';
+    popup.style.left=Math.max(10,left)+'px';
+  }
+  // Zavřít při kliku mimo
+  setTimeout(()=>{
+    function outsideClick(e){ if(!popup.contains(e.target)){hideDopravciDetail();document.removeEventListener('click',outsideClick);} }
+    document.addEventListener('click',outsideClick);
+  },50);
+}
+
+function hideDopravciDetail(){
+  document.getElementById('dopr-popup').classList.remove('open');
+  _doprPopupId=null;
+}
+
+function editDoprFromPopup(){
+  if(_doprPopupId){ hideDopravciDetail(); switchTab('dopravci'); setTimeout(()=>openModalDopr(_doprPopupId),50); }
+}
 
 function toggleStats(){
   const p=document.getElementById('stats-panel');
