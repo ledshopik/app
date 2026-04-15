@@ -824,9 +824,9 @@ function showPoznamkaPopup(id, evt){
   const popup = document.getElementById('poznamka-popup');
   popup.classList.add('open');
   const rect = evt.currentTarget.getBoundingClientRect();
-  const top = rect.bottom + 6 + window.scrollY;
+  const top = Math.min(rect.bottom + 6, window.innerHeight - 160);
   const left = Math.min(rect.left, window.innerWidth - 340);
-  popup.style.top = top + 'px';
+  popup.style.top = Math.max(10, top) + 'px';
   popup.style.left = Math.max(10, left) + 'px';
   setTimeout(() => {
     function outsideClick(e){ if(!popup.contains(e.target)){ hidePoznamkaPopup(); document.removeEventListener('click', outsideClick); } }
