@@ -88,6 +88,17 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
 .s-vyroba  { background: #fdf4d8; color: #e2b830; border: 1px solid #f0e0a0; } .s-vyroba .badge-dot  { background: #e2b830; }
 .s-hotovo  { background: #e0f0e0; color: #40a050; border: 1px solid #c0dcc0; } .s-hotovo .badge-dot  { background: #40a050; }
 .s-vydano  { background: #e0f8e0; color: #3ab0a0; border: 1px solid #c0e8d0; } .s-vydano .badge-dot  { background: #3ab0a0; }
+/* Poznámka popup */
+#poznamka-popup { display:none; position:fixed; z-index:9998; background:#fff; border:1px solid #ddd; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,.15); padding:14px 16px; max-width:320px; min-width:200px; }
+#poznamka-popup.open { display:block; }
+#poznamka-popup .pn-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+#poznamka-popup .pn-label { font-size:9px; font-weight:700; letter-spacing:.15em; color:#aaa; text-transform:uppercase; }
+#poznamka-popup .pn-close { background:none; border:none; color:#aaa; font-size:15px; cursor:pointer; padding:0; line-height:1; }
+#poznamka-popup .pn-close:hover { color:#444; }
+#poznamka-popup .pn-text { font-size:12px; color:#333; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+td.poznamka-cell { cursor:pointer; }
+td.poznamka-cell:hover { color:#c8a830 !important; }
+
 /* Quick-change stav popup */
 #stav-popup { display:none; position:fixed; z-index:9999; background:#fff; border:1px solid #ddd; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,.15); padding:6px 0; min-width:180px; }
 #stav-popup .sp-item { padding:8px 16px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:8px; }
@@ -565,6 +576,14 @@ tbody tr[data-priorita="Normální"] td:first-child { border-left: 3px solid #dd
   </div>
 </div>
 
+<div id="poznamka-popup">
+  <div class="pn-header">
+    <span class="pn-label">Poznámka</span>
+    <button class="pn-close" onclick="hidePoznamkaPopup()">✕</button>
+  </div>
+  <div class="pn-text" id="pn-text"></div>
+</div>
+
 <div id="stav-popup">
   <div class="sp-item" onclick="applyQuickStav('Čeká na výrobu')"><span class="badge s-ceka"><span class="badge-dot"></span>Čeká na výrobu</span></div>
   <div class="sp-item" onclick="applyQuickStav('Ve výrobě')"><span class="badge s-vyroba"><span class="badge-dot"></span>Ve výrobě</span></div>
@@ -746,7 +765,7 @@ function renderTable(){
       <td style="font-size:11px;color:#999;">${r.zadal||'—'}</td>
       <td class="stav-cell" onclick="quickChangeStav('${r.id}',event)"><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
       <td class="datum" style="color:${r.datum_hotovo?'#3a8048':'#ccc'};">${r.datum_hotovo?fmtDate(r.datum_hotovo):'—'}</td>
-      <td style="font-size:11px;color:#999;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.poznamka||''}</td>
+      <td class="${r.poznamka?'poznamka-cell':''}" style="font-size:11px;color:#999;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" ${r.poznamka?`onclick="event.stopPropagation();showPoznamkaPopup('${r.id}',event)"`:''} title="${r.poznamka?'Kliknutím zobrazíš celý text':''}">${r.poznamka||''}</td>
     </tr>`).join('');
 }
 
@@ -797,6 +816,26 @@ function openModal(id){
 }
 
 function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); editId=null; }
+
+function showPoznamkaPopup(id, evt){
+  const r = data.find(x => String(x.id) === String(id));
+  if(!r || !r.poznamka) return;
+  document.getElementById('pn-text').textContent = r.poznamka;
+  const popup = document.getElementById('poznamka-popup');
+  popup.classList.add('open');
+  const rect = evt.currentTarget.getBoundingClientRect();
+  const top = rect.bottom + 6 + window.scrollY;
+  const left = Math.min(rect.left, window.innerWidth - 340);
+  popup.style.top = top + 'px';
+  popup.style.left = Math.max(10, left) + 'px';
+  setTimeout(() => {
+    function outsideClick(e){ if(!popup.contains(e.target)){ hidePoznamkaPopup(); document.removeEventListener('click', outsideClick); } }
+    document.addEventListener('click', outsideClick);
+  }, 50);
+}
+function hidePoznamkaPopup(){
+  document.getElementById('poznamka-popup').classList.remove('open');
+}
 
 let _stavPopupId = null;
 function quickChangeStav(id, event){
