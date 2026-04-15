@@ -426,17 +426,6 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
           <option>Kurýr UPS</option><option>Silnice</option>
         </select>
       </div>
-      <div class="form-group full"><label>Obsah zásilky</label><input type="text" id="f-obsah" placeholder="Co je v zásilce"></div>
-      <div class="form-group"><label>Počet ks / balení</label><input type="text" id="f-pocet" placeholder="např. 500 ks / 10 krabic"></div>
-      <div class="form-group" style="display:flex;gap:8px;">
-        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
-          <label>Hodnota</label><input type="number" id="f-hodnota" placeholder="0" step="0.01">
-        </div>
-        <div style="width:90px;display:flex;flex-direction:column;gap:5px;">
-          <label>Měna</label>
-          <select id="f-mena"><option>USD</option><option>EUR</option><option>CZK</option><option>CNY</option></select>
-        </div>
-      </div>
       <div class="form-group"><label>Datum objednání</label><input type="date" id="f-datum-obj"></div>
       <div class="form-group"><label>Termín zákazník</label><input type="date" id="f-termin-zak"></div>
       <div class="form-group"><label>Termín dokončení výroby</label><input type="date" id="f-termin-dod"></div>
@@ -893,10 +882,6 @@ function openModal(id){
     document.getElementById('f-dodavatel').value=r.dodavatel||'';
     setZemeValue(r.zeme||'Čína');
     document.getElementById('f-doprava').value=r.zpusob_dopravy||'Letecky';
-    document.getElementById('f-obsah').value=r.obsah||'';
-    document.getElementById('f-pocet').value=r.pocet_ks||'';
-    document.getElementById('f-hodnota').value=r.hodnota||'';
-    document.getElementById('f-mena').value=r.mena||'USD';
     document.getElementById('f-datum-obj').value=toInputDate(r.datum_objednani);
     document.getElementById('f-termin-zak').value=toInputDate(r.termin_zakaznik);
     document.getElementById('f-termin-dod').value=toInputDate(r.termin_dodavatel);
@@ -906,7 +891,7 @@ function openModal(id){
     document.getElementById('f-faktura').value=r.faktura||'';
     document.getElementById('f-poznamka').value=r.poznamka||'';
   } else {
-    ['f-cislo','f-zakaznik','f-obsah','f-pocet','f-hodnota','f-tracking','f-faktura','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
+    ['f-cislo','f-zakaznik','f-tracking','f-faktura','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('f-dodavatel').value='';
     setZemeValue('Čína');
     document.getElementById('f-doprava').value='Letecky';
@@ -965,10 +950,6 @@ async function saveRecord(){
     dodavatel:        document.getElementById('f-dodavatel').value,
     zeme:             (document.getElementById('f-zeme').value==='Jiné' ? document.getElementById('f-zeme-jine').value.trim()||'Jiné' : document.getElementById('f-zeme').value),
     zpusob_dopravy:   document.getElementById('f-doprava').value,
-    obsah:            document.getElementById('f-obsah').value.trim(),
-    pocet_ks:         document.getElementById('f-pocet').value.trim(),
-    hodnota:          document.getElementById('f-hodnota').value,
-    mena:             document.getElementById('f-mena').value,
     datum_objednani:  document.getElementById('f-datum-obj').value,
     termin_zakaznik:  document.getElementById('f-termin-zak').value,
     termin_dodavatel: document.getElementById('f-termin-dod').value,
@@ -1273,10 +1254,6 @@ function duplicateRecord(){
     document.getElementById('f-dodavatel').value=r.dodavatel||'';
     setZemeValue(r.zeme||'Čína');
     document.getElementById('f-doprava').value=r.zpusob_dopravy||'Letecky';
-    document.getElementById('f-obsah').value=r.obsah||'';
-    document.getElementById('f-pocet').value=r.pocet_ks||'';
-    document.getElementById('f-hodnota').value=r.hodnota||'';
-    document.getElementById('f-mena').value=r.mena||'USD';
     document.getElementById('f-stav').value='Objednáno';
     document.getElementById('f-datum-obj').value=toInputDate(today);
     ['f-termin-zak','f-termin-dod','f-doruceni','f-tracking','f-vazba','f-faktura'].forEach(fid=>{
