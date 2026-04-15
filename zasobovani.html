@@ -408,6 +408,13 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
     <div id="modal-body">
       <div class="form-group"><label>OBJ. Č.</label><input type="text" id="f-cislo" placeholder="např. 2024-CN-001"></div>
       <div class="form-group"><label>Zákazník</label><input type="text" id="f-zakaznik" placeholder="Jméno zákazníka"></div>
+      <div class="form-group" style="display:flex;gap:8px;align-items:flex-end;">
+        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#888;text-transform:uppercase;">E-mail zákazníka</label>
+          <input type="email" id="f-email-zakaznika" placeholder="zakaznik@email.cz">
+        </div>
+        <button type="button" onclick="sendInfoEmail()" title="Odeslat informační e-mail zákazníkovi" style="background:#4090d0;color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">📧 Odeslat info</button>
+      </div>
       <div class="form-group"><label>Dodavatel</label>
         <select id="f-dodavatel"><option value="">— vyberte —</option></select>
       </div>
@@ -879,6 +886,7 @@ function openModal(id){
   if(r){
     document.getElementById('f-cislo').value=r.cislo_obj||'';
     document.getElementById('f-zakaznik').value=r.zakaznik||'';
+    document.getElementById('f-email-zakaznika').value=r.email_zakaznika||'';
     document.getElementById('f-dodavatel').value=r.dodavatel||'';
     setZemeValue(r.zeme||'Čína');
     document.getElementById('f-doprava').value=r.zpusob_dopravy||'Letecky';
@@ -891,7 +899,7 @@ function openModal(id){
     document.getElementById('f-faktura').value=r.faktura||'';
     document.getElementById('f-poznamka').value=r.poznamka||'';
   } else {
-    ['f-cislo','f-zakaznik','f-tracking','f-faktura','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
+    ['f-cislo','f-zakaznik','f-email-zakaznika','f-tracking','f-faktura','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('f-dodavatel').value='';
     setZemeValue('Čína');
     document.getElementById('f-doprava').value='Letecky';
@@ -946,6 +954,7 @@ async function saveRecord(){
     id: editId||String(Date.now()),
     cislo_obj:        document.getElementById('f-cislo').value.trim(),
     zakaznik:         document.getElementById('f-zakaznik').value.trim(),
+    email_zakaznika:  document.getElementById('f-email-zakaznika').value.trim(),
     dodavatel:        document.getElementById('f-dodavatel').value,
     zeme:             (document.getElementById('f-zeme').value==='Jiné' ? document.getElementById('f-zeme-jine').value.trim()||'Jiné' : document.getElementById('f-zeme').value),
     zpusob_dopravy:   document.getElementById('f-doprava').value,
@@ -1141,6 +1150,29 @@ function hideDopravciDetail(){
 
 function editDoprFromPopup(){
   if(_doprPopupId){ hideDopravciDetail(); switchTab('dopravci'); setTimeout(()=>openModalDopr(_doprPopupId),50); }
+}
+
+function sendInfoEmail(){
+  const email = document.getElementById('f-email-zakaznika').value.trim();
+  if(!email){ alert('Vyplňte e-mail zákazníka.'); document.getElementById('f-email-zakaznika').focus(); return; }
+  const cislo    = document.getElementById('f-cislo').value.trim() || '—';
+  const zakaznik = document.getElementById('f-zakaznik').value.trim();
+  const doruceniRaw = document.getElementById('f-doruceni').value;
+  const doruceni = doruceniRaw ? fmtDate(doruceniRaw) : '—';
+  const osloveni = zakaznik ? `Dobrý den, ${zakaznik},` : 'Dobrý den,';
+  const subject  = `Informace k Vaší objednávce č. ${cislo}`;
+  const body =
+`${osloveni}
+
+rádi bychom Vás informovali o stavu Vaší objednávky č. ${cislo}.
+
+Předpokládané datum doručení: ${doruceni}
+
+V případě jakýchkoliv dotazů jsme Vám k dispozici.
+
+S pozdravem,
+Tým LEDshopik`;
+  window.open('mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body));
 }
 
 function toggleStats(){
