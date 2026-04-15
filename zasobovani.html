@@ -1181,9 +1181,9 @@ async function sendInfoEmail(){
   const subject  = `Informace k Vaší objednávce č. ${cislo}`;
   const body = `<p>${osloveni}</p>
 <p>rádi bychom Vás informovali o stavu Vaší objednávky č. <strong>${cislo}</strong>.</p>
-<p><strong>Předpokládané datum doručení: ${doruceni}</strong></p>
+<p><strong>Předpokládané datum naskladnění: ${doruceni}</strong></p>
 <p>V případě jakýchkoliv dotazů jsme Vám k dispozici.</p>
-<p>S pozdravem,<br><strong>Tým LEDshopik</strong></p>`;
+<p>S pozdravem,<br><strong>Tým LEDshopik</strong><br>Tel: +420 778 519 348<br>E-mail: erik.bilcik@ledshopik.cz</p>`;
 
   const btn = event.currentTarget;
   btn.disabled = true;
