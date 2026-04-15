@@ -412,11 +412,12 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
         <select id="f-dodavatel"><option value="">— vyberte —</option></select>
       </div>
       <div class="form-group"><label>Země původu</label>
-        <select id="f-zeme">
+        <select id="f-zeme" onchange="toggleZemeJine()">
           <option>Čína</option><option>Německo</option><option>Itálie</option>
           <option>Polsko</option><option>Taiwan</option><option>Jižní Korea</option>
           <option>USA</option><option>Jiné</option>
         </select>
+        <input type="text" id="f-zeme-jine" placeholder="Zadejte zemi..." style="display:none;margin-top:6px;">
       </div>
       <div class="form-group"><label>Způsob dopravy</label>
         <select id="f-doprava">
@@ -686,6 +687,22 @@ let modalUploadData = ''; // stores base64 data URL from modal file upload
 let bulkUploadData = ''; // stores base64 data URL from bulk file upload
 const today=new Date();
 
+const ZEME_OPTIONS = ['Čína','Německo','Itálie','Polsko','Taiwan','Jižní Korea','USA'];
+
+function toggleZemeJine(){
+  const sel=document.getElementById('f-zeme');
+  const inp=document.getElementById('f-zeme-jine');
+  if(sel.value==='Jiné'){ inp.style.display='block'; inp.focus(); }
+  else { inp.style.display='none'; inp.value=''; }
+}
+
+function setZemeValue(val){
+  const sel=document.getElementById('f-zeme');
+  const inp=document.getElementById('f-zeme-jine');
+  if(!val||ZEME_OPTIONS.includes(val)){ sel.value=val||'Čína'; inp.style.display='none'; inp.value=''; }
+  else { sel.value='Jiné'; inp.style.display='block'; inp.value=val; }
+}
+
 function toInputDate(d){
   if(!d||d==='') return '';
   if(typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
@@ -874,7 +891,7 @@ function openModal(id){
     document.getElementById('f-cislo').value=r.cislo_obj||'';
     document.getElementById('f-zakaznik').value=r.zakaznik||'';
     document.getElementById('f-dodavatel').value=r.dodavatel||'';
-    document.getElementById('f-zeme').value=r.zeme||'Čína';
+    setZemeValue(r.zeme||'Čína');
     document.getElementById('f-doprava').value=r.zpusob_dopravy||'Letecky';
     document.getElementById('f-obsah').value=r.obsah||'';
     document.getElementById('f-pocet').value=r.pocet_ks||'';
@@ -891,7 +908,7 @@ function openModal(id){
   } else {
     ['f-cislo','f-zakaznik','f-obsah','f-pocet','f-hodnota','f-tracking','f-faktura','f-poznamka'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('f-dodavatel').value='';
-    document.getElementById('f-zeme').value='Čína';
+    setZemeValue('Čína');
     document.getElementById('f-doprava').value='Letecky';
     document.getElementById('f-mena').value='USD';
     document.getElementById('f-stav').value='Objednáno';
@@ -946,7 +963,7 @@ async function saveRecord(){
     cislo_obj:        document.getElementById('f-cislo').value.trim(),
     zakaznik:         document.getElementById('f-zakaznik').value.trim(),
     dodavatel:        document.getElementById('f-dodavatel').value,
-    zeme:             document.getElementById('f-zeme').value,
+    zeme:             (document.getElementById('f-zeme').value==='Jiné' ? document.getElementById('f-zeme-jine').value.trim()||'Jiné' : document.getElementById('f-zeme').value),
     zpusob_dopravy:   document.getElementById('f-doprava').value,
     obsah:            document.getElementById('f-obsah').value.trim(),
     pocet_ks:         document.getElementById('f-pocet').value.trim(),
@@ -1254,7 +1271,7 @@ function duplicateRecord(){
     document.getElementById('btn-duplicate').style.display='none';
     document.getElementById('f-cislo').value='';
     document.getElementById('f-dodavatel').value=r.dodavatel||'';
-    document.getElementById('f-zeme').value=r.zeme||'Čína';
+    setZemeValue(r.zeme||'Čína');
     document.getElementById('f-doprava').value=r.zpusob_dopravy||'Letecky';
     document.getElementById('f-obsah').value=r.obsah||'';
     document.getElementById('f-pocet').value=r.pocet_ks||'';
