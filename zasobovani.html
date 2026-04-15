@@ -545,6 +545,7 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
   <button onclick="openBulkTracking()">📦 Tracking</button>
   <button onclick="openBulkFaktura()">📄 Faktura</button>
   <button onclick="openBulkStav()">🔄 Stav</button>
+  <button onclick="openBulkTermin()">📅 Termín</button>
   <button class="bulk-close" onclick="deselectAll()">✕</button>
 </div>
 
@@ -573,6 +574,23 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
   <div class="bulk-popup-actions">
     <button class="btn-cancel" onclick="closeBulkPopups()">Zrušit</button>
     <button class="btn-save" onclick="applyBulkFaktura()">Uložit</button>
+  </div>
+</div>
+
+<!-- Bulk termín popup -->
+<div class="bulk-popup" id="bulk-termin-popup">
+  <label>Který termín změnit</label>
+  <select id="bulk-termin-pole">
+    <option value="termin_zakaznik">Termín zákazník</option>
+    <option value="termin_dodavatel">Termín dokončení výroby</option>
+    <option value="ocekavane_doruceni">Očekávané doručení</option>
+    <option value="datum_objednani">Datum objednání</option>
+  </select>
+  <label>Nové datum</label>
+  <input type="date" id="bulk-termin-datum">
+  <div class="bulk-popup-actions">
+    <button class="btn-cancel" onclick="closeBulkPopups()">Zrušit</button>
+    <button class="btn-save" onclick="applyBulkTermin()">Uložit</button>
   </div>
 </div>
 
@@ -1359,6 +1377,7 @@ function closeBulkPopups() {
   document.getElementById('bulk-tracking-popup').classList.remove('open');
   document.getElementById('bulk-faktura-popup').classList.remove('open');
   document.getElementById('bulk-stav-popup').classList.remove('open');
+  document.getElementById('bulk-termin-popup').classList.remove('open');
 }
 
 function openBulkTracking() {
@@ -1375,6 +1394,28 @@ function openBulkFaktura() {
   document.getElementById('bulk-faktura-url').value = '';
   document.getElementById('bulk-upload-file').value = '';
   document.getElementById('bulk-faktura-popup').classList.add('open');
+}
+
+function openBulkTermin() {
+  closeBulkPopups();
+  document.getElementById('bulk-termin-datum').value = '';
+  document.getElementById('bulk-termin-popup').classList.add('open');
+}
+
+async function applyBulkTermin() {
+  const pole = document.getElementById('bulk-termin-pole').value;
+  const datum = document.getElementById('bulk-termin-datum').value;
+  if(!datum) { alert('Vyberte datum.'); return; }
+  closeBulkPopups();
+  showSaving('Ukládám termíny...', `${selectedIds.size} zásilek`);
+  try {
+    for(const id of selectedIds) {
+      const rec = dataZas.find(r => String(r.id) === id);
+      if(rec) await sbUpdate('zasilky', rec.id, {[pole]: datum});
+    }
+    showSaving('Hotovo!', '');
+    setTimeout(async () => { hideSaving(); await loadData(); }, 800);
+  } catch(e) { hideSaving(); alert('Chyba: ' + e.message); }
 }
 
 function openBulkStav() {
