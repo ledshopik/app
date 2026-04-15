@@ -1152,7 +1152,7 @@ function editDoprFromPopup(){
   if(_doprPopupId){ hideDopravciDetail(); switchTab('dopravci'); setTimeout(()=>openModalDopr(_doprPopupId),50); }
 }
 
-function sendInfoEmail(){
+async function sendInfoEmail(){
   const email = document.getElementById('f-email-zakaznika').value.trim();
   if(!email){ alert('Vyplňte e-mail zákazníka.'); document.getElementById('f-email-zakaznika').focus(); return; }
   const cislo    = document.getElementById('f-cislo').value.trim() || '—';
@@ -1161,18 +1161,30 @@ function sendInfoEmail(){
   const doruceni = doruceniRaw ? fmtDate(doruceniRaw) : '—';
   const osloveni = zakaznik ? `Dobrý den, ${zakaznik},` : 'Dobrý den,';
   const subject  = `Informace k Vaší objednávce č. ${cislo}`;
-  const body =
-`${osloveni}
+  const body = `<p>${osloveni}</p>
+<p>rádi bychom Vás informovali o stavu Vaší objednávky č. <strong>${cislo}</strong>.</p>
+<p><strong>Předpokládané datum doručení: ${doruceni}</strong></p>
+<p>V případě jakýchkoliv dotazů jsme Vám k dispozici.</p>
+<p>S pozdravem,<br>Tým LEDshopik</p>`;
 
-rádi bychom Vás informovali o stavu Vaší objednávky č. ${cislo}.
-
-Předpokládané datum doručení: ${doruceni}
-
-V případě jakýchkoliv dotazů jsme Vám k dispozici.
-
-S pozdravem,
-Tým LEDshopik`;
-  window.open('mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body));
+  const btn = event.currentTarget;
+  btn.disabled = true;
+  btn.textContent = '⏳ Odesílám...';
+  try {
+    const res = await fetch('https://hook.eu1.make.com/u9ifig1v5yllmz7jxt655nyb3ncesami', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({to: email, subject, body})
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    btn.textContent = '✓ Odesláno';
+    btn.style.background = '#40a050';
+    setTimeout(()=>{ btn.disabled=false; btn.textContent='📧 Odeslat info'; btn.style.background='#4090d0'; }, 3000);
+  } catch(e){
+    btn.disabled = false;
+    btn.textContent = '📧 Odeslat info';
+    alert('Chyba při odesílání: '+e.message);
+  }
 }
 
 function toggleStats(){
