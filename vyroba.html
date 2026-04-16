@@ -765,7 +765,7 @@ function renderTable(){
       <td style="font-size:11px;color:#999;">${r.zadal||'—'}</td>
       <td class="stav-cell" onclick="quickChangeStav('${r.id}',event)"><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
       <td class="datum" style="color:${r.datum_hotovo?'#3a8048':'#ccc'};">${r.datum_hotovo?fmtDate(r.datum_hotovo):'—'}</td>
-      <td class="${r.poznamka?'poznamka-cell':''}" style="font-size:11px;color:#999;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" ${r.poznamka?`onclick="event.stopPropagation();showPoznamkaPopup('${r.id}',event)"`:''} title="${r.poznamka?'Kliknutím zobrazíš celý text':''}">${r.poznamka||''}</td>
+      <td class="${r.poznamka?'poznamka-cell':''}" style="font-size:11px;color:#999;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" ${r.poznamka?`onclick="event.stopPropagation();showPoznamkaPopup('${r.id}',event)"`:''}>${r.poznamka||''}</td>
     </tr>`).join('');
 }
 

@@ -846,6 +846,7 @@ function renderTable(){
     return `<tr data-id="${r.id}" class="${isSelected?'row-selected':''}" style="${isDelay&&!isSelected?'background:#fce8e8;':''}" onclick="openModal('${r.id}')">
       <td class="td-check" onclick="event.stopPropagation()"><input type="checkbox" class="row-checkbox" ${isSelected?'checked':''} onchange="toggleSelect('${r.id}',this)"></td>
       <td class="cislo">${objLink(r.cislo_obj)}</td>
+      <td>${r.zakaznik||'—'}</td>
       <td class="dodavatel-name">${r.dodavatel||'—'}</td>
       <td style="font-size:11px;">${r.zeme||'—'}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.obsah||'—'}</td>
