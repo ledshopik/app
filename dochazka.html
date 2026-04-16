@@ -165,6 +165,28 @@ tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left
 #saving-box .saving-title { font-size: 14px; font-weight: 700; color: #60a0e0; margin-bottom: 6px; }
 #saving-box .saving-sub { font-size: 12px; color: #888; }
 
+/* Porady */
+.cal-ev-porada { background:#e2b830; color:#2a1e00; font-weight:700; }
+#modal-porada-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:200; align-items:center; justify-content:center; padding:20px; }
+#modal-porada-overlay.open { display:flex; }
+#modal-porada { background:#fff; border:1px solid #ddd; border-radius:10px; width:100%; max-width:540px; max-height:90vh; overflow:hidden; display:flex; flex-direction:column; }
+.fp-checks { display:flex; flex-wrap:wrap; gap:10px; }
+.fp-check-item { display:flex; align-items:center; gap:5px; }
+.fp-check-item label { font-size:12px; text-transform:none; letter-spacing:0; color:#333; font-weight:600; cursor:pointer; }
+.fp-check-item input[type="checkbox"] { cursor:pointer; }
+#porada-popup { display:none; position:fixed; background:#fff; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,.18); padding:16px 20px; min-width:280px; max-width:340px; z-index:1000; }
+#porada-popup.open { display:block; }
+.pp-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.pp-title { font-size:15px; font-weight:800; }
+.pp-close { background:none; border:none; color:#888; font-size:18px; cursor:pointer; line-height:1; }
+.pp-row { margin-bottom:8px; }
+.pp-lbl { font-size:9px; font-weight:700; letter-spacing:.12em; color:#aaa; text-transform:uppercase; margin-bottom:2px; }
+.pp-val { font-size:13px; color:#1a1a1a; }
+.pp-pobocka { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; }
+.pp-brno { background:#ddeeff; color:#4080c0; }
+.pp-ostrava { background:#ffe8d0; color:#c06030; }
+.pp-obe { background:#e8f8e8; color:#408040; }
+
 @media (max-width: 720px) {
   #header { padding: 12px 16px; }
   #toolbar { padding: 10px 12px; }
@@ -443,6 +465,7 @@ tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left
     <div class="cal-month-label" id="cal-month-label"></div>
     <button class="cal-nav-btn" onclick="calNav(1)">→</button>
     <button id="btn-cal-today" onclick="calToday()">Dnes</button>
+    <button id="btn-nova-porada" onclick="openModalPorada()" style="display:none;background:#e2b830;color:#2a1e00;border:none;border-radius:4px;padding:4px 14px;font-size:10px;font-weight:700;cursor:pointer;">📋 Nová porada</button>
     <div class="cal-legend">
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#40c060;"></div>Dovolená</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#e05050;"></div>Neschopenka</div>
@@ -450,6 +473,7 @@ tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#6080c0;"></div>Lékař</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#d07030;"></div>Home office</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#8060c0;"></div>Jednání</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#e2b830;"></div>Porada</div>
     </div>
   </div>
   <div class="cal-grid">
@@ -574,6 +598,60 @@ tbody tr[data-typ="Pracovní jednání mimo firmu"] td:first-child { border-left
   </div>
 </div>
 
+<!-- Modal Nová porada -->
+<div id="modal-porada-overlay">
+  <div id="modal-porada">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid #e8e4dc;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:16px;font-weight:800;">📋 Nová porada</div>
+      <button onclick="closeModalPorada()" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:14px;overflow-y:auto;">
+      <div class="form-group full">
+        <label>Název porady</label>
+        <input type="text" id="fp-nazev" placeholder="Např. Měsíční porada...">
+      </div>
+      <div class="form-group">
+        <label>Datum</label>
+        <input type="date" id="fp-datum">
+      </div>
+      <div class="form-group">
+        <label>Čas</label>
+        <input type="time" id="fp-cas" value="09:00">
+      </div>
+      <div class="form-group full">
+        <label>Pobočka</label>
+        <select id="fp-pobocka" onchange="pobockaChanged()">
+          <option value="Brno">Brno</option>
+          <option value="Ostrava">Ostrava</option>
+          <option value="Obě">Obě</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Účastníci</label>
+        <div class="fp-checks" id="fp-ucastnici-wrap"></div>
+      </div>
+      <div class="form-group full">
+        <label>Poznámka</label>
+        <input type="text" id="fp-poznamka" placeholder="Volitelná poznámka...">
+      </div>
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid #e8e4dc;display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn-cancel" onclick="closeModalPorada()">Zrušit</button>
+      <button class="btn-save" onclick="savePorada()">Uložit + Odeslat pozvánky</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail popup Porady -->
+<div id="porada-popup">
+  <div class="pp-header">
+    <div class="pp-title">🗓 Porada</div>
+    <button class="pp-close" onclick="hidePoradaDetail()">✕</button>
+  </div>
+  <div id="pp-body"></div>
+  <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;" id="pp-footer"></div>
+</div>
+
 <script>
 if(!localStorage.getItem('ledshopik_user'))window.location.href='login.html';
 const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
@@ -583,8 +661,21 @@ const COLS = ['id','zamestnanec','typ','datum_od','datum_do','dni','poznamka'];
 const MONTHS_CS = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const TYP_CLASS = { 'Dovolená':'t-dovolena', 'Neschopenka':'t-neschopenka', 'Neplacené volno':'t-neplacene', 'Lékař':'t-lekar', 'Home office':'t-homeoffice', 'Pracovní jednání mimo firmu':'t-jednani' };
 const TYP_CAL  = { 'Dovolená':'ev-dovolena', 'Neschopenka':'ev-neschopenka', 'Neplacené volno':'ev-neplacene', 'Lékař':'ev-lekar', 'Home office':'ev-homeoffice', 'Pracovní jednání mimo firmu':'ev-jednani' };
+const NAMES = ['Ondra','David','Michal','Erik','Lukáš','Mário','Tom','Kuba','Petr','Miriam','Filip','Eve'];
+const POBOCKY = {
+  'Ondra':'Brno','David':'Brno','Michal':'Brno','Erik':'Brno',
+  'Lukáš':'Brno','Mário':'Brno','Tom':'Brno','Kuba':'Brno','Eve':'Brno',
+  'Filip':'Ostrava','Petr':'Ostrava','Miriam':'Ostrava'
+};
+const TG_CHAT_IDS = {
+  'Ondra':8703966707,'Erik':7152131081,'Michal':8370547459,
+  'David':6850619823,'Lukáš':8647300288,'Petr':8749994116,
+  'Miriam':8589677590,'Filip':8640125863,'Tom':8722260762,
+  'Kuba':8722260762,'Eve':8767189722,'Mário':8654467847
+};
+const currentUser = localStorage.getItem('ledshopik_user')||'';
 
-let data=[], filterVal='vse', sortCol='datum_od', sortDir=-1, editId=null;
+let data=[], dataPorada=[], filterVal='vse', sortCol='datum_od', sortDir=-1, editId=null;
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
 const today=new Date();
 
@@ -676,9 +767,14 @@ function syncStatus(state,text){ document.getElementById('sync-dot').className=s
 async function loadData(){
   syncStatus('loading','Načítám data...');
   try {
-    const res=await fetch(SUPABASE_URL+'/rest/v1/dochazka?select=*&order=datum_od.desc&limit=2000',{headers:SB_HEADERS});
+    const [res,resP]=await Promise.all([
+      fetch(SUPABASE_URL+'/rest/v1/dochazka?select=*&order=datum_od.desc&limit=2000',{headers:SB_HEADERS}),
+      fetch(SUPABASE_URL+'/rest/v1/porady?select=*&order=datum.asc',{headers:SB_HEADERS})
+    ]);
     if(!res.ok) throw new Error('HTTP '+res.status);
     data=await res.json();
+    dataPorada=resP.ok?(await resP.json()):[];
+    if(!Array.isArray(dataPorada)) dataPorada=[];
     syncStatus('ok','Aktualizováno '+new Date().toLocaleTimeString('cs-CZ'));
     renderAll();
   } catch(e){ syncStatus('error','Chyba: '+e.message); }
@@ -854,8 +950,10 @@ function renderCalendar(){
     const cdStr=dateStr(cd);
     const isT=cdStr===dateStr(today),isSat=cd.getDay()===6,isSun=cd.getDay()===0,other=mo!==0;
     const evs=data.filter(r=>{ const od=toInputDate(r.datum_od),doo=toInputDate(r.datum_do); return od&&doo&&od<=cdStr&&cdStr<=doo; });
+    const porDay=(dataPorada||[]).filter(p=>p.datum===cdStr);
     let evHtml=evs.slice(0,3).map(ev=>`<div class="cal-ev ${TYP_CAL[ev.typ]||''}" title="${ev.zamestnanec}: ${ev.typ||''}" style="cursor:pointer;" onclick="event.stopPropagation();openDetail('${ev.id}')">${ev.zamestnanec}</div>`).join('');
     if(evs.length>3) evHtml+=`<div style="font-size:8px;color:#888;">+${evs.length-3}</div>`;
+    evHtml+=porDay.map(p=>`<div class="cal-ev cal-ev-porada" title="Porada: ${p.nazev}" onclick="event.stopPropagation();openPoradaDetail('${p.id}',event)">${p.cas?p.cas+' ':''}${p.nazev}</div>`).join('');
     const hol = isHoliday(cdStr);
     const holName = hol ? getHolidayName(cdStr) : '';
     html+=`<div class="cal-day${other?' other':''}${isT?' today':''}${(isSat||isSun)?' weekend':''}${hol?' holiday':''}">
@@ -1026,6 +1124,92 @@ async function deleteRecord(){
   } catch(e){ hideSaving(); alert('Chyba: '+e.message); }
 }
 
+// =============== PORADY ===============
+function openModalPorada(){
+  document.getElementById('fp-nazev').value='';
+  document.getElementById('fp-datum').value=toInputDate(today);
+  document.getElementById('fp-cas').value='09:00';
+  document.getElementById('fp-pobocka').value='Brno';
+  document.getElementById('fp-poznamka').value='';
+  pobockaChanged();
+  document.getElementById('modal-porada-overlay').classList.add('open');
+}
+function closeModalPorada(){
+  document.getElementById('modal-porada-overlay').classList.remove('open');
+}
+function pobockaChanged(){
+  const pobocka=document.getElementById('fp-pobocka').value;
+  document.getElementById('fp-ucastnici-wrap').innerHTML=NAMES.map(n=>{
+    const chk=pobocka==='Obě'||POBOCKY[n]===pobocka?'checked':'';
+    return `<div class="fp-check-item"><input type="checkbox" id="fpc-${n}" value="${n}" ${chk}><label for="fpc-${n}">${n}</label></div>`;
+  }).join('');
+}
+async function savePorada(){
+  const nazev=document.getElementById('fp-nazev').value.trim();
+  if(!nazev){alert('Zadejte název porady');return;}
+  const datum=document.getElementById('fp-datum').value;
+  if(!datum){alert('Zadejte datum');return;}
+  const cas=document.getElementById('fp-cas').value;
+  const pobocka=document.getElementById('fp-pobocka').value;
+  const checks=[...document.querySelectorAll('#fp-ucastnici-wrap input[type="checkbox"]:checked')].map(c=>c.value);
+  const poznamka=document.getElementById('fp-poznamka').value.trim();
+  const rec={nazev,datum,cas,pobocka,ucastnici:checks.join(','),zadal:currentUser,poznamka};
+  closeModalPorada();
+  showSaving('Ukládám poradu...','Ukládám data');
+  try {
+    const res=await fetch(SUPABASE_URL+'/rest/v1/porady',{
+      method:'POST',headers:{...SB_HEADERS,'Prefer':'return=minimal'},body:JSON.stringify(rec)
+    });
+    if(!res.ok){const t=await res.text();throw new Error(t);}
+    showSaving('Odesílám pozvánky...','Telegram');
+    const datCZ=fmtDateCZ(datum);
+    const casText=cas?` v ${cas}`:'';
+    const msg=`🗓 *Porada – ${pobocka}*\n📅 ${datCZ}${casText}\n📌 ${nazev}\n👥 ${checks.join(', ')}${poznamka?'\n_'+poznamka+'_':''}`;
+    checks.forEach(name=>{const id=TG_CHAT_IDS[name];if(id)sendTg(String(id),msg);});
+    showSaving('Hotovo!','Porada uložena');
+    setTimeout(async()=>{hideSaving();await loadData();},800);
+  } catch(e){hideSaving();alert('Chyba: '+e.message);}
+}
+function openPoradaDetail(id,evt){
+  const p=dataPorada.find(x=>String(x.id)===String(id));
+  if(!p)return;
+  const ucastnici=p.ucastnici?p.ucastnici.split(',').map(s=>s.trim()).filter(Boolean):[];
+  const pobockaClass={'Brno':'pp-brno','Ostrava':'pp-ostrava','Obě':'pp-obe'}[p.pobocka]||'pp-brno';
+  document.getElementById('pp-body').innerHTML=`
+    <div class="pp-row"><div class="pp-lbl">Název</div><div class="pp-val" style="font-weight:700;">${p.nazev||'—'}</div></div>
+    <div class="pp-row"><div class="pp-lbl">Datum a čas</div><div class="pp-val">${fmtDateCZ(p.datum)}${p.cas?' v '+p.cas:''}</div></div>
+    <div class="pp-row"><div class="pp-lbl">Pobočka</div><div class="pp-val"><span class="pp-pobocka ${pobockaClass}">${p.pobocka||'—'}</span></div></div>
+    <div class="pp-row"><div class="pp-lbl">Účastníci</div><div class="pp-val" style="line-height:1.6;">${ucastnici.map(n=>'• '+n).join('<br>')||'—'}</div></div>
+    ${p.poznamka?`<div class="pp-row"><div class="pp-lbl">Poznámka</div><div class="pp-val" style="font-size:12px;color:#666;">${p.poznamka}</div></div>`:''}
+  `;
+  document.getElementById('pp-footer').innerHTML=currentUser==='Ondra'
+    ?`<button onclick="deletePorada('${p.id}')" style="background:none;color:#c05050;border:1px solid #f0c8c8;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">🗑 Smazat</button>`
+    :'';
+  const popup=document.getElementById('porada-popup');
+  popup.classList.add('open');
+  const rect=evt.currentTarget.getBoundingClientRect();
+  const top=Math.min(rect.bottom+6,window.innerHeight-300);
+  const left=Math.min(rect.left,window.innerWidth-360);
+  popup.style.top=Math.max(10,top)+'px';
+  popup.style.left=Math.max(10,left)+'px';
+  setTimeout(()=>{
+    function outsideClick(e){if(!popup.contains(e.target)){hidePoradaDetail();document.removeEventListener('click',outsideClick);}}
+    document.addEventListener('click',outsideClick);
+  },50);
+}
+function hidePoradaDetail(){document.getElementById('porada-popup').classList.remove('open');}
+async function deletePorada(id){
+  if(!confirm('Smazat poradu?'))return;
+  hidePoradaDetail();
+  showSaving('Mažu poradu...','');
+  try {
+    const res=await fetch(SUPABASE_URL+'/rest/v1/porady?id=eq.'+id,{method:'DELETE',headers:SB_HEADERS});
+    if(!res.ok){const t=await res.text();throw new Error(t);}
+    showSaving('Smazáno!','');
+    setTimeout(async()=>{hideSaving();await loadData();},800);
+  } catch(e){hideSaving();alert('Chyba: '+e.message);}
+}
+
 initRokSelect();
 loadData();
 // Auto-refresh every 30s (only when page visible and no modal open)
@@ -1034,7 +1218,8 @@ setInterval(()=>{
   if(document.querySelector('.modal[style*="flex"],.modal[style*="block"],.overlay[style*="flex"],.overlay[style*="block"]')) return;
   loadData();
 }, 10000);
-document.getElementById('user-bar-name').textContent=localStorage.getItem('ledshopik_user')||'';
+document.getElementById('user-bar-name').textContent=currentUser;
+if(currentUser==='Ondra') document.getElementById('btn-nova-porada').style.display='';
 function logout(){localStorage.removeItem('ledshopik_user');window.location.href='login.html';}
 </script>
 <script>
@@ -1058,7 +1243,7 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
 
 (function(){var d=new Date(),e=document.getElementById('hdr-day'),m=document.getElementById('hdr-month');if(e)e.textContent=d.getDate();if(m)m.textContent=['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'][d.getMonth()]+' '+d.getFullYear();})();
 </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-dochazka').on('postgres_changes',{event:'*',schema:'public',table:'dochazka'},function(){console.log('RT:dochazka');if(typeof loadData==='function')loadData();}).subscribe();})();</script>
+<script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-dochazka').on('postgres_changes',{event:'*',schema:'public',table:'dochazka'},function(){if(typeof loadData==='function')loadData();}).subscribe();sb.channel('rt-porady').on('postgres_changes',{event:'*',schema:'public',table:'porady'},function(){if(typeof loadData==='function')loadData();}).subscribe();})();</script>
 <script>(function(){var cacheKey='ledshopik_weather',cacheTime='ledshopik_weather_time';var cached=localStorage.getItem(cacheKey),ct=localStorage.getItem(cacheTime);if(cached&&ct&&Date.now()-parseInt(ct)<1800000){try{var d=JSON.parse(cached);showMiniWeather(d);}catch(e){}return;}var loc='Ostrava';if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(pos){fetchWeather(pos.coords.latitude+','+pos.coords.longitude);},function(){fetchWeather(loc);},{timeout:5000,maximumAge:600000});}else{fetchWeather(loc);}function fetchWeather(q){fetch('https://wttr.in/'+encodeURIComponent(q)+'?format=j1').then(function(r){return r.json()}).then(function(d){localStorage.setItem(cacheKey,JSON.stringify(d));localStorage.setItem(cacheTime,String(Date.now()));showMiniWeather(d);}).catch(function(){});}function showMiniWeather(d){var el=document.getElementById('weather-mini');if(!el||!d.current_condition)return;var c=d.current_condition[0];var codes={113:'\u2600\uFE0F',116:'\u26C5',119:'\u2601\uFE0F',122:'\u2601\uFE0F',176:'\uD83C\uDF26\uFE0F',200:'\u26C8\uFE0F',227:'\uD83C\uDF28\uFE0F',266:'\uD83C\uDF27\uFE0F',296:'\uD83C\uDF27\uFE0F',302:'\uD83C\uDF27\uFE0F',332:'\u2744\uFE0F'};var emoji=codes[parseInt(c.weatherCode)]||'\uD83C\uDF24\uFE0F';var area=d.nearest_area?d.nearest_area[0].areaName[0].value:'';el.innerHTML=emoji+' '+c.temp_C+'\u00B0C <span style="color:#bbb;font-size:10px;">'+area+'</span>';}})();</script>
 </body>
 </html>
