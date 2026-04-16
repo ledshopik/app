@@ -859,7 +859,6 @@ function renderTable(){
       <td class="datum">${fmtDate(r.ocekavane_doruceni)}</td>
       <td><span class="${cd.cls}" style="font-size:11px;">${cd.text}</span></td>
       <td>${tracking}</td>
-      <td style="font-size:11px;color:#999;">${r.vazba_zakazka||'—'}</td>
       <td><span class="badge ${STATUS_CLASS[r.stav]||''}"><span class="badge-dot"></span>${r.stav||'—'}</span></td>
       <td>${faktura}</td>
     </tr>`;
