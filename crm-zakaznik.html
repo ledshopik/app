@@ -135,6 +135,24 @@ button, input, select, textarea { font-family: inherit; }
 #sync-dot.error { background: #c05050; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
+/* Modal overlay */
+#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+#modal-overlay.open { display: flex; }
+#modal-box { background: #fff; border-radius: 12px; width: 100%; max-width: 520px; box-shadow: 0 8px 32px rgba(0,0,0,.18); display: flex; flex-direction: column; max-height: 90vh; overflow: hidden; }
+.modal-head { padding: 18px 24px; border-bottom: 1px solid #f0ede5; display: flex; align-items: center; justify-content: space-between; }
+.modal-head h3 { font-size: 16px; font-weight: 800; color: #1a1a1a; letter-spacing: .03em; }
+.modal-head .close { background: none; border: none; font-size: 20px; color: #888; cursor: pointer; line-height: 1; padding: 4px 8px; }
+.modal-head .close:hover { color: #1a1a1a; }
+.modal-body { padding: 20px 24px; overflow-y: auto; }
+.modal-foot { padding: 14px 24px; border-top: 1px solid #f0ede5; display: flex; gap: 10px; justify-content: flex-end; background: #fafaf5; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 10px; font-weight: 700; letter-spacing: .12em; color: #888; text-transform: uppercase; margin-bottom: 6px; }
+.form-group .req { color: #e05050; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; color: #1a1a1a; font-family: inherit; outline: none; transition: border-color .15s; background: #fff; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #3060c0; }
+.form-group textarea { min-height: 100px; resize: vertical; }
+.form-hint { font-size: 10px; color: #bbb; margin-top: 4px; }
+
 /* Responsive */
 @media (max-width: 980px) {
   #detail-grid { grid-template-columns: 1fr; }
@@ -210,11 +228,53 @@ button, input, select, textarea { font-family: inherit; }
     <div class="ch-tagy" id="ch-tagy"></div>
   </div>
   <div id="customer-actions">
-    <button class="btn btn-primary" onclick="alert('Formulář přidání poznámky — další krok')">+ Poznámka</button>
+    <button class="btn btn-primary" onclick="openModal('poznamka')">+ Poznámka</button>
     <button class="btn" onclick="alert('Formulář přidání úkolu — další krok')">+ Úkol</button>
     <button class="btn" onclick="alert('Formulář nového case — další krok')">+ Nový case</button>
-    <button class="btn" onclick="alert('Logování hovoru — další krok')">📞 Hovor</button>
+    <button class="btn" onclick="openModal('telefon')">📞 Hovor</button>
     <a class="btn btn-deeplink" id="btn-admin" href="#" target="_blank">🔗 Otevřít v adminu</a>
+  </div>
+</div>
+
+<!-- Modal pro novou interakci (poznámka / hovor) -->
+<div id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div id="modal-box">
+    <div class="modal-head">
+      <h3 id="modal-title">Nová poznámka</h3>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="modal-form" onsubmit="return false;">
+        <div class="form-group">
+          <label>Nadpis <span class="req">*</span></label>
+          <input type="text" id="m-nadpis" maxlength="150" required placeholder="Krátké shrnutí (max. 150 znaků)">
+        </div>
+        <div class="form-group">
+          <label>Obsah</label>
+          <textarea id="m-obsah" placeholder="Detail, co jsme řešili, co má přijít…"></textarea>
+        </div>
+        <div class="form-group" id="group-hovor" style="display:none;">
+          <label>Trvání hovoru (min)</label>
+          <input type="number" id="m-trvani" min="0" max="600" step="1" placeholder="např. 8">
+        </div>
+        <div class="form-group" id="group-smer" style="display:none;">
+          <label>Směr</label>
+          <select id="m-smer">
+            <option value="in">← Příchozí (klient volal nám)</option>
+            <option value="out">↗ Odchozí (my jsme volali klientovi)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Kdy se to stalo</label>
+          <input type="datetime-local" id="m-datum">
+          <div class="form-hint">Defaultně teď. Můžeš změnit (např. dodatečně zapisuješ včerejší hovor).</div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal()">Zrušit</button>
+      <button class="btn btn-primary" id="btn-save" onclick="saveInterakce()">Uložit</button>
+    </div>
   </div>
 </div>
 
@@ -513,6 +573,95 @@ function escapeHtml(s){
   if(!s) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+
+// ============= MODAL =============
+let modalTyp = 'poznamka';
+
+function openModal(typ){
+  modalTyp = typ;
+  const titulky = {
+    poznamka: '📝 Nová poznámka',
+    telefon: '📞 Zapsat hovor'
+  };
+  document.getElementById('modal-title').textContent = titulky[typ] || 'Nový záznam';
+  document.getElementById('group-hovor').style.display = typ === 'telefon' ? 'block' : 'none';
+  document.getElementById('group-smer').style.display = typ === 'telefon' ? 'block' : 'none';
+
+  // Reset form
+  document.getElementById('m-nadpis').value = '';
+  document.getElementById('m-obsah').value = '';
+  document.getElementById('m-trvani').value = '';
+  document.getElementById('m-smer').value = 'in';
+  // Default: teď
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  document.getElementById('m-datum').value = now.toISOString().slice(0,16);
+
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('m-nadpis').focus(), 50);
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+async function saveInterakce(){
+  const nadpis = document.getElementById('m-nadpis').value.trim();
+  if(!nadpis){ alert('Nadpis je povinný.'); return; }
+  const obsah = document.getElementById('m-obsah').value.trim();
+  const datumLocal = document.getElementById('m-datum').value;
+  if(!datumLocal){ alert('Datum je povinné.'); return; }
+  const datum = new Date(datumLocal).toISOString();
+
+  const payload = {
+    zakaznik_email: emailParam,
+    datum: datum,
+    typ: modalTyp,
+    autor: currentUser,
+    nadpis: nadpis,
+    obsah: obsah || null,
+    automaticky: false
+  };
+
+  if(modalTyp === 'telefon'){
+    const trv = parseInt(document.getElementById('m-trvani').value);
+    if(!isNaN(trv) && trv > 0) payload.trvani_minut = trv;
+    payload.smer = document.getElementById('m-smer').value;
+  }
+
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true; btn.textContent = 'Ukládám…';
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/crm_interakce', {
+      method: 'POST',
+      headers: { ...SB_HEADERS, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok){
+      const errTxt = await res.text();
+      throw new Error('HTTP ' + res.status + ': ' + errTxt);
+    }
+    // Update posledni_interakce_at na zákazníkovi
+    await fetch(SUPABASE_URL + '/rest/v1/crm_zakaznici?email=eq.' + encodeURIComponent(emailParam), {
+      method: 'PATCH',
+      headers: { ...SB_HEADERS, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ posledni_interakce_at: datum })
+    });
+    closeModal();
+    await loadAll();
+  } catch(err) {
+    console.error('saveInterakce error:', err);
+    alert('Chyba při ukládání: ' + err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Uložit';
+  }
+}
+
+// ESC zavře modal
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && document.getElementById('modal-overlay').classList.contains('open')) closeModal();
+});
 
 function logout(){ localStorage.removeItem('ledshopik_user'); window.location.href = 'login.html'; }
 
