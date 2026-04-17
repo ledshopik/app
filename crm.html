@@ -158,7 +158,7 @@ tbody td:last-child { border-right: none; }
 <div id="tabs">
   <button class="tab-btn active" onclick="switchTab('zakaznici')">👥 Zákazníci</button>
   <button class="tab-btn" onclick="switchTab('b2b')">🏢 B2B žádosti</button>
-  <button class="tab-btn" onclick="switchTab('poptavky')">💬 Poptávky</button>
+  <button class="tab-btn" onclick="switchTab('poptavky')">📥 Poptávky z info@</button>
   <button class="tab-btn" onclick="switchTab('objednavky')">📦 Objednávky</button>
   <button class="tab-btn" onclick="switchTab('prehled')">📊 Přehled</button>
 </div>
@@ -239,36 +239,32 @@ tbody td:last-child { border-right: none; }
   </div>
 </div>
 
-<!-- POPTÁVKY TAB -->
+<!-- POPTÁVKY Z INFO@ TAB -->
 <div id="tab-poptavky" style="display:none;">
   <div id="toolbar">
-    <button class="filter-btn active" onclick="setFilter('vse')">Vše</button>
-    <button class="filter-btn" onclick="setFilter('Nové')"><span class="filter-dot" style="background:#3060c0"></span>Nové</button>
-    <button class="filter-btn" onclick="setFilter('V řešení')"><span class="filter-dot" style="background:#c8a830"></span>V řešení</button>
-    <button class="filter-btn" onclick="setFilter('Vyřízeno')"><span class="filter-dot" style="background:#40a050"></span>Vyřízeno</button>
-    <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-pop" placeholder="Hledat zákazníka, místo..." oninput="renderAll()"></div>
+    <button class="filter-btn active" data-filter="vse" onclick="setFilter('vse')">Vše</button>
+    <button class="filter-btn" data-filter="v_reseni" onclick="setFilter('v_reseni')"><span class="filter-dot" style="background:#c8a830"></span>V řešení</button>
+    <button class="filter-btn" data-filter="vyrizeno" onclick="setFilter('vyrizeno')"><span class="filter-dot" style="background:#40a050"></span>Vyřízené</button>
+    <button class="filter-btn" data-filter="sla7" onclick="setFilter('sla7')"><span class="filter-dot" style="background:#e05050"></span>Starší 7 dní bez vyřízení</button>
+    <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-pop" placeholder="Hledat v předmětu, obchodníkovi..." oninput="renderAll()"></div>
     <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
-    <button id="btn-add" onclick="alert('Formulář pro přidání poptávky — bude doplněno v další fázi')">+ Nová poptávka</button>
   </div>
   <div class="table-wrap">
     <table>
       <thead><tr>
-        <th>Datum</th>
-        <th>Zákazník</th>
-        <th>Typ projektu</th>
-        <th>Místo</th>
-        <th>Email</th>
-        <th>Telefon</th>
-        <th>Obchodník</th>
+        <th>Datum přijetí</th>
+        <th>Předmět</th>
+        <th>Přijato na</th>
+        <th>Přeposláno komu</th>
         <th>Stav</th>
-        <th>Poznámka</th>
+        <th>SLA</th>
       </tr></thead>
       <tbody id="tbody-poptavky"></tbody>
     </table>
     <div class="empty-state" id="empty-poptavky">
-      <div class="ico">💬</div>
-      <p>Zatím žádné poptávky</p>
-      <p class="sub">Data se načtou po vytvoření tabulky <code>crm_evidence</code> v Supabase (další fáze)</p>
+      <div class="ico">📥</div>
+      <p>Žádné poptávky</p>
+      <p class="sub">Historie bude importována ze Google Sheet (další krok).</p>
     </div>
   </div>
 </div>
@@ -331,10 +327,10 @@ const KPI_DEFS = {
   ],
   poptavky: [
     { lbl: 'Celkem', color: '#1a1a1a', val: () => dataPoptavky.length },
-    { lbl: 'Nové', color: '#3060c0', val: () => dataPoptavky.filter(r=>r.stav==='Nové').length },
-    { lbl: 'V řešení', color: '#c8a830', val: () => dataPoptavky.filter(r=>r.stav==='V řešení').length },
-    { lbl: 'Vyřízené', color: '#40a050', val: () => dataPoptavky.filter(r=>r.stav==='Vyřízeno').length },
-    { lbl: 'Tento měsíc', color: '#8060c0', val: () => dataPoptavky.filter(r=>isThisMonth(r.datum)).length }
+    { lbl: 'V řešení', color: '#c8a830', val: () => dataPoptavky.filter(r=>r.stav==='v_reseni').length },
+    { lbl: 'Vyřízené', color: '#40a050', val: () => dataPoptavky.filter(r=>r.stav==='vyrizeno').length },
+    { lbl: 'Tento týden', color: '#3060c0', val: () => dataPoptavky.filter(r=>isThisWeek(r.datum_prijeti)).length },
+    { lbl: 'SLA alert >7 dní', color: '#e05050', val: () => dataPoptavky.filter(r=>isSlaBreach(r)).length }
   ],
   objednavky: [],
   prehled: []
@@ -344,6 +340,19 @@ function isThisMonth(d){
   if(!d) return false;
   const x = new Date(d), n = new Date();
   return x.getFullYear()===n.getFullYear() && x.getMonth()===n.getMonth();
+}
+
+function isThisWeek(d){
+  if(!d) return false;
+  const diff = (Date.now() - new Date(d).getTime()) / 86400000;
+  return diff >= 0 && diff < 7;
+}
+
+function isSlaBreach(r){
+  // Není vyřízené + starší 7 dní = SLA breach
+  if(r.stav === 'vyrizeno' || r.stav === 'spam' || r.stav === 'ignorovano') return false;
+  const days = (Date.now() - new Date(r.datum_prijeti).getTime()) / 86400000;
+  return days > 7;
 }
 
 function formatKc(n){
@@ -483,22 +492,48 @@ function renderTablePoptavky(){
   const empty = document.getElementById('empty-poptavky');
   const q = (document.getElementById('search-pop').value||'').toLowerCase();
   const rows = dataPoptavky.filter(r=>{
-    if(filterVal!=='vse' && r.stav!==filterVal) return false;
-    if(q && ![r.zakaznik,r.misto,r.email].join(' ').toLowerCase().includes(q)) return false;
+    // Filtr stavů
+    if(filterVal==='v_reseni' && r.stav !== 'v_reseni') return false;
+    if(filterVal==='vyrizeno' && r.stav !== 'vyrizeno') return false;
+    if(filterVal==='sla7' && !isSlaBreach(r)) return false;
+    // Hledání
+    if(q){
+      const blob = [r.predmet, r.preposlano_komu, r.prijato_na_schrance, r.puvodni_odesilatel_email].join(' ').toLowerCase();
+      if(!blob.includes(q)) return false;
+    }
     return true;
-  });
-  tbody.innerHTML = rows.map(r => '<tr>'
-    + '<td>'+(r.datum||'')+'</td>'
-    + '<td style="font-weight:700;color:#1a1a1a;">'+(r.zakaznik||'—')+'</td>'
-    + '<td>'+(r.typ_projektu||'')+'</td>'
-    + '<td>'+(r.misto||'')+'</td>'
-    + '<td>'+(r.email||'')+'</td>'
-    + '<td>'+(r.telefon||'')+'</td>'
-    + '<td>'+(r.obchodnik||'')+'</td>'
-    + '<td>'+stavBadge(r.stav)+'</td>'
-    + '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(r.poznamka||'')+'</td>'
-    + '</tr>').join('');
+  }).sort((a,b) => new Date(b.datum_prijeti) - new Date(a.datum_prijeti));
+
+  tbody.innerHTML = rows.map(r => {
+    const slaBreach = isSlaBreach(r);
+    const daysAgo = Math.floor((Date.now() - new Date(r.datum_prijeti).getTime()) / 86400000);
+    const slaBadge = r.stav === 'vyrizeno'
+      ? '<span style="color:#40a050;font-size:10px;">✓ hotovo</span>'
+      : slaBreach
+        ? '<span class="badge st-odmitnuto" style="font-size:9px;"><span class="badge-dot"></span>' + daysAgo + ' dní</span>'
+        : '<span style="color:#888;font-size:10px;">' + daysAgo + ' dní</span>';
+    return '<tr>'
+      + '<td>' + formatDateShort(r.datum_prijeti) + '</td>'
+      + '<td style="font-weight:700;color:#1a1a1a;max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (r.predmet || '—') + '</td>'
+      + '<td style="font-size:11px;color:#666;">' + (r.prijato_na_schrance || '—') + '</td>'
+      + '<td>' + (r.preposlano_komu || '<span style="color:#bbb;">—</span>') + '</td>'
+      + '<td>' + poptavkaStavBadge(r.stav) + '</td>'
+      + '<td>' + slaBadge + '</td>'
+      + '</tr>';
+  }).join('');
   empty.style.display = rows.length ? 'none' : 'block';
+}
+
+function poptavkaStavBadge(s){
+  const map = {
+    'nove': { cls: 'st-nove', lbl: 'Nové' },
+    'v_reseni': { cls: 'st-reseni', lbl: 'V řešení' },
+    'vyrizeno': { cls: 'st-vyrizeno', lbl: 'Vyřízené' },
+    'spam': { cls: 'st-odmitnuto', lbl: 'Spam' },
+    'ignorovano': { cls: 'st-odmitnuto', lbl: 'Ignorováno' }
+  };
+  const m = map[s] || { cls: 'st-reseni', lbl: s || '—' };
+  return '<span class="badge ' + m.cls + '"><span class="badge-dot"></span>' + m.lbl + '</span>';
 }
 
 function stavBadge(s){
@@ -523,10 +558,13 @@ function setSync(state, text){
 async function loadData(){
   setSync('loading', 'Načítám...');
   try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/crm_zakaznici?select=*', { headers: SB_HEADERS });
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    dataZakaznici = await res.json();
-    setSync('ok', 'Načteno ' + dataZakaznici.length + ' zákazníků · ' + new Date().toLocaleTimeString('cs-CZ'));
+    const [zak, pop] = await Promise.all([
+      fetch(SUPABASE_URL + '/rest/v1/crm_zakaznici?select=*', { headers: SB_HEADERS }).then(r => r.ok ? r.json() : Promise.reject('zakaznici ' + r.status)),
+      fetch(SUPABASE_URL + '/rest/v1/crm_poptavky?select=*&order=datum_prijeti.desc&limit=500', { headers: SB_HEADERS }).then(r => r.ok ? r.json() : Promise.reject('poptavky ' + r.status))
+    ]);
+    dataZakaznici = zak;
+    dataPoptavky = pop;
+    setSync('ok', 'Načteno ' + dataZakaznici.length + ' zákazníků · ' + dataPoptavky.length + ' poptávek · ' + new Date().toLocaleTimeString('cs-CZ'));
     renderAll();
   } catch(err) {
     setSync('error', 'Chyba načítání: ' + err.message);
