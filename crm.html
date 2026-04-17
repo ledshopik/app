@@ -126,7 +126,7 @@ tbody td:last-child { border-right: none; }
 
 /* Clickable row */
 .row-clickable { cursor: pointer; }
-.row-clickable .preview { font-size: 11px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+.row-clickable .preview { font-size: 11px; color: #666; margin-top: 3px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
 </style>
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e2b830"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="LEDshopik"><link rel="apple-touch-icon" href="icon.svg"><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script></head>
 <body>
@@ -632,15 +632,63 @@ function renderTablePoptavky(){
   empty.style.display = rows.length ? 'none' : 'block';
 }
 
-function escapeEmailPreview(txt){
+function extractEmailBody(txt){
   if(!txt) return '';
-  // Vezmi prvních 140 znaků, odstraň extra whitespace a podpisy
-  let s = String(txt).replace(/\s+/g, ' ').trim();
-  // Odfiltruj generické podpisy na začátku
-  s = s.replace(/^S pozdravem[^\-]*?Ondřej Benada[^\-]*?Brno\s*/i, '');
-  s = s.replace(/^\s*(Ahoj|Dobrý den|Hi|Hello)[^A-Za-z]{0,3}/i, '');
-  if(s.length > 140) s = s.substring(0, 140) + '…';
-  return escapeHtml(s);
+  let s = String(txt);
+
+  // Najdi nejranější marker "začátku forwardovaného obsahu"
+  const markers = [
+    /Dne\s+\d+\.\s*(?:ledna|února|března|dubna|května|června|července|srpna|září|října|listopadu|prosince)\s+\d{4}[^,]*,[^,]*napsal\/a:/i,
+    /Začátek přeposílané zprávy:/i,
+    /-{3,}\s*(?:Original Message|Původní[^\-]{0,20}|Forwarded message)/i,
+    /Kontaktní formulář z webu/i,
+    /Pole\s+Hodnota/i,
+    /^Text:\s*/m,
+    /^Zpráva:\s*/m,
+    /^Požadavek:\s*/m
+  ];
+
+  let startIdx = -1;
+  for(const m of markers){
+    const match = s.match(m);
+    if(match && (startIdx === -1 || match.index < startIdx)){
+      startIdx = match.index + match[0].length;
+    }
+  }
+  if(startIdx > 0) s = s.substring(startIdx);
+
+  // Fallback: pokud zprava zacina Ondrovym podpisem, preskocti ho az za adresu Ostrava/Brno
+  if(/^(S pozdravem|Best Regards)/i.test(s.trim())){
+    const afterSig = s.match(/(?:Ostrava|Brno)[^\n]*\n+[\s\.]*\n+([\s\S]+)$/i);
+    if(afterSig && afterSig[1]){
+      s = afterSig[1];
+    } else {
+      // Podpis bez dosazitelneho konce - zkus preskocit kontaktni udaje
+      const afterContact = s.match(/(?:@ledshopik\.cz|@belightled\.cz|\+420\s*\d{3}\s*\d{3}\s*\d{3})[^\n]*\n+([\s\S]+)$/);
+      if(afterContact && afterContact[1]) s = afterContact[1];
+    }
+  }
+
+  // Odstraň forwarding headers (> Předmět:, > Od:, atd.)
+  s = s.replace(/^>?\s*(Předmět|Od|Datum|Komu|Odpovědět|URL|Reply-To|Subject|From|To|Date):[^\n]*/gim, '');
+  // Odstraň quoted markers ">" na začátku řádků
+  s = s.replace(/^\s*>\s?/gm, '');
+  // Odstraň tabulkové záhlaví z kontaktního formuláře
+  s = s.replace(/^\s*(E-?mail|Jméno a? příjmení|Telefon|Místo realizace[^\n]*?|Předmět zprávy)\s+/gim, '');
+  // Zkomprimuj whitespace
+  s = s.replace(/\s+/g, ' ').trim();
+  // Odstraň opakující se "Dobrý den,"
+  s = s.replace(/^(Dobrý den|Ahoj|Hi|Hello)[,.\s!]+/i, '');
+
+  return s;
+}
+
+function escapeEmailPreview(txt){
+  const body = extractEmailBody(txt);
+  if(!body) return '';
+  const limit = 220;
+  const cut = body.length > limit ? body.substring(0, limit) + '…' : body;
+  return escapeHtml(cut);
 }
 
 function escapeHtml(s){
