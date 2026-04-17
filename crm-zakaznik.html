@@ -230,7 +230,7 @@ button, input, select, textarea { font-family: inherit; }
   <div id="customer-actions">
     <button class="btn btn-primary" onclick="openModal('poznamka')">+ Poznámka</button>
     <button class="btn" onclick="alert('Formulář přidání úkolu — další krok')">+ Úkol</button>
-    <button class="btn" onclick="alert('Formulář nového case — další krok')">+ Nový case</button>
+    <button class="btn" onclick="openCaseModal()">+ Nový case</button>
     <button class="btn" onclick="openModal('telefon')">📞 Hovor</button>
     <a class="btn btn-deeplink" id="btn-admin" href="#" target="_blank">🔗 Otevřít v adminu</a>
   </div>
@@ -274,6 +274,82 @@ button, input, select, textarea { font-family: inherit; }
     <div class="modal-foot">
       <button class="btn" onclick="closeModal()">Zrušit</button>
       <button class="btn btn-primary" id="btn-save" onclick="saveInterakce()">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pro nový pipeline case -->
+<div id="case-modal-overlay" onclick="if(event.target===this) closeCaseModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+  <div id="modal-box" style="max-width:560px;">
+    <div class="modal-head">
+      <h3>🎯 Nový obchodní case</h3>
+      <button class="close" onclick="closeCaseModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="case-form" onsubmit="return false;">
+        <div class="form-group">
+          <label>Název case <span class="req">*</span></label>
+          <input type="text" id="c-nazev" maxlength="200" required placeholder="např. Osvětlení RD Morava - KLUS profily">
+        </div>
+        <div class="form-group">
+          <label>Popis</label>
+          <textarea id="c-popis" placeholder="Detail obchodního případu — co klient chce, termíny, specifika…"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="form-group">
+            <label>Hodnota (Kč)</label>
+            <input type="number" id="c-hodnota" min="0" step="1000" placeholder="např. 50000">
+          </div>
+          <div class="form-group">
+            <label>Pravděpodobnost</label>
+            <select id="c-pravdepodobnost">
+              <option value="">—</option>
+              <option value="10">10 % · Dotaz</option>
+              <option value="30" selected>30 % · Poptávka</option>
+              <option value="50">50 % · Nabídka</option>
+              <option value="70">70 % · Jednání</option>
+              <option value="90">90 % · Před uzavřením</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="form-group">
+            <label>Očekávané uzavření</label>
+            <input type="date" id="c-uzavreni">
+          </div>
+          <div class="form-group">
+            <label>Zdroj</label>
+            <select id="c-zdroj">
+              <option value="">—</option>
+              <option value="info@">Email na info@</option>
+              <option value="obchodník">Obchodník</option>
+              <option value="telefon">Telefon</option>
+              <option value="prodejna">Prodejna</option>
+              <option value="web formulář">Web formulář</option>
+              <option value="tendr">Tendr</option>
+              <option value="doporučení">Doporučení</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Administrator (obchodník)</label>
+          <input type="text" id="c-admin" placeholder="např. Filip Balínek">
+        </div>
+        <div class="form-group">
+          <label>Tagy (odděl čárkou)</label>
+          <input type="text" id="c-tagy" placeholder="např. VIP, Projekty-2026, RD">
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="c-dulezite" style="width:auto;">
+            <span style="font-size:12px;color:#333;letter-spacing:0;text-transform:none;font-weight:normal;">⭐ Označit jako důležité</span>
+          </label>
+        </div>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeCaseModal()">Zrušit</button>
+      <button class="btn btn-primary" id="btn-save-case" onclick="saveCase()">Vytvořit case</button>
     </div>
   </div>
 </div>
@@ -658,9 +734,104 @@ async function saveInterakce(){
   }
 }
 
-// ESC zavře modal
+// ============= CASE MODAL =============
+function openCaseModal(){
+  // Reset form
+  document.getElementById('c-nazev').value = '';
+  document.getElementById('c-popis').value = '';
+  document.getElementById('c-hodnota').value = '';
+  document.getElementById('c-pravdepodobnost').value = '30';
+  document.getElementById('c-uzavreni').value = '';
+  document.getElementById('c-zdroj').value = '';
+  document.getElementById('c-admin').value = dataZakaznik && dataZakaznik.administrator ? dataZakaznik.administrator : currentUser;
+  document.getElementById('c-tagy').value = '';
+  document.getElementById('c-dulezite').checked = false;
+  document.getElementById('case-modal-overlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('c-nazev').focus(), 50);
+}
+
+function closeCaseModal(){
+  document.getElementById('case-modal-overlay').style.display = 'none';
+}
+
+async function saveCase(){
+  const nazev = document.getElementById('c-nazev').value.trim();
+  if(!nazev){ alert('Název je povinný.'); return; }
+  const popis = document.getElementById('c-popis').value.trim();
+  const hodnota = parseFloat(document.getElementById('c-hodnota').value);
+  const pravdepodobnost = parseInt(document.getElementById('c-pravdepodobnost').value);
+  const uzavreni = document.getElementById('c-uzavreni').value;
+  const zdroj = document.getElementById('c-zdroj').value;
+  const admin = document.getElementById('c-admin').value.trim();
+  const tagyRaw = document.getElementById('c-tagy').value.trim();
+  const tagyArr = tagyRaw ? tagyRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+  const dulezite = document.getElementById('c-dulezite').checked;
+
+  const payload = {
+    zakaznik_email: emailParam,
+    nazev: nazev,
+    popis: popis || null,
+    zdroj: zdroj || null,
+    hodnota_kc: isNaN(hodnota) ? null : hodnota,
+    mena: 'CZK',
+    pravdepodobnost_pct: isNaN(pravdepodobnost) ? null : pravdepodobnost,
+    ocekavane_uzavreni: uzavreni || null,
+    stav_crm: 'aktivni',
+    dulezite: dulezite,
+    admin: admin || null,
+    vytvoril: currentUser,
+    tagy: tagyArr
+  };
+
+  const btn = document.getElementById('btn-save-case');
+  btn.disabled = true; btn.textContent = 'Ukládám…';
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/crm_pipeline_case', {
+      method: 'POST',
+      headers: { ...SB_HEADERS, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok){
+      const errTxt = await res.text();
+      throw new Error('HTTP ' + res.status + ': ' + errTxt);
+    }
+    const created = await res.json();
+    const newCaseId = created[0] && created[0].id;
+
+    // Auto-log do timeline jako system event
+    if(newCaseId) {
+      await fetch(SUPABASE_URL + '/rest/v1/crm_interakce', {
+        method: 'POST',
+        headers: { ...SB_HEADERS, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({
+          zakaznik_email: emailParam,
+          datum: new Date().toISOString(),
+          typ: 'pipeline_zmena_faze',
+          autor: currentUser,
+          nadpis: 'Vytvořen case: ' + nazev,
+          obsah: 'Nový obchodní případ' + (hodnota ? ' v hodnotě ~' + Math.round(hodnota).toLocaleString('cs-CZ') + ' Kč' : ''),
+          souvisi_case_id: newCaseId,
+          automaticky: true
+        })
+      });
+    }
+
+    closeCaseModal();
+    await loadAll();
+  } catch(err) {
+    console.error('saveCase error:', err);
+    alert('Chyba při ukládání case: ' + err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Vytvořit case';
+  }
+}
+
+// ESC zavře modal (interakce i case)
 document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape' && document.getElementById('modal-overlay').classList.contains('open')) closeModal();
+  if(e.key !== 'Escape') return;
+  if(document.getElementById('modal-overlay').classList.contains('open')) closeModal();
+  if(document.getElementById('case-modal-overlay').style.display === 'flex') closeCaseModal();
 });
 
 function logout(){ localStorage.removeItem('ledshopik_user'); window.location.href = 'login.html'; }
