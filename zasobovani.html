@@ -301,9 +301,6 @@ tbody tr.row-selected { background: #fdf8e0 !important; }
         <th onclick="sortBy('zakaznik')" data-col="zakaznik">Zákazník <span class="sort-arrow"></span></th>
         <th onclick="sortBy('dodavatel')" data-col="dodavatel">Dodavatel <span class="sort-arrow"></span></th>
         <th onclick="sortBy('zeme')" data-col="zeme">Země <span class="sort-arrow"></span></th>
-        <th onclick="sortBy('obsah')" data-col="obsah">Obsah <span class="sort-arrow"></span></th>
-        <th onclick="sortBy('pocet_ks')" data-col="pocet_ks">Ks <span class="sort-arrow"></span></th>
-        <th onclick="sortBy('hodnota')" data-col="hodnota">Hodnota <span class="sort-arrow"></span></th>
         <th onclick="sortBy('zpusob_dopravy')" data-col="zpusob_dopravy">Doprava <span class="sort-arrow"></span></th>
         <th onclick="sortBy('datum_objednani')" data-col="datum_objednani">Objednáno <span class="sort-arrow"></span></th>
         <th onclick="sortBy('termin_zakaznik')" data-col="termin_zakaznik">Termín zákazník <span class="sort-arrow"></span></th>
@@ -849,9 +846,6 @@ function renderTable(){
       <td>${r.zakaznik||'—'}</td>
       <td class="dodavatel-name">${r.dodavatel||'—'}</td>
       <td style="font-size:11px;">${r.zeme||'—'}</td>
-      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.obsah||'—'}</td>
-      <td style="text-align:center;">${r.pocet_ks||'—'}</td>
-      <td style="font-weight:700;color:#c8a830;">${hodnota}</td>
       <td style="font-size:11px;">${dopravceLink(r.zpusob_dopravy)}</td>
       <td class="datum">${fmtDate(r.datum_objednani)}</td>
       <td class="datum">${fmtDate(r.termin_zakaznik)}</td>

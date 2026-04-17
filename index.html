@@ -143,6 +143,13 @@ option, datalist option { color: #333; background: #fff; }
 .ev-vyr  { background: #fff0e0; color: #c05020; }
 .ev-zas  { background: #f8f4e0; color: #a09020; }
 .ev-nepl { background: #fdf4d8; color: #a08020; }
+.cal-more { font-size:9px; color:#60a0e0; font-weight:700; cursor:pointer; padding:1px 4px; border-radius:3px; display:inline-block; margin-top:1px; }
+.cal-more:hover { background:#f0f6ff; }
+#cal-overflow-popup { display:none; position:fixed; background:#fff; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,.15); padding:10px 12px; min-width:200px; max-width:280px; z-index:1000; }
+#cal-overflow-popup.open { display:block; }
+.cop-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.cop-date { font-size:10px; font-weight:800; color:#888; letter-spacing:.08em; }
+.cop-close { background:none; border:none; color:#888; font-size:15px; cursor:pointer; line-height:1; }
 .cal-day.holiday { background: #fff0f0; }
 .cal-day.weekend.holiday { background: #f8f0f0; }
 .cal-day.holiday .dn { color: #c05050; font-weight: 900; }
@@ -610,13 +617,13 @@ option, datalist option { color: #333; background: #fff; }
             Kalendář
           </div>
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fdf4d8;"></div>Instalace</div>
-              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f4e8;"></div>Obhlídka</div>
-              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f8e0;"></div>Dovolená</div>
-              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fff0e0;"></div>Výroba</div>
-              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#f8f4e0;"></div>Zásobování</div>
-              <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#888;"><div style="width:10px;height:10px;border-radius:2px;background:#fce8e8;"></div>Neschopenka</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <label style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;cursor:pointer;user-select:none;"><input type="checkbox" id="cf-inst" checked onchange="toggleCalFilter('ev-inst',this.checked)" style="cursor:pointer;accent-color:#e2b830;"><div style="width:10px;height:10px;border-radius:2px;background:#fdf4d8;flex-shrink:0;"></div>Instalace</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;cursor:pointer;user-select:none;"><input type="checkbox" id="cf-obh" checked onchange="toggleCalFilter('ev-obh',this.checked)" style="cursor:pointer;accent-color:#e2b830;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f4e8;flex-shrink:0;"></div>Obhlídka</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;cursor:pointer;user-select:none;"><input type="checkbox" id="cf-dov" checked onchange="toggleCalFilter('ev-dov',this.checked)" style="cursor:pointer;accent-color:#e2b830;"><div style="width:10px;height:10px;border-radius:2px;background:#e0f8e0;flex-shrink:0;"></div>Dovolená</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;cursor:pointer;user-select:none;"><input type="checkbox" id="cf-vyr" checked onchange="toggleCalFilter('ev-vyr',this.checked)" style="cursor:pointer;accent-color:#e2b830;"><div style="width:10px;height:10px;border-radius:2px;background:#fff0e0;flex-shrink:0;"></div>Výroba</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;cursor:pointer;user-select:none;"><input type="checkbox" id="cf-zas" checked onchange="toggleCalFilter('ev-zas',this.checked)" style="cursor:pointer;accent-color:#e2b830;"><div style="width:10px;height:10px;border-radius:2px;background:#f8f4e0;flex-shrink:0;"></div>Zásobování</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:9px;color:#555;cursor:pointer;user-select:none;"><input type="checkbox" id="cf-nesc" checked onchange="toggleCalFilter('ev-nesc',this.checked)" style="cursor:pointer;accent-color:#e2b830;"><div style="width:10px;height:10px;border-radius:2px;background:#fce8e8;flex-shrink:0;"></div>Neschopenka</label>
             </div>
             <div class="cal-nav">
               <button onclick="calNav(-1)">&#8592;</button>
@@ -899,6 +906,30 @@ function getHolidayName(dateString) {
   return '';
 }
 
+let calFilters = new Set(['ev-inst','ev-obh','ev-dov','ev-nesc','ev-nepl','ev-vyr','ev-zas']);
+let calEventsMap = {};
+function toggleCalFilter(cls, on){ if(on) calFilters.add(cls); else calFilters.delete(cls); renderCalendar(); }
+function showCalOverflow(dayStr, evt){
+  evt.stopPropagation();
+  const evs = calEventsMap[dayStr]||[];
+  const [y,m,d] = dayStr.split('-');
+  document.getElementById('cop-date').textContent = `${d}. ${m}. ${y}`;
+  document.getElementById('cop-list').innerHTML = evs.map(ev=>
+    `<div class="cal-ev ${ev.cls}" style="margin-bottom:3px;cursor:pointer;" onclick="window.location='${ev.url}'" title="${ev.label}">${ev.label}</div>`
+  ).join('');
+  const popup = document.getElementById('cal-overflow-popup');
+  popup.classList.add('open');
+  const rect = evt.currentTarget.getBoundingClientRect();
+  const top = Math.min(rect.bottom+4, window.innerHeight-220);
+  const left = Math.min(rect.left, window.innerWidth-290);
+  popup.style.top = Math.max(10,top)+'px';
+  popup.style.left = Math.max(10,left)+'px';
+  setTimeout(()=>{
+    function outsideClick(e){ if(!popup.contains(e.target)){ hideCalOverflow(); document.removeEventListener('click',outsideClick); } }
+    document.addEventListener('click', outsideClick);
+  }, 50);
+}
+function hideCalOverflow(){ document.getElementById('cal-overflow-popup').classList.remove('open'); }
 function calNav(dir){ calMonth+=dir; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
 function calToday(){ calYear=today.getFullYear(); calMonth=today.getMonth(); renderCalendar(); }
 
@@ -958,9 +989,10 @@ function renderCalendar(){
     const cd=new Date(calYear,calMonth+mo,dn);
     const cdStr=dateStr(cd);
     const isT=cdStr===dateStr(today),isSat=cd.getDay()===6,isSun=cd.getDay()===0,other=mo!==0;
-    const evs=events.filter(ev=>cd>=ev.start&&cd<=ev.end);
+    const evs=events.filter(ev=>cd>=ev.start&&cd<=ev.end&&calFilters.has(ev.cls));
+    calEventsMap[cdStr]=evs;
     let evHtml=evs.slice(0,3).map(ev=>`<div class="cal-ev ${ev.cls}" onclick="window.location='${ev.url}'" title="${ev.label}">${ev.label}</div>`).join('');
-    if(evs.length>3) evHtml+=`<div style="font-size:8px;color:#888;">+${evs.length-3}</div>`;
+    if(evs.length>3) evHtml+=`<div class="cal-more" onclick="event.stopPropagation();showCalOverflow('${cdStr}',event)">+${evs.length-3} více →</div>`;
     const hol=isHoliday(cdStr);
     const holName=hol?getHolidayName(cdStr):'';
     html+=`<div class="cal-day${other?' other':''}${isT?' today':''}${evs.length?' has-ev':''}${(isSat||isSun)?' weekend':''}${hol?' holiday':''}">
@@ -1501,7 +1533,16 @@ function logout(){localStorage.removeItem('ledshopik_user');window.location.href
   ck();
   setInterval(ck,30000);
 })();
-</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</script>
+<!-- Calendar overflow popup -->
+<div id="cal-overflow-popup">
+  <div class="cop-header">
+    <span class="cop-date" id="cop-date"></span>
+    <button class="cop-close" onclick="hideCalOverflow()">✕</button>
+  </div>
+  <div id="cop-list"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>(function(){var sb=supabase.createClient('https://fqxtlmppfyzsyaxbhbzh.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q');sb.channel('rt-all').on('postgres_changes',{event:'*',schema:'public'},function(){console.log('RT update');if(typeof loadAll==='function')loadAll();}).subscribe();})();</script>
 </body>
 </html>

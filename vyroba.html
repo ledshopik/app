@@ -111,6 +111,8 @@ td.poznamka-cell:hover { color:#c8a830 !important; }
 .prio-normal { color: #888; font-size: 11px; }
 
 /* Odpočet */
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.countdown-blink { color: #e05050; font-weight: 700; animation: blink 1s ease-in-out infinite; }
 .countdown-red  { color: #e05050; font-weight: 700; }
 .countdown-warn { color: #e2b830; font-weight: 700; }
 .countdown-ok   { color: #40a050; }
@@ -636,8 +638,8 @@ function calcCountdown(deadline, stav){
   if(stav==='Hotovo') return {text:'Hotovo',cls:'countdown-done'};
   const d=toInputDate(deadline); if(!d) return {text:'—',cls:''};
   const diff=Math.ceil((new Date(d+'T00:00:00')-today)/(1000*60*60*24));
-  if(diff<0)  return {text:`-${Math.abs(diff)} dní`,cls:'countdown-red'};
-  if(diff===0) return {text:'Dnes!',cls:'countdown-red'};
+  if(diff<0)  return {text:`-${Math.abs(diff)} dní`,cls:'countdown-blink'};
+  if(diff===0) return {text:'Dnes!',cls:'countdown-blink'};
   if(diff<=2) return {text:`${diff} dny`,cls:'countdown-warn'};
   if(diff<=5) return {text:`${diff} dní`,cls:'countdown-warn'};
   return {text:`${diff} dní`,cls:'countdown-ok'};
