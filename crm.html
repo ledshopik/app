@@ -207,34 +207,28 @@ tbody td:last-child { border-right: none; }
 <div id="tab-b2b" style="display:none;">
   <div id="toolbar">
     <button class="filter-btn active" data-filter="vse" onclick="setFilter('vse')">Vše</button>
-    <button class="filter-btn" data-filter="Nové" onclick="setFilter('Nové')"><span class="filter-dot" style="background:#3060c0"></span>Nové</button>
-    <button class="filter-btn" data-filter="V řešení" onclick="setFilter('V řešení')"><span class="filter-dot" style="background:#c8a830"></span>V řešení</button>
-    <button class="filter-btn" data-filter="Schváleno" onclick="setFilter('Schváleno')"><span class="filter-dot" style="background:#40a050"></span>Schváleno</button>
-    <button class="filter-btn" data-filter="Odmítnuto" onclick="setFilter('Odmítnuto')"><span class="filter-dot" style="background:#e05050"></span>Odmítnuto</button>
-    <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-b2b" placeholder="Hledat firmu, IČO, kontakt..." oninput="renderAll()"></div>
+    <button class="filter-btn" data-filter="v_reseni" onclick="setFilter('v_reseni')"><span class="filter-dot" style="background:#c8a830"></span>V řešení</button>
+    <button class="filter-btn" data-filter="vyrizeno" onclick="setFilter('vyrizeno')"><span class="filter-dot" style="background:#40a050"></span>Vyřízené</button>
+    <button class="filter-btn" data-filter="sla7" onclick="setFilter('sla7')"><span class="filter-dot" style="background:#e05050"></span>Starší 7 dní bez vyřízení</button>
+    <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-b2b" placeholder="Hledat v předmětu, obsahu..." oninput="renderAll()"></div>
     <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
-    <button id="btn-add" onclick="alert('Formulář pro přidání B2B žádosti — bude doplněno v další fázi')">+ Nová B2B žádost</button>
   </div>
   <div class="table-wrap">
     <table>
       <thead><tr>
-        <th>Datum</th>
-        <th>Firma</th>
-        <th>IČO</th>
-        <th>Kontakt</th>
-        <th>Email</th>
-        <th>Telefon</th>
-        <th>Obchodník</th>
-        <th>Cenová hladina</th>
+        <th>Datum přijetí</th>
+        <th>Předmět / Obsah</th>
+        <th>Přijato na</th>
+        <th>Přeposláno komu</th>
         <th>Stav</th>
-        <th>Poznámka</th>
+        <th>SLA</th>
       </tr></thead>
       <tbody id="tbody-b2b"></tbody>
     </table>
     <div class="empty-state" id="empty-b2b">
       <div class="ico">🏢</div>
-      <p>Zatím žádné B2B žádosti</p>
-      <p class="sub">Data se načtou po vytvoření tabulky <code>crm_evidence</code> v Supabase (další fáze)</p>
+      <p>Žádné B2B žádosti</p>
+      <p class="sub">Data se načtou po importu z Google Sheet (nebo až bude IMAP integrace).</p>
     </div>
   </div>
 </div>
@@ -306,8 +300,9 @@ const SB_HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABA
 let activeTab = 'zakaznici';
 let filterVal = 'vse';
 let dataZakaznici = [];
-let dataB2B = [];
-let dataPoptavky = [];
+let dataB2B = [];        // filtrovaná podmnožina z crm_poptavky (typ=b2b_zadost)
+let dataPoptavky = [];   // filtrovaná podmnožina z crm_poptavky (typ=poptavka|jine)
+let dataPoptavkyAll = []; // raw ze Supabase, rozděluje se po load do dataB2B + dataPoptavky
 
 const KPI_DEFS = {
   zakaznici: [
@@ -320,10 +315,10 @@ const KPI_DEFS = {
   ],
   b2b: [
     { lbl: 'Celkem', color: '#1a1a1a', val: () => dataB2B.length },
-    { lbl: 'Nové', color: '#3060c0', val: () => dataB2B.filter(r=>r.stav==='Nové').length },
-    { lbl: 'V řešení', color: '#c8a830', val: () => dataB2B.filter(r=>r.stav==='V řešení').length },
-    { lbl: 'Schváleno', color: '#40a050', val: () => dataB2B.filter(r=>r.stav==='Schváleno').length },
-    { lbl: 'Tento měsíc', color: '#8060c0', val: () => dataB2B.filter(r=>isThisMonth(r.datum)).length }
+    { lbl: 'V řešení', color: '#c8a830', val: () => dataB2B.filter(r=>r.stav==='v_reseni').length },
+    { lbl: 'Vyřízené', color: '#40a050', val: () => dataB2B.filter(r=>r.stav==='vyrizeno').length },
+    { lbl: 'Tento měsíc', color: '#8060c0', val: () => dataB2B.filter(r=>isThisMonth(r.datum_prijeti)).length },
+    { lbl: 'SLA alert >7 dní', color: '#e05050', val: () => dataB2B.filter(r=>isSlaBreach(r)).length }
   ],
   poptavky: [
     { lbl: 'Celkem', color: '#1a1a1a', val: () => dataPoptavky.length },
@@ -468,22 +463,35 @@ function renderTableB2B(){
   const empty = document.getElementById('empty-b2b');
   const q = (document.getElementById('search-b2b').value||'').toLowerCase();
   const rows = dataB2B.filter(r=>{
-    if(filterVal!=='vse' && r.stav!==filterVal) return false;
-    if(q && ![r.firma,r.ico,r.kontakt,r.email,r.telefon].join(' ').toLowerCase().includes(q)) return false;
+    if(filterVal==='v_reseni' && r.stav !== 'v_reseni') return false;
+    if(filterVal==='vyrizeno' && r.stav !== 'vyrizeno') return false;
+    if(filterVal==='sla7' && !isSlaBreach(r)) return false;
+    if(q){
+      const blob = [r.predmet, r.zprava, r.preposlano_komu, r.prijato_na_schrance].join(' ').toLowerCase();
+      if(!blob.includes(q)) return false;
+    }
     return true;
-  });
-  tbody.innerHTML = rows.map(r => '<tr>'
-    + '<td>'+(r.datum||'')+'</td>'
-    + '<td style="font-weight:700;color:#1a1a1a;">'+(r.firma||'—')+'</td>'
-    + '<td>'+(r.ico||'')+'</td>'
-    + '<td>'+(r.kontakt||'')+'</td>'
-    + '<td>'+(r.email||'')+'</td>'
-    + '<td>'+(r.telefon||'')+'</td>'
-    + '<td>'+(r.obchodnik||'')+'</td>'
-    + '<td>'+(r.cenova_hladina||'')+'</td>'
-    + '<td>'+stavBadge(r.stav)+'</td>'
-    + '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(r.poznamka||'')+'</td>'
-    + '</tr>').join('');
+  }).sort((a,b) => new Date(b.datum_prijeti) - new Date(a.datum_prijeti));
+
+  tbody.innerHTML = rows.map(r => {
+    const slaBreach = isSlaBreach(r);
+    const daysAgo = Math.floor((Date.now() - new Date(r.datum_prijeti).getTime()) / 86400000);
+    const slaBadge = r.stav === 'vyrizeno'
+      ? '<span style="color:#40a050;font-size:10px;">✓ hotovo</span>'
+      : slaBreach
+        ? '<span class="badge st-odmitnuto" style="font-size:9px;"><span class="badge-dot"></span>' + daysAgo + ' dní</span>'
+        : '<span style="color:#888;font-size:10px;">' + daysAgo + ' dní</span>';
+    const obsahPreview = (r.zprava || '').substring(0, 80).replace(/\s+/g,' ');
+    return '<tr>'
+      + '<td>' + formatDateShort(r.datum_prijeti) + '</td>'
+      + '<td style="max-width:420px;"><div style="font-weight:700;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (r.predmet || '—') + '</div>'
+      + (obsahPreview ? '<div style="font-size:10px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + obsahPreview + '…</div>' : '') + '</td>'
+      + '<td style="font-size:11px;color:#666;">' + (r.prijato_na_schrance || '—') + '</td>'
+      + '<td>' + (r.preposlano_komu || '<span style="color:#bbb;">—</span>') + '</td>'
+      + '<td>' + poptavkaStavBadge(r.stav) + '</td>'
+      + '<td>' + slaBadge + '</td>'
+      + '</tr>';
+  }).join('');
   empty.style.display = rows.length ? 'none' : 'block';
 }
 
@@ -563,8 +571,11 @@ async function loadData(){
       fetch(SUPABASE_URL + '/rest/v1/crm_poptavky?select=*&order=datum_prijeti.desc&limit=500', { headers: SB_HEADERS }).then(r => r.ok ? r.json() : Promise.reject('poptavky ' + r.status))
     ]);
     dataZakaznici = zak;
-    dataPoptavky = pop;
-    setSync('ok', 'Načteno ' + dataZakaznici.length + ' zákazníků · ' + dataPoptavky.length + ' poptávek · ' + new Date().toLocaleTimeString('cs-CZ'));
+    dataPoptavkyAll = pop;
+    // Rozdělení podle typu
+    dataB2B = dataPoptavkyAll.filter(r => r.typ === 'b2b_zadost');
+    dataPoptavky = dataPoptavkyAll.filter(r => r.typ === 'poptavka' || r.typ === 'jine' || r.typ === null);
+    setSync('ok', 'Načteno ' + dataZakaznici.length + ' zákazníků · ' + dataPoptavky.length + ' poptávek · ' + dataB2B.length + ' B2B žádostí · ' + new Date().toLocaleTimeString('cs-CZ'));
     renderAll();
   } catch(err) {
     setSync('error', 'Chyba načítání: ' + err.message);
