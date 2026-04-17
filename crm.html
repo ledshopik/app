@@ -152,7 +152,8 @@ tbody td { padding: 11px 14px; font-size: 12px; vertical-align: middle; color: #
 
 <!-- Sub-taby -->
 <div id="tabs">
-  <button class="tab-btn active" onclick="switchTab('b2b')">🏢 B2B žádosti</button>
+  <button class="tab-btn active" onclick="switchTab('zakaznici')">👥 Zákazníci</button>
+  <button class="tab-btn" onclick="switchTab('b2b')">🏢 B2B žádosti</button>
   <button class="tab-btn" onclick="switchTab('poptavky')">💬 Poptávky</button>
   <button class="tab-btn" onclick="switchTab('objednavky')">📦 Objednávky</button>
   <button class="tab-btn" onclick="switchTab('prehled')">📊 Přehled</button>
@@ -164,8 +165,42 @@ tbody td { padding: 11px 14px; font-size: 12px; vertical-align: middle; color: #
   <div class="stats" id="kpi-stats"></div>
 </div>
 
+<!-- ZÁKAZNÍCI TAB -->
+<div id="tab-zakaznici">
+  <div id="toolbar">
+    <button class="filter-btn active" data-filter="vse" onclick="setFilter('vse')">Vše</button>
+    <button class="filter-btn" data-filter="MO" onclick="setFilter('MO')"><span class="filter-dot" style="background:#888"></span>MO</button>
+    <button class="filter-btn" data-filter="VO" onclick="setFilter('VO')"><span class="filter-dot" style="background:#3060c0"></span>B2B (VO)</button>
+    <button class="filter-btn" data-filter="CN" onclick="setFilter('CN')"><span class="filter-dot" style="background:#c8a830"></span>CN</button>
+    <button class="filter-btn" data-filter="VIP" onclick="setFilter('VIP')"><span class="filter-dot" style="background:#e050a0"></span>VIP</button>
+    <div id="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-zak" placeholder="Hledat firmu, jméno, IČO, email..." oninput="renderAll()"></div>
+    <button id="btn-refresh" onclick="loadData()" title="Obnovit">↻</button>
+    <button id="btn-add" onclick="alert('Noví zákazníci se přidávají v admin eshopu — CRM je zrcadlí automaticky. (Ruční přidání pro edge-case bude v další fázi.)')">+ Nový zákazník</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Firma / Jméno</th>
+        <th>IČO</th>
+        <th>Kontakt</th>
+        <th>Cenová skupina</th>
+        <th>Administrator</th>
+        <th>Tagy</th>
+        <th style="text-align:right;">Obrat celkem</th>
+        <th>Poslední aktivita</th>
+      </tr></thead>
+      <tbody id="tbody-zakaznici"></tbody>
+    </table>
+    <div class="empty-state" id="empty-zakaznici">
+      <div class="ico">👥</div>
+      <p>Žádní zákazníci v Supabase</p>
+      <p class="sub">Spusť mockdata SQL v Supabase konzoli, nebo zkontroluj připojení.</p>
+    </div>
+  </div>
+</div>
+
 <!-- B2B ŽÁDOSTI TAB -->
-<div id="tab-b2b">
+<div id="tab-b2b" style="display:none;">
   <div id="toolbar">
     <button class="filter-btn active" data-filter="vse" onclick="setFilter('vse')">Vše</button>
     <button class="filter-btn" data-filter="Nové" onclick="setFilter('Nové')"><span class="filter-dot" style="background:#3060c0"></span>Nové</button>
@@ -264,12 +299,25 @@ tbody td { padding: 11px 14px; font-size: 12px; vertical-align: middle; color: #
 const currentUser = localStorage.getItem('ledshopik_user') || '';
 if(!currentUser) window.location.href = 'login.html';
 
-let activeTab = 'b2b';
+const SUPABASE_URL = 'https://fqxtlmppfyzsyaxbhbzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeHRsbXBwZnl6c3lheGJoYnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE5MTksImV4cCI6MjA5MDAyNzkxOX0.RUlbSJsZ-H-pQBBJADeIRRNnvpa3tSL3PkxxH14JT-Q';
+const SB_HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+
+let activeTab = 'zakaznici';
 let filterVal = 'vse';
+let dataZakaznici = [];
 let dataB2B = [];
 let dataPoptavky = [];
 
 const KPI_DEFS = {
+  zakaznici: [
+    { lbl: 'Celkem', color: '#1a1a1a', val: () => dataZakaznici.length },
+    { lbl: 'B2B (VO)', color: '#3060c0', val: () => dataZakaznici.filter(r=>(r.cenova_skupina||'').startsWith('VO')).length },
+    { lbl: 'MO', color: '#888', val: () => dataZakaznici.filter(r=>r.cenova_skupina==='MO').length },
+    { lbl: 'CN', color: '#c8a830', val: () => dataZakaznici.filter(r=>r.cenova_skupina==='CN').length },
+    { lbl: 'VIP', color: '#e050a0', val: () => dataZakaznici.filter(r=>(r.tagy||[]).includes('VIP')).length },
+    { lbl: 'Obrat celkem', color: '#40a050', val: () => formatKc(dataZakaznici.reduce((s,r)=>s+(Number(r.celkovy_obrat_cache)||0),0)) }
+  ],
   b2b: [
     { lbl: 'Celkem', color: '#1a1a1a', val: () => dataB2B.length },
     { lbl: 'Nové', color: '#3060c0', val: () => dataB2B.filter(r=>r.stav==='Nové').length },
@@ -294,17 +342,33 @@ function isThisMonth(d){
   return x.getFullYear()===n.getFullYear() && x.getMonth()===n.getMonth();
 }
 
+function formatKc(n){
+  const val = Number(n)||0;
+  return val.toLocaleString('cs-CZ', {maximumFractionDigits:0}) + ' Kč';
+}
+
+function formatDateShort(d){
+  if(!d) return '—';
+  const x = new Date(d);
+  return x.toLocaleDateString('cs-CZ', {day:'numeric', month:'numeric', year:'numeric'});
+}
+
 function switchTab(tab){
   activeTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b=>{
     const m = (b.getAttribute('onclick')||'').match(/switchTab\('(\w+)'\)/);
     if(m) b.classList.toggle('active', m[1]===tab);
   });
+  document.getElementById('tab-zakaznici').style.display = tab==='zakaznici' ? 'block' : 'none';
   document.getElementById('tab-b2b').style.display = tab==='b2b' ? 'block' : 'none';
   document.getElementById('tab-poptavky').style.display = tab==='poptavky' ? 'block' : 'none';
   document.getElementById('tab-objednavky').style.display = tab==='objednavky' ? 'block' : 'none';
   document.getElementById('tab-prehled').style.display = tab==='prehled' ? 'block' : 'none';
   filterVal = 'vse';
+  // Reset active filter-btn na Vše v aktivním tabu
+  document.querySelectorAll('#tab-'+tab+' .filter-btn').forEach(b=>{
+    b.classList.toggle('active', (b.dataset.filter||b.textContent.trim())==='vse' || b.textContent.trim()==='Vše');
+  });
   renderAll();
 }
 
@@ -324,6 +388,67 @@ function renderKPI(){
   wrap.innerHTML = defs.map(d =>
     '<div class="stat"><div class="num" style="color:'+d.color+';">'+d.val()+'</div><div class="lbl">'+d.lbl+'</div></div>'
   ).join('');
+}
+
+function renderTableZakaznici(){
+  const tbody = document.getElementById('tbody-zakaznici');
+  const empty = document.getElementById('empty-zakaznici');
+  const q = (document.getElementById('search-zak').value||'').toLowerCase();
+  const rows = dataZakaznici.filter(r=>{
+    // Filtr podle cenové skupiny / VIP tag
+    if(filterVal==='VO' && !(r.cenova_skupina||'').startsWith('VO')) return false;
+    if(filterVal==='MO' && r.cenova_skupina!=='MO') return false;
+    if(filterVal==='CN' && r.cenova_skupina!=='CN') return false;
+    if(filterVal==='VIP' && !(r.tagy||[]).includes('VIP')) return false;
+    // Hledání
+    if(q){
+      const blob = [r.firma,r.jmeno,r.prijmeni,r.ico,r.email,r.telefon,r.administrator].join(' ').toLowerCase();
+      if(!blob.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b)=>{
+    // Defaultní řazení: poslední aktivita nebo poslední přístup DESC
+    const ax = new Date(a.posledni_interakce_at || a.posledni_pristup || 0).getTime();
+    const bx = new Date(b.posledni_interakce_at || b.posledni_pristup || 0).getTime();
+    return bx - ax;
+  });
+  tbody.innerHTML = rows.map(r => {
+    const nazev = r.firma || ((r.jmeno||'')+' '+(r.prijmeni||'')).trim() || '—';
+    const podnadpis = r.firma ? ((r.jmeno||'')+' '+(r.prijmeni||'')).trim() : '';
+    const cenovaBadge = cenovaSkupinaBadge(r.cenova_skupina);
+    const tagyHtml = (r.tagy||[]).slice(0,3).map(t =>
+      '<span style="display:inline-block;background:#f0eee8;border:1px solid #e0ddd0;color:#888;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;margin-right:3px;">'+t+'</span>'
+    ).join('');
+    return '<tr onclick="openZakaznikDetail(\''+encodeURIComponent(r.email)+'\')">'
+      + '<td><div style="font-weight:700;color:#1a1a1a;">'+nazev+'</div>'
+         + (podnadpis ? '<div style="font-size:10px;color:#888;">'+podnadpis+'</div>' : '')
+         + '</td>'
+      + '<td>'+(r.ico||'—')+'</td>'
+      + '<td><div style="font-size:11px;">'+(r.email||'')+'</div>'
+         + (r.telefon ? '<div style="font-size:10px;color:#888;">📞 '+r.telefon+'</div>' : '')
+         + '</td>'
+      + '<td>'+cenovaBadge+'</td>'
+      + '<td>'+(r.administrator||'<span style="color:#bbb;">—</span>')+'</td>'
+      + '<td>'+(tagyHtml||'<span style="color:#bbb;font-size:10px;">—</span>')+'</td>'
+      + '<td style="text-align:right;font-weight:700;color:#1a1a1a;">'+formatKc(r.celkovy_obrat_cache)+'</td>'
+      + '<td style="font-size:11px;color:#888;">'+formatDateShort(r.posledni_interakce_at || r.posledni_pristup)+'</td>'
+      + '</tr>';
+  }).join('');
+  empty.style.display = rows.length ? 'none' : 'block';
+}
+
+function cenovaSkupinaBadge(s){
+  if(!s) return '<span style="color:#bbb;">—</span>';
+  const color = s==='MO' ? '#888'
+    : s==='CN' ? '#c8a830'
+    : s.startsWith('VO') ? '#3060c0'
+    : '#666';
+  return '<span style="display:inline-block;background:'+color+'22;color:'+color+';font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;border:1px solid '+color+'44;">'+s+'</span>';
+}
+
+function openZakaznikDetail(emailEncoded){
+  const email = decodeURIComponent(emailEncoded);
+  alert('Detail zákazníka: ' + email + '\n\nFormulář + timeline bude v další fázi.');
 }
 
 function renderTableB2B(){
@@ -381,6 +506,7 @@ function stavBadge(s){
 
 function renderAll(){
   renderKPI();
+  if(activeTab==='zakaznici') renderTableZakaznici();
   if(activeTab==='b2b') renderTableB2B();
   if(activeTab==='poptavky') renderTablePoptavky();
 }
@@ -391,14 +517,18 @@ function setSync(state, text){
   t.textContent = text;
 }
 
-function loadData(){
+async function loadData(){
   setSync('loading', 'Načítám...');
-  // Tabulka crm_evidence v Supabase zatím neexistuje — data zůstávají prázdná.
-  // V další fázi sem přijde fetch z REST API Supabase.
-  setTimeout(()=>{
-    setSync('ok', 'Připraveno (data napojíme v další fázi)');
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/crm_zakaznici?select=*', { headers: SB_HEADERS });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    dataZakaznici = await res.json();
+    setSync('ok', 'Načteno ' + dataZakaznici.length + ' zákazníků · ' + new Date().toLocaleTimeString('cs-CZ'));
     renderAll();
-  }, 300);
+  } catch(err) {
+    setSync('error', 'Chyba načítání: ' + err.message);
+    console.error('loadData error:', err);
+  }
 }
 
 function logout(){ localStorage.removeItem('ledshopik_user'); window.location.href = 'login.html'; }
