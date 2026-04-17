@@ -447,8 +447,7 @@ function cenovaSkupinaBadge(s){
 }
 
 function openZakaznikDetail(emailEncoded){
-  const email = decodeURIComponent(emailEncoded);
-  alert('Detail zákazníka: ' + email + '\n\nFormulář + timeline bude v další fázi.');
+  window.location.href = 'crm-zakaznik.html?email=' + emailEncoded;
 }
 
 function renderTableB2B(){
