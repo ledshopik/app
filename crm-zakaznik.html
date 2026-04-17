@@ -229,7 +229,7 @@ button, input, select, textarea { font-family: inherit; }
   </div>
   <div id="customer-actions">
     <button class="btn btn-primary" onclick="openModal('poznamka')">+ Poznámka</button>
-    <button class="btn" onclick="alert('Formulář přidání úkolu — další krok')">+ Úkol</button>
+    <button class="btn" onclick="openUkolModal()">+ Úkol</button>
     <button class="btn" onclick="openCaseModal()">+ Nový case</button>
     <button class="btn" onclick="openModal('telefon')">📞 Hovor</button>
     <a class="btn btn-deeplink" id="btn-admin" href="#" target="_blank">🔗 Otevřít v adminu</a>
@@ -274,6 +274,69 @@ button, input, select, textarea { font-family: inherit; }
     <div class="modal-foot">
       <button class="btn" onclick="closeModal()">Zrušit</button>
       <button class="btn btn-primary" id="btn-save" onclick="saveInterakce()">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pro nový úkol -->
+<div id="ukol-modal-overlay" onclick="if(event.target===this) closeUkolModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+  <div id="modal-box" style="max-width:540px;">
+    <div class="modal-head">
+      <h3>✅ Nový úkol</h3>
+      <button class="close" onclick="closeUkolModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="ukol-form" onsubmit="return false;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="form-group">
+            <label>Typ úkolu</label>
+            <select id="u-typ">
+              <option value="volat">📞 Zavolat</option>
+              <option value="email">📧 Napsat email</option>
+              <option value="poslat_nabidku">📄 Poslat nabídku</option>
+              <option value="pripomenout_nabidku">🔔 Připomenout nabídku</option>
+              <option value="schuzka">🤝 Schůzka</option>
+              <option value="jine">📝 Jiné</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Přiřazeno komu <span class="req">*</span></label>
+            <input type="text" id="u-prirazeno" required placeholder="např. Filip Balínek">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Co má udělat (nadpis) <span class="req">*</span></label>
+          <input type="text" id="u-nadpis" maxlength="200" required placeholder="např. Zavolat Nováka ohledně projektu RD">
+        </div>
+        <div class="form-group">
+          <label>Popis (volitelný)</label>
+          <textarea id="u-popis" placeholder="Detail: co přesně řešit, s čím přijít…"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="form-group">
+            <label>Datum splatnosti <span class="req">*</span></label>
+            <input type="date" id="u-datum" required>
+          </div>
+          <div class="form-group">
+            <label>Čas připomenutí</label>
+            <input type="time" id="u-cas" value="09:00">
+            <div class="form-hint">V tento čas se pak pošle Telegram (až bude napojeno).</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Telegram Chat ID <span style="color:#bbb;font-weight:400;text-transform:none;letter-spacing:0;">(nepovinné)</span></label>
+          <input type="text" id="u-tg-chat-id" placeholder="např. 123456789 – chat ID obchodníka">
+          <div class="form-hint">Zatím se jen uloží. Notifikace přijdou později.</div>
+        </div>
+        <div class="form-group" style="background:#eef2fc;padding:10px 12px;border-radius:6px;border-left:3px solid #3060c0;">
+          <div style="font-size:11px;color:#3060c0;font-weight:700;">ℹ️ Úkol se uloží do Supabase</div>
+          <div style="font-size:11px;color:#555;margin-top:4px;">Telegram notifikace (Make/Edge Function) se doplní později. Úkol zatím uvidíš v panelu „Úkoly" u zákazníka.</div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeUkolModal()">Zrušit</button>
+      <button class="btn btn-primary" id="btn-save-ukol" onclick="saveUkol()">Vytvořit úkol</button>
     </div>
   </div>
 </div>
@@ -827,11 +890,86 @@ async function saveCase(){
   }
 }
 
-// ESC zavře modal (interakce i case)
+// ============= ÚKOL MODAL =============
+function openUkolModal(){
+  // Reset form
+  document.getElementById('u-typ').value = 'volat';
+  document.getElementById('u-nadpis').value = '';
+  document.getElementById('u-popis').value = '';
+  document.getElementById('u-prirazeno').value = dataZakaznik && dataZakaznik.administrator ? dataZakaznik.administrator : currentUser;
+  // Default datum: zítra
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById('u-datum').value = tomorrow.toISOString().slice(0,10);
+  document.getElementById('u-cas').value = '09:00';
+  document.getElementById('u-tg-chat-id').value = '';
+  document.getElementById('ukol-modal-overlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('u-nadpis').focus(), 50);
+}
+
+function closeUkolModal(){
+  document.getElementById('ukol-modal-overlay').style.display = 'none';
+}
+
+async function saveUkol(){
+  const nadpis = document.getElementById('u-nadpis').value.trim();
+  if(!nadpis){ alert('Nadpis je povinný.'); return; }
+  const prirazeno = document.getElementById('u-prirazeno').value.trim();
+  if(!prirazeno){ alert('Přiřazený je povinný.'); return; }
+  const datum = document.getElementById('u-datum').value;
+  if(!datum){ alert('Datum splatnosti je povinné.'); return; }
+
+  const cas = document.getElementById('u-cas').value || '09:00';
+  const popis = document.getElementById('u-popis').value.trim();
+  const typ = document.getElementById('u-typ').value;
+  const tgChatId = document.getElementById('u-tg-chat-id').value.trim();
+
+  // Sestavit pripomenout_v jako ISO timestamp z datum + čas
+  const pripomenoutV = new Date(datum + 'T' + cas + ':00').toISOString();
+
+  const payload = {
+    zakaznik_email: emailParam,
+    typ: typ,
+    nadpis: nadpis,
+    popis: popis || null,
+    datum_splatnosti: datum,
+    pripomenout_v: pripomenoutV,
+    prirazeno: prirazeno,
+    vytvoril: currentUser,
+    stav: 'otevreny',
+    telegram_chat_id: tgChatId || null,
+    telegram_notifikace_odeslana: false
+  };
+
+  const btn = document.getElementById('btn-save-ukol');
+  btn.disabled = true; btn.textContent = 'Ukládám…';
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/crm_ukoly', {
+      method: 'POST',
+      headers: { ...SB_HEADERS, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok){
+      const errTxt = await res.text();
+      throw new Error('HTTP ' + res.status + ': ' + errTxt);
+    }
+    closeUkolModal();
+    await loadAll();
+  } catch(err) {
+    console.error('saveUkol error:', err);
+    alert('Chyba při ukládání úkolu: ' + err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Vytvořit úkol';
+  }
+}
+
+// ESC zavře modal (interakce i case i úkol)
 document.addEventListener('keydown', (e) => {
   if(e.key !== 'Escape') return;
   if(document.getElementById('modal-overlay').classList.contains('open')) closeModal();
   if(document.getElementById('case-modal-overlay').style.display === 'flex') closeCaseModal();
+  if(document.getElementById('ukol-modal-overlay').style.display === 'flex') closeUkolModal();
 });
 
 function logout(){ localStorage.removeItem('ledshopik_user'); window.location.href = 'login.html'; }
